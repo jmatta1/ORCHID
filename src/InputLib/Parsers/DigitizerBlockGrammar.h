@@ -12,8 +12,8 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details holds the functions necessary for parsing calculation blocks to
-** separate them from the calculation block structure
+** @details holds the grammars necessary for parsing digitizer blocks into
+** the digitizer block structure
 **
 ********************************************************************************
 *******************************************************************************/
