@@ -22,7 +22,7 @@
 // includes for C++ system headers
 #include<iostream>
 // includes from other libraries
-// includes from ECHOS
+// includes from ORCHID
 
 namespace InputParser
 {

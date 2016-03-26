@@ -23,7 +23,7 @@
 // includes for C++ system headers
 #include<string>
 // includes from other libraries
-// includes from ECHOS
+// includes from ORCHID
 
 class ostream;
 
