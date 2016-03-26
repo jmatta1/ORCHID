@@ -28,8 +28,7 @@ namespace InputParser
 {
 
 
-PowerBlock::PowerBlock() : numberChannelsUsed(1),
-    globalCfdFraction(0.2), perChannelParameterFile(""){}
+PowerBlock::PowerBlock() : numberChannelsUsed(1), perChannelParameterFile(""){}
 
 // required parameters
 void PowerBlock::totalChannelsAvailableSet(int input)
