@@ -89,10 +89,10 @@ void GeneralBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, GeneralBlock const& gb) 
 {
 return os << "[GeneralBlock]\n"
-    << "    RunTitle            = \"" << cb.runTitle            << "\"\n"
-    << "    WarnRate            = "   << cb.warnRate            << "\n"
-    << "    UpdateFrequency     = "   << cb.updateFrequency     << "\n"
-    << "    BaseOutputDirectory = "   << cb.baseOutputDirectory << "\n"
+    << "    RunTitle            = \"" << gb.runTitle            << "\"\n"
+    << "    WarnRate            = "   << gb.warnRate            << "\n"
+    << "    UpdateFrequency     = "   << gb.updateFrequency     << "\n"
+    << "    BaseOutputDirectory = "   << gb.baseOutputDirectory << "\n"
     << "[EndBlock]";
 }
 
