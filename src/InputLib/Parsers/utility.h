@@ -6,7 +6,7 @@
 ** @date 26 Mar, 2016
 ** @brief
 **
-** @copyright Copyright (C) 2015 James Till Matta
+** @copyright Copyright (C) 2016 James Till Matta
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of

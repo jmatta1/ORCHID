@@ -6,7 +6,7 @@
 ** @date 26 Mar, 2016
 ** @brief
 **
-** @copyright Copyright (C) 2015 James Till Matta
+** @copyright Copyright (C) 2016 James Till Matta
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_INPUTLIB_FILEPARSER_H
-#define ORCHID_SRC_INPUTLIB_FILEPARSER_H
+#ifndef ORCHID_SRC_INPUTLIB_PARSERS_FILEPARSER_H
+#define ORCHID_SRC_INPUTLIB_PARSERS_FILEPARSER_H
 
 // includes for C system headers
 // includes for C++ system headers
