@@ -58,7 +58,7 @@ struct PowerBlockGrammar : qi::grammar<Iterator>
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		startRule = skip(blank) [powerBlockRule];
-		generalBlockRule = lexeme["[PowerBlock]"] >> *eol
+		powerBlockRule = lexeme["[PowerBlock]"] >> *eol
                                > ( 
                                    totalChanAvail ^ paramFile
                                  )

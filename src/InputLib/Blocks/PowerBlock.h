@@ -48,7 +48,7 @@ struct PowerBlock
 	void printValidationErrors();
 	
 	// ostream operator to allow outputting of the block class
-    friend std::ostream& operator<<(std::ostream& os, DigitizerBlock const& db) ;
+    friend std::ostream& operator<<(std::ostream& os, PowerBlock const& db) ;
 
 private:
     // parameters to make sure the required parameters were set

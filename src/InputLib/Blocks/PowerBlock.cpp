@@ -17,7 +17,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"InputLib/blocks/PowerBlock.h"
+#include"InputLib/Blocks/PowerBlock.h"
 // includes for C system headers
 // includes for C++ system headers
 #include<iostream>
@@ -28,7 +28,8 @@ namespace InputParser
 {
 
 
-PowerBlock::PowerBlock() : numberChannelsUsed(1), perChannelParameterFile(""){}
+PowerBlock::PowerBlock() : totalChannelsAvailable(1),
+                           perChannelParameterFile(""){}
 
 // required parameters
 void PowerBlock::totalChannelsAvailableSet(int input)
@@ -40,13 +41,13 @@ void PowerBlock::totalChannelsAvailableSet(int input)
 void PowerBlock::perChannelParameterFileSet(std::string input)
 {
     perChannelParameterFile = input;
-    perChannelParameterFile_ = true;
+    perChannelParameterFileSet_ = true;
 }
 
 bool PowerBlock::validate()
 {
     return (totalChannelsAvailableSet_ &&
-            perChannelParameterFile_ );
+            perChannelParameterFileSet_ );
 }
 
 void PowerBlock::printValidationErrors()
@@ -66,8 +67,8 @@ void PowerBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, PowerBlock const& pb) 
 {
 return os << "[PowerBlock]\n"
-    << "    TotalChannelsAvailable   = \"" << pb.totalChannelsAvailable << "\"\n"
-    << "    PerChannelParameterFile  = "   << pb.perChannelOverrideFile << "\n"
+    << "    TotalChannelsAvailable   = \"" << pb.totalChannelsAvailable     << "\"\n"
+    << "    PerChannelParameterFile  = "   << pb.perChannelParameterFile << "\n"
     << "[EndBlock]";
 }
 

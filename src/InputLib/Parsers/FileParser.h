@@ -45,7 +45,7 @@ struct InputFileParser : qi::grammar<Iterator>
     InputFileParser(InputParameters* params) :
         InputFileParser::base_type(start),
         generalBlockGrammar(params->generalBlock),
-        digitizerBlockGrammar(params->digitizerBlock).
+        digitizerBlockGrammar(params->digitizerBlock),
         powerBlockGrammar(params->powerBlock)
 	{
 		using qi::skip;

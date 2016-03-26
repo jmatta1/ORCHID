@@ -23,9 +23,9 @@ int main(int argc, char* argv[])
     std::cout << "----------------------------------------------------------\n";
     std::cout << "Reading input from the file: " << inputFileName << "\n\n";
 
-    inparser::InputParameters params;
+    InputParser::InputParameters params;
 
-    bool success = inparser::parseBlockInputFile(&params, inputFileName);
+    bool success = InputParser::parseBlockInputFile(&params, inputFileName);
 
     std::cout << "Parsing: " << (success?"Succeeded":"Failed") << "\n";
     if (!params.validateInputParameters())

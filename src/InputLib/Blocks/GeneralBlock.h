@@ -59,7 +59,7 @@ private:
     bool runTitleSet_;
     bool warnRateSet_;
     bool updateFrequencySet_;
-    bool runOutputDirectory_;
+    bool baseOutputDirectorySet_;
 };
 
 }

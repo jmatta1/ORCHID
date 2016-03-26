@@ -25,8 +25,9 @@
 #include<iostream>
 // includes from other libraries
 // includes from ORCHID
-#include"outputblock.h"
-#include"calculationblock.h"
+#include"DigitizerBlock.h"
+#include"GeneralBlock.h"
+#include"PowerBlock.h"
 
 namespace InputParser
 {

@@ -17,7 +17,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"InputLib/blocks/DigitizerBlock.h"
+#include"InputLib/Blocks/DigitizerBlock.h"
 // includes for C system headers
 // includes for C++ system headers
 #include<iostream>
@@ -28,7 +28,7 @@ namespace InputParser
 {
 
 
-DigitizerBlock::DigitizerBlock() : numberChannelsUsed(1),
+DigitizerBlock::DigitizerBlock() : totalChannelsAvailable(1),
     globalCfdFraction(0.2), perChannelParameterFile(""){}
 
 // required parameters
@@ -41,7 +41,7 @@ void DigitizerBlock::totalChannelsAvailableSet(int input)
 void DigitizerBlock::globalCfdFractionSet(float input)
 {
     globalCfdFraction = input;
-    globalVoltageOffsetSet_ = true;
+    globalCfdFractionSet_ = true;
 }
 
 void DigitizerBlock::perChannelParameterFileSet(std::string input)
@@ -54,7 +54,7 @@ bool DigitizerBlock::validate()
 {
     return (totalChannelsAvailableSet_ &&
             globalCfdFractionSet_ &&
-            perChannelParameterFile_ );
+            perChannelParameterFileSet_ );
 }
 
 void DigitizerBlock::printValidationErrors()
@@ -78,9 +78,9 @@ void DigitizerBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, DigitizerBlock const& db) 
 {
 return os << "[DigitizerBlock]\n"
-    << "    TotalChannelsAvailable   = \"" << db.totalChannelsAvailable << "\"\n"
-    << "    GlobalCfdFraction        = "   << db.globalCfdFraction      << "\n"
-    << "    PerChannelParameterFile  = "   << db.perChannelOverrideFile << "\n"
+    << "    TotalChannelsAvailable   = \"" << db.totalChannelsAvailable  << "\"\n"
+    << "    GlobalCfdFraction        = "   << db.globalCfdFraction       << "\n"
+    << "    PerChannelParameterFile  = "   << db.perChannelParameterFile << "\n"
     << "[EndBlock]";
 }
 

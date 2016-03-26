@@ -20,14 +20,14 @@
 #define ORCHID_SRC_INPUTLIB_INPUTLIB_H
 
 //grab the definition of the full parameters structure
-#include"blocks/InputParams.h"
+#include"Blocks/InputParams.h"
 //grab the definition of the parameter blocks
-#include"blocks/GeneralBlock.h"
-#include"blocks/PowerBlock.h"
-#include"blocks/DigitizerBlock.h"
+#include"Blocks/GeneralBlock.h"
+#include"Blocks/PowerBlock.h"
+#include"Blocks/DigitizerBlock.h"
 
 //grab the definition of the parsing function
-#include"parsers/parser.h"
+#include"Parsers/Parser.h"
 
 
 #endif  // ORCHID_SRC_INPUTLIB_INPUTLIB_H

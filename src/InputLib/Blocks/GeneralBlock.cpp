@@ -17,7 +17,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"InputLib/blocks/GeneralBlock.h"
+#include"InputLib/Blocks/GeneralBlock.h"
 // includes for C system headers
 // includes for C++ system headers
 #include<iostream>
@@ -29,7 +29,7 @@ namespace InputParser
 
 
 GeneralBlock::GeneralBlock() : runTitle(""), warnRate(10000),
-    updateFrequency(2), runOutputDirectory(""){}
+    updateFrequency(2), baseOutputDirectory(""){}
 
 // required parameters
 void GeneralBlock::runTitleSet(std::string input)
@@ -75,7 +75,7 @@ void GeneralBlock::printValidationErrors()
     {
         std::cout << "    WarnRate was not set\n";
     }
-    if(!updateFrequency_)
+    if(!updateFrequencySet_)
     {
         std::cout << "    UpdateFrequency was not set\n";
     }
