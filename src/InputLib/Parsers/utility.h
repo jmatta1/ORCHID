@@ -26,10 +26,10 @@
 #include <boost/spirit/include/qi.hpp>
 // includes from ECHOS
 
-namespace inparser
+namespace InputParser
 {
 
-namespace util
+namespace Utility
 {
     //symbol table for reading in boolean values
     struct BoolSymbols_ : boost::spirit::qi::symbols<char, bool>
