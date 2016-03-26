@@ -13,4 +13,9 @@ GlobalCfdFraction = 0.2
 PerChannelParameterFile = "/home/jmatta1/code/ORCHID/digitizer_params.csv"
 [EndBlock]
 
+[PowerBlock]
+TotalChannelsAvailable = 16
+PerChannelParameterFile = "/home/jmatta1/code/ORCHID/mpod_params.csv"
+[EndBlock]
+
 [End]
