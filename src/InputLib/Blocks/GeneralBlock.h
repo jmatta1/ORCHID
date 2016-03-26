@@ -52,7 +52,7 @@ struct GeneralBlock
 	void printValidationErrors();
 	
 	// ostream operator to allow outputting of the block class
-    friend std::ostream& operator<<(std::ostream& os, CalculationBlock const& cb) ;
+    friend std::ostream& operator<<(std::ostream& os, GeneralBlock const& gb) ;
 
 private:
     // parameters to make sure the required parameters were set

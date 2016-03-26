@@ -38,7 +38,6 @@ void GeneralBlock::runTitleSet(std::string input)
     runTitleSet_ = true;
 }
 
-// optional parameters
 void GeneralBlock::warnRateSet(int input)
 {
     warnRate = input;
@@ -87,7 +86,7 @@ void GeneralBlock::printValidationErrors()
     std::cout << "End GeneralBlock Validation Errors\n";
 }
 
-std::ostream& operator<<(std::ostream& os, CalculationBlock const& cb) 
+std::ostream& operator<<(std::ostream& os, GeneralBlock const& gb) 
 {
 return os << "[GeneralBlock]\n"
     << "    RunTitle            = \"" << cb.runTitle            << "\"\n"
