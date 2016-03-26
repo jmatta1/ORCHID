@@ -12,7 +12,7 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Implementation file for the GeneralBlock data structure
+** @details Implementation file for the GeneralBlock data structure struct
 **
 ********************************************************************************
 *******************************************************************************/
