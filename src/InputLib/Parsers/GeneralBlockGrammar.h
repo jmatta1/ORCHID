@@ -36,7 +36,7 @@ namespace Parsing
 
 namespace qi = boost::spirit::qi;
 
-// the gammar to parse a CalculationBlock
+// the main gammar
 template <typename Iterator>
 struct GeneralBlockGrammar : qi::grammar<Iterator>
 {
