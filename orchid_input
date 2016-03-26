@@ -8,9 +8,9 @@ BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
 [EndBlock]
 
 [DigitizerBlock]
-NumberInputChannelsUsed = 1
+TotalChannelsAvailable = 16
 GlobalCfdFraction = 0.2
-PerChannelOverrideFile = "/home/jmatta1/code/ORCHID/digitizer_params.csv"
+PerChannelParameterFile = "/home/jmatta1/code/ORCHID/digitizer_params.csv"
 [EndBlock]
 
 [End]

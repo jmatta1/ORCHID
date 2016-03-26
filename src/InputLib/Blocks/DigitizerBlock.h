@@ -36,13 +36,13 @@ struct DigitizerBlock
     DigitizerBlock();
     // configuration parameters
     // required parameters
-	int numberChannelsUsed;
+	int totalChannelsAvailable;
 	float globalCfdFraction;
 	std::string perChannelOverrideFile;
     
     // parameter setters for binding with boost::spirit::qi
     // required parameters
-    void numberChannelsUsedSet(int input);
+    void totalChannelsAvailableSet(int input);
     void globalCfdFractionSet(float input);
     void perChannelParameterFileSet(std::string input);
 	

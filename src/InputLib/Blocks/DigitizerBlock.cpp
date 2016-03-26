@@ -32,10 +32,10 @@ DigitizerBlock::DigitizerBlock() : numberChannelsUsed(1),
     globalCfdFraction(0.2), perChannelParameterFile(""){}
 
 // required parameters
-void DigitizerBlock::numberChannelsUsedSet(int input)
+void DigitizerBlock::totalChannelsAvailableSet(int input)
 {
-    numberChannelsUsed = input;
-    numberChannelsUsedSet_ = true;
+    totalChannelsAvailable = input;
+    totalChannelsAvailableSet_ = true;
 }
 
 void DigitizerBlock::globalCfdFractionSet(float input)
@@ -52,7 +52,7 @@ void DigitizerBlock::perChannelParameterFileSet(std::string input)
 
 bool DigitizerBlock::validate()
 {
-    return (numberChannelsUsedSet_ &&
+    return (totalChannelsAvailableSet_ &&
             globalCfdFractionSet_ &&
             perChannelParameterFile_ );
 }
@@ -60,9 +60,9 @@ bool DigitizerBlock::validate()
 void DigitizerBlock::printValidationErrors()
 {
     std::cout << "DigitizerBlock Validation Errors:\n";
-    if(!numberChannelsUsedSet_)
+    if(!totalChannelsAvailableSet_)
     {
-        std::cout << "    NumberInputChannelsUsed was not set\n";
+        std::cout << "    TotalChannelsAvailable was not set\n";
     }
     if(!globalCfdFractionSet_)
     {
@@ -70,7 +70,7 @@ void DigitizerBlock::printValidationErrors()
     }
     if(!perChannelParameterFile_)
     {
-        std::cout << "    PerChannelOverrideFile was not set\n";
+        std::cout << "    PerChannelParameterFile was not set\n";
     }
     std::cout << "End DigitizerBlock Validation Errors\n";
 }
@@ -78,7 +78,7 @@ void DigitizerBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, DigitizerBlock const& db) 
 {
 return os << "[DigitizerBlock]\n"
-    << "    NumberInputChannelsUsed  = \"" << db.numberChannelsUsed     << "\"\n"
+    << "    TotalChannelsAvailable   = \"" << db.totalChannelsAvailable << "\"\n"
     << "    GlobalCfdFraction        = "   << db.globalCfdFraction      << "\n"
     << "    PerChannelParameterFile  = "   << db.perChannelOverrideFile << "\n"
     << "[EndBlock]";
