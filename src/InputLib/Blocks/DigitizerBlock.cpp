@@ -78,9 +78,9 @@ void DigitizerBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, DigitizerBlock const& db) 
 {
 return os << "[DigitizerBlock]\n"
-    << "    NumberInputChannelsUsed  = \"" << db.runTitle            << "\"\n"
-    << "    GlobalCfdFraction        = "   << db.updateFrequency     << "\n"
-    << "    PerChannelParameterFile  = "   << db.perChannelParameterFile << "\n"
+    << "    NumberInputChannelsUsed  = \"" << db.numberChannelsUsed     << "\"\n"
+    << "    GlobalCfdFraction        = "   << db.globalCfdFraction      << "\n"
+    << "    PerChannelParameterFile  = "   << db.perChannelOverrideFile << "\n"
     << "[EndBlock]";
 }
 
