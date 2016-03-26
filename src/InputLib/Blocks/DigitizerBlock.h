@@ -33,7 +33,7 @@ namespace InputParser
 // structure to hold the information in calculation blocks
 struct DigitizerBlock
 {
-    GeneralBlock();
+    DigitizerBlock();
     // configuration parameters
     // required parameters
 	int numberChannelsUsed;
