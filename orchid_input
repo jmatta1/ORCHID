@@ -1,5 +1,10 @@
 [Start]
 
-
+[GeneralBlock]
+RunTitle = "Test_Run"
+WarnRate = 20000
+UpdateFrequency = 2
+BaseOutputDirectory = "/home/jmatta1/PROSPECT/data/"
+[EndBlock]
 
 [End]
