@@ -4,7 +4,13 @@
 RunTitle = "Test_Run"
 WarnRate = 20000
 UpdateFrequency = 2
-BaseOutputDirectory = "/home/jmatta1/PROSPECT/data/"
+BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
+[EndBlock]
+
+[DigitizerBlock]
+NumberInputChannelsUsed = 1
+GlobalCfdFraction = 0.2
+PerChannelOverrideFile = "/home/jmatta1/code/ORCHID/digitizer_params.csv"
 [EndBlock]
 
 [End]
