@@ -29,8 +29,7 @@ namespace InputParser
 
 
 DigitizerBlock::DigitizerBlock() : numberChannelsUsed(1),
-    globalVoltageOffset(0.0), globalCfdFraction(0.2),
-    perChannelOverrideFile(""){}
+    globalCfdFraction(0.2), perChannelParameterFile(""){}
 
 // required parameters
 void DigitizerBlock::numberChannelsUsedSet(int input)
@@ -39,28 +38,21 @@ void DigitizerBlock::numberChannelsUsedSet(int input)
     numberChannelsUsedSet_ = true;
 }
 
-void DigitizerBlock::globalVoltageOffsetSet(float input)
-{
-    globalVoltageOffset = input;
-    globalVoltageOffsetSet_ = true;
-}
-
 void DigitizerBlock::globalCfdFractionSet(float input)
 {
     globalCfdFraction = input;
     globalVoltageOffsetSet_ = true;
 }
 
-void DigitizerBlock::perChannelOverrideFileSet(std::string input)
+void DigitizerBlock::perChannelParameterFileSet(std::string input)
 {
-    perChannelOverrideFile = input;
-    perChannelOverrideFileSet_ = true;
+    perChannelParameterFile = input;
+    perChannelParameterFile_ = true;
 }
 
 bool DigitizerBlock::validate()
 {
     return (numberChannelsUsedSet_ &&
-            globalVoltageOffsetSet_ &&
             globalCfdFractionSet_ &&
             perChannelOverrideFileSet_ );
 }
@@ -71,10 +63,6 @@ void DigitizerBlock::printValidationErrors()
     if(!numberChannelsUsedSet_)
     {
         std::cout << "    NumberInputChannelsUsed was not set\n";
-    }
-    if(!globalVoltageOffsetSet_)
-    {
-        std::cout << "    GlobalVoltageOffset was not set\n";
     }
     if(!globalCfdFractionSet_)
     {
@@ -90,10 +78,9 @@ void DigitizerBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, DigitizerBlock const& db) 
 {
 return os << "[DigitizerBlock]\n"
-    << "    NumberInputChannelsUsed = \"" << db.runTitle            << "\"\n"
-    << "    GlobalVoltageOffset     = "   << db.warnRate            << "\n"
-    << "    GlobalCfdFraction       = "   << db.updateFrequency     << "\n"
-    << "    PerChannelOverrideFile  = "   << db.baseOutputDirectory << "\n"
+    << "    NumberInputChannelsUsed  = \"" << db.runTitle            << "\"\n"
+    << "    GlobalCfdFraction        = "   << db.updateFrequency     << "\n"
+    << "    PerChannelParameterFile  = "   << db.perChannelParameterFile << "\n"
     << "[EndBlock]";
 }
 
