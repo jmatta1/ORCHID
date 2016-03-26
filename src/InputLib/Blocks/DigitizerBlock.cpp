@@ -47,7 +47,7 @@ void DigitizerBlock::globalCfdFractionSet(float input)
 void DigitizerBlock::perChannelParameterFileSet(std::string input)
 {
     perChannelParameterFile = input;
-    perChannelParameterFile_ = true;
+    perChannelParameterFileSet_ = true;
 }
 
 bool DigitizerBlock::validate()
@@ -68,7 +68,7 @@ void DigitizerBlock::printValidationErrors()
     {
         std::cout << "    GlobalCfdFraction was not set\n";
     }
-    if(!perChannelParameterFile_)
+    if(!perChannelParameterFileSet_)
     {
         std::cout << "    PerChannelParameterFile was not set\n";
     }
