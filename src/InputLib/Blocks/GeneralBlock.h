@@ -30,7 +30,7 @@ class ostream;
 namespace InputParser
 {
 
-// structure to hold the information in calculation blocks
+// structure to hold the information in general blocks
 struct GeneralBlock
 {
     GeneralBlock();
