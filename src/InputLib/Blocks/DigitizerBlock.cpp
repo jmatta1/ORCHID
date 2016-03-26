@@ -54,7 +54,7 @@ bool DigitizerBlock::validate()
 {
     return (numberChannelsUsedSet_ &&
             globalCfdFractionSet_ &&
-            perChannelOverrideFileSet_ );
+            perChannelParameterFile_ );
 }
 
 void DigitizerBlock::printValidationErrors()
@@ -68,7 +68,7 @@ void DigitizerBlock::printValidationErrors()
     {
         std::cout << "    GlobalCfdFraction was not set\n";
     }
-    if(!perChannelOverrideFileSet_)
+    if(!perChannelParameterFile_)
     {
         std::cout << "    PerChannelOverrideFile was not set\n";
     }
