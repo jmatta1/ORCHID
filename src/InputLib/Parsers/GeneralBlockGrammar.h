@@ -52,10 +52,10 @@ struct GeneralBlockGrammar : qi::grammar<Iterator>
 		using Utility::eol_;
         
         //define the rules to parse the parameters
-        runTitle            = (lexeme["RunTitle"]            >> '=' > quotedString [phoenix::bind(&DigitizerBlock::runTitleSet           , ptr, qi::_1)] > eol_);
-        warnRate            = (lexeme["WarnRate"]            >> '=' > int_         [phoenix::bind(&DigitizerBlock::warnRateSet           , ptr, qi::_1)] > eol_);
-        updateFrequency     = (lexeme["UpdateFrequency"]     >> '=' > int_         [phoenix::bind(&DigitizerBlock::updateFrequencySet    , ptr, qi::_1)] > eol_);
-        baseOutputDirectory = (lexeme["BaseOutputDirectory"] >> '=' > quotedString [phoenix::bind(&DigitizerBlock::baseOutputDirectorySet, ptr, qi::_1)] > eol_);
+        runTitle            = (lexeme["RunTitle"]            >> '=' > quotedString [phoenix::bind(&GeneralBlock::runTitleSet           , ptr, qi::_1)] > eol_);
+        warnRate            = (lexeme["WarnRate"]            >> '=' > int_         [phoenix::bind(&GeneralBlock::warnRateSet           , ptr, qi::_1)] > eol_);
+        updateFrequency     = (lexeme["UpdateFrequency"]     >> '=' > int_         [phoenix::bind(&GeneralBlock::updateFrequencySet    , ptr, qi::_1)] > eol_);
+        baseOutputDirectory = (lexeme["BaseOutputDirectory"] >> '=' > quotedString [phoenix::bind(&GeneralBlock::baseOutputDirectorySet, ptr, qi::_1)] > eol_);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
