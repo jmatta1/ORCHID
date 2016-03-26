@@ -4,10 +4,14 @@ SRC_DIR=src
 OBJ_DIR=build
 #This variable stores the names/paths of all the header files relative to the SRC_DIR
 # a command like "find . -name \*.h | sed 's/^..//'" is good for this
-HEADERS=
+HEADERS=DAQLib/DigiController.h DAQLib/DigiReader.h HVLib/MPODController.h HVLib/MPODReader.h\
+Threads/DigitizerThread.h Threads/EventThread.h Threads/EventThreadPool.h Threads/MPODThread.h\
+Threads/UserThread.h InputLib\InputParser.h
 #This variable stores the names/paths of all the source files relative to the SRC_DIR 
 # a command like "find . -name \*.cpp | sed 's/^..//'" is good for this
-SOURCES=main.cpp
+SOURCES=main.cpp DAQLib/DigiController.cpp DAQLib/DigiReader.cpp HVLib/MPODController.cpp\
+HVLib/MPODReader.cpp Threads/DigitizerThread.cpp Threads/EventThread.cpp Threads/EventThreadPool.cpp\
+Threads/MPODThread.cpp Threads/UserThread.cpp InputLib\InputParser.cpp
 #This variable stores the name/path of the executable file this executable will appear in the same folder as the make file
 EXECUTABLE=orchid
 
