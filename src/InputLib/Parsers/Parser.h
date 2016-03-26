@@ -23,7 +23,7 @@
 // includes for C++ system headers
 #include<string>
 // includes from other libraries
-// includes from ECHOS
+// includes from ORCHID
 
 namespace InputParser
 {
@@ -36,4 +36,4 @@ bool parseBlockInputFile(InputParameters* inParams,
                          const std::string& inputFileName);
 
 }
-#endif  // ECHOS_SRC_INPUTLIB_PARSERS_BLOCKINPUTFILEPARSER_H
+#endif  // ORCHID_SRC_INPUTLIB_PARSERS_BLOCKINPUTFILEPARSER_H

@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ECHOS_SRC_INPUTLIB_INPUTLIB_H
-#define ECHOS_SRC_INPUTLIB_INPUTLIB_H
+#ifndef ORCHID_SRC_INPUTLIB_INPUTLIB_H
+#define ORCHID_SRC_INPUTLIB_INPUTLIB_H
 
 //grab the definition of the full parameters structure
 #include"blocks/InputParams.h"
@@ -30,4 +30,4 @@
 #include"parsers/parser.h"
 
 
-#endif  // ECHOS_SRC_INPUTLIB_INPUTLIB_H
+#endif  // ORCHID_SRC_INPUTLIB_INPUTLIB_H

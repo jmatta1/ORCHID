@@ -27,7 +27,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
-// includes from ECHOS
+// includes from ORCHID
 #include"InputLib/Blocks/InputParams.h"
 #include"GeneralBlockGrammar.h"
 #include"DigitizerBlockGrammar.h"

@@ -24,7 +24,7 @@
 // includes for C++ system headers
 // includes from other libraries
 #include <boost/spirit/include/qi.hpp>
-// includes from ECHOS
+// includes from ORCHID
 
 namespace InputParser
 {

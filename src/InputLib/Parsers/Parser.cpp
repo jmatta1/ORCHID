@@ -23,7 +23,7 @@
 #include<fstream>
 // includes from other libraries
 #include <boost/spirit/include/qi.hpp>
-// includes from ECHOS
+// includes from ORCHID
 #include"FileParser.h"
 
 namespace InputParser
