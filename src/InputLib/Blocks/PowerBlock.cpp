@@ -67,7 +67,7 @@ void PowerBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, PowerBlock const& pb) 
 {
 return os << "[PowerBlock]\n"
-    << "    TotalChannelsAvailable   = \"" << pb.totalChannelsAvailable     << "\"\n"
+    << "    TotalChannelsAvailable   = " << pb.totalChannelsAvailable     << "\n"
     << "    PerChannelParameterFile  = "   << pb.perChannelParameterFile << "\n"
     << "[EndBlock]";
 }
