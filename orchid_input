@@ -11,6 +11,7 @@ BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
 TotalChannelsAvailable = 16
 GlobalCfdFraction = 0.2
 PerChannelParameterFile = "/home/jmatta1/code/ORCHID/digitizer_params.csv"
+BoardAddressList = [00000000, 00010000]
 [EndBlock]
 
 [PowerBlock]

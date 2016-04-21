@@ -48,6 +48,7 @@ struct DigitizerBlockGrammar : qi::grammar<Iterator>
 		using qi::lexeme;
 		using qi::float_;
 		using qi::int_;
+		using qi::hex;
 		using qi::eol;
 		using Utility::eol_;
         
@@ -55,13 +56,16 @@ struct DigitizerBlockGrammar : qi::grammar<Iterator>
         totalChanAvail = (lexeme["TotalChannelsAvailable"]  >> '=' > int_         [phoenix::bind(&DigitizerBlock::totalChannelsAvailableSet , ptr, qi::_1)] > eol_);
         globCfdFrac    = (lexeme["GlobalCfdFraction"]       >> '=' > float_       [phoenix::bind(&DigitizerBlock::globalCfdFractionSet      , ptr, qi::_1)] > eol_);
         paramFile      = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&DigitizerBlock::perChannelParameterFileSet, ptr, qi::_1)] > eol_);
+        addressList    = (lexeme["BoardAddressList"]        >> '=' > '[' >> hex   [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]
+        				>> *(',' >> hex [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]) >> ']' > eol_);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		startRule = skip(blank) [digitizerBlockRule];
 		digitizerBlockRule = lexeme["[DigitizerBlock]"] >> *eol
                                > ( 
-                                   totalChanAvail ^ globCfdFrac ^ paramFile
+                                   totalChanAvail ^ globCfdFrac ^ paramFile ^
+                                   addressList
                                  )
                                > lexeme["[EndBlock]"];
 	}
@@ -75,7 +79,8 @@ private:
 	Utility::QuotedString<Iterator> quotedString;
 	
 	// parameters
-	qi::rule<Iterator, qi::blank_type> totalChanAvail, globCfdFrac, paramFile;
+	qi::rule<Iterator, qi::blank_type> totalChanAvail, globCfdFrac, paramFile,
+									   addressList;
 
 	// hold the pointer that we are going to bind to
 	DigitizerBlock* ptr;

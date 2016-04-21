@@ -22,6 +22,7 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<string>
+#include<vector>
 // includes from other libraries
 // includes from ORCHID
 
@@ -39,12 +40,14 @@ struct DigitizerBlock
 	int totalChannelsAvailable;
 	float globalCfdFraction;
 	std::string perChannelParameterFile;
+	std::vector<unsigned int> boardAddressList;
     
     // parameter setters for binding with boost::spirit::qi
     // required parameters
     void totalChannelsAvailableSet(int input);
     void globalCfdFractionSet(float input);
     void perChannelParameterFileSet(std::string input);
+    void boardAddressListSet(unsigned int input);
 	
 	bool validate();
 	void printValidationErrors();
@@ -57,6 +60,8 @@ private:
     bool totalChannelsAvailableSet_;
     bool globalCfdFractionSet_;
     bool perChannelParameterFileSet_;
+    bool boardAddressListSet_;
+    int boardAddressListCount_;
 };
 
 }

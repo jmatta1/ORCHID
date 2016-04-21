@@ -21,6 +21,7 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<iostream>
+#include<iomanip>
 // includes from other libraries
 // includes from ORCHID
 
@@ -50,11 +51,19 @@ void DigitizerBlock::perChannelParameterFileSet(std::string input)
     perChannelParameterFileSet_ = true;
 }
 
+void DigitizerBlock::boardAddressListSet(unsigned int input)
+{
+	boardAddressList.push_back(input);
+	boardAddressListSet_ = true;
+	++boardAddressListCount_;
+}
+
 bool DigitizerBlock::validate()
 {
     return (totalChannelsAvailableSet_ &&
             globalCfdFractionSet_ &&
-            perChannelParameterFileSet_ );
+            perChannelParameterFileSet_ &&
+            boardAddressListSet_);
 }
 
 void DigitizerBlock::printValidationErrors()
@@ -72,16 +81,30 @@ void DigitizerBlock::printValidationErrors()
     {
         std::cout << "    PerChannelParameterFile was not set\n";
     }
+    if(!boardAddressListSet_)
+    {
+        std::cout << "    BoardAddressList was not set\n";
+    }
     std::cout << "End DigitizerBlock Validation Errors\n";
 }
 
 std::ostream& operator<<(std::ostream& os, DigitizerBlock const& db) 
 {
-return os << "[DigitizerBlock]\n"
-    << "    TotalChannelsAvailable   = \"" << db.totalChannelsAvailable  << "\"\n"
+	using std::hex;
+	using std::dec;
+	using std::setw;
+	using std::setfill;
+	os << "[DigitizerBlock]\n"
     << "    GlobalCfdFraction        = "   << db.globalCfdFraction       << "\n"
-    << "    PerChannelParameterFile  = "   << db.perChannelParameterFile << "\n"
-    << "[EndBlock]";
+    << "    BoardAddressList         = 0x"   << hex << setw(8) << setfill('0') << db.boardAddressList[0] << dec << "\n";
+    for(int i=1; i < db.boardAddressListCount_; ++i)
+    {
+    	os << "                               0x"   << hex << setw(8) << setfill('0') << db.boardAddressList[i] << dec << "\n";
+    }
+    os << "    TotalChannelsAvailable   = " << db.totalChannelsAvailable  << "\n"
+       << "    PerChannelParameterFile  = "   << db.perChannelParameterFile << "\n";
+    
+    return os << "[EndBlock]";
 }
 
 }
