@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
     std::cout << "Reading input from the file: " << inputFileName << "\n\n";
     InputParser::InputParameters params;
     bool success = InputParser::parseBlockInputFile(&params, inputFileName);
-    std::cout << "Parsing: " << (success?"Succeeded":"Failed") << "\n";
+    std::cout << "Input File Parsing: " << (success?"Succeeded":"Failed") << "\n";
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     if (!params.validateInputParameters())
     {
