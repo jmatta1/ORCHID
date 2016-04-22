@@ -32,6 +32,7 @@
 #include"GeneralBlockGrammar.h"
 #include"DigitizerBlockGrammar.h"
 #include"PowerBlockGrammar.h"
+#include"Utility.h"
 
 namespace InputParser 
 {

@@ -26,7 +26,7 @@
 #include <boost/phoenix/bind/bind_member_function.hpp>
 // includes from ECHOS
 #include"InputLib/Blocks/PowerBlock.h"
-#include"utility.h"
+#include"Utility.h"
 
 namespace InputParser
 {

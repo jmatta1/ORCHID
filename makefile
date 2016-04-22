@@ -9,7 +9,7 @@ Threads/DigitizerThread.h Threads/EventThread.h Threads/EventThreadPool.h Thread
 Threads/UserThread.h InputLib/InputParser.h InputLib/Blocks/DigitizerBlock.h\
 InputLib/Blocks/GeneralBlock.h InputLib/Blocks/PowerBlock.h InputLib/Blocks/InputParams.h\
 InputLib/Parsers/Parser.h InputLib/Parsers/DigitizerBlockGrammar.h InputLib/Parsers/FileParser.h\
-InputLib/Parsers/GeneralBlockGrammar.h InputLib/Parsers/PowerBlockGrammar.h InputLib/Parsers/utility.h 
+InputLib/Parsers/GeneralBlockGrammar.h InputLib/Parsers/PowerBlockGrammar.h InputLib/Parsers/Utility.h 
 #This variable stores the names/paths of all the source files relative to the SRC_DIR 
 # a command like "find . -name \*.cpp | sed 's/^..//'" is good for this
 SOURCES=main.cpp DAQLib/DigiController.cpp DAQLib/DigiReader.cpp HVLib/MPODController.cpp\
