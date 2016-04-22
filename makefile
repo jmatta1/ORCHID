@@ -142,10 +142,11 @@ $(EXECUTABLE):$(OBJECTS)
 	$(COMP) $(FLAGS) $(LIB_FLAG) $(OBJECTS) $(OUTPUT_FLAG) $(EXECUTABLE)
 
 #all object files are built here, some moderate magic in making the prerequisites work right
+# add this to the end of the compile line to filter stl errors | gSTLFilt.pl
 .SECONDEXPANSION:
 $(OBJECTS): $$($$(*F))
 	-@mkdir -p $(@D)
-	$(COMP) $(FLAGS) $(NO_LINK_FLAG) $(OUTPUT_FLAG) $@ $(patsubst $(OBJ_DIR)/$(TEMP_DIR)/%.o,$(SRC_DIR)/%$(EXT),$@) #| gSTLFilt.pl
+	$(COMP) $(FLAGS) $(NO_LINK_FLAG) $(OUTPUT_FLAG) $@ $(patsubst $(OBJ_DIR)/$(TEMP_DIR)/%.o,$(SRC_DIR)/%$(EXT),$@)
 	@echo ""
 
 #The prereqs.mk target, here the dependencies for the various object files 
