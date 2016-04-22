@@ -31,35 +31,36 @@ namespace InputParser
 
 namespace Utility
 {
-    //symbol table for reading in boolean values
-    struct BoolSymbols_ : boost::spirit::qi::symbols<char, bool>
-    {
-        BoolSymbols_(){
-            this->add("True" , true )
-                     ("true" , true )
-                     ("T"    , true )
-                     ("t"    , true )
-                     ("False", false)
-                     ("false", false)
-                     ("F"    , false)
-                     ("f"    , false);
-         }
-    } boolSymbols_;
 
-    // define my line ender here, use auto cause it is going to return a strange templated type
-    auto eol_ = boost::spirit::qi::copy((',' >> *boost::spirit::qi::eol) | +boost::spirit::qi::eol);
+//symbol table for reading in boolean values
+struct BoolSymbols_ : boost::spirit::qi::symbols<char, bool>
+{
+    BoolSymbols_(){
+        this->add("True" , true )
+                 ("true" , true )
+                 ("T"    , true )
+                 ("t"    , true )
+                 ("False", false)
+                 ("false", false)
+                 ("F"    , false)
+                 ("f"    , false);
+     }
+} boolSymbols_;
 
-    //grammar for parsing and returning quoted strings
-    template <typename Iterator>
-    struct QuotedString : boost::spirit::qi::grammar<Iterator, std::string()>
+// define my line ender here, use auto cause it is going to return a strange templated type
+auto eol_ = boost::spirit::qi::copy((',' >> *boost::spirit::qi::eol) | +boost::spirit::qi::eol);
+
+//grammar for parsing and returning quoted strings
+template <typename Iterator>
+struct QuotedString : boost::spirit::qi::grammar<Iterator, std::string()>
+{
+    QuotedString() : QuotedString::base_type(quotedStringRule)
     {
-        QuotedString() : QuotedString::base_type(quotedStringRule)
-        {
-            quotedStringRule = '"' > +~boost::spirit::qi::char_("\"\n") > '"';
-        }
-    private:
-        boost::spirit::qi::rule<Iterator, std::string()> quotedStringRule;
-    };
+        quotedStringRule = '"' > +~boost::spirit::qi::char_("\"\n") > '"';
+    }
+private:
+    boost::spirit::qi::rule<Iterator, std::string()> quotedStringRule;
+};
 
 }
 
