@@ -49,9 +49,10 @@ struct InputFileParser : qi::grammar<Iterator>
         powerBlockGrammar(params->powerBlock)
 	{
 		using qi::skip;
-		using qi::eol;
+		using Utility::eol_;
 		using qi::eoi;
 		using qi::blank;
+		using qi::char_;
 		using qi::lexeme;
 		using qi::fail;
 		using qi::on_error;
@@ -60,13 +61,13 @@ struct InputFileParser : qi::grammar<Iterator>
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		start    = skip(blank) [fileRule];
-        fileRule = lexeme["[Start]"] >> +eol
+        fileRule = lexeme["[Start]"] >> eol_
                    > (
-                       ( generalBlockGrammar   > +eol ) ^
-                       ( digitizerBlockGrammar > +eol ) ^
-                       ( powerBlockGrammar     > +eol )
+                       ( generalBlockGrammar   > eol_ ) ^
+                       ( digitizerBlockGrammar > eol_ ) ^
+                       ( powerBlockGrammar     > eol_ )
                      )
-                   > lexeme["[End]"] >> *eol >> eoi;
+                   > lexeme["[End]"] >> -eol_ >> eoi;
         on_error<fail>
         (
             start,
@@ -80,12 +81,12 @@ struct InputFileParser : qi::grammar<Iterator>
 	}
 	
 	// main rules
-    qi::rule<Iterator>                 start;
-    qi::rule<Iterator, qi::blank_type> fileRule;
+    qi::rule<Iterator>                  start;
+    qi::rule<Iterator, qi::blank_type > fileRule;
     // grammars for blocks
-    Parsing::GeneralBlockGrammar<Iterator>     generalBlockGrammar;
+    Parsing::GeneralBlockGrammar<Iterator>   generalBlockGrammar;
     Parsing::DigitizerBlockGrammar<Iterator> digitizerBlockGrammar;
-    Parsing::PowerBlockGrammar<Iterator>         powerBlockGrammar;
+    Parsing::PowerBlockGrammar<Iterator>     powerBlockGrammar;
 };
 
 }

@@ -1,17 +1,15 @@
 [Start]
-
+# adding a test comment to the file
 [GeneralBlock]
-RunTitle = "Test_Run"
-WarnRate = 20000
+RunTitle = "Test_Run", WarnRate = 20000
 UpdateFrequency = 2
 BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
 [EndBlock]
 
 [DigitizerBlock]
-TotalChannelsAvailable = 16
-GlobalCfdFraction = 0.2
+TotalChannelsAvailable = 16, GlobalCfdFraction = 0.2
 PerChannelParameterFile = "/home/jmatta1/code/ORCHID/digitizer_params.csv"
-BoardAddressList = [00000000, 00010000]
+BoardAddressList = [00000000, 00010000] 									# this is a listing of the board addresses set by the rotary switches
 [EndBlock]
 
 [PowerBlock]

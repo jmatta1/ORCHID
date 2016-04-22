@@ -33,8 +33,8 @@ typedef boost::spirit::istream_iterator It;
 
 bool parseBlockInputFile(InputParameters* inParams, const std::string& inputFileName)
 {
-    //make the parser, this line will make the compiler *CHUG* as it has to
-    //grind its way through the huge amount template stuff
+    //make the parser, this line will make the compiler *GRIND* as it has to
+    //work its way through the huge amount template stuff
     Parsing::InputFileParser<It> inputFileParser(inParams);
     //set up the file
     std::ifstream input(inputFileName);

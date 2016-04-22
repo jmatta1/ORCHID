@@ -49,11 +49,11 @@ struct PowerBlockGrammar : qi::grammar<Iterator>
 		using qi::float_;
 		using qi::int_;
 		using qi::eol;
-		using Utility::eol_;
+		using Utility::separator;
         
         //define the rules to parse the parameters
-        totalChanAvail = (lexeme["TotalChannelsAvailable"]  >> '=' > int_         [phoenix::bind(&PowerBlock::totalChannelsAvailableSet , ptr, qi::_1)] > eol_);
-        paramFile      = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&PowerBlock::perChannelParameterFileSet, ptr, qi::_1)] > eol_);
+        totalChanAvail = (lexeme["TotalChannelsAvailable"]  >> '=' > int_         [phoenix::bind(&PowerBlock::totalChannelsAvailableSet , ptr, qi::_1)] > separator);
+        paramFile      = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&PowerBlock::perChannelParameterFileSet, ptr, qi::_1)] > separator);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators

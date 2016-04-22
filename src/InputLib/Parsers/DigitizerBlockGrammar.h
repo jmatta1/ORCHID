@@ -50,14 +50,14 @@ struct DigitizerBlockGrammar : qi::grammar<Iterator>
 		using qi::int_;
 		using qi::hex;
 		using qi::eol;
-		using Utility::eol_;
+		using Utility::separator;
         
         //define the rules to parse the parameters
-        totalChanAvail = (lexeme["TotalChannelsAvailable"]  >> '=' > int_         [phoenix::bind(&DigitizerBlock::totalChannelsAvailableSet , ptr, qi::_1)] > eol_);
-        globCfdFrac    = (lexeme["GlobalCfdFraction"]       >> '=' > float_       [phoenix::bind(&DigitizerBlock::globalCfdFractionSet      , ptr, qi::_1)] > eol_);
-        paramFile      = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&DigitizerBlock::perChannelParameterFileSet, ptr, qi::_1)] > eol_);
-        addressList    = (lexeme["BoardAddressList"]        >> '=' > '[' >> hex   [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]
-        				>> *(',' >> hex [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]) >> ']' > eol_);
+        totalChanAvail = (lexeme["TotalChannelsAvailable"]  >> '=' > int_         [phoenix::bind(&DigitizerBlock::totalChannelsAvailableSet , ptr, qi::_1)] > separator);
+        globCfdFrac    = (lexeme["GlobalCfdFraction"]       >> '=' > float_       [phoenix::bind(&DigitizerBlock::globalCfdFractionSet      , ptr, qi::_1)] > separator);
+        paramFile      = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&DigitizerBlock::perChannelParameterFileSet, ptr, qi::_1)] > separator);
+        addressList    = (lexeme["BoardAddressList"]        >> '=' > '[' >> -lexeme["0x"] >> hex   [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]
+        				>> *(',' >> -lexeme["0x"] >> hex [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]) >> ']' > separator);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
