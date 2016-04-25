@@ -1,10 +1,10 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file blockinputfileparser.cpp
+** @file Parser.cpp
 ** @author James Till Matta
 ** @date 26 Mar, 2016
-** @brief Implementation file for the class BlockInputFileParser
+** @brief Implementation file for the function that calls the boost::spirit parser
 **
 ** @copyright Copyright (C) 2016 James Till Matta
 **
@@ -12,8 +12,10 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Definition and implementation for the class that handles parsing
-** the input files whose grammars are constructed
+** @details Implementation for the function that handles parsing the block
+** input files whose grammars are constructed. This exists to offload the
+** template instantiation to a file where things should not change during later
+** development
 **
 ********************************************************************************
 *******************************************************************************/

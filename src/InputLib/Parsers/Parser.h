@@ -1,10 +1,10 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file blockinputfileparser.h
+** @file parser.h
 ** @author James Till Matta
 ** @date 26 Mar, 2016
-** @brief Definition file for the class BlockInputFileParser
+** @brief Definition file for the function that calls the boost::spirit parser
 **
 ** @copyright Copyright (C) 2016 James Till Matta
 **
@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_INPUTLIB_BLOCKINPUTFILEPARSER_H
-#define ORCHID_SRC_INPUTLIB_BLOCKINPUTFILEPARSER_H
+#ifndef ORCHID_SRC_INPUTLIB_PARSERS_PARSER_H
+#define ORCHID_SRC_INPUTLIB_PARSERS_PARSER_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -36,4 +36,4 @@ bool parseBlockInputFile(InputParameters* inParams,
                          const std::string& inputFileName);
 
 }
-#endif  // ORCHID_SRC_INPUTLIB_PARSERS_BLOCKINPUTFILEPARSER_H
+#endif  // ORCHID_SRC_INPUTLIB_PARSERS_PARSERS_PARSER_H
