@@ -24,7 +24,7 @@
 // includes for C++ system headers
 // includes from other libraries
 #include <boost/phoenix/bind/bind_member_function.hpp>
-// includes from ECHOS
+// includes from ORCHID
 #include"InputLib/Blocks/GeneralBlock.h"
 #include"Utility.h"
 

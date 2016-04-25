@@ -24,7 +24,7 @@
 #include<vector>
 #include<iostream>
 // includes from other libraries
-// includes from ECHOS
+// includes from ORCHID
 
 namespace InputParser
 {
