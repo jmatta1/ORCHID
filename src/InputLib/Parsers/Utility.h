@@ -25,7 +25,6 @@
 // includes from other libraries
 #define BOOST_SPIRIT_DEBUG
 #include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_omit.hpp>
 // includes from ORCHID
 
 namespace InputParser
