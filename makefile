@@ -9,14 +9,15 @@ Threads/DigitizerThread.h Threads/EventThread.h Threads/EventThreadPool.h Thread
 Threads/UserThread.h InputLib/InputParser.h InputLib/Blocks/DigitizerBlock.h\
 InputLib/Blocks/GeneralBlock.h InputLib/Blocks/PowerBlock.h InputLib/Blocks/InputParams.h\
 InputLib/Parsers/Parser.h InputLib/Parsers/DigitizerBlockGrammar.h InputLib/Parsers/FileParser.h\
-InputLib/Parsers/GeneralBlockGrammar.h InputLib/Parsers/PowerBlockGrammar.h InputLib/Parsers/Utility.h 
+InputLib/Parsers/GeneralBlockGrammar.h InputLib/Parsers/PowerBlockGrammar.h InputLib/Parsers/Utility.h\
+InputLib/Blocks/MpodCsvData.h InputLib/Parsers/MpodCsvParser.h InputLib/Parsers/MpodParser.h
 #This variable stores the names/paths of all the source files relative to the SRC_DIR 
 # a command like "find . -name \*.cpp | sed 's/^..//'" is good for this
 SOURCES=main.cpp DAQLib/DigiController.cpp DAQLib/DigiReader.cpp HVLib/MPODController.cpp\
 HVLib/MPODReader.cpp Threads/DigitizerThread.cpp Threads/EventThread.cpp Threads/EventThreadPool.cpp\
 Threads/MPODThread.cpp Threads/UserThread.cpp InputLib/Blocks/DigitizerBlock.cpp\
 InputLib/Blocks/GeneralBlock.cpp InputLib/Blocks/PowerBlock.cpp InputLib/Blocks/InputParams.cpp\
-InputLib/Parsers/Parser.cpp
+InputLib/Parsers/Parser.cpp InputLib/Blocks/MpodCsvData.cpp InputLib/Parsers/MpodParser.cpp
 #This variable stores the name/path of the executable file this executable will appear in the same folder as the make file
 EXECUTABLE=orchid
 

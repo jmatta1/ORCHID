@@ -25,9 +25,11 @@
 #include"Blocks/GeneralBlock.h"
 #include"Blocks/PowerBlock.h"
 #include"Blocks/DigitizerBlock.h"
+#include"Blocks/MpodCsvData.h"
 
 //grab the definition of the parsing function
 #include"Parsers/Parser.h"
+#include"Parsers/MpodParser.h"
 
 
 #endif  // ORCHID_SRC_INPUTLIB_INPUTLIB_H
