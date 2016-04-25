@@ -23,7 +23,6 @@
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
-#define BOOST_SPIRIT_DEBUG
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
 
