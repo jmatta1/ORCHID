@@ -45,15 +45,17 @@ struct BoolSymbols_ : boost::spirit::qi::symbols<char, bool>
                  ("F"    , false)
                  ("f"    , false);
      }
-} boolSymbols_;
+};
+
+static const BoolSymbols_ boolSymbols_;
 
 // define my 'line enders' here, use auto cause it is going to return a strange templated type
 // this version is for use within blocks, it allows key value pairs to be separated with
 // commas, newlines, or comments followed by newlines
-auto separator = boost::spirit::qi::copy(',' | +(boost::spirit::qi::eol | ('#' >> *(boost::spirit::qi::char_ - boost::spirit::qi::eol) >> boost::spirit::qi::eol)));
+static const auto separator = boost::spirit::qi::copy(',' | +(boost::spirit::qi::eol | ('#' >> *(boost::spirit::qi::char_ - boost::spirit::qi::eol) >> boost::spirit::qi::eol)));
 	//allows trailing comments newlines comment lines in any order and quantity
 // this line ender version is a more strict newline in that it requires a newline character
-auto eol_ = boost::spirit::qi::copy( +(('#' >> *(boost::spirit::qi::char_ - boost::spirit::qi::eol) >> boost::spirit::qi::eol) | boost::spirit::qi::eol));
+static const auto eol_ = boost::spirit::qi::copy( +(('#' >> *(boost::spirit::qi::char_ - boost::spirit::qi::eol) >> boost::spirit::qi::eol) | boost::spirit::qi::eol));
 
 //grammar for parsing and returning quoted strings
 template <typename Iterator>
