@@ -16,8 +16,9 @@ PerChannelParameterFile = "/home/jmatta1/code/ORCHID/digitizer_params.csv"
 [EndBlock]
 
 [PowerBlock]
-TotalChannelsAvailable = 16
-PerChannelParameterFile = "/home/jmatta1/code/ORCHID/mpod_params.csv"
+PerChannelParameterFile = "/home/jmatta1/code/ORCHID/mpod_channel_params.csv"
+PerModuleParameterFile = "/home/jmatta1/code/ORCHID/mpod_module_params.csv"
+MpodIPAddress = 192.168.1.11
 [EndBlock]
 
 [End]
