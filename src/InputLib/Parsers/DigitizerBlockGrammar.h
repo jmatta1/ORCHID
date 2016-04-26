@@ -49,7 +49,7 @@ struct DigitizerBlockGrammar : qi::grammar<Iterator>
 		using qi::float_;
 		using qi::int_;
 		using qi::hex;
-		using qi::eol;
+		using Utility::eol_;
 		using Utility::separator;
         
         //define the rules to parse the parameters
@@ -62,7 +62,7 @@ struct DigitizerBlockGrammar : qi::grammar<Iterator>
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		startRule = skip(blank) [digitizerBlockRule];
-		digitizerBlockRule = lexeme["[DigitizerBlock]"] >> *eol
+		digitizerBlockRule = lexeme["[DigitizerBlock]"] >> *eol_
                                > ( 
                                    totalChanAvail ^ globCfdFrac ^ paramFile ^
                                    addressList

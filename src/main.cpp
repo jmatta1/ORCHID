@@ -85,6 +85,10 @@ int main(int argc, char* argv[])
     bool success = InputParser::parseBlockInputFile(&params, inputFileName);
     std::cout << "Input File Parsing: " << (success?"Succeeded":"Failed") << "\n";
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    if(!success)
+    {
+        return 1;
+    }
     if (!params.validateInputParameters())
     {
         std::cout << "\nParameter Validation Failed" << "\n";
@@ -108,7 +112,10 @@ int main(int argc, char* argv[])
     bool csvSuccess = InputParser::parseMpodCsvFile(&mpodData, params.powerBlock->perChannelParameterFile);
     std::cout << "MPOD CSV Parsing: " << (csvSuccess?"Succeeded":"Failed") << "\n";
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    
+    if(!csvSuccess)
+    {
+        return 1;
+    }
     if (!mpodData.validate())
     {
         std::cout << "\nParameter Validation Failed" << "\n";

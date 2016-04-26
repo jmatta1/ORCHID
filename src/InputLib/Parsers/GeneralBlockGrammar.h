@@ -48,7 +48,7 @@ struct GeneralBlockGrammar : qi::grammar<Iterator>
 		using qi::lexeme;
 		using qi::float_;
 		using qi::int_;
-		using qi::eol;
+		using Utility::eol_;
 		using Utility::separator;
         
         //define the rules to parse the parameters
@@ -60,7 +60,7 @@ struct GeneralBlockGrammar : qi::grammar<Iterator>
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		startRule = skip(blank) [generalBlockRule];
-		generalBlockRule = lexeme["[GeneralBlock]"] >> *eol
+		generalBlockRule = lexeme["[GeneralBlock]"] >> *eol_
                                > ( 
                                    runTitle        ^ warnRate            ^
                                    updateFrequency ^ baseOutputDirectory
