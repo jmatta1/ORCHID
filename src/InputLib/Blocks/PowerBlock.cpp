@@ -28,38 +28,51 @@ namespace InputParser
 {
 
 
-PowerBlock::PowerBlock() : totalChannelsAvailable(1),
-                           perChannelParameterFile(""){}
+PowerBlock::PowerBlock() : perChannelParameterFile(""),
+    mpodIpAddress(""), perChannelParameterFileSet_(false),
+    mpodIpAddressSet_(false) {}
 
 // required parameters
-void PowerBlock::totalChannelsAvailableSet(int input)
-{
-    totalChannelsAvailable = input;
-    totalChannelsAvailableSet_ = true;
-}
-
-void PowerBlock::perChannelParameterFileSet(std::string input)
+void PowerBlock::perChannelParameterFileSet(const std::string& input)
 {
     perChannelParameterFile = input;
     perChannelParameterFileSet_ = true;
 }
 
+void PowerBlock::perModuleParameterFileSet(const std::string& input)
+{
+    perModuleParameterFile = input;
+    perModuleParameterFileSet_ = true;
+}
+
+void PowerBlock::mpodIpAddressSet(const std::string& input)
+{
+    mpodIpAddress = input;
+    mpodIpAddressSet_ = true;
+}
+
+
 bool PowerBlock::validate()
 {
-    return (totalChannelsAvailableSet_ &&
-            perChannelParameterFileSet_ );
+    return (perChannelParameterFileSet_ &&
+            perModuleParameterFileSet_ &&
+            mpodIpAddressSet_);
 }
 
 void PowerBlock::printValidationErrors()
 {
     std::cout << "PowerBlock Validation Errors:\n";
-    if(!totalChannelsAvailableSet_)
+    if(!perModuleParameterFileSet_)
     {
-        std::cout << "    TotalChannelsAvailable was not set\n";
+        std::cout << "    PerModuleParameterFile was not set\n";
     }
     if(!perChannelParameterFileSet_)
     {
         std::cout << "    PerChannelParameterFile was not set\n";
+    }
+    if(!mpodIpAddressSet_)
+    {
+        std::cout << "    IPAddress was not set\n";
     }
     std::cout << "End PowerBlock Validation Errors\n";
 }
@@ -67,8 +80,9 @@ void PowerBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, PowerBlock const& pb) 
 {
 return os << "[PowerBlock]\n"
-    << "    TotalChannelsAvailable   = " << pb.totalChannelsAvailable     << "\n"
+    << "    PerModuleParameterFile   = "   << pb.perModuleParameterFile  << "\n"
     << "    PerChannelParameterFile  = "   << pb.perChannelParameterFile << "\n"
+    << "    IPAddress                = "   << pb.mpodIpAddress           << "\n"
     << "[EndBlock]";
 }
 

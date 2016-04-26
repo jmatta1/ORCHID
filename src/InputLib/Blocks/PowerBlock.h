@@ -36,13 +36,15 @@ struct PowerBlock
     PowerBlock();
     // configuration parameters
     // required parameters
-	int totalChannelsAvailable;
 	std::string perChannelParameterFile;
+	std::string perModuleParameterFile;
+	std::string mpodIpAddress;
     
     // parameter setters for binding with boost::spirit::qi
     // required parameters
-    void totalChannelsAvailableSet(int input);
-    void perChannelParameterFileSet(std::string input);
+    void perChannelParameterFileSet(const std::string& input);
+    void perModuleParameterFileSet(const std::string& input);
+    void mpodIpAddressSet(const std::string& input);
 	
 	bool validate();
 	void printValidationErrors();
@@ -52,8 +54,9 @@ struct PowerBlock
 
 private:
     // parameters to make sure the required parameters were set
-    bool totalChannelsAvailableSet_;
     bool perChannelParameterFileSet_;
+    bool perModuleParameterFileSet_;
+    bool mpodIpAddressSet_;
 };
 
 }
