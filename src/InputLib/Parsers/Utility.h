@@ -69,6 +69,30 @@ private:
     boost::spirit::qi::rule<Iterator, std::string()> quotedStringRule;
 };
 
+//grammar for parsing and returning normal strings
+template <typename Iterator>
+struct String_ : public boost::spirit::qi::grammar<Iterator, std::string()>
+{
+    String_() : String_::base_type(stringRule)
+    {
+        stringRule = +(~boost::spirit::qi::char_("\"\n\r "));
+    }
+private:
+    boost::spirit::qi::rule<Iterator, std::string()> stringRule;
+};
+
+//grammar for handling strings that represent IP addresses
+template <typename Iterator>
+struct IPAddressString : public boost::spirit::qi::grammar<Iterator, std::string()>
+{
+    IPAddressString() : IPAddressString::base_type(addrRule)
+    {
+        addrRule = +boost::spirit::qi::char_("0123456789.");
+    }
+private:
+    boost::spirit::qi::rule<Iterator, std::string()> addrRule;
+};
+
 }
 
 }
