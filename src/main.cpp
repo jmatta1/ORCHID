@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     
     //now that we have successfully read the block input file, now read the
     // csv file with the MPOD data
-    
+  /*  
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     std::cout << "Reading MPOD CSV from the file: " << params.powerBlock->perChannelParameterFile << "\n\n";
     InputParser::MpodCsvData mpodData;
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         std::cout << "------------------------------------------------------\n";
         std::cout << mpodData << "\n";
         std::cout << "------------------------------------------------------\n";
-    }
+    }*/
     
     return 0;
 }
