@@ -1,7 +1,7 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file MpodCsvData.cpp
+** @file MpodChannelData.cpp
 ** @author James Till Matta
 ** @date 26 Mar, 2016
 ** @brief
@@ -12,12 +12,12 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Implementation file for the MpodCsvData data structure struct
+** @details Implementation file for the MpodChannelData data structure struct
 **
 ********************************************************************************
 *******************************************************************************/
 
-#include"InputLib/Blocks/MpodCsvData.h"
+#include"InputLib/Blocks/MpodChannelData.h"
 // includes for C system headers
 // includes for C++ system headers
 #include<iomanip>
@@ -28,32 +28,32 @@ namespace InputParser
 {
 
 
-void MpodCsvData::addBoard(int input)
+void MpodChannelData::addBoard(int input)
 {
     this->board.push_back(input);
 }
 
-void MpodCsvData::addChannel(int input)
+void MpodChannelData::addChannel(int input)
 {
     this->channel.push_back(input);
 }
 
-void MpodCsvData::addOnline(bool input)
+void MpodChannelData::addOnline(bool input)
 {
     this->online.push_back(input);
 }
 
-void MpodCsvData::addVoltage(float input)
+void MpodChannelData::addVoltage(float input)
 {
     this->voltage.push_back(input);
 }
 
-void MpodCsvData::addMaxCurrent(float input)
+void MpodChannelData::addMaxCurrent(float input)
 {
     this->maxCurrent.push_back(input);
 }
 
-bool MpodCsvData::validate()
+bool MpodChannelData::validate()
 {
     bool output = ( (board.size() > 1) &&
                     (channel.size() > 1) &&
@@ -86,7 +86,7 @@ bool MpodCsvData::validate()
     return output;             
 }
 
-void MpodCsvData::printValidationErrors()
+void MpodChannelData::printValidationErrors()
 {
     if(!((board.size() > 1) &&
          (channel.size() > 1) &&
@@ -122,7 +122,7 @@ void MpodCsvData::printValidationErrors()
     }
 }
 
-std::ostream& operator<<(std::ostream& os, MpodCsvData const& mcd)
+std::ostream& operator<<(std::ostream& os, MpodChannelData const& mcd)
 {
     using std::setw;
     using std::setfill;

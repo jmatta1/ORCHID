@@ -33,7 +33,7 @@ namespace InputParser
 
 typedef boost::spirit::istream_iterator It;
 
-bool parseMpodCsvFile(MpodCsvData* mpodData, const std::string& inputFileName)
+bool parseMpodCsvFile(MpodChannelData* mpodData, const std::string& inputFileName)
 {
     //make the parser, this line will make the compiler *GRIND* as it has to
     //work its way through the huge amount template stuff

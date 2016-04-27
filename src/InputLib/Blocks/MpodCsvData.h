@@ -30,7 +30,7 @@ namespace InputParser
 {
 
 
-class MpodCsvData
+class MpodChannelData
 {
 public:
     // a vector for each column
@@ -51,7 +51,7 @@ public:
     void printValidationErrors();
 
     // ostream operator to allow outputting of the block class
-    friend std::ostream& operator<<(std::ostream& os, MpodCsvData const& mcd);
+    friend std::ostream& operator<<(std::ostream& os, MpodChannelData const& mcd);
 
 };
 

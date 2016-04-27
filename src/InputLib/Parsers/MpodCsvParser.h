@@ -26,7 +26,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
 // includes from ORCHID
-#include"InputLib/Blocks/MpodCsvData.h"
+#include"InputLib/Blocks/MpodChannelData.h"
 #include"Utility.h"
 
 namespace InputParser 
@@ -40,7 +40,7 @@ namespace qi = boost::spirit::qi;
 template <typename Iterator>
 struct MpodCsvParser : qi::grammar<Iterator>
 {
-    MpodCsvParser(MpodCsvData* data) :
+    MpodCsvParser(MpodChannelData* data) :
         MpodCsvParser::base_type(start),
         ptr(data)
 	{
@@ -66,11 +66,11 @@ struct MpodCsvParser : qi::grammar<Iterator>
                      > *eol_
                      > eoi
                    );
-        lineRule = ( int_         [phoenix::bind(&MpodCsvData::addBoard,      ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&MpodCsvData::addChannel,    ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&MpodCsvData::addOnline,     ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodCsvData::addVoltage,    ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodCsvData::addMaxCurrent, ptr, qi::_1)] > eol_ );
+        lineRule = ( int_         [phoenix::bind(&MpodChannelData::addBoard,      ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&MpodChannelData::addChannel,    ptr, qi::_1)] > lexeme[','] >
+                     boolSymbols_ [phoenix::bind(&MpodChannelData::addOnline,     ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodChannelData::addVoltage,    ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodChannelData::addMaxCurrent, ptr, qi::_1)] > eol_ );
 
         on_error<fail>
         (
@@ -90,7 +90,7 @@ struct MpodCsvParser : qi::grammar<Iterator>
     qi::rule<Iterator, qi::blank_type > lineRule;
     
     //data holder
-    MpodCsvData* ptr;
+    MpodChannelData* ptr;
 };
 
 }
