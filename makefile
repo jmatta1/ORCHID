@@ -172,6 +172,7 @@ cleanall: clean
 #this constructs the executable
 $(EXECUTABLE):$(OBJECTS)
 	$(COMP) $(FLAGS) $(LIB_FLAG) $(OBJECTS) $(OUTPUT_FLAG) $(EXECUTABLE)
+	@echo ""
 
 #all object files are built here, some moderate magic in making the prerequisites work right
 # add this to the end of the compile line to filter stl errors | gSTLFilt.pl
