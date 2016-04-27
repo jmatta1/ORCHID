@@ -3,7 +3,7 @@
 **
 ** @file MpodChannelData.cpp
 ** @author James Till Matta
-** @date 26 Mar, 2016
+** @date 25 Mar, 2016
 ** @brief
 **
 ** @copyright Copyright (C) 2016 James Till Matta
@@ -12,7 +12,7 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Implementation file for the MpodChannelData data structure struct
+** @details implementation file that holds the class with MPOD per channel info
 **
 ********************************************************************************
 *******************************************************************************/
@@ -128,8 +128,7 @@ std::ostream& operator<<(std::ostream& os, MpodChannelData const& mcd)
     using std::setfill;
     using std::setprecision;
     using std::fixed;
-    os << "MPOD Settings\n"
-       << "Board #, Channel #, Active, Voltage (V), Maximum Current (uA)\n";
+    os << "Board #, Channel #, Active, Voltage (V), Maximum Current (uA)\n";
     for(int i=0; i<mcd.channel.size(); ++i)
     {
         os << setw(7)  << setfill(' ')                             << mcd.board[i]              << ", ";

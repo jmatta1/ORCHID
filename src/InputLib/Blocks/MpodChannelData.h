@@ -1,7 +1,7 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file CsvBlock.h
+** @file MpodChannelData.h
 ** @author James Till Matta
 ** @date 25 Apr, 2016
 ** @brief
@@ -12,7 +12,7 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details file with the template class for storing parsed csv data
+** @details definition file that holds the class with MPOD per channel info
 **
 ********************************************************************************
 *******************************************************************************/
