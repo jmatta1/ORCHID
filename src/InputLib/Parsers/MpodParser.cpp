@@ -37,7 +37,7 @@ bool parseMpodChannelFile(MpodChannelData* mpodData, const std::string& inputFil
 {
     //make the parser, this line will make the compiler *GRIND* as it has to
     //work its way through the huge amount template stuff
-    Parsing::MpodCsvParser<It> mpodCsvParser(mpodData);
+    Parsing::MpodCsvParser<It> MpodChannelParser(mpodData);
     //set up the file
     std::ifstream input(inputFileName);
     //unset the skip whitespace

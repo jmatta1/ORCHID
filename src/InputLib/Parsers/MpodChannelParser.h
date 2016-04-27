@@ -38,10 +38,10 @@ namespace Parsing
 namespace qi = boost::spirit::qi;
 
 template <typename Iterator>
-struct MpodCsvParser : qi::grammar<Iterator>
+struct MpodChannelParser : qi::grammar<Iterator>
 {
-    MpodCsvParser(MpodChannelData* data) :
-        MpodCsvParser::base_type(start),
+    MpodChannelParser(MpodChannelData* data) :
+        MpodChannelParser::base_type(start),
         ptr(data)
 	{
 		using qi::skip;
@@ -70,7 +70,7 @@ struct MpodCsvParser : qi::grammar<Iterator>
                      int_         [phoenix::bind(&MpodChannelData::addChannel,    ptr, qi::_1)] > lexeme[','] >
                      boolSymbols_ [phoenix::bind(&MpodChannelData::addOnline,     ptr, qi::_1)] > lexeme[','] >
                      float_       [phoenix::bind(&MpodChannelData::addVoltage,    ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodChannelData::addMaxCurrent, ptr, qi::_1)] > eol_ );
+                     float_       [phoenix::bind(&MpodChannelData::addMaxCurrent, ptr, qi::_1)] > +eol_ );
 
         on_error<fail>
         (
