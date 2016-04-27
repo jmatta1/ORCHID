@@ -32,7 +32,7 @@ namespace InputParser
 class MpodChannelData;
 
 //function prototype for the parsing function
-bool parseMpodCsvFile(MpodChannelData* mpodData, const std::string& inputFileName);
+bool parseMpodChannelFile(MpodChannelData* mpodData, const std::string& inputFileName);
 
 }
 #endif  // ORCHID_SRC_INPUTLIB_PARSERS_PARSERS_MPODPARSER_H

@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     std::cout << "Reading MPOD CSV from the file: " << params.powerBlock->perChannelParameterFile << "\n\n";
     InputParser::MpodCsvData mpodData;
-    bool csvSuccess = InputParser::parseMpodCsvFile(&mpodData, params.powerBlock->perChannelParameterFile);
+    bool csvSuccess = InputParser::parseMpodChannelFile(&mpodData, params.powerBlock->perChannelParameterFile);
     std::cout << "MPOD CSV Parsing: " << (csvSuccess?"Succeeded":"Failed") << "\n";
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
     if(!csvSuccess)

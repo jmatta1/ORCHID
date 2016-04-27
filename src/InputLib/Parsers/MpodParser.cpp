@@ -26,14 +26,14 @@
 // includes from other libraries
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
-#include"MpodCsvParser.h"
+#include"MpodChannelParser.h"
 
 namespace InputParser
 {
 
 typedef boost::spirit::istream_iterator It;
 
-bool parseMpodCsvFile(MpodChannelData* mpodData, const std::string& inputFileName)
+bool parseMpodChannelFile(MpodChannelData* mpodData, const std::string& inputFileName)
 {
     //make the parser, this line will make the compiler *GRIND* as it has to
     //work its way through the huge amount template stuff
