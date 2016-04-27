@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_INPUTLIB_BLOCKS_CSVBLOCK_H
-#define ORCHID_SRC_INPUTLIB_BLOCKS_CSVBLOCK_H
+#ifndef ORCHID_SRC_INPUTLIB_BLOCKS_MPODCHANNELDATA_H
+#define ORCHID_SRC_INPUTLIB_BLOCKS_MPODCHANNELDATA_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -56,4 +56,4 @@ public:
 };
 
 }
-#endif  // ORCHID_SRC_INPUTLIB_BLOCKS_CSVBLOCK_H
+#endif  // ORCHID_SRC_INPUTLIB_BLOCKS_MPODCHANNELDATA_H

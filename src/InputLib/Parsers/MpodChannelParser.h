@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_INPUTLIB_PARSERS_MPODCSVPARSER_H
-#define ORCHID_SRC_INPUTLIB_PARSERS_MPODCSVPARSER_H
+#ifndef ORCHID_SRC_INPUTLIB_PARSERS_MPODCHANNELPARSER_H
+#define ORCHID_SRC_INPUTLIB_PARSERS_MPODCHANNELPARSER_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -97,4 +97,4 @@ struct MpodCsvParser : qi::grammar<Iterator>
 
 }
 
-#endif  // ORCHID_SRC_INPUTLIB_PARSERS_CSVPARSER_H
+#endif  // ORCHID_SRC_INPUTLIB_PARSERS_MPODCHANNELPARSER_H
