@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_INPUTLIB_PARSERS_MPODCHANNELPARSER_H
-#define ORCHID_SRC_INPUTLIB_PARSERS_MPODCHANNELPARSER_H
+#ifndef ORCHID_SRC_INPUTLIB_PARSERS_MPODMODULEPARSER_H
+#define ORCHID_SRC_INPUTLIB_PARSERS_MPODMODULEPARSER_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -26,7 +26,7 @@
 #include <boost/spirit/include/phoenix_operator.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
 // includes from ORCHID
-#include"InputLib/Blocks/MpodChannelData.h"
+#include"InputLib/Blocks/MpodModuleData.h"
 #include"Utility.h"
 
 namespace InputParser 
@@ -38,10 +38,10 @@ namespace Parsing
 namespace qi = boost::spirit::qi;
 
 template <typename Iterator>
-struct MpodChannelParser : qi::grammar<Iterator>
+struct MpodModuleParser : qi::grammar<Iterator>
 {
-    MpodChannelParser(MpodChannelData* data) :
-        MpodChannelParser::base_type(start),
+    MpodModuleParser(MpodModuleData* data) :
+        MpodModuleParser::base_type(start),
         ptr(data)
 	{
 		using qi::skip;
@@ -66,11 +66,12 @@ struct MpodChannelParser : qi::grammar<Iterator>
                      > *eol_
                      > eoi
                    );
-        lineRule = ( int_         [phoenix::bind(&MpodChannelData::addBoard,      ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&MpodChannelData::addChannel,    ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&MpodChannelData::addOnline,     ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodChannelData::addVoltage,    ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodChannelData::addMaxCurrent, ptr, qi::_1)] );
+        lineRule = ( int_         [phoenix::bind(&MpodModuleData::addBoard,       ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&MpodModuleData::addNumChannels, ptr, qi::_1)] > lexeme[','] >
+                     boolSymbols_ [phoenix::bind(&MpodModuleData::addOnline,      ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodModuleData::addRampSpeed,   ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodModuleData::addMaxVoltage,  ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodModuleData::addMaxCurrent,  ptr, qi::_1)] );
 
         on_error<fail>
         (
@@ -90,11 +91,11 @@ struct MpodChannelParser : qi::grammar<Iterator>
     qi::rule<Iterator, qi::blank_type > lineRule;
     
     //data holder
-    MpodChannelData* ptr;
+    MpodModuleData* ptr;
 };
 
 }
 
 }
 
-#endif  // ORCHID_SRC_INPUTLIB_PARSERS_MPODCHANNELPARSER_H
+#endif  // ORCHID_SRC_INPUTLIB_PARSERS_MPODMODULEPARSER_H

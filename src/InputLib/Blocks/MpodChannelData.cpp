@@ -55,11 +55,11 @@ void MpodChannelData::addMaxCurrent(float input)
 
 bool MpodChannelData::validate()
 {
-    bool output = ( (board.size() > 1) &&
-                    (channel.size() > 1) &&
-                    (online.size() > 1) &&
-                    (voltage.size() > 1) &&
-                    (maxCurrent.size() > 1));
+    bool output = ( (board.size() >= 1) &&
+                    (channel.size() >= 1) &&
+                    (online.size() >= 1) &&
+                    (voltage.size() >= 1) &&
+                    (maxCurrent.size() >= 1));
 
     output = (output &&
               (board.size() == channel.size()) &&

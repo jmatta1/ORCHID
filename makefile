@@ -2,24 +2,55 @@
 SRC_DIR=src
 #This variable stores the name/path of the directory with all the object files will be (relative to the make file)
 OBJ_DIR=build
-#This variable stores the names/paths of all the header files relative to the SRC_DIR
-# a command like "find . -name \*.h | sed 's/^..//'" is good for this
-HEADERS=DAQLib/DigiController.h DAQLib/DigiReader.h HVLib/MPODController.h HVLib/MPODReader.h\
-Threads/DigitizerThread.h Threads/EventThread.h Threads/EventThreadPool.h Threads/MPODThread.h\
-Threads/UserThread.h InputLib/InputParser.h InputLib/Blocks/DigitizerBlock.h\
-InputLib/Blocks/GeneralBlock.h InputLib/Blocks/PowerBlock.h InputLib/Blocks/InputParams.h\
-InputLib/Parsers/Parser.h InputLib/Parsers/DigitizerBlockGrammar.h InputLib/Parsers/FileParser.h\
-InputLib/Parsers/GeneralBlockGrammar.h InputLib/Parsers/PowerBlockGrammar.h InputLib/Parsers/Utility.h\
-InputLib/Blocks/MpodCsvData.h InputLib/Parsers/MpodCsvParser.h InputLib/Parsers/MpodParser.h
-#This variable stores the names/paths of all the source files relative to the SRC_DIR 
-# a command like "find . -name \*.cpp | sed 's/^..//'" is good for this
-SOURCES=main.cpp DAQLib/DigiController.cpp DAQLib/DigiReader.cpp HVLib/MPODController.cpp\
-HVLib/MPODReader.cpp Threads/DigitizerThread.cpp Threads/EventThread.cpp Threads/EventThreadPool.cpp\
-Threads/MPODThread.cpp Threads/UserThread.cpp InputLib/Blocks/DigitizerBlock.cpp\
-InputLib/Blocks/GeneralBlock.cpp InputLib/Blocks/PowerBlock.cpp InputLib/Blocks/InputParams.cpp\
-InputLib/Parsers/Parser.cpp InputLib/Blocks/MpodCsvData.cpp InputLib/Parsers/MpodParser.cpp
 #This variable stores the name/path of the executable file this executable will appear in the same folder as the make file
 EXECUTABLE=orchid
+
+#These variables store the names/paths of all the header files relative to the SRC_DIR
+INPUT_BLOCK_HEADERS=InputLib/Blocks/DigitizerBlock.h InputLib/Blocks/GeneralBlock.h\
+InputLib/Blocks/PowerBlock.h InputLib/Blocks/InputParams.h InputLib/Blocks/MpodChannelData.h\
+InputLib/Blocks/MpodModuleData.h
+
+INPUT_PARSER_HEADERS=InputLib/Parsers/Parser.h InputLib/Parsers/DigitizerBlockGrammar.h\
+InputLib/Parsers/FileParser.h InputLib/Parsers/GeneralBlockGrammar.h InputLib/Parsers/PowerBlockGrammar.h\
+InputLib/Parsers/Utility.h InputLib/Parsers/MpodChannelParser.h InputLib/Parsers/MpodParser.h
+
+# headers for DAQ reading and control
+DAQ_HEADERS=DAQLib/DigiController.h DAQLib/DigiReader.h
+
+# headers for HV reading and control classes
+HV_HEADERS=HVLib/MPODController.h HVLib/MPODReader.h
+
+# headers for thread classes
+THREAD_HEADERS=Threads/DigitizerThread.h Threads/EventThread.h Threads/EventThreadPool.h\
+Threads/MPODThread.h Threads/UserThread.h InputLib/InputParser.h
+
+# headers that are used to tie together subpackages
+SUB_PACKAGE_HEADERS=InputLib/InputLib.h
+
+MISC_HEADERS=TitleString.h
+
+#These variables store the names/paths of all the source files relative to the SRC_DIR 
+INPUT_BLOCK_SOURCES=InputLib/Blocks/DigitizerBlock.cpp InputLib/Blocks/GeneralBlock.cpp\
+InputLib/Blocks/PowerBlock.cpp InputLib/Blocks/InputParams.cpp InputLib/Blocks/MpodModuleData.cpp\
+InputLib/Blocks/MpodChannelData.cpp
+
+INPUT_PARSER_SOURCES=InputLib/Parsers/Parser.cpp InputLib/Parsers/MpodParser.cpp
+
+DAQ_SOURCES=DAQLib/DigiController.cpp DAQLib/DigiReader.cpp
+
+HV_SOURCES=HVLib/MPODController.cpp HVLib/MPODReader.cpp
+
+#sources for the threading stuff
+THREAD_SOURCES=Threads/DigitizerThread.cpp Threads/EventThread.cpp\
+Threads/EventThreadPool.cpp Threads/MPODThread.cpp Threads/UserThread.cpp
+
+# the full list of header files
+HEADERS=$(INPUT_BLOCK_HEADERS) $(INPUT_PARSER_HEADERS) $(SUB_PACKAGE_HEADERS)\
+$(DAQ_HEADERS) $(HV_HEADERS) $(THREAD_HEADERS) $(MISC_HEADERS)
+
+# The full list of source files
+SOURCES=main.cpp $(INPUT_BLOCK_SOURCES) $(INPUT_PARSER_SOURCES) $(DAQ_SOURCES)\
+$(HV_SOURCES) $(THREAD_SOURCES)
 
 #This flag contains special include directories in case the user needs to include headers from non standard directories
 #The user need not modify this for their own header files as the paths are calculated and included elsewhere in this program

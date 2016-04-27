@@ -10,64 +10,20 @@ HFIR background monitoring wall.
 #include<string>
 // includes from other libraries
 // includes from ORCHID
+#include"TitleString.h"
 #include"InputLib/InputLib.h"
 
-static const std::string titleString = "\n\n"
-"  OOOO           kk              RRRR            dd                         \n"
-"OO    OO         kk              RR  RR   ii     dd         eeee            \n"
-"OO    OO   aa    kk  kk          RR  RR          dd        ee  ee           \n"
-"OO    OO aa  aa  kkkk            RRRR     ii  ddddd  ggggg eeeee            \n"
-"OO    OO aa  aa  kk  kk          RR RR    ii dd  dd gg  gg ee               \n"
-"  OOOO     aa aa kk   kk         RR  RR   ii  ddddd  ggggg  eeeee           \n"
-"                                                        gg                  \n"
-"                                                      gggg                  \n"
-"                                                                            \n"
-"bb               CCCC kk                                               dd   \n"
-"bb              CC    kk                                               dd   \n"
-"bbbb     aa    CC     kk  kk         rrrrr    oo   uu  uu  nn nn     dddd   \n"
-"bb  bb aa  aa  CC     kkkk     ggggg rr  rr oo  oo uu  uu  nnn  nn dd  dd   \n"
-"bb  bb aa  aa   CC    kk  kk  gg  gg rr     oo  oo uu  uu  nn   nn dd  dd   \n"
-"bbbb     aa aa   CCCC kk   kk  ggggg rr       oo     uu uu nn   nn   dddd   \n"
-"                                  gg                                        \n"
-"                                gggg                                        \n"
-"                                                                            \n"
-"          tt           HH  HH IIIIII   fff                                  \n"
-"          tt           HH  HH   II    ff ff                                 \n"
-"  aa    tttttt         HHHHHH   II    ff    rrrrr                           \n"
-"aa  aa    tt           HH  HH   II   ffff   rr  rr                          \n"
-"aa  aa    tt           HH  HH   II    ff    rr                              \n"
-"  aa aa   tt           HH  HH IIIIII  ff    rr                              \n"
-"                                                                            \n"
-"DDDD                                                                        \n"
-"DD  DD                                                                      \n"
-"DD   DD   aa      qq                                                        \n"
-"DD   DD aa  aa  qq  qq                                                      \n"
-"DD  DD  aa  aa  qq  qq                                                      \n"
-"DDDD      aa aa   qqqq                                                      \n"
-"                    qq qq                                                   \n"
-"                    qqqq                                                    \n"
-"                                                                            \n"
-"============================================================================\n"
-"============================================================================\n"
-"=                                                                          =\n"
-"=                                                                          =\n"
-"=     OOOO     RRRRRR          CCCCCC  HH      HH  IIIIIIIIII  DDDDD       =\n"
-"=   OOO  OOO   RR   RRR      CCC       HH      HH  IIIIIIIIII  DD  DDD     =\n"
-"=  OO      OO  RR      RR   CCC        HH      HH      II      DD    DDD   =\n"
-"=  OO      OO  RR      RR  CCC         HH      HH      II      DD      DD  =\n"
-"=  OO      OO  RR   RRR    CCC         HHHHHHHHHH      II      DD      DD  =\n"
-"=  OO      OO  RRRRRR      CCC         HHHHHHHHHH      II      DD      DD  =\n"
-"=  OO      OO  RR   RR     CCC         HH      HH      II      DD      DD  =\n"
-"=  OO      OO  RR    RR     CCC        HH      HH      II      DD    DDD   =\n"
-"=   OOO  OOO   RR     RR     CCC       HH      HH  IIIIIIIIII  DD  DDD     =\n"
-"=     OOOO     RR      RR      CCCCCC  HH      HH  IIIIIIIIII  DDDDD       =\n"
-"=                                                                          =\n"
-"=                                                                          =\n"
-"============================================================================\n"
-"============================================================================\n"
-"    Version:                                                                \n"
-"             0.0.1\n\n";
 
+
+bool parseAndValidateInput(InputParser::InputParameters& params,
+                           const std::string& inputFileName);
+
+bool parseAndValidateMpodChannel(InputParser::MpodChannelData& mpodChannelData,
+                                 const std::string& inputFileName);
+
+bool parseAndValidateMpodModule(InputParser::MpodModuleData& mpodModuleData,
+                                const std::string& inputFileName);
+                                
 
 int main(int argc, char* argv[])
 {
@@ -76,59 +32,125 @@ int main(int argc, char* argv[])
         std::cout << "Usage:\n\t" << argv[0] << " InputFileName" << std::endl;
         return 1;
     }
-
+    
+    //read the input file
     std::cout << titleString;
     std::string inputFileName(argv[1]);
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    std::cout << "Reading input from the file: " << inputFileName << "\n\n";
     InputParser::InputParameters params;
-    bool success = InputParser::parseBlockInputFile(&params, inputFileName);
-    std::cout << "Input File Parsing: " << (success?"Succeeded":"Failed") << "\n";
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    if(!success)
+    InputParser::MpodChannelData mpodChannelData;
+    InputParser::MpodModuleData mpodModuleData;
+    if(!parseAndValidateInput(params, inputFileName) ||
+       !parseAndValidateMpodModule(mpodModuleData, params.powerBlock->perModuleParameterFile) ||
+       !parseAndValidateMpodChannel(mpodChannelData, params.powerBlock->perChannelParameterFile) )
     {
         return 1;
-    }
-    if (!params.validateInputParameters())
-    {
-        std::cout << "\nParameter Validation Failed" << "\n";
-        params.printValidationProblems();
-        return 1;
-    }
-    else
-    {
-        std::cout << "\nParameter Validation Succeeded" << "\n";
-        std::cout << "------------------------------------------------------\n";
-        std::cout << params << "\n";
-        std::cout << "------------------------------------------------------\n";
     }
     
-    //now that we have successfully read the block input file, now read the
-    // csv file with the MPOD data
-  /*  
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    std::cout << "Reading MPOD CSV from the file: " << params.powerBlock->perChannelParameterFile << "\n\n";
-    InputParser::MpodCsvData mpodData;
-    bool csvSuccess = InputParser::parseMpodChannelFile(&mpodData, params.powerBlock->perChannelParameterFile);
-    std::cout << "MPOD CSV Parsing: " << (csvSuccess?"Succeeded":"Failed") << "\n";
-    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
-    if(!csvSuccess)
-    {
-        return 1;
-    }
-    if (!mpodData.validate())
-    {
-        std::cout << "\nParameter Validation Failed" << "\n";
-        mpodData.printValidationErrors();
-        return 1;
-    }
-    else
-    {
-        std::cout << "\nParameter Validation Succeeded" << "\n";
-        std::cout << "------------------------------------------------------\n";
-        std::cout << mpodData << "\n";
-        std::cout << "------------------------------------------------------\n";
-    }*/
+    std::cout << std::flush << "\n\nInput Parameters\n\n";
+    std::cout << "==========================================================\n";
+    std::cout << "----------------------------------------------------------\n";
+    std::cout << "Base Parameter Input File\n";
+    std::cout << params << "\n";
+    std::cout << "----------------------------------------------------------\n";
+    std::cout << "----------------------------------------------------------\n";
+    std::cout << "MPOD Module Input File\n";
+    std::cout << mpodModuleData << "\n";
+    std::cout << "----------------------------------------------------------\n";
+    std::cout << "----------------------------------------------------------\n";
+    std::cout << "MPOD Channel Input File\n";
+    std::cout << mpodChannelData << "\n";
+    std::cout << "----------------------------------------------------------\n";
     
     return 0;
 }
+
+bool parseAndValidateInput(InputParser::InputParameters& params,
+                           const std::string& inputFileName)
+{
+    bool parseSuccess = true;
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    std::cout << "Reading Primary Input from the file: " << inputFileName << "\n";
+    parseSuccess = InputParser::parseBlockInputFile(&params, inputFileName);
+    std::cout << "Input File Parsing: " << (parseSuccess?"Succeeded":"Failed") << "\n";
+    
+    if(!parseSuccess)
+    {
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    if (!params.validateInputParameters())
+    {
+        std::cout << "\nInput File Validation Failed\n";
+        params.printValidationProblems();
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    else
+    {
+        std::cout << "Input File Validation Succeeded\n";
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    }
+    std::cout << "\n";
+    return true;
+}
+
+bool parseAndValidateMpodModule(InputParser::MpodModuleData& mpodModuleData,
+                                const std::string& inputFileName)
+{
+    bool parseSuccess = true;
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    std::cout << "Reading MPOD Module Data from the file: " << inputFileName << "\n";
+    parseSuccess = InputParser::parseMpodModuleFile(&mpodModuleData, inputFileName);
+    std::cout << "MPOD Module Data File Parsing: " << (parseSuccess?"Succeeded":"Failed") << "\n";
+    
+    if(!parseSuccess)
+    {
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    if (!mpodModuleData.validate())
+    {
+        std::cout << "MPOD Module Data Validation Failed\n";
+        mpodModuleData.printValidationErrors();
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    else
+    {
+        std::cout << "MPOD Module Data Validation Succeeded\n";
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    }
+    std::cout << "\n";
+    return true;
+}
+
+bool parseAndValidateMpodChannel(InputParser::MpodChannelData& mpodChannelData,
+                                 const std::string& inputFileName)
+{
+    bool parseSuccess = true;
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    std::cout << "Reading MPOD Channel Data from the file: " << inputFileName << "\n";
+    parseSuccess = InputParser::parseMpodChannelFile(&mpodChannelData, inputFileName);
+    std::cout << "MPOD Channel Data File Parsing: " << (parseSuccess?"Succeeded":"Failed") << "\n";
+    
+    if(!parseSuccess)
+    {
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    if (!mpodChannelData.validate())
+    {
+        std::cout << "MPOD Channel File Validation Failed\n";
+        mpodChannelData.printValidationErrors();
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    else
+    {
+        std::cout << "MPOD Channel File Validation Succeeded\n";
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    }
+    std::cout << "\n";
+    return true;
+}
+

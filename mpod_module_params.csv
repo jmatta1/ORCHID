@@ -1,2 +1,2 @@
-#module #, active, ramp speed (V/s), max set voltage (V), max set current (uA)
-        1,      T,              100,                2000,                 310
+#module #, # channels, active, ramp speed (V/s), max set voltage (V), max set current (uA)
+        1,         16,      T,              100,                2000,                 310

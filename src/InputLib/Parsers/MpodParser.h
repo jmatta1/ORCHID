@@ -30,9 +30,12 @@ namespace InputParser
 
 //predeclare the InputParameters class to get a pointer to it
 class MpodChannelData;
+class MpodModuleData;
 
 //function prototype for the parsing function
 bool parseMpodChannelFile(MpodChannelData* mpodData, const std::string& inputFileName);
+
+bool parseMpodModuleFile(MpodModuleData* mpodData, const std::string& inputFileName);
 
 }
 #endif  // ORCHID_SRC_INPUTLIB_PARSERS_PARSERS_MPODPARSER_H

@@ -27,6 +27,7 @@
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
 #include"MpodChannelParser.h"
+#include"MpodModuleParser.h"
 
 namespace InputParser
 {
@@ -37,7 +38,7 @@ bool parseMpodChannelFile(MpodChannelData* mpodData, const std::string& inputFil
 {
     //make the parser, this line will make the compiler *GRIND* as it has to
     //work its way through the huge amount template stuff
-    Parsing::MpodCsvParser<It> MpodChannelParser(mpodData);
+    Parsing::MpodChannelParser<It> mpodChannelParser(mpodData);
     //set up the file
     std::ifstream input(inputFileName);
     //unset the skip whitespace
@@ -45,7 +46,23 @@ bool parseMpodChannelFile(MpodChannelData* mpodData, const std::string& inputFil
     //set up the iterators
     It start(input), stop;
     //parse the damn thing
-    return boost::spirit::qi::parse(start, stop, mpodCsvParser);
+    return boost::spirit::qi::parse(start, stop, mpodChannelParser);
+}
+
+
+bool parseMpodModuleFile(MpodModuleData* mpodData, const std::string& inputFileName)
+{
+    //make the parser, this line will make the compiler *GRIND* as it has to
+    //work its way through the huge amount template stuff
+    Parsing::MpodModuleParser<It> mpodModuleParser(mpodData);
+    //set up the file
+    std::ifstream input(inputFileName);
+    //unset the skip whitespace
+    input.unsetf(std::ios::skipws);
+    //set up the iterators
+    It start(input), stop;
+    //parse the damn thing
+    return boost::spirit::qi::parse(start, stop, mpodModuleParser);
 }
 
 }

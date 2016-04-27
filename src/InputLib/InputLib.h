@@ -25,7 +25,8 @@
 #include"Blocks/GeneralBlock.h"
 #include"Blocks/PowerBlock.h"
 #include"Blocks/DigitizerBlock.h"
-#include"Blocks/MpodCsvData.h"
+#include"Blocks/MpodChannelData.h"
+#include"Blocks/MpodModuleData.h"
 
 //grab the definition of the parsing function
 #include"Parsers/Parser.h"
