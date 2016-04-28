@@ -18,7 +18,7 @@ PerChannelParameterFile = "./digitizer_params.csv"
 [PowerBlock]
 PerChannelParameterFile = "./mpod_channel_params.csv"
 PerModuleParameterFile = "./mpod_module_params.csv"
-MpodIPAddress = 192.168.1.11
+MpodIPAddress = 192.168.11.11
 [EndBlock]
 
 [End]
