@@ -27,7 +27,7 @@ Threads/MPODThread.h Threads/UserThread.h InputLib/InputParser.h
 # headers that are used to tie together subpackages
 SUB_PACKAGE_HEADERS=InputLib/InputLib.h
 
-MISC_HEADERS=TitleString.h
+MISC_HEADERS=Utility/TitleString.h Utility/ParseAndValidate.h
 
 #These variables store the names/paths of all the source files relative to the SRC_DIR 
 INPUT_BLOCK_SOURCES=InputLib/Blocks/DigitizerBlock.cpp InputLib/Blocks/GeneralBlock.cpp\
@@ -44,13 +44,15 @@ HV_SOURCES=HVLib/MPODController.cpp HVLib/MPODReader.cpp
 THREAD_SOURCES=Threads/DigitizerThread.cpp Threads/EventThread.cpp\
 Threads/EventThreadPool.cpp Threads/MPODThread.cpp Threads/UserThread.cpp
 
+MISC_SOURCES=Utility/ParseAndValidate.cpp
+
 # the full list of header files
 HEADERS=$(INPUT_BLOCK_HEADERS) $(INPUT_PARSER_HEADERS) $(SUB_PACKAGE_HEADERS)\
 $(DAQ_HEADERS) $(HV_HEADERS) $(THREAD_HEADERS) $(MISC_HEADERS)
 
 # The full list of source files
 SOURCES=main.cpp $(INPUT_BLOCK_SOURCES) $(INPUT_PARSER_SOURCES) $(DAQ_SOURCES)\
-$(HV_SOURCES) $(THREAD_SOURCES)
+$(HV_SOURCES) $(THREAD_SOURCES) $(MISC_SOURCES)
 
 #This flag contains special include directories in case the user needs to include headers from non standard directories
 #The user need not modify this for their own header files as the paths are calculated and included elsewhere in this program
