@@ -27,9 +27,6 @@ Threads/MPODThread.h Threads/UserThread.h InputLib/InputParser.h
 # headers that are used to tie together subpackages
 SUB_PACKAGE_HEADERS=InputLib/InputLib.h
 
-#headers for the communications classes
-COMM_HEADERS=Comm/SnmpConnection.h
-
 MISC_HEADERS=Utility/TitleString.h Utility/ParseAndValidate.h
 
 #These variables store the names/paths of all the source files relative to the SRC_DIR 
@@ -47,8 +44,6 @@ HV_SOURCES=HVLib/MpodController.cpp HVLib/MpodReader.cpp
 THREAD_SOURCES=Threads/DigitizerThread.cpp Threads/EventThread.cpp\
 Threads/EventThreadPool.cpp Threads/MPODThread.cpp Threads/UserThread.cpp
 
-#sourcess for the communications classes
-COMM_SOURCES=Comm/SnmpConnection.cpp
 
 MISC_SOURCES=Utility/ParseAndValidate.cpp
 
@@ -67,8 +62,7 @@ $(HV_SOURCES) $(THREAD_SOURCES) $(MISC_SOURCES) $(COMM_SOURCES)
 USER_INCLUDE_LOCATIONS=$(CLANG_INCLUDE_LOCATIONS)
 #This flag contains special library location directories and library link flags
 #CLANG_LIBRARY_FLAGS=-L/usr/lib/gcc/x86_64-redhat-linux/5.1.1 -L/usr/lib64 -L/usr/lib/
-USER_LIBRARY_FLAGS=$(CLANG_LIBRARY_FLAGS) -Wl,-z,relro -Wl,-z,now -L/usr/lib64 -lnetsnmp\
--lssl -lssl -lcrypto -lm -lboost_system
+USER_LIBRARY_FLAGS=$(CLANG_LIBRARY_FLAGS)
 #This variable contains the compiler command set it to g++ for C++ programs and gcc for C programs
 COMP=g++
 #COMP=clang++
@@ -91,7 +85,7 @@ MAKE_INCLUDES=$(patsubst %$(EXT),$(OBJ_DIR)/prerequisites/%.mk,$(SOURCES))
 # only bother including the prereq files if we are not cleaning
 ifeq (,$(findstring clean,$(MAKECMDGOALS)))
 #include the files, suppress the errors since if they are non existant
-#they will be rebuilt
+#they will be built
 -include $(MAKE_INCLUDES)
 endif
 

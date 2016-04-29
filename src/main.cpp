@@ -10,6 +10,9 @@ HFIR background monitoring wall.
 #include<string>
 // includes from other libraries
 // includes from ORCHID
+#include"Utility/TitleString.h"
+#include"Utility/ParseAndValidate.h"
+#include"InputLib/InputLib.h"
 
 void snmpPrint(std::string result, int num)
 {
