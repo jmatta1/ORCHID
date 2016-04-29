@@ -13,6 +13,7 @@ HFIR background monitoring wall.
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
 #include"InputLib/InputLib.h"
+#include"HVLib/MpodSnmpUtil.h"
 
 int main(int argc, char* argv[])
 {
@@ -49,6 +50,10 @@ int main(int argc, char* argv[])
     std::cout << "MPOD Channel Input File\n";
     std::cout << mpodChannelData << "\n";
     std::cout << "----------------------------------------------------------\n";
+    
+    std::cout << "testing template metaprogramming: "
+              << SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysMainSwitch>::cmd()
+              << std::endl;
     
     return 0;
 }
