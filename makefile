@@ -27,6 +27,9 @@ Threads/MPODThread.h Threads/UserThread.h InputLib/InputParser.h
 # headers that are used to tie together subpackages
 SUB_PACKAGE_HEADERS=InputLib/InputLib.h
 
+#headers for the communications classes
+COMM_HEADERS=Comm/SnmpConnection.h
+
 MISC_HEADERS=Utility/TitleString.h Utility/ParseAndValidate.h
 
 #These variables store the names/paths of all the source files relative to the SRC_DIR 
@@ -44,15 +47,18 @@ HV_SOURCES=HVLib/MpodController.cpp HVLib/MpodReader.cpp
 THREAD_SOURCES=Threads/DigitizerThread.cpp Threads/EventThread.cpp\
 Threads/EventThreadPool.cpp Threads/MPODThread.cpp Threads/UserThread.cpp
 
+#sourcess for the communications classes
+COMM_SOURCES=Comm/SnmpConnection.cpp
+
 MISC_SOURCES=Utility/ParseAndValidate.cpp
 
 # the full list of header files
 HEADERS=$(INPUT_BLOCK_HEADERS) $(INPUT_PARSER_HEADERS) $(SUB_PACKAGE_HEADERS)\
-$(DAQ_HEADERS) $(HV_HEADERS) $(THREAD_HEADERS) $(MISC_HEADERS)
+$(DAQ_HEADERS) $(HV_HEADERS) $(THREAD_HEADERS) $(MISC_HEADERS) $(COMM_HEADERS)
 
 # The full list of source files
 SOURCES=main.cpp $(INPUT_BLOCK_SOURCES) $(INPUT_PARSER_SOURCES) $(DAQ_SOURCES)\
-$(HV_SOURCES) $(THREAD_SOURCES) $(MISC_SOURCES)
+$(HV_SOURCES) $(THREAD_SOURCES) $(MISC_SOURCES) $(COMM_SOURCES)
 
 #This flag contains special include directories in case the user needs to include headers from non standard directories
 #The user need not modify this for their own header files as the paths are calculated and included elsewhere in this program
@@ -61,7 +67,8 @@ $(HV_SOURCES) $(THREAD_SOURCES) $(MISC_SOURCES)
 USER_INCLUDE_LOCATIONS=$(CLANG_INCLUDE_LOCATIONS)
 #This flag contains special library location directories and library link flags
 #CLANG_LIBRARY_FLAGS=-L/usr/lib/gcc/x86_64-redhat-linux/5.1.1 -L/usr/lib64 -L/usr/lib/
-USER_LIBRARY_FLAGS=$(CLANG_LIBRARY_FLAGS)
+USER_LIBRARY_FLAGS=$(CLANG_LIBRARY_FLAGS) -Wl,-z,relro -Wl,-z,now -L/usr/lib64 -lnetsnmp\
+-lssl -lssl -lcrypto -lm -lboost_system
 #This variable contains the compiler command set it to g++ for C++ programs and gcc for C programs
 COMP=g++
 #COMP=clang++
