@@ -3,7 +3,7 @@
 **
 ** @file MpodChannelData.cpp
 ** @author James Till Matta
-** @date 25 Mar, 2016
+** @date 25 Apr, 2016
 ** @brief
 **
 ** @copyright Copyright (C) 2016 James Till Matta
