@@ -1,7 +1,7 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file MpodSnmpOid.h
+** @file MpodSnmpUtil.h
 ** @author James Till Matta
 ** @date 29 Apr, 2016
 ** @brief
@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_COMM_MPODSNMPOID_H
-#define ORCHID_SRC_COMM_MPODSNMPOID_H
+#ifndef ORCHID_SRC_COMM_MPODSNMPUTIL_H
+#define ORCHID_SRC_COMM_MPODSNMPUTIL_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -131,4 +131,4 @@ template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::Sys
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugBoot>
 {   static constexpr const char suff[] = ".1.1029";
     static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugBoot>::suff, 4>::value();}};
-#endif //ORCHID_SRC_COMM_MPODSNMPOID_H
+#endif //ORCHID_SRC_COMM_MPODSNMPUTIL_H
