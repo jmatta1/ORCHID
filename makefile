@@ -18,7 +18,7 @@ InputLib/Parsers/Utility.h InputLib/Parsers/MpodChannelParser.h InputLib/Parsers
 DAQ_HEADERS=DAQLib/DigiController.h DAQLib/DigiReader.h
 
 # headers for HV reading and control classes
-HV_HEADERS=HVLib/MPODController.h HVLib/MPODReader.h
+HV_HEADERS=HVLib/MpodController.h HVLib/MpodReader.h
 
 # headers for thread classes
 THREAD_HEADERS=Threads/DigitizerThread.h Threads/EventThread.h Threads/EventThreadPool.h\
@@ -38,7 +38,7 @@ INPUT_PARSER_SOURCES=InputLib/Parsers/Parser.cpp InputLib/Parsers/MpodParser.cpp
 
 DAQ_SOURCES=DAQLib/DigiController.cpp DAQLib/DigiReader.cpp
 
-HV_SOURCES=HVLib/MPODController.cpp HVLib/MPODReader.cpp
+HV_SOURCES=HVLib/MpodController.cpp HVLib/MpodReader.cpp
 
 #sources for the threading stuff
 THREAD_SOURCES=Threads/DigitizerThread.cpp Threads/EventThread.cpp\
