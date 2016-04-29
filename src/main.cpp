@@ -51,9 +51,9 @@ int main(int argc, char* argv[])
     std::cout << mpodChannelData << "\n";
     std::cout << "----------------------------------------------------------\n";
     
-    std::cout << "testing template metaprogramming: "
+    std::cout << "\n\nTesting template metaprogramming: \n"
               << SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysMainSwitch>::cmd()
-              << std::endl;
+              << "\n\n" << std::endl;
     
     return 0;
 }

@@ -77,65 +77,58 @@ enum class SignaVals : int
 
 static constexpr const char WienerCrateOid[] = ".1.3.6.1.4.1.19947.1";
 
-static constexpr const char PtOne[]        = ".1";
-static constexpr const char PtTwo[]        = ".2";
-static constexpr const char PtThree[]      = ".3";
-static constexpr const char PtFour[]       = ".4";
-static constexpr const char PtFive[]       = ".5";
-static constexpr const char PtSix[]        = ".6";
-static constexpr const char PtSeven[]      = ".7";
-static constexpr const char PtEight[]      = ".8";
-static constexpr const char PtNine[]       = ".9";
-static constexpr const char PtTen[]        = ".10";
-static constexpr const char PtEleven[]     = ".11";
-static constexpr const char PtTwelve[]     = ".12";
-static constexpr const char PtThousand24[] = ".1024";
-static constexpr const char PtThousand25[] = ".1025";
-static constexpr const char PtThousand26[] = ".1026";
-static constexpr const char PtThousand27[] = ".1027";
-static constexpr const char PtThousand28[] = ".1028";
-static constexpr const char PtThousand29[] = ".1029";
-
-
 template<CrateSubTrees subTree, typename SubTreeType, SubTreeType val>
 struct SnmpReadCmd;
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysMainSwitch>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtOne, 2>::value(), 4>::value();}};
-/*
+{   static constexpr const char suff[] = ".1.1";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysMainSwitch>::suff, 4>::value();}};
+
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysStatus>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtTwo, 2>::value(), 4>::value();}};
+{   static constexpr const char suff[] = ".1.2";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysStatus>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysVmeSysReset>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtThree, 2>::value(), 4>::value();}};
+{   static constexpr const char suff[] = ".1.3";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysVmeSysReset>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysHardwareReset>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtFour, 2>::value(), 4>::value();}};
+{   static constexpr const char suff[] = ".1.4";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysHardwareReset>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysFactoryDefaults>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtFive, 2>::value(), 4>::value();}};
+{   static constexpr const char suff[] = ".1.5";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysFactoryDefaults>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysConfigDoMeasurementCurrent>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtTen, 3>::value(), 5>::value();}};
+{   static constexpr const char suff[] = ".1.11";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysConfigDoMeasurementCurrent>::suff, 5>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysOperatingTime>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtEleven, 3>::value(), 5>::value();}};
+{   static constexpr const char suff[] = ".1.12";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysOperatingTime>::suff, 5>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugMemory8>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtThousand24, 5>::value(), 7>::value();}};
+{   static constexpr const char suff[] = ".1.1024";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugMemory8>::suff, 7>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugMemory16>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtThousand25, 5>::value(), 7>::value();}};
+{   static constexpr const char suff[] = ".1.1025";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugMemory16>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugMemory32>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtThousand26, 5>::value(), 7>::value();}};
+{   static constexpr const char suff[] = ".1.1026";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugMemory32>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebug>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtThousand27, 5>::value(), 7>::value();}};
+{   static constexpr const char suff[] = ".1.1027";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebug>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugDisplay>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtThousand28, 5>::value(), 7>::value();}};
+{   static constexpr const char suff[] = ".1.1028";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugDisplay>::suff, 4>::value();}};
 
 template<> struct SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugBoot>
-{static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, AppendStrings<PtOne, 2, PtThousand29, 5>::value(), 7>::value();}};*/
+{   static constexpr const char suff[] = ".1.1029";
+    static constexpr const char* cmd() {return AppendStrings<WienerCrateOid, 20, SnmpReadCmd<CrateSubTrees::System, SystemVals, SystemVals::SysDebugBoot>::suff, 4>::value();}};
 #endif //ORCHID_SRC_COMM_MPODSNMPOID_H
