@@ -12,7 +12,8 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds the template system that concatenates strings
+** @details Holds the template system that concatenates strings also has int to
+** strings and digit count utilities
 **
 ********************************************************************************
 *******************************************************************************/
@@ -30,7 +31,7 @@ template <const char* str, int len, char... suffix>
 struct AppendChars
 {
     static constexpr const char* value()
-        {return AppendChars<str, len-1, std[len-1], suffix...>::value();}
+        {return AppendChars<str, len-1, str[len-1], suffix...>::value();}
 };
 
 //end point of the recursion
@@ -58,4 +59,47 @@ struct AppendStrings<str1, len1, str2, 0, suffix...>
         {return AppendChars<str1, len1, suffix...>::value();}
 };
 
+
+
+
+
+//This is the recursive int to string used by IntToString
+template <int value, char ... suffix>
+struct IntToStringRecur
+{
+    static constexpr const char* toStr()
+        {return IntToStringRecur<(value/10), ('0' + (value%10)), suffix...>::value();}
+};
+
+template <char ... suffix>
+struct IntToStringRecur <0, suffix...>
+{
+    static constexpr const char* toStr()
+        {return (const char[]){suffix..., 0};}
+};
+
+//this class converts an integer value to a string
+template <int value>
+struct IntToString
+{
+    static constexpr const char* toStr()
+        {return IntToStringRecur<(value/10), ('0' + (value%10))>::value();}
+};
+
+//this class counts the number of digits in an integer
+//this is to be used in tandem with IntToStr so that they can work with the
+//AppendChars and AppendStrings stuff above
+template <int value, int count>
+struct IntDigitCount
+{
+    static constexpr int digits()
+        {return IntDigitCount<(value/10), (count+1)>::digits();}
+};
+
+template <int count>
+struct IntDigitCount<0, count>
+{
+    static constexpr int digits()
+        {return (count);}
+};
 #endif //ORCHID_SRC_UTILITY_TMPSTRINGCONCAT_H
