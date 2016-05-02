@@ -25,6 +25,7 @@
 #include<cstdio>
 #include<memory>
 #include<stdexcept>
+#include<iostream>
 // includes from other libraries
 // includes from ORCHID
 
@@ -111,7 +112,7 @@ std::string SnmpUtilControl::buildCommand(const std::string& command, const std:
     std::ostringstream cmdBuilder;
     cmdBuilder << command << " -OeqUv -v 2c -M " << this->mibLocation;
     cmdBuilder << " -m +WIENER-CRATE-MIB  -c guru " << this->ipAddress;
-    cmdBuilder << parameter;
+    cmdBuilder << " " << parameter;
     return cmdBuilder.str();
 }
 
