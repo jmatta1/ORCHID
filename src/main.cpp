@@ -13,6 +13,9 @@ HFIR background monitoring wall.
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
 #include"InputLib/InputLib.h"
+#include"HVLib/SnmpUtilControl.h"
+#include<thread>
+#include<chrono>
 
 void snmpPrint(std::string result, int num)
 {
@@ -56,5 +59,110 @@ int main(int argc, char* argv[])
     std::cout << mpodChannelData << "\n";
     std::cout << "----------------------------------------------------------\n";
     
+    std::cout << "\n\n" << std::endl;
+    
+    SnmpUtilControl mpodControl(params.powerBlock->mpodIpAddress,
+                                params.powerBlock->weinerMibFileDirectory);
+    
+    std::chrono::seconds longDuration(8);
+    std::chrono::seconds shortDuration(1);
+    
+    std::cout << "Starting the MPOD Crate" <<std::endl;
+    
+    std::cout << mpodControl.snmpGlobalSet(MpodGlobalSetParam::SysMainSwitch, 1) << std::endl;
+    
+    std::this_thread::sleep_for(longDuration);
+    
+    std::cout << "Setting Voltages" << std::endl;
+    
+    for(int i=0; i<mpodChannelData.board.size(); ++i)
+    {
+        if(mpodChannelData.online[i])
+        {
+            std::cout << mpodControl.snmpChannelSet(MpodChannelSetParam::SetVoltage,
+                                                    mpodChannelData.board[i],
+                                                    mpodChannelData.channel[i],
+                                                    mpodChannelData.voltage[i]) << std::flush;
+        }
+    }
+    
+    std::this_thread::sleep_for(longDuration);
+    
+    std::cout << "Switching channels to on" << std::endl;
+    
+    for(int i=0; i<mpodChannelData.board.size(); ++i)
+    {
+        if(mpodChannelData.online[i])
+        {
+            std::cout << mpodControl.snmpChannelSet(MpodChannelSetParam::OutputSwitch,
+                                                    mpodChannelData.board[i],
+                                                    mpodChannelData.channel[i],
+                                                    1) << std::endl;
+        }
+    }
+    
+    std::cout << "Watching ramp up" << std::endl;
+    
+    for(int j=0; j<45; ++j)
+    {
+        
+        std::cout << "Ramp Up step: " << j << std::endl;
+        std::cout << "Voltages: " << j << std::endl;
+        std::cout << mpodControl.snmpChannelWalk(MpodChannelGetParam::TerminalVoltage) << std::endl;
+        std::cout << "Statuses: " << j << std::endl;
+        std::cout << mpodControl.snmpChannelWalk(MpodChannelGetParam::OutputStatus) << std::endl;
+        
+        std::this_thread::sleep_for(shortDuration);
+    }
+    
+    std::this_thread::sleep_for(longDuration);
+    
+    std::cout << "Switching channels to off" << std::endl;
+    
+    for(int i=0; i<mpodChannelData.board.size(); ++i)
+    {
+        if(mpodChannelData.online[i])
+        {
+            std::cout << mpodControl.snmpChannelSet(MpodChannelSetParam::OutputSwitch,
+                                                    mpodChannelData.board[i],
+                                                    mpodChannelData.channel[i],
+                                                    0) << std::flush;
+        }
+    }
+    
+    std::cout << "Watching ramp down" << std::endl;
+    
+    for(int j=0; j<45; ++j)
+    {
+        
+        std::cout << "Ramp down step: " << j << std::endl;
+        std::cout << "Voltages: " << j << std::endl;
+        std::cout << mpodControl.snmpChannelWalk(MpodChannelGetParam::TerminalVoltage) << std::endl;
+        std::cout << "Statuses: " << j << std::endl;
+        std::cout << mpodControl.snmpChannelWalk(MpodChannelGetParam::OutputStatus) << std::endl;
+        
+        std::this_thread::sleep_for(shortDuration);
+    }
+    
+    std::cout << "Resetting Voltages" << std::endl;
+    
+    for(int i=0; i<mpodChannelData.board.size(); ++i)
+    {
+        if(mpodChannelData.online[i])
+        {
+            std::cout << mpodControl.snmpChannelSet(MpodChannelSetParam::SetVoltage,
+                                                    mpodChannelData.board[i],
+                                                    mpodChannelData.channel[i],
+                                                    0.0) << std::flush;
+        }
+    }
+    
+    std::this_thread::sleep_for(longDuration);
+    
+    std::cout << "Shutting Down MPOD Crate" <<std::endl;
+    
+    std::cout << mpodControl.snmpGlobalSet(MpodGlobalSetParam::SysMainSwitch, 0) << std::endl;
+    
+    return 0;
 }
 

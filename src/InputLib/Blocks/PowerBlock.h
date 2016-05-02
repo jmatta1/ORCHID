@@ -39,12 +39,14 @@ struct PowerBlock
 	std::string perChannelParameterFile;
 	std::string perModuleParameterFile;
 	std::string mpodIpAddress;
+	std::string weinerMibFileDirectory;
     
     // parameter setters for binding with boost::spirit::qi
     // required parameters
     void perChannelParameterFileSet(const std::string& input);
     void perModuleParameterFileSet(const std::string& input);
     void mpodIpAddressSet(const std::string& input);
+    void weinerMibFileDirectorySet(const std::string& input);
 	
 	bool validate();
 	void printValidationErrors();
@@ -57,6 +59,7 @@ private:
     bool perChannelParameterFileSet_;
     bool perModuleParameterFileSet_;
     bool mpodIpAddressSet_;
+    bool weinerMibFileDirectorySet_;
 };
 
 }

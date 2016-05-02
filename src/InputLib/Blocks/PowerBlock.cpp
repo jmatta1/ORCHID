@@ -51,12 +51,18 @@ void PowerBlock::mpodIpAddressSet(const std::string& input)
     mpodIpAddressSet_ = true;
 }
 
+void PowerBlock::weinerMibFileDirectorySet(const std::string& input)
+{
+    weinerMibFileDirectory = input;
+    weinerMibFileDirectorySet_ = true;
+}
 
 bool PowerBlock::validate()
 {
     return (perChannelParameterFileSet_ &&
             perModuleParameterFileSet_ &&
-            mpodIpAddressSet_);
+            mpodIpAddressSet_&&
+            weinerMibFileDirectorySet_);
 }
 
 void PowerBlock::printValidationErrors()
@@ -74,6 +80,10 @@ void PowerBlock::printValidationErrors()
     {
         std::cout << "    IPAddress was not set\n";
     }
+    if(!weinerMibFileDirectorySet_)
+    {
+        std::cout << "    MIB file directory was not set\n";
+    }
     std::cout << "End PowerBlock Validation Errors\n";
 }
 
@@ -83,6 +93,7 @@ return os << "[PowerBlock]\n"
     << "    PerModuleParameterFile   = "   << pb.perModuleParameterFile  << "\n"
     << "    PerChannelParameterFile  = "   << pb.perChannelParameterFile << "\n"
     << "    IPAddress                = "   << pb.mpodIpAddress           << "\n"
+    << "    WienerMibFileDirectory   = "   << pb.weinerMibFileDirectory  << "\n"
     << "[EndBlock]";
 }
 

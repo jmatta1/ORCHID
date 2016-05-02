@@ -52,16 +52,17 @@ struct PowerBlockGrammar : qi::grammar<Iterator>
 		using Utility::separator;
         
         //define the rules to parse the parameters
-        moduleFile  = (lexeme["PerModuleParameterFile"]  >> '=' > quotedString [phoenix::bind(&PowerBlock::perModuleParameterFileSet , ptr, qi::_1)] > separator);
+        moduleFile  = (lexeme["PerModuleParameterFile"]  >> '=' > quotedString [phoenix::bind(&PowerBlock::perModuleParameterFileSet,  ptr, qi::_1)] > separator);
         channelFile = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&PowerBlock::perChannelParameterFileSet, ptr, qi::_1)] > separator);
         ipAddress   = (lexeme["MpodIPAddress"]           >> '=' > ipAddr       [phoenix::bind(&PowerBlock::mpodIpAddressSet,           ptr, qi::_1)] > separator);
+        mibFile     = (lexeme["WienerMibFileDirectory"]  >> '=' > quotedString [phoenix::bind(&PowerBlock::weinerMibFileDirectorySet,  ptr, qi::_1)] > separator);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		startRule = skip(blank) [powerBlockRule];
 		powerBlockRule = lexeme["[PowerBlock]"] >> *eol_
                                > ( 
-                                   moduleFile ^ channelFile ^ ipAddress
+                                   moduleFile ^ channelFile ^ ipAddress ^ mibFile
                                  )
                                > lexeme["[EndBlock]"];
 	}
@@ -76,7 +77,7 @@ private:
 	Utility::IPAddressString<Iterator> ipAddr;
 	
 	// parameters
-	qi::rule<Iterator, qi::blank_type> moduleFile, channelFile, ipAddress;
+	qi::rule<Iterator, qi::blank_type> moduleFile, channelFile, ipAddress, mibFile;
 
 	// hold the pointer that we are going to bind to
 	PowerBlock* ptr;

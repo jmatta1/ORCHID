@@ -19,6 +19,7 @@ PerChannelParameterFile = "./digitizer_params.csv"
 PerChannelParameterFile = "./mpod_channel_params.csv"
 PerModuleParameterFile = "./mpod_module_params.csv"
 MpodIPAddress = 192.168.11.11
+WienerMibFileDirectory = "/usr/share/snmp/mibs"
 [EndBlock]
 
 [End]
