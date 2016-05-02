@@ -17,9 +17,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#ifndef ORCHID_SRC_HVLIB_SNMPUTILCONTROL_H
-#define ORCHID_SRC_HVLIB_SNMPUTILCONTROL_H
-
+#include"SnmpUtilControl.h"
 // includes for C system headers
 // includes for C++ system headers
 #include<sstream>
@@ -33,13 +31,13 @@
 std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command)
 {
     return this->runCommand(this->buildCommand("snmpget",
-                                               CmdLookup::GLOBAL_GET_COMMANDS[command]));
+                                               CmdLookup::GLOBAL_GET_COMMANDS.at(command)));
 }
 
 std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command, int board, int channel)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::CHANNEL_GET_COMMANDS[command];
+    parameterBuilder << CmdLookup::CHANNEL_GET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
     return this->runCommand(this->buildCommand("snmpget",
                                                parameterBuilder.str()));
@@ -48,60 +46,60 @@ std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command, int boa
 std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command)
 {
     return this->runCommand(this->buildCommand("snmpwalk",
-                                               CmdLookup::CHANNEL_GET_COMMANDS[command]));
+                                               CmdLookup::CHANNEL_GET_COMMANDS.at(command)));
 }
 
-std::string SnmpUtilControl::snmpGlobalSet(MpodSet command, float value)
+std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, float value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS[command];
+    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
     parameterBuilder << " F " << value;
     return this->runCommand(this->buildCommand("snmpset",
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::snmpGlobalSet(MpodSet command, double value)
+std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, double value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS[command];
+    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
     parameterBuilder << " F " << value;
     return this->runCommand(this->buildCommand("snmpset",
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::snmpGlobalSet(MpodSet command, int value)
+std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, int value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS[command];
+    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
     parameterBuilder << " i " << value;
     return this->runCommand(this->buildCommand("snmpset",
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::snmpChannelSet(MpodGet command, int board, int channel, float value)
+std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, float value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS[command];
+    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
     parameterBuilder << " F " << value;
     return this->runCommand(this->buildCommand("snmpset",
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::snmpChannelSet(MpodGet command, int board, int channel, double value)
+std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, double value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS[command];
+    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
     parameterBuilder << " F " << value;
     return this->runCommand(this->buildCommand("snmpset",
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::snmpChannelSet(MpodGet command, int board, int channel, int value)
+std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, int value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS[command];
+    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
     parameterBuilder << " i " << value;
     return this->runCommand(this->buildCommand("snmpset",
@@ -134,11 +132,16 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     return result;
 }
 
-std::string convertToUniversalChannel(int board, int channel)
+std::string SnmpUtilControl::convertToUniversalChannel(int board, int channel)
 {
     if( (board < 1) || (board > 10) ) throw std::runtime_error("Invalid board number (not in the range [1, 10]");
     std::ostringstream channelNamer;
-    channelNamer << ".u" << (board>=2)?(board-1):"" << (channel-1)
+    channelNamer << ".u";
+    if((board>=2))
+    {
+        channelNamer << (board-1);
+    }
+    channelNamer << (channel-1);
     return channelNamer.str();
 }
 

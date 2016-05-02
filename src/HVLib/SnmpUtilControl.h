@@ -30,23 +30,23 @@
 class SnmpUtilControl
 {
 public:
-    SnmpUtilControl(const std::string& ip, const string& mibLoc):
+    SnmpUtilControl(const std::string& ip, const std::string& mibLoc):
         ipAddress(ip), mibLocation(mibLoc) {}
     ~SnmpUtilControl(){}
     
     std::string snmpGlobalGet(MpodGlobalGetParam command);
-    std::string snmpChannelGet(MpodGet command, int board, int channel);
-    std::string snmpChannelWalk(MpodGet command);
+    std::string snmpChannelGet(MpodChannelGetParam command, int board, int channel);
+    std::string snmpChannelWalk(MpodChannelGetParam command);
 
-    std::string snmpGlobalSet(MpodSet command, int board, int channel, float value);
-    std::string snmpGlobalSet(MpodSet command, int board, int channel, double value);
-    std::string snmpGlobalSet(MpodSet command, int board, int channel, int value);
-    std::string snmpChannelSet(MpodGet command, int board, int channel, float value);
-    std::string snmpChannelSet(MpodGet command, int board, int channel, double value);
-    std::string snmpChannelSet(MpodGet command, int board, int channel, int value);
+    std::string snmpGlobalSet(MpodGlobalSetParam command, float value);
+    std::string snmpGlobalSet(MpodGlobalSetParam command, double value);
+    std::string snmpGlobalSet(MpodGlobalSetParam command, int value);
+    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, float value);
+    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, double value);
+    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, int value);
 
 private:
-    std::string buildCommand(const std::string& parameter);
+    std::string buildCommand(const std::string& command, const std::string& parameter);
     std::string runCommand(const std::string& command);
     std::string convertToUniversalChannel(int board, int channel);
 
