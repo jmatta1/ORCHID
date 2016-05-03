@@ -36,8 +36,8 @@ enum class MpodGlobalGetParam: char{SysMainSwitch, SysStatus};
 
 enum class MpodChannelGetParam: char{OutputStatus, OutputSwitch, SenseVoltage, TerminalVoltage,
                                      Temperature, SetVoltage, Current, RampUp,
-                                     RampDown, MaxTerminalVoltage, MaxCurrent, 
-                                     MaxCurrentTripTime, MaxTemperature};
+                                     RampDown, MaxTerminalVoltage, MaxCurrent,
+                                     SetCurrent, MaxCurrentTripTime,};
 
 enum class MpodGlobalSetParam: char{SysMainSwitch};
 
@@ -57,14 +57,14 @@ static const std::map<MpodChannelGetParam, std::string> CHANNEL_GET_COMMANDS =
                 (MpodChannelGetParam::OutputSwitch      , "outputSwitch")
                 (MpodChannelGetParam::SenseVoltage      , "outputMeasurementSenseVoltage")
                 (MpodChannelGetParam::TerminalVoltage   , "outputMeasurementTerminalVoltage")
+                (MpodChannelGetParam::Current           , "outputMeasurementCurrent")
                 (MpodChannelGetParam::Temperature       , "outputMeasurementTemperature")
                 (MpodChannelGetParam::SetVoltage        , "outputVoltage")
-                (MpodChannelGetParam::Current           , "outputCurrent")
+                (MpodChannelGetParam::SetCurrent        , "outputCurrent")
                 (MpodChannelGetParam::RampUp            , "outputVoltageRiseRate")
                 (MpodChannelGetParam::RampDown          , "outputVoltageFallRate")
                 (MpodChannelGetParam::MaxTerminalVoltage, "outputSupervisionMaxTerminalVoltage")
                 (MpodChannelGetParam::MaxCurrent        , "outputSupervisionMaxCurrent")
-                (MpodChannelGetParam::MaxTemperature    , "outputSupervisionMaxTemperature")
                 (MpodChannelGetParam::MaxCurrentTripTime, "outputTripTimeMaxCurrent");
 
 static const std::map<MpodGlobalSetParam, std::string> GLOBAL_SET_COMMANDS =
