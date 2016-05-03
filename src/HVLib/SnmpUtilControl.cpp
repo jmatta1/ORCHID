@@ -110,7 +110,7 @@ std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int boa
 std::string SnmpUtilControl::buildCommand(const std::string& command, const std::string& parameter)
 {
     std::ostringstream cmdBuilder;
-    cmdBuilder << command << " -OeqUv -v 2c -M " << this->mibLocation;
+    cmdBuilder << command << " -OeUv -v 2c -M " << this->mibLocation;
     cmdBuilder << " -m +WIENER-CRATE-MIB  -c guru " << this->ipAddress;
     cmdBuilder << " " << parameter;
     return cmdBuilder.str();
