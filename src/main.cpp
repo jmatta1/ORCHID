@@ -7,6 +7,7 @@ HFIR background monitoring wall.
 // includes for C system headers
 // includes for C++ system headers
 #include<iostream>
+#include<iomanip>
 #include<string>
 // includes from other libraries
 // includes from ORCHID
@@ -60,14 +61,7 @@ int main(int argc, char* argv[])
     std::cout << "----------------------------------------------------------\n";
     
     std::cout << "\n\n" << std::endl;
-    
-    SnmpUtilControl mpodControl(params.powerBlock->mpodIpAddress,
-                                params.powerBlock->weinerMibFileDirectory);
-    
-    std::chrono::seconds longDuration(8);
-    std::chrono::seconds shortDuration(1);
 
-    std::this_thread::sleep_for(longDuration);
     
     return 0;
 }
