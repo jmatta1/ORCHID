@@ -12,8 +12,7 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Template definitions that do some magic to convert a strongly typed
-**  enumeration into a strings
+** @details Lookup table to convert a command enum into a command string
 **
 ********************************************************************************
 *******************************************************************************/
@@ -38,7 +37,7 @@ enum class MpodGlobalGetParam: char{SysMainSwitch, SysStatus};
 enum class MpodChannelGetParam: char{OutputStatus, OutputSwitch, SenseVoltage, TerminalVoltage,
                                      Temperature, SetVoltage, Current, RampUp,
                                      RampDown, MaxTerminalVoltage, MaxCurrent, 
-                                     MaxCurrentTripTime};
+                                     MaxCurrentTripTime, MaxTemperature};
 
 enum class MpodGlobalSetParam: char{SysMainSwitch};
 
@@ -65,6 +64,7 @@ static const std::map<MpodChannelGetParam, std::string> CHANNEL_GET_COMMANDS =
                 (MpodChannelGetParam::RampDown          , "outputVoltageFallRate")
                 (MpodChannelGetParam::MaxTerminalVoltage, "outputSupervisionMaxTerminalVoltage")
                 (MpodChannelGetParam::MaxCurrent        , "outputSupervisionMaxCurrent")
+                (MpodChannelGetParam::MaxTemperature    , "outputSupervisionMaxTemperature")
                 (MpodChannelGetParam::MaxCurrentTripTime, "outputTripTimeMaxCurrent");
 
 static const std::map<MpodGlobalSetParam, std::string> GLOBAL_SET_COMMANDS =
