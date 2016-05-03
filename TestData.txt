@@ -1,0 +1,225 @@
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysMainSwitch
+INTEGER: 1
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+BITS: 80 0
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementSenseVoltage
+Opaque: Float: 0.011941
+Opaque: Float: -0.093543
+Opaque: Float: -0.066263
+Opaque: Float: -0.081191
+Opaque: Float: -0.068010
+Opaque: Float: -0.079909
+Opaque: Float: -0.093116
+Opaque: Float: -0.076308
+Opaque: Float: -0.060489
+Opaque: Float: -0.027393
+Opaque: Float: 0.078624
+Opaque: Float: -0.051197
+Opaque: Float: 0.077518
+Opaque: Float: -0.037471
+Opaque: Float: 0.051563
+Opaque: Float: -0.056412
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementTerminalVoltage
+Opaque: Float: 0.011941
+Opaque: Float: -0.090592
+Opaque: Float: -0.067738
+Opaque: Float: -0.082666
+Opaque: Float: -0.073170
+Opaque: Float: -0.079172
+Opaque: Float: -0.092378
+Opaque: Float: -0.087375
+Opaque: Float: -0.063441
+Opaque: Float: -0.027393
+Opaque: Float: 0.078624
+Opaque: Float: -0.051934
+Opaque: Float: 0.077518
+Opaque: Float: -0.037471
+Opaque: Float: 0.051563
+Opaque: Float: -0.057886
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementTemperature
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+INTEGER: 25
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputCurrent
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementCurrent
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltageRiseRate
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltageFallRate
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputSupervisionMaxTerminalVoltage
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputSupervisionMaxCurrent
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ORCHID]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputTripTimeMaxCurrent
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
