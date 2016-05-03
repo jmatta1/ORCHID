@@ -20,8 +20,13 @@
 #include"VoltageData.h"
 // includes for C system headers
 // includes for C++ system headers
+#include<sstream>
+#include<algorithm>
+#include<cctype>
 // includes from other libraries
+#include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
+#include "InputLib/Parsers/Utility.h"
 
 
 CrateStatus::CrateStatus():         mainOn(false),          mainInhibit(false),
@@ -85,8 +90,92 @@ VoltageData::VoltageData(int channels):                terminalVoltage(channels)
     numChannels(channels) {}
 
 
+void VoltageData::loadTerminalVoltages(const std::string& input)
+{
 
+}
 
+void VoltageData::loadSenseVoltages(const std::string& input)
+{
 
+}
+
+void VoltageData::loadSetVoltages(const std::string& input)
+{
+
+}
+
+void VoltageData::loadTemperatures(const std::string& input)
+{
+
+}
+
+void VoltageData::loadCurrents(const std::string& input)
+{
+
+}
+
+void VoltageData::loadOutputSwitchs(const std::string& input)
+{
+
+}
+
+void VoltageData::loadRampUpRates(const std::string& input)
+{
+
+}
+
+void VoltageData::loadRampDownRates(const std::string& input)
+{
+
+}
+
+void VoltageData::loadCurrentTripTimes(const std::string& input)
+{
+
+}
+
+void VoltageData::loadMaxTemperatures(const std::string& input)
+{
+
+}
+
+void VoltageData::loadMaxCurrents(const std::string& input)
+{
+
+}
+
+void VoltageData::loadMaxVoltages(const std::string& input)
+{
+
+}
+
+void VoltageData::loadChannelStatuses(const std::string& input)
+{
+    int i = 0;
+    std::stringstream inStream(input);
+    std::string line;
+    std::string intermediate;
+    
+    while(std::getline(inStream, line, '\n') && (i < numChannels))
+    {
+        line.append('\n');
+        //parse the interesting part of the input line
+        boost::spirit::qi::parse(test.begin(), test.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        //remove the spaces
+        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(), std::isspace), intermediate.end());
+        float final;
+        //parse into an integer from hex format
+        boost::spirit::qi::parse(intermediate.begin(), intermediate.end(), hex, final);
+        //now put the values into the vector
+        channelStatus[i].loadFromValue(final);
+        ++i;
+    }
+}
+
+void VoltageData::loadCrateStatus(const std::string& input)
+{
+
+}
 
 
