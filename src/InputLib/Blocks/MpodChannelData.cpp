@@ -128,14 +128,14 @@ std::ostream& operator<<(std::ostream& os, MpodChannelData const& mcd)
     using std::setfill;
     using std::setprecision;
     using std::fixed;
-    os << "Board #, Channel #, Active, Voltage (V), Maximum Current (uA)\n";
+    os << "Board #, Channel #, Active, Voltage(V), Max I(uA)\n";
     for(int i=0; i<mcd.channel.size(); ++i)
     {
         os << setw(7)  << setfill(' ')                             << mcd.board[i]              << ", ";
         os << setw(9)  << setfill(' ')                             << mcd.channel[i]            << ", ";
         os << setw(6)  << setfill(' ')                             << (mcd.online[i] ? "T":"F") << ", ";
-        os << setw(11) << setfill(' ') << fixed << setprecision(1) << mcd.voltage[i]            << ", ";
-        os << setw(20) << setfill(' ') << fixed << setprecision(1) << mcd.maxCurrent[i]         << "\n";
+        os << setw(10) << setfill(' ') << fixed << setprecision(1) << mcd.voltage[i]            << ", ";
+        os << setw(9)  << setfill(' ') << fixed << setprecision(1) << mcd.maxCurrent[i]         << "\n";
     }
     return os;
 }
