@@ -115,6 +115,8 @@ public:
 
 private:
     int numChannels;
+    //parser for handling strings in the various load systems
+    InputParser::Utility::StrWithSpaces<std::string::iterator> string_;
 
 };
 
