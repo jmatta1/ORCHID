@@ -81,6 +81,18 @@ private:
     boost::spirit::qi::rule<Iterator, std::string()> stringRule;
 };
 
+//grammar for parsing strings that contain spaces and go up to the end of the line
+template <typename Iterator>
+struct StrWithSpaces : public boost::spirit::qi::grammar<Iterator, std::string()>
+{
+    StrWithSpaces() : StrWithSpaces::base_type(stringRule)
+    {
+        stringRule = +(~boost::spirit::qi::char_("\n\r"));
+    }
+private:
+    boost::spirit::qi::rule<Iterator, std::string()> stringRule;
+};
+
 //grammar for handling strings that represent IP addresses
 template <typename Iterator>
 struct IPAddressString : public boost::spirit::qi::grammar<Iterator, std::string()>
