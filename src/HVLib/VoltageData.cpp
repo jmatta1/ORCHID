@@ -115,7 +115,7 @@ void VoltageData::loadTerminalVoltages(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
@@ -139,7 +139,7 @@ void VoltageData::loadSenseVoltages(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
@@ -163,7 +163,7 @@ void VoltageData::loadSetVoltages(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
@@ -187,7 +187,7 @@ void VoltageData::loadTemperatures(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         int final;
@@ -211,7 +211,7 @@ void VoltageData::loadCurrents(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
@@ -235,7 +235,7 @@ void VoltageData::loadOutputSwitchs(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         int final;
@@ -259,7 +259,7 @@ void VoltageData::loadRampUpRates(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
@@ -283,7 +283,7 @@ void VoltageData::loadRampDownRates(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
@@ -307,7 +307,7 @@ void VoltageData::loadCurrentTripTimes(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         int final;
@@ -331,7 +331,7 @@ void VoltageData::loadMaxTemperatures(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         int final;
@@ -355,7 +355,7 @@ void VoltageData::loadMaxCurrents(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
@@ -379,7 +379,7 @@ void VoltageData::loadMaxVoltages(const std::string& input)
     {
         line.append("\n");
         //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
+        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
         //remove the spaces
         intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
         float final;
