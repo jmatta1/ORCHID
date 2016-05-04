@@ -22,8 +22,18 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<string>
+#include<vector>
 // includes from other libraries
 // includes from ORCHID
+#include "InputLib/Parsers/Utility.h"
+
+namespace CrateMasks 
+{
+static const unsigned int MaskMainOn=0x800,        MaskMainInhibit=0x400,    MaskLocalControlOnly=0x200;
+static const unsigned int MaskInputFailure=0x100,  MaskOutputFailure=0x080,  MaskFantrayFailue=0x400;
+static const unsigned int MaskSensorFailure=0x020, MaskVmeSysFailure=0x010,  MaskPlugAndPlayIncompatible=0x008;
+static const unsigned int MaskBusReset=0x004,      MaskSupplyDerating=0x002, MaskSupplyFailure=0x001;
+}
 
 class CrateStatus
 {
@@ -36,17 +46,28 @@ public:
     bool outputFailure           :1;//bit4
     bool fantrayFailure          :1;//bit5
     bool sensorFailure           :1;//bit6
-    bool vmeSysfail              :1;//bit7
+    bool vmeSysFailure           :1;//bit7
     bool plugAndPlayIncompatible :1;//bit8
     bool busReset                :1;//bit9
     bool supplyDerating          :1;//bit10
-    bool supplyFailure           :1;//bit11
-    bool supplyDerating2         :1;//bit12
-    bool supplyFailure2          :1;//bit13     (LSB)
+    bool supplyFailure           :1;//bit11     (LSB)
     
     std::string getStatusString();
-    void loadFromValue(int value);
+    void loadFromValue(unsigned int value);
 };
+
+namespace ChannelMasks 
+{
+static const unsigned int MaskOutputOn=0x800000,                         MaskOutputInhibit=0x400000;
+static const unsigned int MaskOutputFailureMinSenseVoltage=0x200000,     MaskOutputFailureMaxSenseVoltage=0x100000;
+static const unsigned int MaskOutputFailureMaxTerminalVoltage=0x080000,  MaskOutputFailureMaxCurrent=0x040000;
+static const unsigned int MaskOutputFailureMaxTemperature=0x020000,      MaskOutputFailureMaxPower=0x010000;
+static const unsigned int MaskOutputFailureTimeout=0x008000,             MaskOutputCurrentLimited=0x004000;
+static const unsigned int MaskOutputRampUp=0x002000,                     MaskOutputRampDown=0x001000;
+static const unsigned int MaskOutputEnableKill=0x000800,                 MaskOutputEmergencyOff=0x000400;
+static const unsigned int MaskOutputAdjusting=0x000400,                  MaskOutputConstantVoltage=0x000200;
+static const unsigned int MaskOutputCurrentBoundsExceeded=0x000100,      MaskOutputFailureCurrentLimit=0x000010;
+}
 
 class ChannelStatus
 {
@@ -74,7 +95,7 @@ public:
     bool outputFailureCurrentLimit       :1;//bit19     (LSB)
 
     std::string getStatusString();
-    void loadFromValue(int value);
+    void loadFromValue(unsigned int value);
 };
 
 class VoltageData
