@@ -18,11 +18,6 @@ HFIR background monitoring wall.
 #include<thread>
 #include<chrono>
 
-void snmpPrint(std::string result, int num)
-{
-    std::cout << "result " << result << std::endl;
-    std::cout << "num " << num << std::endl;
-}
 
 int main(int argc, char* argv[])
 {
