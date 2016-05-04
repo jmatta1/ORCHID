@@ -1,0 +1,515 @@
+[jmatta1@amaterasu-linux ~]$ snmpset -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysMainSwitch.0 i 0
+INTEGER: 0
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+BITS: 10 3 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+WIENER-CRATE-MIB::sysStatus.0 = BITS: 10 inputFailure(3) 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+WIENER-CRATE-MIB::sysStatus.0 = BITS: 10 inputFailure(3) 
+[jmatta1@amaterasu-linux ~]$ snmpset -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysMainSwitch.0 i 1
+INTEGER: 1
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+WIENER-CRATE-MIB::sysStatus.0 = BITS: 80 mainOn(0) 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+WIENER-CRATE-MIB::sysStatus.0 = BITS: 80 mainOn(0) 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+BITS: 80 0
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+WIENER-CRATE-MIB::outputStatus.u0 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u1 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u2 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u3 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u4 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u5 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u6 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u7 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u8 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u9 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u10 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u11 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u12 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u13 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u14 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u15 = BITS: 00 01 outputAdjusting(15)
+
+[jmatta1@amaterasu-linux ~]$ snmpset -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u0 F 2400
+Opaque: Float: 2400.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+WIENER-CRATE-MIB::outputStatus.u0 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u1 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u2 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u3 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u4 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u5 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u6 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u7 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u8 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u9 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u10 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u11 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u12 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u13 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u14 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u15 = BITS: 00 01 outputAdjusting(15)
+
+
+[jmatta1@amaterasu-linux ~]$ snmpset -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u0 i 1
+WIENER-CRATE-MIB::outputSwitch.u0 = INTEGER: on(1)
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+WIENER-CRATE-MIB::outputStatus.u0 = BITS: 80 11 80 outputOn(0) outputRampUp(11) outputAdjusting(15) outputConstantVoltage(16) 
+WIENER-CRATE-MIB::outputStatus.u1 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u2 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u3 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u4 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u5 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u6 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u7 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u8 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u9 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u10 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u11 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u12 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u13 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u14 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u15 = BITS: 00 01 outputAdjusting(15) 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 80 11 80 0 11 15 16 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+WIENER-CRATE-MIB::outputStatus.u0 = BITS: 80 11 80 outputOn(0) outputRampUp(11) outputAdjusting(15) outputConstantVoltage(16) 
+WIENER-CRATE-MIB::outputStatus.u1 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u2 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u3 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u4 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u5 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u6 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u7 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u8 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u9 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u10 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u11 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u12 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u13 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u14 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u15 = BITS: 00 01 outputAdjusting(15) 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 80 11 80 0 11 15 16 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15
+
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+WIENER-CRATE-MIB::outputStatus.u0 = BITS: 80 01 80 outputOn(0) outputAdjusting(15) outputConstantVoltage(16) 
+WIENER-CRATE-MIB::outputStatus.u1 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u2 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u3 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u4 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u5 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u6 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u7 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u8 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u9 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u10 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u11 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u12 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u13 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u14 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u15 = BITS: 00 01 outputAdjusting(15) 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 80 01 80 0 15 16 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+
+
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 80 01 80 0 15 16 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 80 01 80   [...]0 15 16 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+BITS: 80   [.]0
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 sysStatus
+BITS: 80 0
+
+
+
+
+
+
+
+
+[jmatta1@amaterasu-linux ~]$ snmpwalk -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+WIENER-CRATE-MIB::outputStatus.u0 = BITS: 80 01 80 outputOn(0) outputAdjusting(15) outputConstantVoltage(16) 
+WIENER-CRATE-MIB::outputStatus.u1 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u2 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u3 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u4 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u5 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u6 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u7 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u8 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u9 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u10 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u11 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u12 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u13 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u14 = BITS: 00 01 outputAdjusting(15) 
+WIENER-CRATE-MIB::outputStatus.u15 = BITS: 00 01 outputAdjusting(15) 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 80 01 80 0 15 16 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+BITS: 00 01 15 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputStatus
+BITS: 80 01 80   [...]0 15 16 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+BITS: 00 01   [..]15 
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch
+INTEGER: 1
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+INTEGER: 0
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementSenseVoltage
+Opaque: Float: 2400.000244
+Opaque: Float: -0.089855
+Opaque: Float: -0.077329
+Opaque: Float: -0.082666
+Opaque: Float: -0.068010
+Opaque: Float: -0.071796
+Opaque: Float: -0.090165
+Opaque: Float: -0.084424
+Opaque: Float: -0.073771
+Opaque: Float: -0.027393
+Opaque: Float: 0.078624
+Opaque: Float: -0.057828
+Opaque: Float: 0.077518
+Opaque: Float: -0.037471
+Opaque: Float: 0.051563
+Opaque: Float: -0.063784
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementTerminalVoltage
+Opaque: Float: 2399.999023
+Opaque: Float: -0.095018
+Opaque: Float: -0.074378
+Opaque: Float: -0.082666
+Opaque: Float: -0.068747
+Opaque: Float: -0.081385
+Opaque: Float: -0.097542
+Opaque: Float: -0.081473
+Opaque: Float: -0.065654
+Opaque: Float: -0.027393
+Opaque: Float: 0.078624
+Opaque: Float: -0.057828
+Opaque: Float: 0.077518
+Opaque: Float: -0.037471
+Opaque: Float: 0.051563
+Opaque: Float: -0.063784
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementCurrent
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementTemperature
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+INTEGER: 27
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputMeasurementCurrent
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage
+Opaque: Float: 2400.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputCurrent
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+Opaque: Float: 0.003000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltageRiseRate
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltageFallRate
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+Opaque: Float: 30.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputSupervisionMaxTerminalVoltage
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputSupervisionMaxCurrent
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+Opaque: Float: 0.000000
+[jmatta1@amaterasu-linux ~]$ snmpwalk -OTeUv -v 2c -M /usr/share/snmp/mibs -m WIENER-CRATE-MIB -c guru 192.168.11.11 outputTripTImeMaxCurrent
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+INTEGER: 500
+
