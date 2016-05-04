@@ -46,7 +46,7 @@ public:
     std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, int value);
 
 private:
-    std::string buildCommand(const std::string& command, const std::string& parameter);
+    std::string buildCommand(const std::string& command, const std::string& user, const std::string& parameter);
     std::string runCommand(const std::string& command);
     std::string convertToUniversalChannel(int board, int channel);
 

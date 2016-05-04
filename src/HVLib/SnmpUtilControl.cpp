@@ -31,7 +31,7 @@
 
 std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command)
 {
-    return this->runCommand(this->buildCommand("snmpget",
+    return this->runCommand(this->buildCommand("snmpget", "guru",
                                                CmdLookup::GLOBAL_GET_COMMANDS.at(command)));
 }
 
@@ -40,13 +40,13 @@ std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command, int boa
     std::ostringstream parameterBuilder;
     parameterBuilder << CmdLookup::CHANNEL_GET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
-    return this->runCommand(this->buildCommand("snmpget",
+    return this->runCommand(this->buildCommand("snmpget", "guru",
                                                parameterBuilder.str()));
 }
 
 std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command)
 {
-    return this->runCommand(this->buildCommand("snmpwalk",
+    return this->runCommand(this->buildCommand("snmpwalk", "guru",
                                                CmdLookup::CHANNEL_GET_COMMANDS.at(command)));
 }
 
@@ -55,7 +55,7 @@ std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, float val
     std::ostringstream parameterBuilder;
     parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
     parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset",
+    return this->runCommand(this->buildCommand("snmpset", CmdLookup::GLOBAL_SET_USERS.at(command),
                                                parameterBuilder.str()));
 }
 
@@ -64,7 +64,7 @@ std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, double va
     std::ostringstream parameterBuilder;
     parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
     parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset",
+    return this->runCommand(this->buildCommand("snmpset", CmdLookup::GLOBAL_SET_USERS.at(command),
                                                parameterBuilder.str()));
 }
 
@@ -73,7 +73,7 @@ std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, int value
     std::ostringstream parameterBuilder;
     parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
     parameterBuilder << " i " << value;
-    return this->runCommand(this->buildCommand("snmpset",
+    return this->runCommand(this->buildCommand("snmpset", CmdLookup::GLOBAL_SET_USERS.at(command),
                                                parameterBuilder.str()));
 }
 
@@ -83,7 +83,7 @@ std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int boa
     parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
     parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset",
+    return this->runCommand(this->buildCommand("snmpset", CmdLookup::CHANNEL_SET_USERS.at(command),
                                                parameterBuilder.str()));
 }
 
@@ -93,7 +93,7 @@ std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int boa
     parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
     parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset",
+    return this->runCommand(this->buildCommand("snmpset", CmdLookup::CHANNEL_SET_USERS.at(command),
                                                parameterBuilder.str()));
 }
 
@@ -103,15 +103,15 @@ std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int boa
     parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
     parameterBuilder << " i " << value;
-    return this->runCommand(this->buildCommand("snmpset",
+    return this->runCommand(this->buildCommand("snmpset", CmdLookup::CHANNEL_SET_USERS.at(command),
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::buildCommand(const std::string& command, const std::string& parameter)
+std::string SnmpUtilControl::buildCommand(const std::string& command, const std::string& user, const std::string& parameter)
 {
     std::ostringstream cmdBuilder;
     cmdBuilder << command << " -OeUv -v 2c -M " << this->mibLocation;
-    cmdBuilder << " -m +WIENER-CRATE-MIB  -c guru " << this->ipAddress;
+    cmdBuilder << " -m +WIENER-CRATE-MIB  -c "<< user << " " << this->ipAddress;
     cmdBuilder << " " << parameter;
     return cmdBuilder.str();
 }

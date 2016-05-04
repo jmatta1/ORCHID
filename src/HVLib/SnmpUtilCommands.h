@@ -79,5 +79,17 @@ static const std::map<MpodChannelSetParam, std::string> CHANNEL_SET_COMMANDS =
                 (MpodChannelSetParam::MaxCurrent        , "outputSupervisionMaxCurrent")
                 (MpodChannelSetParam::MaxCurrentTripTime, "outputTripTimeMaxCurrent");
 
+static const std::map<MpodGlobalSetParam, std::string> GLOBAL_SET_USERS =
+    map_list_of (MpodGlobalSetParam::SysMainSwitch, "guru");
+
+static const std::map<MpodChannelSetParam, std::string> CHANNEL_SET_USERS =
+    map_list_of (MpodChannelSetParam::OutputSwitch      , "guru")
+                (MpodChannelSetParam::SetVoltage        , "guru")
+                (MpodChannelSetParam::RampUp            , "admin")
+                (MpodChannelSetParam::RampDown          , "admin")
+                (MpodChannelSetParam::MaxTerminalVoltage, "admin")
+                (MpodChannelSetParam::MaxCurrent        , "admin")
+                (MpodChannelSetParam::MaxCurrentTripTime, "admin");
+
 }
 #endif //ORCHID_SRC_HVLIB_SNMPUTILCOMMANDS_H
