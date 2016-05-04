@@ -19,7 +19,7 @@ DAQ_HEADERS=DAQLib/DigiController.h DAQLib/DigiReader.h
 
 # headers for HV reading and control classes
 HV_HEADERS=HVLib/MpodController.h HVLib/MpodReader.h HVLib/SnmpUtilControl.h\
-HVLib/SnmpUtilCommands.h
+HVLib/SnmpUtilCommands.h HVLib/VoltageData.h
 
 # headers for thread classes
 THREAD_HEADERS=Threads/DigitizerThread.h Threads/EventThread.h Threads/EventThreadPool.h\
@@ -39,7 +39,8 @@ INPUT_PARSER_SOURCES=InputLib/Parsers/Parser.cpp InputLib/Parsers/MpodParser.cpp
 
 DAQ_SOURCES=DAQLib/DigiController.cpp DAQLib/DigiReader.cpp
 
-HV_SOURCES=HVLib/MpodController.cpp HVLib/MpodReader.cpp HVLib/SnmpUtilControl.cpp
+HV_SOURCES=HVLib/MpodController.cpp HVLib/MpodReader.cpp HVLib/SnmpUtilControl.cpp\
+HVLib/VoltageData.cpp
 
 #sources for the threading stuff
 THREAD_SOURCES=Threads/DigitizerThread.cpp Threads/EventThread.cpp\
