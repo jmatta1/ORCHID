@@ -37,15 +37,21 @@ public:
     std::vector<int>   board;
     std::vector<int>   channel;
     std::vector<bool>  online;
+    std::vector<float> rampUpRate;
+    std::vector<float> rampDownRate;
     std::vector<float> voltage;
     std::vector<float> maxCurrent;
+    std::vector<int>   currentTripTime;
     
     // now an adder for each vector
     void addBoard(int input);
     void addChannel(int input);
     void addOnline(bool input);
+    void addRampUpRate(float input);
+    void addRampDownRate(float input);
     void addVoltage(float input);
     void addMaxCurrent(float input);
+    void addCurrentTripTime(int input);
     
     bool validate();
     void printValidationErrors();
@@ -57,3 +63,4 @@ public:
 
 }
 #endif  // ORCHID_SRC_INPUTLIB_BLOCKS_MPODCHANNELDATA_H
+

@@ -66,11 +66,14 @@ struct MpodChannelParser : qi::grammar<Iterator>
                      > *eol_
                      > eoi
                    );
-        lineRule = ( int_         [phoenix::bind(&MpodChannelData::addBoard,      ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&MpodChannelData::addChannel,    ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&MpodChannelData::addOnline,     ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodChannelData::addVoltage,    ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodChannelData::addMaxCurrent, ptr, qi::_1)] );
+        lineRule = ( int_         [phoenix::bind(&MpodChannelData::addBoard,           ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&MpodChannelData::addChannel,         ptr, qi::_1)] > lexeme[','] >
+                     boolSymbols_ [phoenix::bind(&MpodChannelData::addOnline,          ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodChannelData::addRampUpRate,      ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodChannelData::addRampDownRate,    ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodChannelData::addVoltage,         ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodChannelData::addMaxCurrent,      ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&MpodChannelData::addCurrentTripTime, ptr, qi::_1)] );
 
         on_error<fail>
         (

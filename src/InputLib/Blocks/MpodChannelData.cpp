@@ -43,6 +43,16 @@ void MpodChannelData::addOnline(bool input)
     this->online.push_back(input);
 }
 
+void MpodChannelData::addRampUpRate(float input)
+{
+    this->rampUpRate.push_back(input);
+}
+
+void MpodChannelData::addRampDownRate(float input)
+{
+    this->rampDownRate.push_back(input);
+}
+
 void MpodChannelData::addVoltage(float input)
 {
     this->voltage.push_back(input);
@@ -53,19 +63,30 @@ void MpodChannelData::addMaxCurrent(float input)
     this->maxCurrent.push_back(input);
 }
 
+void MpodChannelData::addCurrentTripTime(int input)
+{
+    this->currentTripTime.push_back(input);
+}
+
 bool MpodChannelData::validate()
 {
     bool output = ( (board.size() >= 1) &&
                     (channel.size() >= 1) &&
                     (online.size() >= 1) &&
+                    (rampUpRate.size() >= 1) &&
+                    (rampDownRate.size() >= 1) &&
                     (voltage.size() >= 1) &&
-                    (maxCurrent.size() >= 1));
+                    (maxCurrent.size() >= 1) &&
+                    (currentTripTime.size() >= 1) );
 
     output = (output &&
               (board.size() == channel.size()) &&
               (board.size() == online.size()) &&
+              (board.size() == rampUpRate.size()) &&
+              (board.size() == rampDownRate.size()) &&
               (board.size() == voltage.size()) &&
-              (board.size() == maxCurrent.size()));
+              (board.size() == maxCurrent.size()) &&
+              (board.size() == currentTripTime.size()) );
 
     for(int i=0; i<voltage.size(); ++i)
     {
@@ -77,7 +98,7 @@ bool MpodChannelData::validate()
     
     for(int i=0; i<maxCurrent.size(); ++i)
     {
-        if(maxCurrent[i] > 2000.0)
+        if(maxCurrent[i] > 3000.0)
         {
             output = false;
         }
@@ -88,19 +109,25 @@ bool MpodChannelData::validate()
 
 void MpodChannelData::printValidationErrors()
 {
-    if(!((board.size() > 1) &&
-         (channel.size() > 1) &&
-         (online.size() > 1) &&
-         (voltage.size() > 1) &&
-         (maxCurrent.size() > 1)))
+    if(!((board.size() >= 1) &&
+         (channel.size() >= 1) &&
+         (online.size() >= 1) &&
+         (rampUpRate.size() >= 1) &&
+         (rampDownRate.size() >= 1) &&
+         (voltage.size() >= 1) &&
+         (maxCurrent.size() >= 1) &&
+         (currentTripTime.size() >= 1)) )
     {
         std::cout << "There must be 1 or more entries for each parameter" <<std::endl;
     }
     
-    if(!((board.size() == channel.size()) &&
-         (board.size() == online.size()) &&
-         (board.size() == voltage.size()) &&
-         (board.size() == maxCurrent.size())))
+    if( !( (board.size() == channel.size()) &&
+           (board.size() == online.size()) &&
+           (board.size() == rampUpRate.size()) &&
+           (board.size() == rampDownRate.size()) &&
+           (board.size() == voltage.size()) &&
+           (board.size() == maxCurrent.size()) &&
+           (board.size() == currentTripTime.size()) ) )
     {
         std::cout << "There must be an equal number of entries for each parameter" <<std::endl;
     }
@@ -115,9 +142,9 @@ void MpodChannelData::printValidationErrors()
     
     for(int i=0; i<maxCurrent.size(); ++i)
     {
-        if(maxCurrent[i] > 2000.0)
+        if(maxCurrent[i] > 3000.0)
         {
-            std::cout << "The maximum current on channel " << i << " exceeds the 2mA limit" <<std::endl;
+            std::cout << "The maximum current on channel " << i << " exceeds the 3mA limit" <<std::endl;
         }
     }
 }
@@ -128,14 +155,17 @@ std::ostream& operator<<(std::ostream& os, MpodChannelData const& mcd)
     using std::setfill;
     using std::setprecision;
     using std::fixed;
-    os << "Board #, Channel #, Active, Voltage(V), Max I(uA)\n";
+    os << "Board #, Channel #, Active, Rise Rate(V/s), Fall Rate(V/s), Voltage(V), Max I(uA), Max I Trip Time(ms)\n";
     for(int i=0; i<mcd.channel.size(); ++i)
     {
         os << setw(7)  << setfill(' ')                             << mcd.board[i]              << ", ";
         os << setw(9)  << setfill(' ')                             << mcd.channel[i]            << ", ";
         os << setw(6)  << setfill(' ')                             << (mcd.online[i] ? "T":"F") << ", ";
+        os << setw(14) << setfill(' ')                             << mcd.rampUpRate[i]         << ", ";
+        os << setw(14) << setfill(' ')                             << mcd.rampDownRate[i]       << ", ";
         os << setw(10) << setfill(' ') << fixed << setprecision(1) << mcd.voltage[i]            << ", ";
-        os << setw(9)  << setfill(' ') << fixed << setprecision(1) << mcd.maxCurrent[i]         << "\n";
+        os << setw(9)  << setfill(' ') << fixed << setprecision(1) << mcd.maxCurrent[i]         << ", ";
+        os << setw(19) << setfill(' ')                             << mcd.currentTripTime[i]    << "\n";
     }
     return os;
 }
