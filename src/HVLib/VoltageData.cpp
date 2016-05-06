@@ -315,7 +315,7 @@ void VoltageData::loadChannelStatuses(const std::string& input)
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
         //get the integer representation of the bits line
-        unsigned int value = parseBitsLine(input, 6);
+        unsigned int final = parseBitsLine(input, 6);
         //send the integer representation into the struct for parsing
         channelStatus[i].loadFromValue(final);
         ++i;
@@ -325,9 +325,9 @@ void VoltageData::loadChannelStatuses(const std::string& input)
 void VoltageData::loadCrateStatus(const std::string& input)
 {
     //get the integer representation of the bits line
-    unsigned int value = parseBitsLine(input, 4);
+    unsigned int final = parseBitsLine(input, 4);
     //send the integer representation into the struct for parsing
-    crateStatus.loadFromValue(value);
+    crateStatus.loadFromValue(final);
 }
 
 int VoltageData::parseIntegerLine(const std::string& line)
