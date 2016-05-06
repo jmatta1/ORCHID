@@ -111,7 +111,7 @@ VoltageData::VoltageData(int channels):                terminalVoltage(channels)
     maxCurrent(channels),   maxVoltage(channels),      channelStatus(channels),
     numChannels(channels) {}
 
-void VoltageData::loadTerminalVoltages(const std::string& input)
+void VoltageData::loadOutputSwitches(const std::string& input)
 {
     int i = 0;
     std::stringstream inStream(input + '\n');
@@ -119,188 +119,10 @@ void VoltageData::loadTerminalVoltages(const std::string& input)
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        terminalVoltage[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadSenseVoltages(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        senseVoltage[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadSetVoltages(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        setVoltage[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadTemperatures(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the int from the line
-        int final = parseIntegerLine(line);
-        //now put the values into the vector
-        temperature[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadCurrents(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        //currents are returned in amps, so convert to uA
-        current[i] = 1000000.0 * final;
-        ++i;
-    }
-}
-
-void VoltageData::loadOutputSwitchs(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the int from the line
-        int final = parseIntegerLine(line);
-        //now put the values into the vector
-        outputSwitch[i] = (final != 0);
-        ++i;
-    }
-}
-
-void VoltageData::loadRampUpRates(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        rampUpRate[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadRampDownRates(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        rampDownRate[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadCurrentTripTimes(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the int from the line
-        int final = parseIntegerLine(line);
-        //now put the values into the vector
-        currentTripTime[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadMaxTemperatures(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the int from the line
-        int final = parseIntegerLine(line);
-        //now put the values into the vector
-        maxTemperature[i] = final;
-        ++i;
-    }
-}
-
-void VoltageData::loadMaxCurrents(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        //currents are returned in amps, so convert to uA
-        maxCurrent[i] = 1000000.0 * final;
-        ++i;
-    }
-}
-
-void VoltageData::loadMaxVoltages(const std::string& input)
-{
-    int i = 0;
-    std::stringstream inStream(input + '\n');
-    std::string line;
-    
-    while(std::getline(inStream, line, '\n') && (i < numChannels))
-    {
-        //extract the float from the line
-        float final = parseFloatLine(line);
-        //now put the values into the vector
-        maxVoltage[i] = final;
+        //get the integer representation of the bits line
+        int final = parseIntegerLine(input);
+        //send the integer representation into the struct for parsing
+        outputSwitch[i] = ((final==0)?false:true);
         ++i;
     }
 }
@@ -310,7 +132,6 @@ void VoltageData::loadChannelStatuses(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
@@ -328,6 +149,38 @@ void VoltageData::loadCrateStatus(const std::string& input)
     unsigned int final = parseBitsLine(input, 4);
     //send the integer representation into the struct for parsing
     crateStatus.loadFromValue(final);
+}
+
+void VoltageData::parseMultiLineInt(const std::string& input, std::vector<int>& container, int mult)
+{
+    int i = 0;
+    std::stringstream inStream(input + '\n');
+    std::string line;
+    
+    while(std::getline(inStream, line, '\n') && (i < numChannels))
+    {
+        //extract the int from the line
+        int final = parseIntegerLine(line);
+        //now put the values into the vector
+        container[i] = mult * final;
+        ++i;
+    }
+}
+
+void VoltageData::parseMultiLineFloat(const std::string& input, std::vector<float>& container, float mult)
+{
+    int i = 0;
+    std::stringstream inStream(input + '\n');
+    std::string line;
+    
+    while(std::getline(inStream, line, '\n') && (i < numChannels))
+    {
+        //extract the float from the line
+        float final = parseFloatLine(line);
+        //now put the values into the vector
+        container[i] = mult * final;
+        ++i;
+    }
 }
 
 int VoltageData::parseIntegerLine(const std::string& line)

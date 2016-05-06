@@ -107,34 +107,46 @@ public:
     std::vector<float>         terminalVoltage;
     std::vector<float>         senseVoltage;
     std::vector<float>         setVoltage;
-    std::vector<int>           temperature;
     std::vector<float>         current;
-    std::vector<bool>          outputSwitch;
     std::vector<float>         rampUpRate;
     std::vector<float>         rampDownRate;
-    std::vector<int>           currentTripTime;
-    std::vector<int>           maxTemperature;
     std::vector<float>         maxCurrent;
     std::vector<float>         maxVoltage;
+    std::vector<int>           currentTripTime;
+    std::vector<int>           temperature;
+    std::vector<int>           maxTemperature;
+    std::vector<bool>          outputSwitch;
     std::vector<ChannelStatus> channelStatus;
     CrateStatus                crateStatus;
     
-    void loadTerminalVoltages(const std::string& input);
-    void loadSenseVoltages   (const std::string& input);
-    void loadSetVoltages     (const std::string& input);
-    void loadTemperatures    (const std::string& input);
-    void loadCurrents        (const std::string& input);
-    void loadOutputSwitchs   (const std::string& input);
-    void loadRampUpRates     (const std::string& input);
-    void loadRampDownRates   (const std::string& input);
-    void loadCurrentTripTimes(const std::string& input);
-    void loadMaxTemperatures (const std::string& input);
-    void loadMaxCurrents     (const std::string& input);
-    void loadMaxVoltages     (const std::string& input);
+    //measured voltages
+    void loadTerminalVoltages(const std::string& input) {   parseMultiLineFloat(input, this->terminalVoltage, 1.0);}
+    void loadSenseVoltages   (const std::string& input) {   parseMultiLineFloat(input, this->senseVoltage,    1.0);}
+    //set voltages and max voltages
+    void loadSetVoltages     (const std::string& input) {   parseMultiLineFloat(input, this->setVoltage,      1.0);}
+    void loadMaxVoltages     (const std::string& input) {   parseMultiLineFloat(input, this->maxVoltage,      1.0);}
+    //ramp rates
+    void loadRampUpRates     (const std::string& input) {   parseMultiLineFloat(input, this->rampUpRate,      1.0);}
+    void loadRampDownRates   (const std::string& input) {   parseMultiLineFloat(input, this->rampDownRate,    1.0);}
+    //currents are multiplied by 1,000,000 since they are read in A and we want them in uA
+    void loadCurrents        (const std::string& input) {   parseMultiLineFloat(input, this->current,         1000000.0);}
+    void loadMaxCurrents     (const std::string& input) {   parseMultiLineFloat(input, this->maxCurrent,      1000000.0);}
+    //current temperature and max temperature
+    void loadTemperatures    (const std::string& input) {   parseMultiLineInt(input, this->temperature,       1.0);}
+    void loadMaxTemperatures (const std::string& input) {   parseMultiLineInt(input, this->maxTemperature,    1.0);}
+    //time that we can be over current without tripping
+    void loadCurrentTripTimes(const std::string& input) {   parseMultiLineInt(input, this->currentTripTime,   1.0);}
+    //switches controlling terminal output
+    void loadOutputSwitches   (const std::string& input);
+    //bit fields with various status flags for each channel
     void loadChannelStatuses (const std::string& input);
+    //bit fields with various status flags for the crate
     void loadCrateStatus     (const std::string& input);
 
 private:
+    void parseMultiLineInt(const std::string& input, std::vector<int>& container, int mult);
+    void parseMultiLineFloat(const std::string& input, std::vector<float>& container, float mult);
+    
     int parseIntegerLine(const std::string& line);
     float parseFloatLine(const std::string& line);
     unsigned int parseBitsLine(const std::string& line, int nibbleCount);
