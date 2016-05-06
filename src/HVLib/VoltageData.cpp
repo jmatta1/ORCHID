@@ -35,6 +35,7 @@ CrateStatus::CrateStatus():         mainOn(false),          mainInhibit(false),
     plugAndPlayIncompatible(false), busReset(false),        supplyDerating(false),
     supplyFailure(false) {}
 
+//TODO: Parse channel status into nice string format for UI
 std::string CrateStatus::getStatusString()
 {
     return std::string("");
@@ -56,6 +57,9 @@ void CrateStatus::loadFromValue(unsigned int value)
     supplyFailure           = ((value & CrateMasks::MaskSupplyFailure)           != 0);
 }
 
+
+
+
 ChannelStatus::ChannelStatus():          outputOn(false),
     outputInhibit(false),                outputFailureMinSenseVoltage(false),
     outputFailureMaxSenseVoltage(false), outputFailureMaxTerminalVoltage(false),
@@ -68,6 +72,7 @@ ChannelStatus::ChannelStatus():          outputOn(false),
     reserved2(false),                    outputCurrentBoundsExceeded(false),
     outputFailureCurrentLimit(false) {}
 
+//TODO: Parse channel status into nice string format for UI
 std::string ChannelStatus::getStatusString()
 {
     return std::string("");
@@ -96,6 +101,9 @@ void ChannelStatus::loadFromValue(unsigned int value)
     outputFailureCurrentLimit       = ((value & ChannelMasks::MaskOutputFailureCurrentLimit)       != 0);
 }
 
+
+
+
 VoltageData::VoltageData(int channels):                terminalVoltage(channels),
     senseVoltage(channels), setVoltage(channels),      temperature(channels),
     current(channels),      outputSwitch(channels),    rampUpRate(channels),
@@ -108,19 +116,11 @@ void VoltageData::loadTerminalVoltages(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
         terminalVoltage[i] = final;
         ++i;
@@ -132,19 +132,11 @@ void VoltageData::loadSenseVoltages(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
         senseVoltage[i] = final;
         ++i;
@@ -156,19 +148,11 @@ void VoltageData::loadSetVoltages(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
         setVoltage[i] = final;
         ++i;
@@ -180,19 +164,11 @@ void VoltageData::loadTemperatures(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        int final;
-        //parse into an integer
-        parse(intermediate.begin(), intermediate.end(), int_, final);
+        //extract the int from the line
+        int final = parseIntegerLine(line);
         //now put the values into the vector
         temperature[i] = final;
         ++i;
@@ -204,21 +180,14 @@ void VoltageData::loadCurrents(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
-        current[i] = final;
+        //currents are returned in amps, so convert to uA
+        current[i] = 1000000.0 * final;
         ++i;
     }
 }
@@ -228,19 +197,11 @@ void VoltageData::loadOutputSwitchs(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        int final;
-        //parse into an integer
-        parse(intermediate.begin(), intermediate.end(), int_, final);
+        //extract the int from the line
+        int final = parseIntegerLine(line);
         //now put the values into the vector
         outputSwitch[i] = (final != 0);
         ++i;
@@ -252,19 +213,11 @@ void VoltageData::loadRampUpRates(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
         rampUpRate[i] = final;
         ++i;
@@ -276,19 +229,11 @@ void VoltageData::loadRampDownRates(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
         rampDownRate[i] = final;
         ++i;
@@ -300,19 +245,11 @@ void VoltageData::loadCurrentTripTimes(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        int final;
-        //parse into an integer
-        parse(intermediate.begin(), intermediate.end(), int_, final);
+        //extract the int from the line
+        int final = parseIntegerLine(line);
         //now put the values into the vector
         currentTripTime[i] = final;
         ++i;
@@ -324,19 +261,11 @@ void VoltageData::loadMaxTemperatures(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["INTEGER: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        int final;
-        //parse into an integer
-        parse(intermediate.begin(), intermediate.end(), int_, final);
+        //extract the int from the line
+        int final = parseIntegerLine(line);
         //now put the values into the vector
         maxTemperature[i] = final;
         ++i;
@@ -348,21 +277,14 @@ void VoltageData::loadMaxCurrents(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
-        maxCurrent[i] = final;
+        //currents are returned in amps, so convert to uA
+        maxCurrent[i] = 1000000.0 * final;
         ++i;
     }
 }
@@ -372,19 +294,11 @@ void VoltageData::loadMaxVoltages(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["Opaque: Float: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        float final;
-        //parse into a float
-        parse(intermediate.begin(), intermediate.end(), float_, final);
+        //extract the float from the line
+        float final = parseFloatLine(line);
         //now put the values into the vector
         maxVoltage[i] = final;
         ++i;
@@ -397,19 +311,12 @@ void VoltageData::loadChannelStatuses(const std::string& input)
     std::stringstream inStream(input + '\n');
     std::string line;
     std::string intermediate;
-    using namespace boost::spirit::qi;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        line.append("\n");
-        //parse the interesting part of the input line
-        parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
-        //remove the spaces
-        intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(),[](char x){return std::isspace(x);}), intermediate.end());
-        unsigned int final;
-        //parse into an integer from hex format
-        parse(intermediate.begin(), intermediate.end(), hex, final);
-        //now put the values into the vector
+        //get the integer representation of the bits line
+        unsigned int value = parseBitsLine(input, 6);
+        //send the integer representation into the struct for parsing
         channelStatus[i].loadFromValue(final);
         ++i;
     }
@@ -417,18 +324,48 @@ void VoltageData::loadChannelStatuses(const std::string& input)
 
 void VoltageData::loadCrateStatus(const std::string& input)
 {
-    using namespace boost::spirit::qi;
-    std::string line(input + '\n');
-    std::string intermediate;
-    //parse the interesting part of the input line
-    parse(line.begin(), line.end(), lexeme["BITS: "] >> string_ >> eol, intermediate);
-    //remove the spaces
-    intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(), [](char x){return std::isspace(x);}), intermediate.end());
-    unsigned int final;
-    //parse into an integer from hex format
-    parse(intermediate.begin(), intermediate.end(), hex, final);
-    //now put the values into the vector
-    crateStatus.loadFromValue(final);
+    //get the integer representation of the bits line
+    unsigned int value = parseBitsLine(input, 4);
+    //send the integer representation into the struct for parsing
+    crateStatus.loadFromValue(value);
 }
 
+int VoltageData::parseIntegerLine(const std::string& line)
+{
+    using namespace boost::spirit::qi;
+    std::string input(line + '\n');
+    int output;
+    //parse the interesting part of the input line
+    parse(line.begin(), line.end(), lexeme["INTEGER: "] >> int_ >> +eol, output);
+    return output;
+}
+
+float VoltageData::parseFloatLine(const std::string& line)
+{
+    using namespace boost::spirit::qi;
+    std::string input(line + '\n');
+    float output;
+    //parse the interesting part of the input line
+    parse(input.begin(), input.end(), lexeme["Opaque: Float: "] >> float_ >> +eol, output);
+    return output;
+}
+
+unsigned int VoltageData::parseBitsLine(const std::string& line, int nibbleCount)
+{
+    using namespace boost::spirit::qi;
+    std::string input(line + '\n');
+    std::string intermediate;
+    //parse the interesting part of the input line
+    parse(input.begin(), input.end(), lexeme["BITS: "] >> string_ >> lexeme["["] >> +char_('.') >> lexeme["]"] >> +eol, intermediate);
+    //remove the spaces
+    intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(), [](char x){return std::isspace(x);}), intermediate.end());
+    //since mpod does not return a trailing byte if its value is zero (ie no bits set)
+    //calculate how many bits we need to push to result up to have a '4*nibbleCount-bit' integer
+    int push = (4 * (nibbleCount -  intermediate.size()));
+    //parse into an integer from hex format
+    unsigned int final;
+    parse(intermediate.begin(), intermediate.end(), hex, final);
+    final <<= push;
+    return final;    
+}
 

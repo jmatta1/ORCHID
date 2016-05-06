@@ -29,10 +29,10 @@
 
 namespace CrateMasks 
 {
-static const unsigned int MaskMainOn=0x800,        MaskMainInhibit=0x400,    MaskLocalControlOnly=0x200;
-static const unsigned int MaskInputFailure=0x100,  MaskOutputFailure=0x080,  MaskFantrayFailue=0x400;
-static const unsigned int MaskSensorFailure=0x020, MaskVmeSysFailure=0x010,  MaskPlugAndPlayIncompatible=0x008;
-static const unsigned int MaskBusReset=0x004,      MaskSupplyDerating=0x002, MaskSupplyFailure=0x001;
+static const unsigned int MaskMainOn=0x8000,        MaskMainInhibit=0x4000,    MaskLocalControlOnly=0x2000;
+static const unsigned int MaskInputFailure=0x1000,  MaskOutputFailure=0x0800,  MaskFantrayFailue=0x4000;
+static const unsigned int MaskSensorFailure=0x0200, MaskVmeSysFailure=0x0100,  MaskPlugAndPlayIncompatible=0x0080;
+static const unsigned int MaskBusReset=0x0040,      MaskSupplyDerating=0x0020, MaskSupplyFailure=0x0010;
 }
 
 class CrateStatus
@@ -135,6 +135,10 @@ public:
     void loadCrateStatus     (const std::string& input);
 
 private:
+    int parseIntegerLine(const std::string& line);
+    float parseFloatLine(const std::string& line);
+    unsigned int parseBitsLine(const std::string& line, int nibbleCount);
+
     int numChannels;
     //parser for handling strings in the various load systems
     InputParser::Utility::StrWithSpaces<std::string::iterator> string_;
