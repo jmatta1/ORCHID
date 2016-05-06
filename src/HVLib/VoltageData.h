@@ -134,7 +134,7 @@ public:
     //current temperature and max temperature
     void loadTemperatures    (const std::string& input) {   parseMultiLineInt(input, this->temperature,       1.0);}
     void loadMaxTemperatures (const std::string& input) {   parseMultiLineInt(input, this->maxTemperature,    1.0);}
-    //time that we can be over current without tripping
+    //max time that we can be over current without tripping
     void loadCurrentTripTimes(const std::string& input) {   parseMultiLineInt(input, this->currentTripTime,   1.0);}
     //switches controlling terminal output
     void loadOutputSwitches   (const std::string& input);
