@@ -1,2 +1,2 @@
-#module #, # channels, active, max ramp speed (V/s), max set voltage (V), max set current (uA), max current over time (ms)
-        1,         16,      T,                  100,                2000,                  320,                        250
+#module #, # channels, active, Max Rise Rate(V/s), Max Fall Rate(V/s)(V/s), Max Set V(V), Max Set I(uA), Max I Trip Time (ms)
+        1,         16,      T,                100,                     100,         2000,           320,                  250
