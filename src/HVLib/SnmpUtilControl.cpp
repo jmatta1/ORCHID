@@ -119,7 +119,7 @@ std::string SnmpUtilControl::buildSetGlobalParameter(const std::string& paramNam
 std::string SnmpUtilControl::buildCommand(const std::string& command, const std::string& user, const std::string& parameter)
 {
     std::ostringstream cmdBuilder;
-    cmdBuilder << command << " -OeUv -v 2c -M " << this->mibLocation;
+    cmdBuilder << command << " -OTeUv -v 2c -M " << this->mibLocation;
     cmdBuilder << " -m +WIENER-CRATE-MIB  -c "<< user << " " << this->ipAddress;
     cmdBuilder << " " << parameter;
     return cmdBuilder.str();
