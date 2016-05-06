@@ -43,19 +43,29 @@ void MpodModuleData::addOnline(bool input)
     this->online.push_back(input);
 }
 
-void MpodModuleData::addRampSpeed(float input)
+void MpodModuleData::addMaxRampUpSpeed(float input)
 {
-    this->rampSpeed.push_back(input);
+    this->maxRampUpSpeed.push_back(input);
 }
 
-void MpodModuleData::addMaxVoltage(float input)
+void MpodModuleData::addMaxRampDownSpeed(float input)
 {
-    this->maxVoltage.push_back(input);
+    this->maxRampDownSpeed.push_back(input);
 }
 
-void MpodModuleData::addMaxCurrent(float input)
+void MpodModuleData::addMaxSetVoltage(float input)
 {
-    this->maxCurrent.push_back(input);
+    this->maxSetVoltage.push_back(input);
+}
+
+void MpodModuleData::addMaxSetCurrent(float input)
+{
+    this->maxSetCurrent.push_back(input);
+}
+
+void MpodModuleData::addMaxCurrentTripTime(float input)
+{
+    this->maxCurrentTripTime.push_back(input);
 }
 
 bool MpodModuleData::validate()
@@ -63,28 +73,56 @@ bool MpodModuleData::validate()
     bool output = ( (board.size() >= 1) &&
                     (numChannels.size() >= 1) &&
                     (online.size() >= 1) &&
-                    (rampSpeed.size() >= 1) &&
-                    (maxVoltage.size() >= 1) &&
-                    (maxCurrent.size() >= 1) );
+                    (maxRampUpSpeed.size() >= 1) &&
+                    (maxRampDownSpeed.size() >= 1) &&
+                    (maxSetVoltage.size() >= 1) &&
+                    (maxSetCurrent.size() >= 1) &&
+                    (maxCurrentTripTime.size() >= 1));
 
     output = (output &&
               (board.size() == online.size()) &&
               (board.size() == numChannels.size()) &&
-              (board.size() == rampSpeed.size()) &&
-              (board.size() == maxVoltage.size()) &&
-              (board.size() == maxCurrent.size()));
+              (board.size() == maxRampUpSpeed.size()) &&
+              (board.size() == maxRampDownSpeed.size()) &&
+              (board.size() == maxSetVoltage.size()) &&
+              (board.size() == maxSetCurrent.size()) &&
+              (board.size() == maxCurrentTripTime.size()));
 
-    for(int i=0; i<maxVoltage.size(); ++i)
+    for(int i=0; i<maxSetVoltage.size(); ++i)
     {
-        if(maxVoltage[i] > 3000.0)
+        if(maxSetVoltage[i] > 3000.0)
         {
             output = false;
         }
     }
     
-    for(int i=0; i<maxCurrent.size(); ++i)
+    for(int i=0; i<maxSetCurrent.size(); ++i)
     {
-        if(maxCurrent[i] > 2000.0)
+        if(maxSetCurrent[i] > 2000.0)
+        {
+            output = false;
+        }
+    }
+    
+    for(int i=0; i<maxRampUpSpeed.size(); ++i)
+    {
+        if(maxRampUpSpeed[i] > 150.0)
+        {
+            output = false;
+        }
+    }
+    
+    for(int i=0; i<maxRampDownSpeed.size(); ++i)
+    {
+        if(maxRampDownSpeed[i] > 150.0)
+        {
+            output = false;
+        }
+    }
+    
+    for(int i=0; i<maxCurrentTripTime.size(); ++i)
+    {
+        if(maxCurrentTripTime[i] > 500)
         {
             output = false;
         }
@@ -95,38 +133,66 @@ bool MpodModuleData::validate()
 
 void MpodModuleData::printValidationErrors()
 {
-    if(!((board.size() >= 1) &&
-         (numChannels.size() >= 1) &&
-         (online.size() >= 1) &&
-         (rampSpeed.size() >= 1) &&
-         (maxVoltage.size() >= 1) &&
-         (maxCurrent.size() >= 1)) )
+    if(!( (board.size() >= 1) &&
+          (numChannels.size() >= 1) &&
+          (online.size() >= 1) &&
+          (maxRampUpSpeed.size() >= 1) &&
+          (maxRampDownSpeed.size() >= 1) &&
+          (maxSetVoltage.size() >= 1) &&
+          (maxSetCurrent.size() >= 1) &&
+          (maxCurrentTripTime.size() >= 1) ) )
     {
         std::cout << "There must be 1 or more entries for each parameter" <<std::endl;
     }
     
-    if(!((board.size() == online.size()) &&
-         (board.size() == numChannels.size()) &&
-         (board.size() == rampSpeed.size()) &&
-         (board.size() == maxVoltage.size()) &&
-         (board.size() == maxCurrent.size())))
+    if(!(board.size() == online.size()) &&
+        (board.size() == numChannels.size()) &&
+        (board.size() == maxRampUpSpeed.size()) &&
+        (board.size() == maxRampDownSpeed.size()) &&
+        (board.size() == maxSetVoltage.size()) &&
+        (board.size() == maxSetCurrent.size()) &&
+        (board.size() == maxCurrentTripTime.size()))
     {
         std::cout << "There must be an equal number of entries for each parameter" <<std::endl;
     }
     
-    for(int i=0; i<maxVoltage.size(); ++i)
+    for(int i=0; i<maxSetVoltage.size(); ++i)
     {
-        if(maxVoltage[i] > 3000.0)
+        if(maxSetVoltage[i] > 3000.0)
         {
             std::cout << "The voltage on module " << i << " exceeds the 3000V limit" <<std::endl;
         }
     }
     
-    for(int i=0; i<maxCurrent.size(); ++i)
+    for(int i=0; i<maxSetCurrent.size(); ++i)
     {
-        if(maxCurrent[i] > 2000.0)
+        if(maxSetCurrent[i] > 2000.0)
         {
             std::cout << "The maximum current on module " << i << " exceeds the 2mA limit" <<std::endl;
+        }
+    }
+    
+    for(int i=0; i<maxRampUpSpeed.size(); ++i)
+    {
+        if(maxRampUpSpeed[i] > 150.0)
+        {
+            std::cout << "The maximum ramp up speed on module " << i << " exceeds the 150V/s limit" <<std::endl;
+        }
+    }
+    
+    for(int i=0; i<maxRampDownSpeed.size(); ++i)
+    {
+        if(maxRampDownSpeed[i] > 150.0)
+        {
+            std::cout << "The maximum ramp down speed on module " << i << " exceeds the 150V/s limit" <<std::endl;
+        }
+    }
+    
+    for(int i=0; i<maxCurrentTripTime.size(); ++i)
+    {
+        if(maxCurrentTripTime[i] > 500)
+        {
+            std::cout << "The maximum current trip time on module " << i << " exceeds the 500ms limit" <<std::endl;
         }
     }
 }
@@ -137,15 +203,17 @@ std::ostream& operator<<(std::ostream& os, MpodModuleData const& mmd)
     using std::setfill;
     using std::setprecision;
     using std::fixed;
-    os << "Module #, # Channels, Active, Ramp speed (V/s), Max set voltage (V), Max set current (uA)\n";
+    os << "Module, Channels, On, Max Rise(V/s), Max Fall(V/s), Max Set V(V), Max Set I(uA), Max Trip Time(ms)\n";
     for(int i=0; i<mmd.board.size(); ++i)
     {
-        os << setw(8)  << setfill(' ')                             << mmd.board[i]              << ", ";
-        os << setw(10) << setfill(' ')                             << mmd.numChannels[i]        << ", ";
-        os << setw(6)  << setfill(' ')                             << (mmd.online[i] ? "T":"F") << ", ";
-        os << setw(16) << setfill(' ') << fixed << setprecision(1) << mmd.rampSpeed[i]          << ", ";
-        os << setw(19) << setfill(' ') << fixed << setprecision(1) << mmd.maxVoltage[i]         << ", ";
-        os << setw(20) << setfill(' ') << fixed << setprecision(1) << mmd.maxCurrent[i]         << "\n";
+        os << setw(6)  << setfill(' ')                             << mmd.board[i]              << ", ";
+        os << setw(8) << setfill(' ')                             << mmd.numChannels[i]        << ", ";
+        os << setw(2)  << setfill(' ')                             << (mmd.online[i] ? "T":"F") << ", ";
+        os << setw(13) << setfill(' ') << fixed << setprecision(1) << mmd.maxRampUpSpeed[i]     << ", ";
+        os << setw(13) << setfill(' ') << fixed << setprecision(1) << mmd.maxRampDownSpeed[i]   << ", ";
+        os << setw(12) << setfill(' ') << fixed << setprecision(1) << mmd.maxSetVoltage[i]      << ", ";
+        os << setw(13) << setfill(' ') << fixed << setprecision(1) << mmd.maxSetCurrent[i]      << ", ";
+        os << setw(17) << setfill(' ') << fixed << setprecision(1) << mmd.maxCurrentTripTime[i] << "\n";
     }
     return os;
 }

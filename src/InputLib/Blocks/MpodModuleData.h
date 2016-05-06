@@ -37,17 +37,21 @@ public:
     std::vector<int>   board;
     std::vector<int>   numChannels;
     std::vector<bool>  online;
-    std::vector<float> rampSpeed;
-    std::vector<float> maxVoltage;
-    std::vector<float> maxCurrent;
+    std::vector<float> maxRampUpSpeed;
+    std::vector<float> maxRampDownSpeed;
+    std::vector<float> maxSetVoltage;
+    std::vector<float> maxSetCurrent;
+    std::vector<int>   maxCurrentTripTime;
     
     // now an adder for each vector
     void addBoard(int input);
     void addNumChannels(int input);
     void addOnline(bool input);
-    void addRampSpeed(float input);
-    void addMaxVoltage(float input);
-    void addMaxCurrent(float input);
+    void addMaxRampUpSpeed(float input);
+    void addMaxRampDownSpeed(float input);
+    void addMaxSetVoltage(float input);
+    void addMaxSetCurrent(float input);
+    void addMaxCurrentTripTime(float input);
     
     bool validate();
     void printValidationErrors();

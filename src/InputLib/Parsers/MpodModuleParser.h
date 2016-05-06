@@ -66,12 +66,14 @@ struct MpodModuleParser : qi::grammar<Iterator>
                      > *eol_
                      > eoi
                    );
-        lineRule = ( int_         [phoenix::bind(&MpodModuleData::addBoard,       ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&MpodModuleData::addNumChannels, ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&MpodModuleData::addOnline,      ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodModuleData::addRampSpeed,   ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodModuleData::addMaxVoltage,  ptr, qi::_1)] > lexeme[','] >
-                     float_       [phoenix::bind(&MpodModuleData::addMaxCurrent,  ptr, qi::_1)] );
+        lineRule = ( int_         [phoenix::bind(&MpodModuleData::addBoard,              ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&MpodModuleData::addNumChannels,        ptr, qi::_1)] > lexeme[','] >
+                     boolSymbols_ [phoenix::bind(&MpodModuleData::addOnline,             ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodModuleData::addMaxRampUpSpeed,     ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodModuleData::addMaxRampDownSpeed,   ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodModuleData::addMaxSetVoltage,      ptr, qi::_1)] > lexeme[','] >
+                     float_       [phoenix::bind(&MpodModuleData::addMaxSetCurrent,      ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&MpodModuleData::addMaxCurrentTripTime, ptr, qi::_1)] );
 
         on_error<fail>
         (
