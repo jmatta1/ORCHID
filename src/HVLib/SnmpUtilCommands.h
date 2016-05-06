@@ -91,5 +91,17 @@ static const std::map<MpodChannelSetParam, std::string> CHANNEL_SET_USERS =
                 (MpodChannelSetParam::MaxCurrent        , "admin")
                 (MpodChannelSetParam::MaxCurrentTripTime, "admin");
 
+static const std::map<MpodGlobalSetParam, char> GLOBAL_SET_TYPES =
+    map_list_of (MpodGlobalSetParam::SysMainSwitch, 'i');
+
+static const std::map<MpodChannelSetParam, char> CHANNEL_SET_TYPES =
+    map_list_of (MpodChannelSetParam::OutputSwitch      , 'i')
+                (MpodChannelSetParam::SetVoltage        , 'F')
+                (MpodChannelSetParam::RampUp            , 'F')
+                (MpodChannelSetParam::RampDown          , 'F')
+                (MpodChannelSetParam::MaxTerminalVoltage, 'F')
+                (MpodChannelSetParam::MaxCurrent        , 'F')
+                (MpodChannelSetParam::MaxCurrentTripTime, 'i');
+
 }
 #endif //ORCHID_SRC_HVLIB_SNMPUTILCOMMANDS_H

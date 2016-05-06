@@ -38,14 +38,17 @@ public:
     std::string snmpChannelGet(MpodChannelGetParam command, int board, int channel);
     std::string snmpChannelWalk(MpodChannelGetParam command);
 
-    std::string snmpGlobalSet(MpodGlobalSetParam command, float value);
-    std::string snmpGlobalSet(MpodGlobalSetParam command, double value);
-    std::string snmpGlobalSet(MpodGlobalSetParam command, int value);
-    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, float value);
-    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, double value);
-    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, int value);
+    
+    template<class Number>
+    std::string snmpGlobalSet(MpodGlobalSetParam command, Number value);
+    template<class Number>
+    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, Number value);
 
 private:
+    template<class Number>
+    std::string buildSetChannelParameter(const std::string& paramName, const std::string& channel, const std::string& type, Number value);
+    template<class Number>
+    std::string buildSetGlobalParameter(const std::string& paramName, const std::string& type, Number value);
     std::string buildCommand(const std::string& command, const std::string& user, const std::string& parameter);
     std::string runCommand(const std::string& command);
     std::string convertToUniversalChannel(int board, int channel);

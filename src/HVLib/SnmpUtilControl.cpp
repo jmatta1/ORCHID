@@ -50,61 +50,70 @@ std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command)
                                                CmdLookup::CHANNEL_GET_COMMANDS.at(command)));
 }
 
-std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, float value)
+template<class Number>
+std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, Number value)
 {
-    std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
-    parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset", CmdLookup::GLOBAL_SET_USERS.at(command),
-                                               parameterBuilder.str()));
+    if(CmdLookup::GLOBAL_SET_TYPES.at(command) == 'i')
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::GLOBAL_SET_USERS.at(command),
+                                                   this->buildSetGlobalParameter(
+                                                       CmdLookup::GLOBAL_SET_COMMANDS.at(command),
+                                                       "i", (int)value) ));
+    }
+    else
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::GLOBAL_SET_USERS.at(command),
+                                                   this->buildSetGlobalParameter(
+                                                       CmdLookup::GLOBAL_SET_COMMANDS.at(command),
+                                                       "F", (float)value) ));
+    }
 }
 
-std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, double value)
+template<class Number>
+std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, Number value)
 {
-    std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
-    parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset", CmdLookup::GLOBAL_SET_USERS.at(command),
-                                               parameterBuilder.str()));
+    if(CmdLookup::CHANNEL_SET_TYPES.at(command) == 'i')
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::CHANNEL_SET_USERS.at(command),
+                                                   this->buildSetChannelParameter(
+                                                       CmdLookup::CHANNEL_SET_COMMANDS.at(command),
+                                                       this->convertToUniversalChannel(board, channel),
+                                                       "i", (int)value) ));
+    }
+    else
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::CHANNEL_SET_USERS.at(command),
+                                                   this->buildSetChannelParameter(
+                                                       CmdLookup::CHANNEL_SET_COMMANDS.at(command),
+                                                       this->convertToUniversalChannel(board, channel),
+                                                       "F", (float)value) ));
+    }
+    
 }
 
-std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, int value)
+template<class Number>
+std::string SnmpUtilControl::buildSetChannelParameter(const std::string& paramName,
+                                                      const std::string& channel,
+                                                      const std::string& type,
+                                                      Number value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::GLOBAL_SET_COMMANDS.at(command);
-    parameterBuilder << " i " << value;
-    return this->runCommand(this->buildCommand("snmpset", CmdLookup::GLOBAL_SET_USERS.at(command),
-                                               parameterBuilder.str()));
+    parameterBuilder << paramName << channel << " " << type << " " << value;
+    return parameterBuilder.str();
 }
 
-std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, float value)
+template<class Number>
+std::string SnmpUtilControl::buildSetGlobalParameter(const std::string& paramName,
+                                                     const std::string& type,
+                                                     Number value)
 {
     std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
-    parameterBuilder << this->convertToUniversalChannel(board, channel);
-    parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset", CmdLookup::CHANNEL_SET_USERS.at(command),
-                                               parameterBuilder.str()));
-}
-
-std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, double value)
-{
-    std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
-    parameterBuilder << this->convertToUniversalChannel(board, channel);
-    parameterBuilder << " F " << value;
-    return this->runCommand(this->buildCommand("snmpset", CmdLookup::CHANNEL_SET_USERS.at(command),
-                                               parameterBuilder.str()));
-}
-
-std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, int value)
-{
-    std::ostringstream parameterBuilder;
-    parameterBuilder << CmdLookup::CHANNEL_SET_COMMANDS.at(command);
-    parameterBuilder << this->convertToUniversalChannel(board, channel);
-    parameterBuilder << " i " << value;
-    return this->runCommand(this->buildCommand("snmpset", CmdLookup::CHANNEL_SET_USERS.at(command),
-                                               parameterBuilder.str()));
+    parameterBuilder << paramName << " " << type << " " << value;
+    return parameterBuilder.str();
 }
 
 std::string SnmpUtilControl::buildCommand(const std::string& command, const std::string& user, const std::string& parameter)
