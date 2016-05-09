@@ -13,9 +13,8 @@ HFIR background monitoring wall.
 // includes from ORCHID
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
+#include"Utility/SortPermutation.h"
 #include"InputLib/InputLib.h"
-#include<thread>
-#include<chrono>
 
 
 int main(int argc, char* argv[])
@@ -38,7 +37,8 @@ int main(int argc, char* argv[])
     {
         return 1;
     }
-    
+    mpodModuleData.sort();
+    mpodChannelData.sort();
     std::cout << std::flush << "\n\nInput Parameters\n";
     std::cout << "==========================================================\n\n";
     std::cout << "----------------------------------------------------------\n";
@@ -55,8 +55,6 @@ int main(int argc, char* argv[])
     std::cout << "----------------------------------------------------------\n";
     
     std::cout << "\n\n" << std::endl;
-
-    
     return 0;
 }
 
