@@ -29,13 +29,14 @@
 // includes from other libraries
 // includes from ORCHID
 
-std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command)
+std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command) const
 {
     return this->runCommand(this->buildCommand("snmpget", "guru",
                                                CmdLookup::GLOBAL_GET_COMMANDS.at(command)));
 }
 
-std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command, int board, int channel)
+std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command,
+                                            int board, int channel) const
 {
     std::ostringstream parameterBuilder;
     parameterBuilder << CmdLookup::CHANNEL_GET_COMMANDS.at(command);
@@ -44,14 +45,15 @@ std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command, int boa
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command)
+std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command) const
 {
     return this->runCommand(this->buildCommand("snmpwalk", "guru",
                                                CmdLookup::CHANNEL_GET_COMMANDS.at(command)));
 }
 
 template<class Number>
-std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, Number value)
+std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command,
+                                           Number value) const
 {
     if(CmdLookup::GLOBAL_SET_TYPES.at(command) == 'i')
     {
@@ -72,7 +74,9 @@ std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command, Number va
 }
 
 template<class Number>
-std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command, int board, int channel, Number value)
+std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command,
+                                            int board, int channel,
+                                            Number value) const
 {
     if(CmdLookup::CHANNEL_SET_TYPES.at(command) == 'i')
     {
@@ -99,7 +103,7 @@ template<class Number>
 std::string SnmpUtilControl::buildSetChannelParameter(const std::string& paramName,
                                                       const std::string& channel,
                                                       const std::string& type,
-                                                      Number value)
+                                                      Number value) const
 {
     std::ostringstream parameterBuilder;
     parameterBuilder << paramName << channel << " " << type << " " << value;
@@ -109,14 +113,16 @@ std::string SnmpUtilControl::buildSetChannelParameter(const std::string& paramNa
 template<class Number>
 std::string SnmpUtilControl::buildSetGlobalParameter(const std::string& paramName,
                                                      const std::string& type,
-                                                     Number value)
+                                                     Number value) const
 {
     std::ostringstream parameterBuilder;
     parameterBuilder << paramName << " " << type << " " << value;
     return parameterBuilder.str();
 }
 
-std::string SnmpUtilControl::buildCommand(const std::string& command, const std::string& user, const std::string& parameter)
+std::string SnmpUtilControl::buildCommand(const std::string& command,
+                                          const std::string& user,
+                                          const std::string& parameter) const
 {
     std::ostringstream cmdBuilder;
     cmdBuilder << command << " -OTeUv -v 2c -M " << this->mibLocation;
@@ -126,7 +132,7 @@ std::string SnmpUtilControl::buildCommand(const std::string& command, const std:
 }
 
 
-std::string SnmpUtilControl::runCommand(const std::string& command)
+std::string SnmpUtilControl::runCommand(const std::string& command) const
 {
     char buffer[128];
     std::string result = "";
@@ -142,7 +148,8 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     return result;
 }
 
-std::string SnmpUtilControl::convertToUniversalChannel(int board, int channel)
+std::string SnmpUtilControl::convertToUniversalChannel(int board,
+                                                       int channel) const
 {
     if( (board < 1) || (board > 10) ) throw std::runtime_error("Invalid board number (not in the range [1, 10]");
     std::ostringstream channelNamer;

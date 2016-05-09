@@ -34,25 +34,28 @@ public:
         ipAddress(ip), mibLocation(mibLoc) {}
     ~SnmpUtilControl(){}
     
-    std::string snmpGlobalGet(MpodGlobalGetParam command);
-    std::string snmpChannelGet(MpodChannelGetParam command, int board, int channel);
-    std::string snmpChannelWalk(MpodChannelGetParam command);
+    std::string snmpGlobalGet(MpodGlobalGetParam command) const;
+    std::string snmpChannelGet(MpodChannelGetParam command, int board, int channel) const;
+    std::string snmpChannelWalk(MpodChannelGetParam command) const;
 
     
     template<class Number>
-    std::string snmpGlobalSet(MpodGlobalSetParam command, Number value);
+    std::string snmpGlobalSet(MpodGlobalSetParam command, Number value) const;
     template<class Number>
-    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, Number value);
+    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, Number value) const;
 
 private:
     template<class Number>
-    std::string buildSetChannelParameter(const std::string& paramName, const std::string& channel, const std::string& type, Number value);
+    std::string buildSetChannelParameter(const std::string& paramName, const std::string& channel, const std::string& type, Number value) const;
     template<class Number>
-    std::string buildSetGlobalParameter(const std::string& paramName, const std::string& type, Number value);
-    std::string buildCommand(const std::string& command, const std::string& user, const std::string& parameter);
-    std::string runCommand(const std::string& command);
-    std::string convertToUniversalChannel(int board, int channel);
+    std::string buildSetGlobalParameter(const std::string& paramName, const std::string& type, Number value) const;
+    std::string buildCommand(const std::string& command, const std::string& user, const std::string& parameter) const;
 
+
+    std::string convertToUniversalChannel(int board, int channel) const;
+    std::string runCommand(const std::string& command) const;
+
+    //member variables with data for creating commands
     std::string ipAddress;
     std::string mibLocation;
 };
