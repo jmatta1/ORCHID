@@ -28,7 +28,7 @@ Threads/MPODThread.h Threads/UserThread.h InputLib/InputParser.h
 # headers that are used to tie together subpackages
 SUB_PACKAGE_HEADERS=InputLib/InputLib.h
 
-MISC_HEADERS=Utility/TitleString.h Utility/ParseAndValidate.h
+MISC_HEADERS=Utility/TitleString.h Utility/ParseAndValidate.h Utility/SortPermutation.h
 
 #These variables store the names/paths of all the source files relative to the SRC_DIR 
 INPUT_BLOCK_SOURCES=InputLib/Blocks/DigitizerBlock.cpp InputLib/Blocks/GeneralBlock.cpp\
