@@ -23,6 +23,7 @@
 #include<iomanip>
 // includes from other libraries
 // includes from ORCHID
+#include"Utility/SortPermutation.h"
 
 namespace InputParser
 {
@@ -147,6 +148,21 @@ void MpodChannelData::printValidationErrors()
             std::cout << "The maximum current on channel " << i << " exceeds the 3mA limit" <<std::endl;
         }
     }
+}
+
+
+void MpodChannelData::sort()
+{
+    TwoKeyIntCompare comp;
+    std::vector<std::size_t> permutation = twoKeySortPermutation(board, channel, comp);
+    board = applyPermutation(board, permutation);
+    channel = applyPermutation(channel, permutation);
+    online = applyPermutation(online, permutation);
+    rampUpRate = applyPermutation(rampUpRate, permutation);
+    rampDownRate = applyPermutation(rampDownRate, permutation);
+    voltage = applyPermutation(voltage, permutation);
+    maxCurrent = applyPermutation(maxCurrent, permutation);
+    currentTripTime = applyPermutation(currentTripTime, permutation);
 }
 
 std::ostream& operator<<(std::ostream& os, MpodChannelData const& mcd)

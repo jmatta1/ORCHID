@@ -23,6 +23,7 @@
 #include<iomanip>
 // includes from other libraries
 // includes from ORCHID
+#include"Utility/SortPermutation.h"
 
 namespace InputParser
 {
@@ -197,6 +198,20 @@ void MpodModuleData::printValidationErrors()
     }
 }
 
+void MpodModuleData::sort()
+{
+    OneKeyIntCompare comp;
+    std::vector<std::size_t> permutation = oneKeySortPermutation(board, comp);
+    board              = applyPermutation(board, permutation);
+    numChannels        = applyPermutation(numChannels, permutation);
+    online             = applyPermutation(online, permutation);
+    maxRampUpSpeed     = applyPermutation(maxRampUpSpeed, permutation);
+    maxRampDownSpeed   = applyPermutation(maxRampDownSpeed, permutation);
+    maxSetVoltage      = applyPermutation(maxSetVoltage, permutation);
+    maxSetCurrent      = applyPermutation(maxSetCurrent, permutation);
+    maxCurrentTripTime = applyPermutation(maxCurrentTripTime, permutation);
+}
+
 std::ostream& operator<<(std::ostream& os, MpodModuleData const& mmd)
 {
     using std::setw;
@@ -207,7 +222,7 @@ std::ostream& operator<<(std::ostream& os, MpodModuleData const& mmd)
     for(int i=0; i<mmd.board.size(); ++i)
     {
         os << setw(6)  << setfill(' ')                             << mmd.board[i]              << ", ";
-        os << setw(8) << setfill(' ')                             << mmd.numChannels[i]        << ", ";
+        os << setw(8)  << setfill(' ')                             << mmd.numChannels[i]        << ", ";
         os << setw(2)  << setfill(' ')                             << (mmd.online[i] ? "T":"F") << ", ";
         os << setw(13) << setfill(' ') << fixed << setprecision(1) << mmd.maxRampUpSpeed[i]     << ", ";
         os << setw(13) << setfill(' ') << fixed << setprecision(1) << mmd.maxRampDownSpeed[i]   << ", ";

@@ -55,6 +55,8 @@ public:
     
     bool validate();
     void printValidationErrors();
+    
+    void sort();
 
     // ostream operator to allow outputting of the block class
     friend std::ostream& operator<<(std::ostream& os, MpodModuleData const& mcd);
