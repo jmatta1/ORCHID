@@ -1,0 +1,4 @@
+
+// the configured options and settings for Tutorial
+#define ORCHID_VERSION "@ORCHID_VERSION@"
+#define ORCHID_BUILD "@BUILD_TYPE"

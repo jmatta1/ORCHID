@@ -7,9 +7,10 @@ set(ORCHID_VERSION_MINOR 1)
 set(ORCHID_VERSION_PATCH 0)
 set(ORCHID_VERSION ${ORCHID_VERSION_MAJOR}.${ORCHID_VERSION_MINOR}.${ORCHID_VERSION_PATCH})
 
-configure_file("${PROJECT_SOURCE_DIR}/Utility/TitleString.h.in"
-               "${PROJECT_BINARY_DIR}/Utility/TitleString.h"
+configure_file("${PROJECT_SOURCE_DIR}/Utility/OrchidConfig.h.in"
+               "${PROJECT_BINARY_DIR}/Utility/OrchidConfig.h"
                @ONLY)
+
 include_directories("${PROJECT_BINARY_DIR}")
 
 include(./CMakeFlagDefs.txt)

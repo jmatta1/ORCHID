@@ -16,14 +16,14 @@
 **
 ********************************************************************************
 *******************************************************************************/
+#ifndef ORCHID_SRC_UTILITY_TITLESTRING_H
+#define ORCHID_SRC_UTILITY_TITLESTRING_H
 // includes for C system headers
 // includes for C++ system headers
 #include<string>
 // includes from other libraries
 // includes from ORCHID
-
-// the configured options and settings for Tutorial
-#define ORCHID_VERSION "@ORCHID_VERSION@"
+#include"OrchidConfig.h"
 
 static const std::string titleString = "\n\n"
 "  OOOO           kk              RRRR            dd                         \n"
@@ -79,4 +79,8 @@ static const std::string titleString = "\n\n"
 "============================================================================\n"
 "============================================================================\n"
 "    Version:                                                                \n"
-"             " ORCHID_VERSION "\n\n";
+"               " ORCHID_VERSION "\n"
+"    Build With:
+"               " ORCHID_BUILD "\n\n";
+
+#endif //ORCHID_SRC_UTILITY_TITLESTRING_H
