@@ -48,6 +48,9 @@ warn_opt:
 	@cd $(OBJ_DIR)/warn_opt; cmake -DBUILD_TYPE=WarnOpt ../../src; make -j $(NUM_CORES)
 	@mv $(OBJ_DIR)/warn_opt/orchid ./orchid
 
+.PHONY: everything
+everything: debug plain opt_debug release warn warn_opt
+
 #this builds the automatic documentation
 .PHONY: docs
 docs: $(patsubst %,$(SRC_DIR)/%,$(SOURCES)) $(patsubst %,$(SRC_DIR)/%,$(HEADERS))
