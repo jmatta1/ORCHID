@@ -1,4 +1,5 @@
 *.o
 *.mk
 build
+CMakeLists.txt.user
 orchid
