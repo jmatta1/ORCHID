@@ -19,15 +19,24 @@ HFIR background monitoring wall.
 
 int main(int argc, char* argv[])
 {
-    if (argc != 2)
+    std::string inputFileName;
+    if (argc == 1)
     {
-        std::cout << "Usage:\n\t" << argv[0] << " InputFileName" << std::endl;
+        std::cout << "Enter the configuration file name" << std::endl;
+        std::cin >> inputFileName;
+    }
+    else if (argc == 2)
+    {
+        inputFileName = std::string(argv[1]);
+    }
+    else
+    {
+        std::cout << "Usage:\n\t" << argv[0] << " [InputFileName]" << std::endl;
         return 1;
     }
     
     //read the input file
     std::cout << titleString;
-    std::string inputFileName(argv[1]);
     InputParser::InputParameters params;
     InputParser::MpodChannelData mpodChannelData;
     InputParser::MpodModuleData mpodModuleData;
