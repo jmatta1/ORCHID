@@ -11,6 +11,7 @@ configure_file("${PROJECT_SOURCE_DIR}/Utility/OrchidConfig.h.in"
                "${PROJECT_BINARY_DIR}/Utility/OrchidConfig.h"
                @ONLY)
 
+include_directories("${PROJECT_BINARY_DIR}/Utility")
 include_directories("${PROJECT_BINARY_DIR}")
 
 include(./CMakeFlagDefs.txt)

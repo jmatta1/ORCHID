@@ -79,8 +79,8 @@ static const std::string titleString = "\n\n"
 "============================================================================\n"
 "============================================================================\n"
 "    Version:                                                                \n"
-"               " ORCHID_VERSION "\n"
-"    Build With:
+"            " ORCHID_VERSION "\n"
+"    Build Mode:                                                             \n"
 "               " ORCHID_BUILD "\n\n";
 
 #endif //ORCHID_SRC_UTILITY_TITLESTRING_H
