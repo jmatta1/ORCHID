@@ -22,6 +22,9 @@
 // includes from other libraries
 // includes from ORCHID
 
+// the configured options and settings for Tutorial
+#define ORCHID_VERSION "@ORCHID_VERSION@"
+
 static const std::string titleString = "\n\n"
 "  OOOO           kk              RRRR            dd                         \n"
 "OO    OO         kk              RR  RR   ii     dd         eeee            \n"
@@ -76,4 +79,4 @@ static const std::string titleString = "\n\n"
 "============================================================================\n"
 "============================================================================\n"
 "    Version:                                                                \n"
-"             0.0.1\n\n";
+"             " ORCHID_VERSION "\n\n";
