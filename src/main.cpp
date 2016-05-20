@@ -36,13 +36,13 @@ int main(int argc, char* argv[])
     }
     
     //read the input file
-    std::cout << titleString;
+    std::cout << Resources::titleString;
     InputParser::InputParameters params;
     InputParser::MpodChannelData mpodChannelData;
     InputParser::MpodModuleData mpodModuleData;
-    if(!parseAndValidateInput(params, inputFileName) ||
-       !parseAndValidateMpodModule(mpodModuleData, params.powerBlock->perModuleParameterFile) ||
-       !parseAndValidateMpodChannel(mpodChannelData, params.powerBlock->perChannelParameterFile) )
+    if(!Utility::parseAndValidateInput(params, inputFileName) ||
+       !Utility::parseAndValidateMpodModule(mpodModuleData, params.powerBlock->perModuleParameterFile) ||
+       !Utility::parseAndValidateMpodChannel(mpodChannelData, params.powerBlock->perChannelParameterFile) )
     {
         return 1;
     }

@@ -200,16 +200,16 @@ void MpodModuleData::printValidationErrors()
 
 void MpodModuleData::sort()
 {
-    OneKeyIntCompare comp;
-    std::vector<std::size_t> permutation = oneKeySortPermutation(board, comp);
-    board              = applyPermutation(board, permutation);
-    numChannels        = applyPermutation(numChannels, permutation);
-    online             = applyPermutation(online, permutation);
-    maxRampUpSpeed     = applyPermutation(maxRampUpSpeed, permutation);
-    maxRampDownSpeed   = applyPermutation(maxRampDownSpeed, permutation);
-    maxSetVoltage      = applyPermutation(maxSetVoltage, permutation);
-    maxSetCurrent      = applyPermutation(maxSetCurrent, permutation);
-    maxCurrentTripTime = applyPermutation(maxCurrentTripTime, permutation);
+    Utility::OneKeyIntCompare comp;
+    std::vector<std::size_t> permutation = Utility::oneKeySortPermutation(board, comp);
+    board              = Utility::applyPermutation(board, permutation);
+    numChannels        = Utility::applyPermutation(numChannels, permutation);
+    online             = Utility::applyPermutation(online, permutation);
+    maxRampUpSpeed     = Utility::applyPermutation(maxRampUpSpeed, permutation);
+    maxRampDownSpeed   = Utility::applyPermutation(maxRampDownSpeed, permutation);
+    maxSetVoltage      = Utility::applyPermutation(maxSetVoltage, permutation);
+    maxSetCurrent      = Utility::applyPermutation(maxSetCurrent, permutation);
+    maxCurrentTripTime = Utility::applyPermutation(maxCurrentTripTime, permutation);
 }
 
 std::ostream& operator<<(std::ostream& os, MpodModuleData const& mmd)

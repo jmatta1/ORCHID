@@ -23,7 +23,8 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-
+namespace Utility
+{
 
 bool parseAndValidateInput(InputParser::InputParameters& params,
                            const std::string& inputFileName)
@@ -113,4 +114,6 @@ bool parseAndValidateMpodChannel(InputParser::MpodChannelData& mpodChannelData,
     }
     std::cout << "\n";
     return true;
+}
+
 }

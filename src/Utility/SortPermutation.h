@@ -22,7 +22,8 @@
 #include<algorithm>
 // includes from other libraries
 // includes from ORCHID
-
+namespace Utility
+{
 //calculates the permutation required to order the key vector
 template<typename T, typename Compare>
 std::vector<std::size_t> oneKeySortPermutation(const std::vector<T>& key,
@@ -73,3 +74,4 @@ struct TwoKeyIntCompare
         { return ( (primaryKey1 != primaryKey2) ? (primaryKey1 < primaryKey2) : (secondaryKey1 < secondaryKey2)); }
 };
 
+}

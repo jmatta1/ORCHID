@@ -24,7 +24,8 @@
 // includes from other libraries
 // includes from ORCHID
 #include"OrchidConfig.h"
-
+namespace Resources
+{
 static const std::string titleString = "\n\n"
 "  OOOO           kk              RRRR            dd                         \n"
 "OO    OO         kk              RR  RR   ii     dd         eeee            \n"
@@ -82,5 +83,5 @@ static const std::string titleString = "\n\n"
 "            " ORCHID_VERSION "\n"
 "    Build Mode:                                                             \n"
 "               " ORCHID_BUILD "\n\n";
-
+}
 #endif //ORCHID_SRC_UTILITY_TITLESTRING_H

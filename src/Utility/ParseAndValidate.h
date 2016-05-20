@@ -27,6 +27,8 @@
 // includes from ORCHID
 #include"InputLib/InputLib.h"
 
+namespace Utility
+{
 
 bool parseAndValidateInput(InputParser::InputParameters& params,
                            const std::string& inputFileName);
@@ -37,4 +39,5 @@ bool parseAndValidateMpodChannel(InputParser::MpodChannelData& mpodChannelData,
 bool parseAndValidateMpodModule(InputParser::MpodModuleData& mpodModuleData,
                                 const std::string& inputFileName);
 
+}
 #endif //ORCHID_SRC_UTILITY_PARSEANDVALIDATE_H

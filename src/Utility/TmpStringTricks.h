@@ -20,6 +20,9 @@
 #ifndef ORCHID_SRC_UTILITY_TMPSTRINGCONCAT_H
 #define ORCHID_SRC_UTILITY_TMPSTRINGCONCAT_H
 
+namespace Utility
+{
+
 //this is my template metaprogramming string concatenator
 //basicly it takes an array of characters and several distinct characters to be
 //appended is then keeps stripping characters off the end of the array and
@@ -102,4 +105,5 @@ struct IntDigitCount<0, count>
     static constexpr int digits()
         {return (count);}
 };
+}
 #endif //ORCHID_SRC_UTILITY_TMPSTRINGCONCAT_H
