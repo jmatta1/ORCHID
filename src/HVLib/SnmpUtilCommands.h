@@ -29,6 +29,8 @@
 using boost::assign::map_list_of;
 // includes from ORCHID
 
+namespace SlowControls
+{
 //this is a hackish solution to generate the appropriate strings for enums
 //it is crap to maintain, but it will work for now
 enum class MpodGlobalGetParam: char{SysMainSwitch, SysStatus};
@@ -103,5 +105,6 @@ static const std::map<MpodChannelSetParam, char> CHANNEL_SET_TYPES =
                 (MpodChannelSetParam::MaxCurrent        , 'F')
                 (MpodChannelSetParam::MaxCurrentTripTime, 'i');
 
+}
 }
 #endif //ORCHID_SRC_HVLIB_SNMPUTILCOMMANDS_H

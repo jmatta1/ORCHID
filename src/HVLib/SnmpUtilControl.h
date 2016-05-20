@@ -26,7 +26,8 @@
 // includes from other libraries
 // includes from ORCHID
 #include"SnmpUtilCommands.h"
-
+namespace SlowControls
+{
 class SnmpUtilControl
 {
 public:
@@ -59,4 +60,5 @@ private:
     std::string ipAddress;
     std::string mibLocation;
 };
+}
 #endif //ORCHID_SRC_HVLIB_SNMPUTILCONTROL_H

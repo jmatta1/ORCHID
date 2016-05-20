@@ -26,7 +26,8 @@
 // includes from other libraries
 // includes from ORCHID
 #include "InputLib/Parsers/Utility.h"
-
+namespace SlowControls
+{
 namespace CrateMasks 
 {
 static const unsigned int MaskMainOn=0x8000,        MaskMainInhibit=0x4000,    MaskLocalControlOnly=0x2000;
@@ -156,5 +157,5 @@ private:
     InputParser::Utility::StrWithSpaces<std::string::iterator> string_;
 
 };
-
+}
 #endif //ORCHID_SRC_HVLIB_VOLTAGEDATA_H

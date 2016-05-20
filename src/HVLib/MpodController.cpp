@@ -23,7 +23,8 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-
+namespace SlowControls
+{
 void MpodController::setCrateStatus(bool online)
 {
     
@@ -64,4 +65,5 @@ bool MpodController::doMaxSetup()
         //first make certain that the given module is listed in the module data
         //file
     }
+}
 }

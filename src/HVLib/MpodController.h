@@ -27,7 +27,8 @@
 #include"SnmpUtilControl.h"
 #include"InputLib/Blocks/MpodChannelData.h"
 #include"InputLib/Blocks/MpodModuleData.h"
-
+namespace SlowControls
+{
 using InputParser::MpodChannelData;
 using InputParser::MpodModuleData;
 
@@ -60,6 +61,6 @@ private:
     MpodChannelData* channelData;
     MpodModuleData* moduleData;
 };
-
+}
 #endif //ORCHID_SRC_HVLIB_MPODCONTROLLER_H
 

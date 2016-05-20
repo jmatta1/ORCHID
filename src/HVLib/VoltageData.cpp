@@ -28,7 +28,8 @@
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
 
-
+namespace SlowControls
+{
 CrateStatus::CrateStatus():         mainOn(false),          mainInhibit(false),
     localControlOnly(false),        inputFailure(false),    outputFailure(false),
     fantrayFailure(false),          sensorFailure(false),   vmeSysFailure(false),
@@ -222,3 +223,4 @@ unsigned int VoltageData::parseBitsLine(const std::string& line, int nibbleCount
     return final;    
 }
 
+}

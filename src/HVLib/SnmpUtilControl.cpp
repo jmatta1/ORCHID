@@ -28,7 +28,8 @@
 #include<iostream>
 // includes from other libraries
 // includes from ORCHID
-
+namespace SlowControls
+{
 std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command) const
 {
     return this->runCommand(this->buildCommand("snmpget", "guru",
@@ -161,4 +162,4 @@ std::string SnmpUtilControl::convertToUniversalChannel(int board,
     channelNamer << (channel-1);
     return channelNamer.str();
 }
-
+}
