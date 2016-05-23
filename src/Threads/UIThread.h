@@ -32,6 +32,11 @@ class UIThread
 public:
     UIThread(){}
     ~UIThread(){}
+
+    //this is the function that is called by boost::thread when making a thread
+    void operator() ();
+private:
+
 };
 
 }
