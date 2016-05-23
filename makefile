@@ -3,21 +3,19 @@ OBJ_DIR=build
 #get the number of cores
 NUM_CORES=$(shell cat /proc/cpuinfo | grep processor | wc --lines)
 
-
-#here are the targets that the user should access to build the project they define the 
-#this builds the project with debug flags making it easier to attach a debugger and see what is happening
-.PHONY: debug
-debug: 
-	@mkdir -p $(OBJ_DIR)/debug
-	@cd $(OBJ_DIR)/debug; cmake -DBUILD_TYPE=Debug ../../src; make -j $(NUM_CORES)
-	@mv $(OBJ_DIR)/debug/orchid ./orchid
-
 #this builds the project with no flags but those absolutely necessary
 .PHONY: plain
 plain: 
 	@mkdir -p $(OBJ_DIR)/plain
 	@cd $(OBJ_DIR)/plain; cmake -DBUILD_TYPE=Plain ../../src; make -j $(NUM_CORES)
 	@mv $(OBJ_DIR)/plain/orchid ./orchid
+
+#this builds the project with debug flags making it easier to attach a debugger and see what is happening
+.PHONY: debug
+debug: 
+	@mkdir -p $(OBJ_DIR)/debug
+	@cd $(OBJ_DIR)/debug; cmake -DBUILD_TYPE=Debug ../../src; make -j $(NUM_CORES)
+	@mv $(OBJ_DIR)/debug/orchid ./orchid
 
 #this builds the project with debug flags and with optimization flags allowing you to attach a debugger
 #to see if the optimization is screwing something up
