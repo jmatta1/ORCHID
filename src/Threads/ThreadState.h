@@ -12,8 +12,8 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds the definition of the class that is run by main to handle the
-** user interface
+** @details Holds the definition of the enums used to control threads also
+** contains the typedefs that wrap them in atomic structures
 **
 ********************************************************************************
 *******************************************************************************/
