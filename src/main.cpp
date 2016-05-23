@@ -9,13 +9,15 @@ HFIR background monitoring wall.
 #include<iostream>
 #include<iomanip>
 #include<string>
+#include<thread>
+#include<future>
+#include<locale>
 // includes from other libraries
 // includes from ORCHID
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
 #include"Utility/SortPermutation.h"
 #include"InputLib/InputLib.h"
-
 
 int main(int argc, char* argv[])
 {
@@ -63,7 +65,28 @@ int main(int argc, char* argv[])
     std::cout << mpodChannelData << "\n";
     std::cout << "----------------------------------------------------------\n";
     
-    std::cout << "\n\n" << std::endl;
+    std::cout << "\n" << std::endl;
+    bool quit_flag = false;
+    std::locale loc;
+    while(!quit_flag)
+    {
+        std::cout << "\nWaiting for input... " << std::endl;
+        auto input = std::async(std::launch::async, []{std::string s; if(std::cin >> s) return s;});
+
+        while(input.wait_for(std::chrono::seconds(2))!=std::future_status::ready)
+        {
+            std::cout << "Still Waiting..." << std::endl;
+        }
+        std::string temp = input.get();
+        std::cout << "Input was: " << temp << std::endl;
+        for(std::string::size_type i = 0; i<temp.length(); ++i) temp[i] = std::tolower(temp[i], loc);
+        std::cout << "Lowered input is: " << temp << std::endl;
+        if(temp == "quit")
+        {
+            quit_flag = true;
+        }
+    }
+
     return 0;
 }
 

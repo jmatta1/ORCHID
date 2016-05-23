@@ -26,9 +26,13 @@ include(./CMakeFlagDefs.txt)
 
 # force the existence of the BOOST library package
 find_package(Boost REQUIRED)
+# force the existence of the ncurses library
+#find_package(Curses REQUIRED)
+#find the threading stuff
+find_package(Threads REQUIRED)
 
 # add our default g++ flags
-add_definitions(-m64 -std=c++11 -D_FILE_OFFSET_BITS=64)
+add_definitions(-m64 -std=c++11 -D_FILE_OFFSET_BITS=64 -lpthread)
 
 # check for each supported build type and add the appropriate g++ flags
 if(${BUILD_TYPE} STREQUAL "Release")
@@ -45,7 +49,9 @@ elseif(${BUILD_TYPE} STREQUAL "Warn_Opt")
 endif()
 
 # include the boost header dir in my system
-include_directories( ${Boost_INCLUDE_DIR} )
+include_directories( ${BOOST_INCLUDE_DIR} )
+# include the ncurses header dir
+include_directories( ${CURSES_INCLUDE_DIR} )
 
 # Grab all the source files
 file(GLOB_RECURSE SRCS *.cpp)
@@ -61,4 +67,6 @@ include_directories(".")
 add_executable(orchid ${SRCS} ${HDRS})
 
 # make sure that the system knows to link the boost libraries
-target_link_libraries( orchid ${Boost_LIBRARIES} )
+target_link_libraries( orchid ${BOOST_LIBRARIES})
+#target_link_libraries( orchid ${CURSES_LIBRARIES})
+target_link_libraries( orchid ${CMAKE_THREAD_LIBS_INIT})
