@@ -39,6 +39,8 @@ int main(int argc, char* argv[])
     InputParser::InputParameters params;
     InputParser::MpodChannelData mpodChannelData;
     InputParser::MpodModuleData mpodModuleData;
+    //TODO: Add reading of digitizer module and channel csv files
+    //TODO: Also add the reading of the mapping csv which maps digitizer channel to voltage channel
     if(!Utility::parseAndValidateInput(params, inputFileName) ||
        !Utility::parseAndValidateMpodModule(mpodModuleData, params.powerBlock->perModuleParameterFile) ||
        !Utility::parseAndValidateMpodChannel(mpodChannelData, params.powerBlock->perChannelParameterFile) )
@@ -62,7 +64,7 @@ int main(int argc, char* argv[])
     std::cout << "MPOD Channel Input File\n";
     std::cout << mpodChannelData << "\n";
     std::cout << "----------------------------------------------------------\n";
-    
+    //TODO: output the data from the digitizer csvs and the mapping csv
     std::cout << "\n" << std::endl;
     std::cout << "Ready to start!" << std::endl;
     std::cout << "Press enter to continue" <<std::endl;
