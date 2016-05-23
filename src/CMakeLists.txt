@@ -27,7 +27,7 @@ include(./CMakeFlagDefs.txt)
 # force the existence of the BOOST library package
 find_package(Boost REQUIRED)
 # force the existence of the ncurses library
-#find_package(Curses REQUIRED)
+find_package(Curses REQUIRED)
 #find the threading stuff
 find_package(Threads REQUIRED)
 
@@ -68,5 +68,5 @@ add_executable(orchid ${SRCS} ${HDRS})
 
 # make sure that the system knows to link the boost libraries
 target_link_libraries( orchid ${BOOST_LIBRARIES})
-#target_link_libraries( orchid ${CURSES_LIBRARIES})
+target_link_libraries( orchid ${CURSES_LIBRARIES})
 target_link_libraries( orchid ${CMAKE_THREAD_LIBS_INIT})

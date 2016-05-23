@@ -6,13 +6,14 @@ HFIR background monitoring wall.
 
 // includes for C system headers
 // includes for C++ system headers
-#include<iostream>
+#include<sstream>
 #include<iomanip>
 #include<string>
 #include<thread>
 #include<future>
 #include<locale>
 // includes from other libraries
+#include<ncurses.h>
 // includes from ORCHID
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
@@ -22,23 +23,19 @@ HFIR background monitoring wall.
 int main(int argc, char* argv[])
 {
     std::string inputFileName;
-    if (argc == 1)
-    {
-        std::cout << "Enter the configuration file name" << std::endl;
-        std::cin >> inputFileName;
-    }
-    else if (argc == 2)
+    if (argc == 2)
     {
         inputFileName = std::string(argv[1]);
     }
     else
     {
-        std::cout << "Usage:\n\t" << argv[0] << " [InputFileName]" << std::endl;
+        std::cout << "Usage:\n\t" << argv[0] << " InputFileName" << std::endl;
         return 1;
     }
-    
-    //read the input file
+
     std::cout << Resources::titleString;
+
+    //parse the input file and ancillary csv files
     InputParser::InputParameters params;
     InputParser::MpodChannelData mpodChannelData;
     InputParser::MpodModuleData mpodModuleData;
@@ -48,6 +45,7 @@ int main(int argc, char* argv[])
     {
         return 1;
     }
+
     mpodModuleData.sort();
     mpodChannelData.sort();
     std::cout << std::flush << "\n\nInput Parameters\n";
@@ -66,27 +64,55 @@ int main(int argc, char* argv[])
     std::cout << "----------------------------------------------------------\n";
     
     std::cout << "\n" << std::endl;
+    std::cout << "Ready to start!" << std::endl;
+    std::cout << "Press enter to continue" <<std::endl;
+    std::cin.get();
+
+    //build interthread queues and data strutures
+
+    //create the various threads, except the input thread
+
+    //This thread *is* the IO thread, so we call the routine that sets everything
+    //up for work
+    initscr();
+    clear();
+    std::ostringstream out;
+    out << "Starting now" << std::endl;
+    printw(out.str().c_str());
+    getch();
+    printw(out.str().c_str());
+    out.str("");
+    out.clear();
     bool quit_flag = false;
     std::locale loc;
     while(!quit_flag)
     {
-        std::cout << "\nWaiting for input... " << std::endl;
-        auto input = std::async(std::launch::async, []{std::string s; if(std::cin >> s) return s;});
+        out << "\nWaiting for input... " << std::endl;
+        printw(out.str().c_str());
+        out.str("");
+        out.clear();
+        auto input = std::async(std::launch::async, []{char s[150]; if(getnstr(s, 150) > 0) return std::string(s);});
 
         while(input.wait_for(std::chrono::seconds(2))!=std::future_status::ready)
         {
-            std::cout << "Still Waiting..." << std::endl;
+            out << "Still Waiting..." << std::endl;
+            printw(out.str().c_str());
+            out.str("");
+            out.clear();
         }
         std::string temp = input.get();
-        std::cout << "Input was: " << temp << std::endl;
+        out << "Input was: " << temp << std::endl;
         for(std::string::size_type i = 0; i<temp.length(); ++i) temp[i] = std::tolower(temp[i], loc);
-        std::cout << "Lowered input is: " << temp << std::endl;
+        out << "Lowered input is: " << temp << std::endl;
+        printw(out.str().c_str());
+        out.str("");
+        out.clear();
         if(temp == "quit")
         {
             quit_flag = true;
         }
     }
-
+    endwin();
     return 0;
 }
 
