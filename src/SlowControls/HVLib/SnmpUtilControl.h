@@ -17,8 +17,8 @@
 ********************************************************************************
 *******************************************************************************/
 
-#ifndef ORCHID_SRC_HVLIB_SNMPUTILCONTROL_H
-#define ORCHID_SRC_HVLIB_SNMPUTILCONTROL_H
+#ifndef ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
+#define ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -61,4 +61,4 @@ private:
     std::string mibLocation;
 };
 }
-#endif //ORCHID_SRC_HVLIB_SNMPUTILCONTROL_H
+#endif //ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H

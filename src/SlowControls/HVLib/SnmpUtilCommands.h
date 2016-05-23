@@ -17,8 +17,8 @@
 ********************************************************************************
 *******************************************************************************/
 
-#ifndef ORCHID_SRC_HVLIB_SNMPUTILCOMMANDS_H
-#define ORCHID_SRC_HVLIB_SNMPUTILCOMMANDS_H
+#ifndef ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCOMMANDS_H
+#define ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCOMMANDS_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -107,4 +107,4 @@ static const std::map<MpodChannelSetParam, char> CHANNEL_SET_TYPES =
 
 }
 }
-#endif //ORCHID_SRC_HVLIB_SNMPUTILCOMMANDS_H
+#endif //ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCOMMANDS_H
