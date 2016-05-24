@@ -72,7 +72,11 @@ int main(int argc, char* argv[])
 
     //build interthread queues and data strutures
 
-    //create the various threads, except the input thread
+    //create the various thread callable objects
+
+    //start the threads except the IO thread
+
+    //start the IO thread and join it
 
     //This thread *is* the IO thread, so we call the routine that sets everything
     //up for work
@@ -115,6 +119,10 @@ int main(int argc, char* argv[])
         }
     }
     endwin();
+
+    std::cout << "IO thread has returned, shutdown should be complete.\n";
+    std::cout << "Exitting ORCHID, have a nice day! :-)" << std::endl;
+
     return 0;
 }
 
