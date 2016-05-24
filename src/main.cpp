@@ -16,6 +16,7 @@ HFIR background monitoring wall.
 #include"Utility/ParseAndValidate.h"
 // ORCHID interprocess communication objects
 #include"SlowControls/SlowData.h"
+#include"DigiLib/RateData.h"
 // ORCHID threads
 #include"Threads/UIThread.h"
 
@@ -50,19 +51,19 @@ int main(int argc, char* argv[])
     mpodModuleData.sort();
     mpodChannelData.sort();
     std::cout << std::flush << "\n\nInput Parameters\n";
-    std::cout << "==========================================================\n\n";
-    std::cout << "----------------------------------------------------------\n";
+    std::cout << "================================================================================\n\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
     std::cout << "Base Parameter Input File\n";
     std::cout << params << "\n";
-    std::cout << "----------------------------------------------------------\n";
-    std::cout << "----------------------------------------------------------\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
     std::cout << "MPOD Module Input File\n";
     std::cout << mpodModuleData << "\n";
-    std::cout << "----------------------------------------------------------\n";
-    std::cout << "----------------------------------------------------------\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
     std::cout << "MPOD Channel Input File\n";
     std::cout << mpodChannelData << "\n";
-    std::cout << "----------------------------------------------------------\n";
+    std::cout << "--------------------------------------------------------------------------------\n";
     //TODO: output the data from the digitizer csvs and the mapping csv
     std::cout << "\n" << std::endl;
     std::cout << "Ready to start!" << std::endl;
@@ -74,11 +75,15 @@ int main(int argc, char* argv[])
     int numVoltageChannels = std::count(mpodChannelData.online.begin(),
                                         mpodChannelData.online.end(), true);
     int numTemperatureChannels = 0;
-    SlowControls:: SlowData* slowData = new SlowControls::SlowData(numVoltageChannels,
+    SlowControls::SlowData* slowData = new SlowControls::SlowData(numVoltageChannels,
                                                                    numTemperatureChannels);
+    int numDigitizerChannels = 0;
+    FastData::RateData* rateData = new FastData::RateData(numDigitizerChannels);
 
     //create the various thread callable objects
-    Threads::UIThread* ui = new Threads::UIThread(slowData, params.generalBlock->updateFrequency);
+    Threads::UIThread* ui = new Threads::UIThread(slowData,
+                                                  rateData,
+                                                  params.generalBlock->updateFrequency);
 
     //start the threads except the IO thread and detach them
 
@@ -87,7 +92,7 @@ int main(int argc, char* argv[])
     uiThread.join();
 
     //the IO thread has joined proceed with shutdown
-    std::cout << "IO thread has rejoined.\nDeleting thread callable objects" << std::endl;
+    std::cout << "IO thread has rejoined main the thread.\nDeleting thread callable objects" << std::endl;
     //delete the thread callable objects
     delete ui;
 
