@@ -6,14 +6,18 @@ HFIR background monitoring wall.
 
 // includes for C system headers
 // includes for C++ system headers
-#include<sstream>
-#include<iomanip>
 #include<string>
+#include<algorithm>
 // includes from other libraries
-#include<ncurses.h>
+#include<boost/thread.hpp>
 // includes from ORCHID
+// ORCHID utilities
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
+// ORCHID interprocess communication objects
+#include"SlowControls/SlowData.h"
+// ORCHID threads
+#include"Threads/UIThread.h"
 
 int main(int argc, char* argv[])
 {
@@ -66,58 +70,35 @@ int main(int argc, char* argv[])
     std::cin.get();
 
     //build interthread queues and data strutures
+    //count the number of voltage channels
+    int numVoltageChannels = std::count(mpodChannelData.online.begin(),
+                                        mpodChannelData.online.end(), true);
+    int numTemperatureChannels = 0;
+    SlowControls:: SlowData* slowData = new SlowControls::SlowData(numVoltageChannels,
+                                                                   numTemperatureChannels);
 
     //create the various thread callable objects
+    Threads::UIThread* ui = new Threads::UIThread(slowData, params.generalBlock->updateFrequency);
 
-    //start the threads except the IO thread
+    //start the threads except the IO thread and detach them
 
     //start the IO thread and join it
+    boost::thread uiThread(*ui);
+    uiThread.join();
 
-    //This thread *is* the IO thread, so we call the routine that sets everything
-    //up for work
-    /*
-    initscr();
-    clear();
-    std::ostringstream out;
-    out << "Starting now" << std::endl;
-    printw(out.str().c_str());
-    getch();
-    printw(out.str().c_str());
-    out.str("");
-    out.clear();
-    bool quit_flag = false;
-    std::locale loc;
-    while(!quit_flag)
-    {
-        out << "\nWaiting for input... " << std::endl;
-        printw(out.str().c_str());
-        out.str("");
-        out.clear();
-        auto input = std::async(std::launch::async, []{char s[150]; if(getnstr(s, 150) > 0) return std::string(s);});
+    //the IO thread has joined proceed with shutdown
+    std::cout << "IO thread has rejoined.\nDeleting thread callable objects" << std::endl;
+    //delete the thread callable objects
+    delete ui;
 
-        while(input.wait_for(std::chrono::seconds(2))!=std::future_status::ready)
-        {
-            out << "Still Waiting..." << std::endl;
-            printw(out.str().c_str());
-            out.str("");
-            out.clear();
-        }
-        std::string temp = input.get();
-        out << "Input was: " << temp << std::endl;
-        for(std::string::size_type i = 0; i<temp.length(); ++i) temp[i] = std::tolower(temp[i], loc);
-        out << "Lowered input is: " << temp << std::endl;
-        printw(out.str().c_str());
-        out.str("");
-        out.clear();
-        if(temp == "quit")
-        {
-            quit_flag = true;
-        }
-    }
-    endwin();
-    */
-    std::cout << "IO thread has returned, shutdown should be complete.\n";
-    std::cout << "Exitting ORCHID, have a nice day! :-)" << std::endl;
+
+    std::cout << "Deleting the interprocess communication shared objects" << std::endl;
+    //delete shared objects generated for interprocess communication
+    delete slowData;
+
+
+    std::cout << "Shutdown should be complete.\n";
+    std::cout << "Closing ORCHID, have a nice day! :-)" << std::endl;
 
     return 0;
 }
