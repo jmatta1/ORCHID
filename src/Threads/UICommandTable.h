@@ -30,13 +30,14 @@ using boost::assign::map_list_of;
 namespace Threads
 {
 
+//The various enumerated commands
 enum class UICommands : char {Quit, Invalid};
+
+//A lookup between string and the command
 static const std::map<std::string, UICommands> UI_COMMAND_DISPATCH =
-    map_list_of("exit", UICommands::quit)
-        ("quit", UICommands::quit)
-        ("nope", UICommands::quit);
-
-
+    map_list_of("exit", UICommands::Quit)
+        ("quit", UICommands::Quit)
+        ("nope", UICommands::Quit);
 }
 
 #endif //ORCHID_SRC_THREADS_UICOMMANDTABLE_H

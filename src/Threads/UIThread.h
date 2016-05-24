@@ -30,6 +30,10 @@
 #include"DigiLib/RateData.h"
 namespace Threads
 {
+
+//An enumeration for the modes the display might be in
+enum class UIMode : char {Options, Running};
+
 class UIThread
 {
 public:
@@ -44,9 +48,15 @@ private:
     void handleKeyPress(int inChar);
     //This function handles commands when the user presses enter
     void handleCommand();
+    //this function selects the appropriate draw function based on mode
+    void drawScreen();
+    //This function draws the main options screen
+    void drawOptionsScreen();
+    //This function draws the screen while the system is taking data
+    void drawRunningScreen();
+    
     
     //Private Member Variables
-    
     //we may have a pointer to these data but we do not own it so: No deletions!
     // *vader says shaking his finger at Boba Fett*
     SlowControls::SlowData* slowData;
@@ -61,10 +71,14 @@ private:
     std::string command;
     //string to hold persistent messages in
     std::string persistentMessage;
+    //integer to store persistent message color in
+    int persistColor;
     //counter for number of refreshes persistent messages persist for
     long persistCount;
     //flag to continue or kill loop
     bool runLoop;
+    //enum to hold what mode we are in
+    UIMode mode;
 };
 
 }
