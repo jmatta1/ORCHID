@@ -1,6 +1,6 @@
 # ORCHID
-ORCHID - ORnl baCkground at HfIr Daq
-![orchid](https://github.com/jmatta1/ORCHID/raw/master/doc/resources/orchid.jpg)
+<img src="https://github.com/jmatta1/ORCHID/raw/master/doc/resources/orchid.jpg" width="320" height="200" />
+###ORCHID - ORnl baCkground at HfIr Daq
 
 This is a Data Acquisiton and Control program for handling the CAEN digitizer via optical link and handling the MPOD HV system.
 
