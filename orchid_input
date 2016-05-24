@@ -4,7 +4,7 @@
 
 [GeneralBlock] # this block of parameters holds the basic values that control the overall running of the DAQ
 RunTitle = "Test_Run", WarnRate = 20000
-UpdateFrequency = 2
+UpdateFrequency = 20
 BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
 [EndBlock]
 
