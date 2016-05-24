@@ -23,9 +23,35 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-namespace Digitizer
+namespace FastData
 {
 
+RateData::RateData(int numDigiChan): numDigitizerChannels(numDigiChan)
+{
+    this->triggers = new std::atomic_uint[this->numDigitizerChannels];
+    for(int i=0; i<this->numDigitizerChannels; ++i)
+    {
+        triggers[i].store(0);
+    }
+}
+
+RateData::~RateData()
+{
+    delete[] this->triggers;
+}
+
+void RateData::clearTrigs()
+{
+    for(int i=0; i<this->numDigitizerChannels; ++i)
+    {
+        triggers[i].store(0, std::memory_order_relaxed);
+    }
+}
+
+void RateData::addTrigs(int chan, unsigned count)
+{
+    triggers[chan].fetch_add(count, std::memory_order_relaxed);
+}
 
 }
 

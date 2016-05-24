@@ -22,14 +22,23 @@
 #define ORCHID_SRC_DIGILIB_RATEDATA_H
 // includes for C system headers
 // includes for C++ system headers
+#include<atomic>
 // includes from other libraries
 // includes from ORCHID
-namespace Digitizer
+
+namespace FastData
 {
 
 struct RateData
 {
+    RateData(int numDigiChan);
+    ~RateData();
+    void clearTrigs();
+    void addTrigs(int chan, unsigned count);
 
+    std::atomic_uint* triggers;
+
+    int numDigitizerChannels;
 };
 
 }
