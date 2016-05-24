@@ -23,10 +23,13 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-SlowData::SlowData(int numVolChan, int numTempChan)
+#include"HVLib/VoltageData.h"
+
+
+SlowData::SlowData(int numVolChan, int numTempChan):
+    numVoltageChannels(numVolChan), numTemperatureChannels(numTempChan)
 {
-    this->numVoltageChannels.store(numVolChan);
-    this->numTemperatureChannels.store(numTempChan);
+    //allocate everything
     this->terminalVoltage                 = new std::atomic<float>[numVoltageChannels];
     this->senseVoltage                    = new std::atomic<float>[numVoltageChannels];
     this->setVoltage                      = new std::atomic<float>[numVoltageChannels];
@@ -57,6 +60,54 @@ SlowData::SlowData(int numVolChan, int numTempChan)
     this->outputConstantVoltage           = new std::atomic<bool>[numVoltageChannels];
     this->outputCurrentBoundsExceeded     = new std::atomic<bool>[numVoltageChannels];
     this->outputFailureCurrentLimit       = new std::atomic<bool>[numVoltageChannels];
+    //now initialize everything
+    //first initialize the per channel information
+    for(int i = 0; i < numVolChan; ++i)
+    {
+        this->terminalVoltage[i].store(0.0);
+        this->senseVoltage[i].store(0.0);
+        this->setVoltage[i].store(0.0);
+        this->current[i].store(0.0);
+        this->rampUpRate[i].store(0.0);
+        this->rampDownRate[i].store(0.0);
+        this->maxCurrent[i].store(0.0);
+        this->maxVoltage[i].store(0.0);
+        this->currentTripTime[i].store(0);
+        this->temperature[i].store(0);
+        this->maxTemperature[i].store(0);
+        this->outputSwitch[i].store(false);
+        this->outputOn[i].store(false);
+        this->outputInhibit[i].store(false);
+        this->outputFailureMinSenseVoltage[i].store(false);
+        this->outputFailureMaxSenseVoltage[i].store(false);
+        this->outputFailureMaxTerminalVoltage[i].store(false);
+        this->outputFailureMaxCurrent[i].store(false);
+        this->outputFailureMaxTemperature[i].store(false);
+        this->outputFailureMaxPower[i].store(false);
+        this->outputFailureTimeout[i].store(false);
+        this->outputCurrentLimited[i].store(false);
+        this->outputRampUp[i].store(false);
+        this->outputRampDown[i].store(false);
+        this->outputEnableKill[i].store(false);
+        this->outputEmergencyOff[i].store(false);
+        this->outputAdjusting[i].store(false);
+        this->outputConstantVoltage[i].store(false);
+        this->outputCurrentBoundsExceeded[i].store(false);
+        this->outputFailureCurrentLimit[i].store(false);
+    }
+    //now initialize the crate information
+    this->crateMainOn.store(false);
+    this->crateMainInhibit.store(false);
+    this->crateLocalControlOnly.store(false);
+    this->crateInputFailure.store(false);
+    this->crateOutputFailure.store(false);
+    this->crateFantrayFailure.store(false);
+    this->crateSensorFailure.store(false);
+    this->crateVmeSysFailure.store(false);
+    this->cratePlugAndPlayIncompatible.store(false);
+    this->crateBusReset.store(false);
+    this->crateSupplyDerating.store(false);
+    this->crateSupplyFailure.store(false);
 }
 
 SlowData::~SlowData(int numVolChan, int numTempChan)
@@ -93,7 +144,62 @@ SlowData::~SlowData(int numVolChan, int numTempChan)
     delete[] this->outputFailureCurrentLimit;
 }
 
-SlowData::readVoltageData(const VoltageData& data)
+void SlowData::readVoltageData(const VoltageData& data)
 {
+    //set up the loop for transfering per channel information
+    std::size_t i=0, j=0;
+    std::size_t dataSize = data.terminalVoltage.size();
+    //loop and transfer per channel information
+    while((i < dataSize) && (j < numVoltageChannels))
+    {
+        if(data.outputSwitch[i])
+        {
+            this->terminalVoltage[j].store( data.terminalVoltage[i]);
+            this->senseVoltage[j].store(    data.senseVoltage[i]);
+            this->setVoltage[j].store(      data.setVoltage[i]);
+            this->current[j].store(         data.current[i]);
+            this->rampUpRate[j].store(      data.rampUpRate[i]);
+            this->rampDownRate[j].store(    data.rampDownRate[i]);
+            this->maxCurrent[j].store(      data.maxCurrent[i]);
+            this->maxVoltage[j].store(      data.maxVoltage[i]);
+            this->currentTripTime[j].store( data.currentTripTime[i]);
+            this->temperature[j].store(     data.temperature[i]);
+            this->maxTemperature[j].store(  data.maxTemperature[i]);
+            this->outputSwitch[j].store(    data.outputSwitch[i]);
 
+            this->outputOn[j].store(                        data.channelStatus[i].outputOn);
+            this->outputInhibit[j].store(                   data.channelStatus[i].outputInhibit);
+            this->outputFailureMinSenseVoltage[j].store(    data.channelStatus[i].outputFailureMinSenseVoltage);
+            this->outputFailureMaxSenseVoltage[j].store(    data.channelStatus[i].outputFailureMaxSenseVoltage);
+            this->outputFailureMaxTerminalVoltage[j].store( data.channelStatus[i].outputFailureMaxTerminalVoltage);
+            this->outputFailureMaxCurrent[j].store(         data.channelStatus[i].outputFailureMaxCurrent);
+            this->outputFailureMaxTemperature[j].store(     data.channelStatus[i].outputFailureMaxTemperature);
+            this->outputFailureMaxPower[j].store(           data.channelStatus[i].outputFailureMaxPower);
+            this->outputFailureTimeout[j].store(            data.channelStatus[i].outputFailureTimeout);
+            this->outputCurrentLimited[j].store(            data.channelStatus[i].outputCurrentLimited);
+            this->outputRampUp[j].store(                    data.channelStatus[i].outputRampUp);
+            this->outputRampDown[j].store(                  data.channelStatus[i].outputRampDown);
+            this->outputEnableKill[j].store(                data.channelStatus[i].outputEnableKill);
+            this->outputEmergencyOff[j].store(              data.channelStatus[i].outputEmergencyOff);
+            this->outputAdjusting[j].store(                 data.channelStatus[i].outputAdjusting);
+            this->outputConstantVoltage[j].store(           data.channelStatus[i].outputConstantVoltage);
+            this->outputCurrentBoundsExceeded[j].store(     data.channelStatus[i].outputCurrentBoundsExceeded);
+            this->outputFailureCurrentLimit[j].store(       data.channelStatus[i].outputFailureCurrentLimit);
+            ++j;
+        }
+        ++i;
+    }
+    //now transfer crate information
+    this->crateMainOn.store(mainOn);
+    this->crateMainInhibit.store(mainInhibit);
+    this->crateLocalControlOnly.store(localControlOnly);
+    this->crateInputFailure.store(inputFailure);
+    this->crateOutputFailure.store(outputFailure);
+    this->crateFantrayFailure.store(fantrayFailure);
+    this->crateSensorFailure.store(sensorFailure);
+    this->crateVmeSysFailure.store(vmeSysFailure);
+    this->cratePlugAndPlayIncompatible.store(plugAndPlayIncompatible);
+    this->crateBusReset.store(busReset);
+    this->crateSupplyDerating.store(supplyDerating);
+    this->crateSupplyFailure.store(supplyFailure);
 }
