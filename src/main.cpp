@@ -9,16 +9,11 @@ HFIR background monitoring wall.
 #include<sstream>
 #include<iomanip>
 #include<string>
-#include<thread>
-#include<future>
-#include<locale>
 // includes from other libraries
 #include<ncurses.h>
 // includes from ORCHID
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
-#include"Utility/SortPermutation.h"
-#include"InputLib/InputLib.h"
 
 int main(int argc, char* argv[])
 {
@@ -80,6 +75,7 @@ int main(int argc, char* argv[])
 
     //This thread *is* the IO thread, so we call the routine that sets everything
     //up for work
+    /*
     initscr();
     clear();
     std::ostringstream out;
@@ -119,7 +115,7 @@ int main(int argc, char* argv[])
         }
     }
     endwin();
-
+    */
     std::cout << "IO thread has returned, shutdown should be complete.\n";
     std::cout << "Exitting ORCHID, have a nice day! :-)" << std::endl;
 
