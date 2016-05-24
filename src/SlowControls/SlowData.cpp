@@ -23,8 +23,9 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-#include"HVLib/VoltageData.h"
 
+namespace SlowControls
+{
 
 SlowData::SlowData(int numVolChan, int numTempChan):
     numVoltageChannels(numVolChan), numTemperatureChannels(numTempChan)
@@ -110,7 +111,7 @@ SlowData::SlowData(int numVolChan, int numTempChan):
     this->crateSupplyFailure.store(false);
 }
 
-SlowData::~SlowData(int numVolChan, int numTempChan)
+SlowData::~SlowData()
 {
     delete[] this->terminalVoltage;
     delete[] this->senseVoltage;
@@ -190,16 +191,17 @@ void SlowData::readVoltageData(const VoltageData& data)
         ++i;
     }
     //now transfer crate information
-    this->crateMainOn.store(mainOn);
-    this->crateMainInhibit.store(mainInhibit);
-    this->crateLocalControlOnly.store(localControlOnly);
-    this->crateInputFailure.store(inputFailure);
-    this->crateOutputFailure.store(outputFailure);
-    this->crateFantrayFailure.store(fantrayFailure);
-    this->crateSensorFailure.store(sensorFailure);
-    this->crateVmeSysFailure.store(vmeSysFailure);
-    this->cratePlugAndPlayIncompatible.store(plugAndPlayIncompatible);
-    this->crateBusReset.store(busReset);
-    this->crateSupplyDerating.store(supplyDerating);
-    this->crateSupplyFailure.store(supplyFailure);
+    this->crateMainOn.store(                    data.crateStatus.mainOn);
+    this->crateMainInhibit.store(               data.crateStatus.mainInhibit);
+    this->crateLocalControlOnly.store(          data.crateStatus.localControlOnly);
+    this->crateInputFailure.store(              data.crateStatus.inputFailure);
+    this->crateOutputFailure.store(             data.crateStatus.outputFailure);
+    this->crateFantrayFailure.store(            data.crateStatus.fantrayFailure);
+    this->crateSensorFailure.store(             data.crateStatus.sensorFailure);
+    this->crateVmeSysFailure.store(             data.crateStatus.vmeSysFailure);
+    this->cratePlugAndPlayIncompatible.store(   data.crateStatus.plugAndPlayIncompatible);
+    this->crateBusReset.store(                  data.crateStatus.busReset);
+    this->crateSupplyDerating.store(            data.crateStatus.supplyDerating);
+    this->crateSupplyFailure.store(             data.crateStatus.supplyFailure);
+}
 }
