@@ -23,20 +23,24 @@
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
+#include<boost/chrono.hpp>
 // includes from ORCHID
-
+#include"SlowControls/SlowData.h"
 namespace Threads
 {
 class UIThread
 {
 public:
-    UIThread(){}
+    UIThread(SlowControls::SlowData* slDat, int refreshFrequency);
     ~UIThread(){}
 
     //this is the function that is called by boost::thread when making a thread
     void operator() ();
 private:
-
+    //we may have a pointer to the slowData but we do not own it so no deletions
+    // *vader says shaking his finger at Boba Fett*
+    SlowControls::SlowData* slowData;
+    boost::chrono::nanoseconds refreshPeriod;
 };
 
 }
