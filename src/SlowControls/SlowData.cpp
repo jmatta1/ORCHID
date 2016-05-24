@@ -155,53 +155,53 @@ void SlowData::readVoltageData(const VoltageData& data)
     {
         if(data.outputSwitch[i])
         {
-            this->terminalVoltage[j].store( data.terminalVoltage[i]);
-            this->senseVoltage[j].store(    data.senseVoltage[i]);
-            this->setVoltage[j].store(      data.setVoltage[i]);
-            this->current[j].store(         data.current[i]);
-            this->rampUpRate[j].store(      data.rampUpRate[i]);
-            this->rampDownRate[j].store(    data.rampDownRate[i]);
-            this->maxCurrent[j].store(      data.maxCurrent[i]);
-            this->maxVoltage[j].store(      data.maxVoltage[i]);
-            this->currentTripTime[j].store( data.currentTripTime[i]);
-            this->temperature[j].store(     data.temperature[i]);
-            this->maxTemperature[j].store(  data.maxTemperature[i]);
-            this->outputSwitch[j].store(    data.outputSwitch[i]);
+            this->terminalVoltage[j].store( data.terminalVoltage[i], std::memory_order_relaxed);
+            this->senseVoltage[j].store(    data.senseVoltage[i], std::memory_order_relaxed);
+            this->setVoltage[j].store(      data.setVoltage[i], std::memory_order_relaxed);
+            this->current[j].store(         data.current[i], std::memory_order_relaxed);
+            this->rampUpRate[j].store(      data.rampUpRate[i], std::memory_order_relaxed);
+            this->rampDownRate[j].store(    data.rampDownRate[i], std::memory_order_relaxed);
+            this->maxCurrent[j].store(      data.maxCurrent[i], std::memory_order_relaxed);
+            this->maxVoltage[j].store(      data.maxVoltage[i], std::memory_order_relaxed);
+            this->currentTripTime[j].store( data.currentTripTime[i], std::memory_order_relaxed);
+            this->temperature[j].store(     data.temperature[i], std::memory_order_relaxed);
+            this->maxTemperature[j].store(  data.maxTemperature[i], std::memory_order_relaxed);
+            this->outputSwitch[j].store(    data.outputSwitch[i], std::memory_order_relaxed);
 
-            this->outputOn[j].store(                        data.channelStatus[i].outputOn);
-            this->outputInhibit[j].store(                   data.channelStatus[i].outputInhibit);
-            this->outputFailureMinSenseVoltage[j].store(    data.channelStatus[i].outputFailureMinSenseVoltage);
-            this->outputFailureMaxSenseVoltage[j].store(    data.channelStatus[i].outputFailureMaxSenseVoltage);
-            this->outputFailureMaxTerminalVoltage[j].store( data.channelStatus[i].outputFailureMaxTerminalVoltage);
-            this->outputFailureMaxCurrent[j].store(         data.channelStatus[i].outputFailureMaxCurrent);
-            this->outputFailureMaxTemperature[j].store(     data.channelStatus[i].outputFailureMaxTemperature);
-            this->outputFailureMaxPower[j].store(           data.channelStatus[i].outputFailureMaxPower);
-            this->outputFailureTimeout[j].store(            data.channelStatus[i].outputFailureTimeout);
-            this->outputCurrentLimited[j].store(            data.channelStatus[i].outputCurrentLimited);
-            this->outputRampUp[j].store(                    data.channelStatus[i].outputRampUp);
-            this->outputRampDown[j].store(                  data.channelStatus[i].outputRampDown);
-            this->outputEnableKill[j].store(                data.channelStatus[i].outputEnableKill);
-            this->outputEmergencyOff[j].store(              data.channelStatus[i].outputEmergencyOff);
-            this->outputAdjusting[j].store(                 data.channelStatus[i].outputAdjusting);
-            this->outputConstantVoltage[j].store(           data.channelStatus[i].outputConstantVoltage);
-            this->outputCurrentBoundsExceeded[j].store(     data.channelStatus[i].outputCurrentBoundsExceeded);
-            this->outputFailureCurrentLimit[j].store(       data.channelStatus[i].outputFailureCurrentLimit);
+            this->outputOn[j].store(                        data.channelStatus[i].outputOn, std::memory_order_relaxed);
+            this->outputInhibit[j].store(                   data.channelStatus[i].outputInhibit, std::memory_order_relaxed);
+            this->outputFailureMinSenseVoltage[j].store(    data.channelStatus[i].outputFailureMinSenseVoltage, std::memory_order_relaxed);
+            this->outputFailureMaxSenseVoltage[j].store(    data.channelStatus[i].outputFailureMaxSenseVoltage, std::memory_order_relaxed);
+            this->outputFailureMaxTerminalVoltage[j].store( data.channelStatus[i].outputFailureMaxTerminalVoltage, std::memory_order_relaxed);
+            this->outputFailureMaxCurrent[j].store(         data.channelStatus[i].outputFailureMaxCurrent, std::memory_order_relaxed);
+            this->outputFailureMaxTemperature[j].store(     data.channelStatus[i].outputFailureMaxTemperature, std::memory_order_relaxed);
+            this->outputFailureMaxPower[j].store(           data.channelStatus[i].outputFailureMaxPower, std::memory_order_relaxed);
+            this->outputFailureTimeout[j].store(            data.channelStatus[i].outputFailureTimeout, std::memory_order_relaxed);
+            this->outputCurrentLimited[j].store(            data.channelStatus[i].outputCurrentLimited, std::memory_order_relaxed);
+            this->outputRampUp[j].store(                    data.channelStatus[i].outputRampUp, std::memory_order_relaxed);
+            this->outputRampDown[j].store(                  data.channelStatus[i].outputRampDown, std::memory_order_relaxed);
+            this->outputEnableKill[j].store(                data.channelStatus[i].outputEnableKill, std::memory_order_relaxed);
+            this->outputEmergencyOff[j].store(              data.channelStatus[i].outputEmergencyOff, std::memory_order_relaxed);
+            this->outputAdjusting[j].store(                 data.channelStatus[i].outputAdjusting, std::memory_order_relaxed);
+            this->outputConstantVoltage[j].store(           data.channelStatus[i].outputConstantVoltage, std::memory_order_relaxed);
+            this->outputCurrentBoundsExceeded[j].store(     data.channelStatus[i].outputCurrentBoundsExceeded, std::memory_order_relaxed);
+            this->outputFailureCurrentLimit[j].store(       data.channelStatus[i].outputFailureCurrentLimit, std::memory_order_relaxed);
             ++j;
         }
         ++i;
     }
     //now transfer crate information
-    this->crateMainOn.store(                    data.crateStatus.mainOn);
-    this->crateMainInhibit.store(               data.crateStatus.mainInhibit);
-    this->crateLocalControlOnly.store(          data.crateStatus.localControlOnly);
-    this->crateInputFailure.store(              data.crateStatus.inputFailure);
-    this->crateOutputFailure.store(             data.crateStatus.outputFailure);
-    this->crateFantrayFailure.store(            data.crateStatus.fantrayFailure);
-    this->crateSensorFailure.store(             data.crateStatus.sensorFailure);
-    this->crateVmeSysFailure.store(             data.crateStatus.vmeSysFailure);
-    this->cratePlugAndPlayIncompatible.store(   data.crateStatus.plugAndPlayIncompatible);
-    this->crateBusReset.store(                  data.crateStatus.busReset);
-    this->crateSupplyDerating.store(            data.crateStatus.supplyDerating);
-    this->crateSupplyFailure.store(             data.crateStatus.supplyFailure);
+    this->crateMainOn.store(                    data.crateStatus.mainOn, std::memory_order_relaxed);
+    this->crateMainInhibit.store(               data.crateStatus.mainInhibit, std::memory_order_relaxed);
+    this->crateLocalControlOnly.store(          data.crateStatus.localControlOnly, std::memory_order_relaxed);
+    this->crateInputFailure.store(              data.crateStatus.inputFailure, std::memory_order_relaxed);
+    this->crateOutputFailure.store(             data.crateStatus.outputFailure, std::memory_order_relaxed);
+    this->crateFantrayFailure.store(            data.crateStatus.fantrayFailure, std::memory_order_relaxed);
+    this->crateSensorFailure.store(             data.crateStatus.sensorFailure, std::memory_order_relaxed);
+    this->crateVmeSysFailure.store(             data.crateStatus.vmeSysFailure, std::memory_order_relaxed);
+    this->cratePlugAndPlayIncompatible.store(   data.crateStatus.plugAndPlayIncompatible, std::memory_order_relaxed);
+    this->crateBusReset.store(                  data.crateStatus.busReset, std::memory_order_relaxed);
+    this->crateSupplyDerating.store(            data.crateStatus.supplyDerating, std::memory_order_relaxed);
+    this->crateSupplyFailure.store(             data.crateStatus.supplyFailure, std::memory_order_relaxed);
 }
 }
