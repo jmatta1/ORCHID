@@ -33,8 +33,5 @@ namespace Threads
 enum class TState  : char {Running, Waiting, Stopping};
 typedef atomic<TState> ThreadState;
 
-enum class DigMode : char {PSDWaveforms, PSDIntegrals, PSDBoth, Waveforms};
-typedef atomic<DigMode> DigitizerMode;
-
 }
 #endif //ORCHID_SRC_THREADS_THREADSTATE_H
