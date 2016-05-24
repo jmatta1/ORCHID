@@ -25,7 +25,7 @@ include_directories("${PROJECT_BINARY_DIR}")
 include(./CMakeFlagDefs.txt)
 
 # force the existence of the BOOST library package
-find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS thread REQUIRED)
 # force the existence of the ncurses library
 find_package(Curses REQUIRED)
 #find the threading stuff
@@ -49,7 +49,7 @@ elseif(${BUILD_TYPE} STREQUAL "Warn_Opt")
 endif()
 
 # include the boost header dir in my system
-include_directories( ${BOOST_INCLUDE_DIR} )
+include_directories( ${Boost_INCLUDE_DIR} )
 # include the ncurses header dir
 include_directories( ${CURSES_INCLUDE_DIR} )
 
@@ -67,6 +67,6 @@ include_directories(".")
 add_executable(orchid ${SRCS} ${HDRS})
 
 # make sure that the system knows to link the boost libraries
-target_link_libraries( orchid ${BOOST_LIBRARIES})
+target_link_libraries( orchid ${Boost_LIBRARIES})
 target_link_libraries( orchid ${CURSES_LIBRARIES})
 target_link_libraries( orchid ${CMAKE_THREAD_LIBS_INIT})
