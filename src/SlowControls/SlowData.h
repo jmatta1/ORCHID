@@ -84,9 +84,10 @@ struct SlowData
 
     //Temperature Sensor Information
 
-    //general information
-    std::atomic<int> numVoltageChannels;
-    std::atomic<int> numTemperatureChannels;
+    //general information these do not need to be atomic as they are written
+    //once at object creation and never again
+    int numVoltageChannels;
+    int numTemperatureChannels;
 };
 
 }
