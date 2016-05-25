@@ -25,6 +25,7 @@
 #include<string>
 // includes from other libraries
 #include<boost/chrono.hpp>
+#include<ncurses.h>
 // includes from ORCHID
 #include"SlowControls/SlowData.h"
 #include"DigiLib/RateData.h"
@@ -47,6 +48,8 @@ private:
     ** Private Member Functions
     */
     /** Drawing and standard UI functions **/
+    //This function handles initial setup of the window
+    void initScreen();
     //This function is used to handle key presses
     void handleKeyPress(int inChar);
     //This function handles commands when the user presses enter
@@ -67,6 +70,8 @@ private:
     //This function does screen sizing stuff and figures out how to position
     //things, or how to yell at the user to fix it if the screen is too small
     void handleScreenResize();
+    //This loop handles waiting for the user to fix their mistake
+    void waitForResize();
     
     /** Command functions **/
     //shuts down orchid, disconnecting from digitizer and ramping down voltages
@@ -124,8 +129,8 @@ private:
     /**  Variables for managing basic screen drawing**/
     int numRows;
     int numCols;
-    int messageRow;
-    int commandRow;
+    WINDOW* textWindow;
+    WINDOW* messageWindow;
     
 };
 
