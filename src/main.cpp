@@ -65,9 +65,9 @@ int main(int argc, char* argv[])
     std::cout << mpodChannelData << "\n";
     std::cout << "--------------------------------------------------------------------------------\n";
     //TODO: output the data from the digitizer csvs and the mapping csv
-    std::cout << "\n" << std::endl;
-    std::cout << "Ready to start!" << std::endl;
+    std::cout << "\nReady to start!" << std::endl;
     std::cout << "Press enter to continue" <<std::endl;
+    std::cout << "\n" << std::endl;
     std::cin.get();
 
     //build interthread queues and data strutures
@@ -102,8 +102,7 @@ int main(int argc, char* argv[])
     delete slowData;
 
 
-    std::cout << "Shutdown should be complete.\n";
-    std::cout << "Closing ORCHID, have a nice day! :-)" << std::endl;
+    std::cout << "Closing ORCHID, have a nice day! :-)\n\n" << std::endl;
 
     return 0;
 }
