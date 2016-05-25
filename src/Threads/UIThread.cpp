@@ -41,7 +41,7 @@ UIThread::UIThread(SlowControls::SlowData* slDat,
                    int refreshFrequency):
     slowData(slDat), rateData(rtDat), persistCount(-1), command(""),
     persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
-    mode(UIMode::Options)
+    mode(UIMode::Init)
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
@@ -58,9 +58,11 @@ void UIThread::operator() ()
     keypad(stdscr, true);
     cbreak();
     nodelay(stdscr, true);
-    //holds characters that were input
-    int inChar;
-    wmove(stdscr, 20, 0);
+    //prep for initial drawing
+    //get the screen size
+    this->handleScreenResize();
+    
+    //find out if we can use color to draw things
     if(has_colors())
     {  
         start_color();
@@ -69,10 +71,14 @@ void UIThread::operator() ()
     //init some colors for usage
     init_pair(errorColor, COLOR_RED, COLOR_BLACK);
     init_pair(goodColor, COLOR_GREEN, COLOR_BLACK);
+    
+    //holds characters that were input during the loop
+    int inChar;
+    //start the event loop
     while(runLoop)
     {
         //here we check if a key was pressed
-        if((inChar = getch()) != ERR)
+        if((inChar = getch()) != ERR) //if we get ERR then no key was pressed in the period
         {
             this->handleKeyPress(inChar);
         }
@@ -88,8 +94,11 @@ void UIThread::drawScreen()
 {
     switch(mode)
     {
-    case UIMode::Options:
-        this->drawOptionsScreen();
+    case UIMode::Init:
+        this->drawInitScreen();
+        break;
+    case UIMode::Idle:
+        this->drawIdleScreen();
         break;
     case UIMode::Running:
         this->drawRunningScreen();
@@ -97,41 +106,76 @@ void UIThread::drawScreen()
     }
 }
 
-void UIThread::drawOptionsScreen()
+void UIThread::drawInitScreen()
 {
     wmove(stdscr, 0, 0);
-    printw("Status: Not taking data");
+    printw("Status: Not Ready");
+    wmove(stdscr, 1, 0);
+    printw("Commands Available");
+    wmove(stdscr, 2, 4);
+    printw("turnon");
+    wmove(stdscr, 2, 16);
+    printw("- Connects to digitizer and activates MPOD");
+    wmove(stdscr, 3, 4);
+    printw("quit/exit");
+    wmove(stdscr, 3, 16);
+    printw("- Exit ORCHID");
+    
+    this->drawPersistentMessage();
+    this->drawCommandInProgress();
+}
+
+void UIThread::drawIdleScreen()
+{
+    wmove(stdscr, 0, 0);
+    printw("Status: Idle");
     wmove(stdscr, 1, 0);
     printw("Commands Available");
     wmove(stdscr, 2, 4);
     printw("start");
     wmove(stdscr, 2, 16);
-    printw("- Starts data taking with current settings");
+    printw("- Start taking data");
     wmove(stdscr, 3, 4);
     printw("name");
     wmove(stdscr, 3, 16);
-    printw("- Change run name");
+    printw("- Set run name");
     wmove(stdscr, 4, 4);
     printw("number");
     wmove(stdscr, 4, 16);
-    printw("- Change run number");
+    printw("- Set run number");
     wmove(stdscr, 5, 4);
-    printw("quit/exit");
+    printw("turnoff");
     wmove(stdscr, 5, 16);
+    printw("- Disconnect from digitizer and shutdown MPOD");
+    wmove(stdscr, 6, 4);
+    printw("quit/exit");
+    wmove(stdscr, 6, 16);
     printw("- Exit ORCHID");
     
-    wmove(stdscr, 20, 0);
-    printw(command.c_str());
-    refresh();
+    this->drawPersistentMessage();
+    this->drawCommandInProgress();
 }
 
 void UIThread::drawRunningScreen()
 {
+    this->drawPersistentMessage();
+    this->drawCommandInProgress();
+}
+
+void UIThread::drawCommandInProgress()
+{
+    wmove(stdscr, this->commandRow, 0);
+    printw("?> ");
+    printw(command.c_str());
+    refresh();
+}
+
+void UIThread::drawPersistentMessage()
+{
     //first figure out if we should display the persistent message
     if(persistCount > 0)
     {
-        wmove(stdscr, 0, 0);
-        printw("Message: ");
+        wmove(stdscr, this->messageRow, 0);
         attron(COLOR_PAIR(persistColor));
         attron(A_BOLD);
         printw(this->persistentMessage.c_str());
@@ -141,18 +185,11 @@ void UIThread::drawRunningScreen()
     }
     else if(persistCount == 0)
     {
-        wmove(stdscr, 0, 0);
-        printw("         ");
-        int pMsgSize = persistentMessage.size();
+        wmove(stdscr, this->messageRow, 0);
         persistentMessage.clear();
-        persistentMessage.append(pMsgSize, ' ');
-        printw(persistentMessage.c_str());
-        persistentMessage.clear();
+        clrtoeol();
         --persistCount;
     }
-    wmove(stdscr, 20, 0);
-    printw(command.c_str());
-    refresh();
 }
 
 void UIThread::handleCommand()
@@ -169,28 +206,76 @@ void UIThread::handleCommand()
     if(cmdFind != UI_COMMAND_DISPATCH.end())
     {
         cmd = cmdFind->second;
+        bool okFlag = false;
+        switch(this->mode)
+        {
+        case UIMode::Init:
+            okFlag = INIT_MODE_VALID_CMD.find(cmd)->second;
+            break;
+        case UIMode::Idle:
+            okFlag = IDLE_MODE_VALID_CMD.find(cmd)->second;
+            break;
+        case UIMode::Running:
+            okFlag = RUN_MODE_VALID_CMD.find(cmd)->second;
+            break;
+        }
+        if(!okFlag)
+        {
+            cmd = UICommands::Unavailable;
+        }
     }
     else
-    {
-        cmd = UICommands::Invalid;
-    }
+    { cmd = UICommands::Invalid; }
     
     // switch on the command enum to figure out what to do
     switch(cmd)
     {
     case UICommands::Invalid:
-        this->persistentMessage = "Invalid Command";
+        this->persistentMessage = "Error:  Invalid Command";
         this->persistColor = errorColor;
         this->persistCount = refreshRate*5;
         break;
     case UICommands::Quit:
-        this->runLoop = false;
+        this->runGracefulShutdown();
+        break;
+    case UICommands::TurnOn:
+        this->turnOn();
+        break;
+    case UICommands::TurnOff:
+        this->turnOff();
+        break;
+    case UICommands::Start:
+        this->startDataTaking();
+        break;
+    case UICommands::Stop:
+        this->stopDataTaking();
+        break;
+    case UICommands::Next:
+        this->incrementRunNumber();
+        break;
+    case UICommands::Number:
+        this->setRunNumber();
+        break;
+    case UICommands::Name:
+        this->setRunName();
+        break;
+    case UICommands::Unavailable:
+        this->persistentMessage = "Error:  Command unvailable in this mode";
+        this->persistColor = errorColor;
+        this->persistCount = refreshRate*5;
         break;
     default:
-        this->persistentMessage = "Got to command loop default. This should be IMPOSSIBLE!";
-        this->persistCount = refreshRate*10;
+        this->persistentMessage = "Critical Error: Got to command loop default case. This should be IMPOSSIBLE!";
+        this->persistCount = refreshRate*60;
         break;
     }
+}
+
+void UIThread::handleScreenResize()
+{
+    getmaxyx(stdscr, this->numRows, this->numCols);
+    commandRow = this->numRows - 1;
+    messageRow = this->numRows - 3;
 }
 
 void UIThread::handleKeyPress(int inChar)
@@ -204,18 +289,21 @@ void UIThread::handleKeyPress(int inChar)
     case '\f':
         this->handleCommand();
         break;
+    case KEY_RESIZE:
+        this->handleScreenResize();
+        break;
     case KEY_BACKSPACE:
     case KEY_DC:
         if(lastCharInd >= 0)
         {
-            wmove(stdscr, 20, lastCharInd);
+            wmove(stdscr, this->commandRow, lastCharInd+3);
             printw(" ");
             command.erase(lastCharInd, 1);   
         }
         break;
     case 'a'://I know it is probably a bit silly, but this was my first thought
     case 'b'://on how to make certain that only non silly characters make it
-    case 'c'://to the command
+    case 'c'://to the command with this all the meta characters etc are filtered
     case 'd':
     case 'e':
     case 'f':
@@ -281,6 +369,62 @@ void UIThread::handleKeyPress(int inChar)
     default://anything not listed explicitly, ignore
         break;
     }
+}
+
+void UIThread::runGracefulShutdown()
+{
+    if(mode != UIMode::Init)
+    {
+        turnOff();
+    }
+    this->runLoop = false;
+}
+
+void UIThread::turnOn()
+{
+    //TODO write code to handle connecting to the digitizer and shutting
+    //down the MPOD
+    mode = UIMode::Idle;
+}
+
+void UIThread::turnOff()
+{
+    //TODO write code to handle disconnecting from the digitizer and shutting
+    //down the MPOD
+    mode = UIMode::Init;
+}
+
+void UIThread::startDataTaking()
+{
+    //TODO write code to put the digitizer in acquire mode, start the processing
+    //threads, start the file thread, and start the slow controls polling thread
+    mode = UIMode::Running;
+}
+
+void UIThread::stopDataTaking()
+{
+    //TODO write the code to put the digitizer in stopped mode, halt the processing
+    //threads, halt the file thread, and stop the slow controls polling
+    mode = UIMode::Idle;
+}
+
+void UIThread::incrementRunNumber()
+{
+    this->stopDataTaking();
+    //TODO write code to increment the run number and set the sequence # to 0
+    this->startDataTaking();
+}
+
+void UIThread::setRunNumber()
+{
+    //TODO write code to get a new run number from the user and then set the
+    //run number to that and the sequence number to zero
+}
+
+void UIThread::setRunName()
+{
+    //TODO write code to get a new run name from the user and then set the run
+    // name to that and reset the run number and sequence number to 0
 }
 
 }
