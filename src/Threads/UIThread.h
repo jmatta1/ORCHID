@@ -70,8 +70,20 @@ private:
     //This function does screen sizing stuff and figures out how to position
     //things, or how to yell at the user to fix it if the screen is too small
     void handleScreenResize();
-    //This loop handles waiting for the user to fix their mistake
+    //This loop handles waiting for the user to fix their mistake in making the
+    //window too small
     void waitForResize();
+    //This function draws the grid for display of slow controls and info
+    //void drawInfoGrid();
+    //this function draws the MPOD information into the grid
+    //void drawVoltageInfo();
+    //this function draws the temperature information into the grid
+    //void drawTemperatureInfo();
+    //this function draws the trigger rate information into the grid
+    //void drawTriggerInfo();
+    //this function draws the file information and digitizer data rate info
+    //to the area above the grid
+    //void drawGeneralInfo();
     
     /** Command functions **/
     //shuts down orchid, disconnecting from digitizer and ramping down voltages

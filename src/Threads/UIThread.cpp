@@ -91,9 +91,9 @@ void UIThread::initScreen()
     {
         wclear(this->textWindow);
         wclear(this->messageWindow);
-        wrefresh(this->textWindow);
-        wrefresh(this->messageWindow);
-        mvwprintw(this->textWindow, 0, 0, "Too Small! Make Window Bigger");
+        clear();
+        wmove(this->textWindow, 0, 0);
+        printw("Too Small! Make Window Bigger");
         this->waitForResize();
         this->numRows = LINES; this->numCols = COLS;
     }
