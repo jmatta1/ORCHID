@@ -87,7 +87,7 @@ void UIThread::initScreen()
     //get the terminal size, if it is not big enough force the user to resize
     //the terminal until we get at least the minimum size
     this->numRows = LINES; this->numCols = COLS;
-    while((this->numRows < 10) || (this->numCols < 72))
+    while((this->numRows < 14) || (this->numCols < 72))
     {
         wclear(this->textWindow);
         wclear(this->messageWindow);
@@ -102,7 +102,7 @@ void UIThread::initScreen()
     //make the sub windows
     this->textWindow = newwin(this->numRows - 4, this->numCols, 0, 0);
     this->messageWindow = newwin(4, this->numCols, this->numRows - 4, 0);
-    
+    scrollok(this->textWindow, true);
     //find out if we can use color to draw things
     if(has_colors())
     {  
@@ -139,6 +139,7 @@ void UIThread::drawScreen()
 
 void UIThread::drawInitScreen()
 {
+    this->sizeDiff = 0;
     mvwprintw(this->textWindow, 0, 0,  "Status: Not Ready");
     mvwprintw(this->textWindow, 1, 0,  "Commands Available");
     mvwprintw(this->textWindow, 2, 4,  "turnon");
@@ -152,6 +153,7 @@ void UIThread::drawInitScreen()
 
 void UIThread::drawIdleScreen()
 {
+    this->sizeDiff = 0;
     mvwprintw(this->textWindow, 0, 0, "Status: Idle");
     mvwprintw(this->textWindow, 1, 0,  "Commands Available");
     mvwprintw(this->textWindow, 2, 4,  "start");
@@ -171,6 +173,7 @@ void UIThread::drawIdleScreen()
 
 void UIThread::drawRunningScreen()
 {
+    this->sizeDiff = 7;
     this->drawPersistentMessage();
     this->drawCommandInProgress();
 }
@@ -320,7 +323,7 @@ void UIThread::handleScreenResize()
     //get the terminal size, if it is not big enough force the user to resize
     //the terminal until we get at least the minimum size
     this->numRows = LINES; this->numCols = COLS;
-    while((this->numRows < 10) || (this->numCols < 72))
+    while((this->numRows < 14) || (this->numCols < 72))
     {
         wclear(this->textWindow);
         wclear(this->messageWindow);
@@ -336,6 +339,7 @@ void UIThread::handleScreenResize()
     //make the sub windows
     this->textWindow = newwin(this->numRows - 4, this->numCols, 0, 0);
     this->messageWindow = newwin(4, this->numCols, this->numRows - 4, 0);
+    scrollok(this->textWindow, true);
 }
 
 void UIThread::waitForResize()
@@ -438,6 +442,42 @@ void UIThread::handleKeyPress(int inChar)
     case ' ':
         command.append(1, inChar);
         break;
+    case KEY_UP:
+        if(this->startLine > 0 && this->sizeDiff != 0)
+        {
+            --(this->startLine);
+        }
+        else if(this->sizeDiff == 0)
+        {
+            this->persistentMessage = "Error: No scrolling in this mode";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*1;
+        }
+        else
+        {
+            this->persistentMessage = "Cannot Scroll Further";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate/2;
+        }
+        break;
+    case KEY_DOWN:
+        if(this->startLine < this->sizeDiff && this->sizeDiff != 0)
+        {
+            ++(this->startLine);
+        }
+        else if(this->sizeDiff == 0)
+        {
+            this->persistentMessage = "Error: No scrolling in this mode";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*1;
+        }
+        else
+        {
+            this->persistentMessage = "Cannot Scroll Further";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate/2;
+        }
+        break;
     default://anything not listed explicitly, ignore
         break;
     }
@@ -457,6 +497,7 @@ void UIThread::turnOn()
     //TODO write code to handle connecting to the digitizer and shutting
     //down the MPOD
     mode = UIMode::Idle;
+    this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -465,6 +506,7 @@ void UIThread::turnOff()
     //TODO write code to handle disconnecting from the digitizer and shutting
     //down the MPOD
     mode = UIMode::Init;
+    this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -473,6 +515,7 @@ void UIThread::startDataTaking()
     //TODO write code to put the digitizer in acquire mode, start the processing
     //threads, start the file thread, and start the slow controls polling thread
     mode = UIMode::Running;
+    this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -481,6 +524,7 @@ void UIThread::stopDataTaking()
     //TODO write the code to put the digitizer in stopped mode, halt the processing
     //threads, halt the file thread, and stop the slow controls polling
     mode = UIMode::Idle;
+    this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -489,6 +533,7 @@ void UIThread::incrementRunNumber()
     this->stopDataTaking();
     //TODO write code to increment the run number and set the sequence # to 0
     this->startDataTaking();
+    this->startLine = 0;
     wclear(this->textWindow);
 }
 

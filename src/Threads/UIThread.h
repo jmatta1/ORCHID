@@ -25,6 +25,7 @@
 #include<string>
 // includes from other libraries
 #include<boost/chrono.hpp>
+#define NCURSES_MOUSE_VERSION 1
 #include<ncurses.h>
 // includes from ORCHID
 #include"SlowControls/SlowData.h"
@@ -143,7 +144,8 @@ private:
     int numCols;
     WINDOW* textWindow;
     WINDOW* messageWindow;
-    
+    int startLine;
+    int sizeDiff;
 };
 
 }
