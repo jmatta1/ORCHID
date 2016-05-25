@@ -36,23 +36,20 @@ add_definitions(-m64 -std=c++11 -D_FILE_OFFSET_BITS=64 -lpthread)
 
 # a little hack to make Qt Creator a little happier when it runs cmake to get
 # the project files
-IF(NOT BUILD_TYPE)
-SET(BUILD_TYPE "Plain" CACHE STRING)
-ENDIF(NOT BUILD_TYPE)
 
 # check for each supported build type and add the appropriate g++ flags
-if(${BUILD_TYPE} STREQUAL "Release")
+if(BUILD_TYPE STREQUAL "Release")
     add_definitions(${GCC_OPT_FLAG})
-elseif(${BUILD_TYPE} STREQUAL "Debug")
+elseif(BUILD_TYPE STREQUAL "Debug")
     add_definitions(${GCC_DEB_FLAG})
-elseif(${BUILD_TYPE} STREQUAL "OptDebug")
+elseif(BUILD_TYPE STREQUAL "OptDebug")
     add_definitions(-g -O2)
-elseif(${BUILD_TYPE} STREQUAL "Warn")
+elseif(BUILD_TYPE STREQUAL "Warn")
     add_definitions(${WARN_FLAGS})
-elseif(${BUILD_TYPE} STREQUAL "Warn_Opt")
+elseif(BUILD_TYPE STREQUAL "Warn_Opt")
     add_definitions(${WARN_FLAGS})
     add_definitions(${WARN_OPT_FLAGS})
-endif(${BUILD_TYPE} STREQUAL "Release")
+endif(BUILD_TYPE STREQUAL "Release")
 
 # include the boost header dir in my system
 include_directories( ${Boost_INCLUDE_DIR} )
