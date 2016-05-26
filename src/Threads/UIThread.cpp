@@ -35,12 +35,14 @@ namespace Threads
 static const int errorColor = 1;
 static const int goodColor = 2;
 
-UIThread::UIThread(SlowControls::SlowData* slDat,
-                   FastData::RateData* rtDat,
+UIThread::UIThread(InterThread::SlowData* slDat,
+                   InterThread::RateData* rtDat,
+                   InterThread::FileData* fiDat,
                    int refreshFrequency):
-    slowData(slDat), rateData(rtDat), persistCount(-1), command(""),
-    persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
-    mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr)
+    slowData(slDat), rateData(rtDat), fileData(fiDat), persistCount(-1),
+    command(""), persistentMessage(""), runLoop(true),
+    refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
+    messageWindow(nullptr)
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
@@ -171,9 +173,13 @@ void UIThread::drawIdleScreen()
     this->drawCommandInProgress();
 }
 
+void UIThread::drawFileInfo()
+{
+    
+}
+
 void UIThread::drawRunningScreen()
 {
-    this->sizeDiff = 7;
     this->drawPersistentMessage();
     this->drawCommandInProgress();
 }
@@ -442,7 +448,7 @@ void UIThread::handleKeyPress(int inChar)
     case ' ':
         command.append(1, inChar);
         break;
-    case KEY_UP:
+    /*case KEY_UP:
         if(this->startLine > 0 && this->sizeDiff != 0)
         {
             --(this->startLine);
@@ -477,7 +483,7 @@ void UIThread::handleKeyPress(int inChar)
             this->persistColor = errorColor;
             this->persistCount = refreshRate/2;
         }
-        break;
+        break;*/
     default://anything not listed explicitly, ignore
         break;
     }

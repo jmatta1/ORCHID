@@ -28,8 +28,9 @@
 #define NCURSES_MOUSE_VERSION 1
 #include<ncurses.h>
 // includes from ORCHID
-#include"SlowControls/SlowData.h"
-#include"DigiLib/RateData.h"
+#include"InterThreadComm/Data/SlowData.h"
+#include"InterThreadComm/Data/RateData.h"
+#include"InterThreadComm/Data/FileData.h"
 namespace Threads
 {
 
@@ -39,7 +40,8 @@ enum class UIMode : char {Init, Idle, Running};
 class UIThread
 {
 public:
-    UIThread(SlowControls::SlowData* slDat, FastData::RateData* rtDat, int refreshFrequency);
+    UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat, InterThread::FileData* fiDat,
+             int refreshFrequency);
     ~UIThread(){}
 
     //this is the function that is called by boost::thread when making a thread
@@ -63,6 +65,8 @@ private:
     void drawIdleScreen();
     //This function draws the screen while the system is taking data
     void drawRunningScreen();
+    //This function draws the file information across the top of the text window
+    void drawFileInfo();
     //This function handles drawing the command in progress
     void drawCommandInProgress();
     //This function handles drawing any persistent message that may need to
@@ -101,8 +105,9 @@ private:
     /**  Variables used to aggregate trigger data and the like*/
     //we may have a pointer to these data but we do not own it so: No deletions!
     // *vader says shaking his finger at Boba Fett*
-    SlowControls::SlowData* slowData;
-    FastData::RateData* rateData;
+    InterThread::SlowData* slowData;
+    InterThread::RateData* rateData;
+    InterThread::FileData* fileData;
     //multiplier for calculating rate from number of triggers
     float rateMultiplier;
     
@@ -117,6 +122,8 @@ private:
     int persistColor;
     //counter for number of refreshes persistent messages persist for
     long persistCount;
+    //variable to store the size of the file when we check
+    unsigned long long lastFileSize;
     
     /**  Variables for managing the user interface**/
     //amount of time to sleep for
