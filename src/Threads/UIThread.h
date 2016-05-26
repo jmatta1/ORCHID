@@ -33,7 +33,6 @@
 #include"InterThreadComm/Data/FileData.h"
 namespace Threads
 {
-
 //An enumeration for the modes the display might be in
 enum class UIMode : char {Init, Idle, Running};
 
@@ -122,8 +121,14 @@ private:
     int persistColor;
     //counter for number of refreshes persistent messages persist for
     long persistCount;
+    
+    /**Variables for displaying file info*/
+    std::string fileName;
+    std::string runTitle;
+    int runNumber;
+    int sequenceNumber;
     //variable to store the size of the file when we check
-    unsigned long long lastFileSize;
+    long long lastFileSize;
     
     /**  Variables for managing the user interface**/
     //amount of time to sleep for
@@ -140,8 +145,8 @@ private:
     int numCols;
     WINDOW* textWindow;
     WINDOW* messageWindow;
-    int startLine;
-    int sizeDiff;
+    //int startLine;
+    //int sizeDiff;
 };
 
 }
