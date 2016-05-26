@@ -23,6 +23,7 @@
 // includes for C++ system headers
 #include<string>
 #include<sstream>
+#include<iomanip>
 // includes from other libraries
 #include<boost/thread.hpp>
 #include<boost/algorithm/string.hpp>
@@ -40,7 +41,7 @@ UIThread::UIThread(InterThread::SlowData* slDat,
                    InterThread::FileData* fiDat,
                    int refreshFrequency):
     slowData(slDat), rateData(rtDat), fileData(fiDat), persistCount(-1),
-    command(""), persistentMessage(""), runLoop(true),
+    lastFileSize(0), command(""), persistentMessage(""), runLoop(true),
     refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
     messageWindow(nullptr)
 {
@@ -141,7 +142,7 @@ void UIThread::drawScreen()
 
 void UIThread::drawInitScreen()
 {
-    this->sizeDiff = 0;
+    //this->sizeDiff = 0;
     mvwprintw(this->textWindow, 0, 0,  "Status: Not Ready");
     mvwprintw(this->textWindow, 1, 0,  "Commands Available");
     mvwprintw(this->textWindow, 2, 4,  "turnon");
@@ -155,7 +156,7 @@ void UIThread::drawInitScreen()
 
 void UIThread::drawIdleScreen()
 {
-    this->sizeDiff = 0;
+    //this->sizeDiff = 0;
     mvwprintw(this->textWindow, 0, 0, "Status: Idle");
     mvwprintw(this->textWindow, 1, 0,  "Commands Available");
     mvwprintw(this->textWindow, 2, 4,  "start");
@@ -175,11 +176,53 @@ void UIThread::drawIdleScreen()
 
 void UIThread::drawFileInfo()
 {
-    
+    //check if we need to get new values
+    if(fileData->fileNameChangeSinceLastGet())
+    {
+        fileData->getFileName(this->fileName);
+    }
+    if(fileData->runTitleChangeSinceLastGet())
+    {
+        fileData->getRunTitle(this->runTitle);
+    }
+    if(fileData->runNumberChangeSinceLastGet())
+    {
+        this->runNumber = fileData->getRunNumber();
+    }
+    if(fileData->sequenceNumberChangeSinceLastGet())
+    {
+        this->sequenceNumber = fileData->getSequenceNumber();
+    }
+    //Generate the file info string
+    std::ostringstream builder;
+    builder << "Run Title: " << this->runTitle << " | Run #: " << this->runNumber;
+    builder << " | File #: " << this->sequenceNumber << " | Rate: ";
+    //get the file size and calculate the current file write rate
+    long long tempFileSize = this->fileData->getSize();
+    long long rate = (tempFileSize - this->lastFileSize) * this->rateMultiplier;
+    this->lastFileSize = tempFileSize;
+    //calculate if the file write rate is in thousands or millions etc
+    if(rate > 1000000)
+    {
+        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
+    }
+    else if(rate > 1000)
+    {
+        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
+    }
+    else
+    {
+        builder << std::setw(4) << std::setfill(' ') << rate;
+    }
+    builder << "B/s | File: " << this->fileName;
+    mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
 }
 
 void UIThread::drawRunningScreen()
 {
+    //draw the file information line
+    this->drawFileInfo();
+    
     this->drawPersistentMessage();
     this->drawCommandInProgress();
 }
@@ -503,7 +546,7 @@ void UIThread::turnOn()
     //TODO write code to handle connecting to the digitizer and shutting
     //down the MPOD
     mode = UIMode::Idle;
-    this->startLine = 0;
+    //this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -512,7 +555,7 @@ void UIThread::turnOff()
     //TODO write code to handle disconnecting from the digitizer and shutting
     //down the MPOD
     mode = UIMode::Init;
-    this->startLine = 0;
+    //this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -521,7 +564,7 @@ void UIThread::startDataTaking()
     //TODO write code to put the digitizer in acquire mode, start the processing
     //threads, start the file thread, and start the slow controls polling thread
     mode = UIMode::Running;
-    this->startLine = 0;
+    //this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -530,7 +573,7 @@ void UIThread::stopDataTaking()
     //TODO write the code to put the digitizer in stopped mode, halt the processing
     //threads, halt the file thread, and stop the slow controls polling
     mode = UIMode::Idle;
-    this->startLine = 0;
+    //this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -539,7 +582,7 @@ void UIThread::incrementRunNumber()
     this->stopDataTaking();
     //TODO write code to increment the run number and set the sequence # to 0
     this->startDataTaking();
-    this->startLine = 0;
+    //this->startLine = 0;
     wclear(this->textWindow);
 }
 
