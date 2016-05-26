@@ -34,7 +34,7 @@ struct SlowData
 {
     SlowData(int numVolChan, int numTempChan);
     ~SlowData();
-    void readVoltageData(const VoltageData& data);
+    void readVoltageData(const SlowControls::VoltageData& data);
 
     //all stored data in this class is std::atomic for thread safety
 

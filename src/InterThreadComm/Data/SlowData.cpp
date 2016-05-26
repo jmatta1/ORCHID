@@ -145,7 +145,7 @@ SlowData::~SlowData()
     delete[] this->outputFailureCurrentLimit;
 }
 
-void SlowData::readVoltageData(const VoltageData& data)
+void SlowData::readVoltageData(const SlowControls::VoltageData& data)
 {
     //set up the loop for transfering per channel information
     std::size_t i=0, j=0;
