@@ -24,7 +24,7 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace SlowControls
+namespace InterThread
 {
 
 SlowData::SlowData(int numVolChan, int numTempChan):

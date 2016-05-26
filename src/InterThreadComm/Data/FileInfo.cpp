@@ -24,7 +24,7 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace FileOutput
+namespace InterThread
 {
 
 FileInfo::FileInfo():fileName(""), runTitle(""), runNumber(0),

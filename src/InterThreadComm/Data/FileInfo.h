@@ -28,7 +28,7 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 
-namespace FileOutput
+namespace InterThread
 {
 
 struct FileInfo

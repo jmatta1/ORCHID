@@ -26,9 +26,9 @@
 using std::atomic;
 // includes from other libraries
 // includes from ORCHID
-#include"HVLib/VoltageData.h"
+#include"SlowControls/HVLib/VoltageData.h"
 
-namespace SlowControls
+namespace InterThread
 {
 struct SlowData
 {

@@ -26,7 +26,7 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace FastData
+namespace InterThread
 {
 
 struct RateData

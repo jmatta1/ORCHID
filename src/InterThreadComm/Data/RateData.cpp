@@ -23,7 +23,7 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-namespace FastData
+namespace InterThread
 {
 
 RateData::RateData(int numDigiChan): numDigitizerChannels(numDigiChan)
