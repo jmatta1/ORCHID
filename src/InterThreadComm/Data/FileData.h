@@ -42,16 +42,16 @@ public:
     void setRunTitle(const std::string& rTitle);
     void setRunNumber(int rn){runNumber.store(rn); runNumberTest.store(true);}
     void setSequenceNumber(int sn){sequenceNumber.store(sn); sequenceNumberTest.store(true);}
-    void setSize(int s){size.store(s);}
+    void setSize(long long s){size.store(s);}
     void incrementRunNumber(){++runNumber; sequenceNumberTest.store(true);}
     void incrementSequenceNumber(){++sequenceNumber; sequenceNumberTest.store(true);}
     void increaseRunNumber(int diff){runNumber.fetch_add(diff); runNumberTest.store(true);}
     void increaseSequenceNumber(int diff){sequenceNumber.fetch_add(diff); sequenceNumberTest.store(true);}
-    void increaseSize(int diff){size.fetch_add(diff);}
+    void increaseSize(long long diff){size.fetch_add(diff);}
     //getters
     int getRunNumber(){return runNumber.load(); runNumberTest.store(false);}
-    int getSequencNumber(){return sequenceNumber.load(); sequenceNumberTest.store(false);}
-    int getSize(){return size.load();}
+    int getSequenceNumber(){return sequenceNumber.load(); sequenceNumberTest.store(false);}
+    long long getSize(){return size.load();}
     void getFileName(std::string& fName);
     void getRunTitle(std::string& rTitle);
     void getFileNameAndRunTitle(std::string& fName, std::string& rTitle);
@@ -73,7 +73,7 @@ private:
     //atomic integers
     std::atomic_int runNumber;
     std::atomic_int sequenceNumber;
-    std::atomic_int size;
+    std::atomic_llong size;
     
     //atomic boolean test
     std::atomic_bool fileNameTest;
