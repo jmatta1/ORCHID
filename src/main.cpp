@@ -15,8 +15,8 @@ HFIR background monitoring wall.
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
 // ORCHID interprocess communication objects
-#include"SlowControls/SlowData.h"
-#include"DigiLib/RateData.h"
+#include"InterThreadComm/Data/SlowData.h"
+#include"InterThreadComm/Data/RateData.h"
 // ORCHID threads
 #include"Threads/UIThread.h"
 
@@ -75,10 +75,10 @@ int main(int argc, char* argv[])
     int numVoltageChannels = std::count(mpodChannelData.online.begin(),
                                         mpodChannelData.online.end(), true);
     int numTemperatureChannels = 0;
-    SlowControls::SlowData* slowData = new SlowControls::SlowData(numVoltageChannels,
+    InterThread::SlowData* slowData = new SlowControls::SlowData(numVoltageChannels,
                                                                    numTemperatureChannels);
     int numDigitizerChannels = 0;
-    FastData::RateData* rateData = new FastData::RateData(numDigitizerChannels);
+    InterThread::RateData* rateData = new FastData::RateData(numDigitizerChannels);
 
     //create the various thread callable objects
     Threads::UIThread* ui = new Threads::UIThread(slowData,
