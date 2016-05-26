@@ -41,7 +41,7 @@ struct FileInfo
     void setRunTitle(const std::string& rTitle);
     void setRunNumber(int rn){runNumber.store(rn); runNumberTest.store(true);}
     void setSequenceNumber(int sn){sequenceNumber.store(sn); sequenceNumberTest.store(true);}
-    void setSize(int s){size.store(sn);}
+    void setSize(int s){size.store(s);}
     void incrementRunNumber(){++runNumber; sequenceNumberTest.store(true);}
     void incrementSequenceNumber(){++sequenceNumber; sequenceNumberTest.store(true);}
     void increaseRunNumber(int diff){runNumber.fetch_add(diff); runNumberTest.store(true);}
