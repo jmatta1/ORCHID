@@ -31,10 +31,11 @@
 namespace InterThread
 {
 
-struct FileInfo
+class FileData
 {
-    FileInfo();
-    ~FileInfo(){}
+public:
+    FileData();
+    ~FileData(){}
     //setters
     void setFileNameAndRunTitle(const std::string& fName, const std::string& rTitle);
     void setFileName(const std::string& fName);

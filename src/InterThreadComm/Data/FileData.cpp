@@ -18,7 +18,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"FileInfo.h"
+#include"FileData.h"
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -27,12 +27,12 @@
 namespace InterThread
 {
 
-FileInfo::FileInfo():fileName(""), runTitle(""), runNumber(0),
+FileData::FileData():fileName(""), runTitle(""), runNumber(0),
     sequenceNumber(0), size(0),fileNameTest(true), runTitleTest(true),
     runNumberTest(true), sequenceNumberTest(true)
 {}
 //setters
-void FileInfo::setFileNameAndRunTitle(const std::string& fName, const std::string& rTitle)
+void FileData::setFileNameAndRunTitle(const std::string& fName, const std::string& rTitle)
 {
     boost::upgrade_lock<boost::shared_mutex> lock(nonAtomicAccess);
     boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
@@ -44,7 +44,7 @@ void FileInfo::setFileNameAndRunTitle(const std::string& fName, const std::strin
     //when the locks go out of scope they unlock
 }
 
-void FileInfo::setFileName(const std::string& fName)
+void FileData::setFileName(const std::string& fName)
 {
     boost::upgrade_lock<boost::shared_mutex> lock(nonAtomicAccess);
     boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
@@ -54,7 +54,7 @@ void FileInfo::setFileName(const std::string& fName)
     //when the locks go out of scope they unlock
 }
 
-void FileInfo::setRunTitle(const std::string& rTitle)
+void FileData::setRunTitle(const std::string& rTitle)
 {
     boost::upgrade_lock<boost::shared_mutex> lock(nonAtomicAccess);
     boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
@@ -64,21 +64,21 @@ void FileInfo::setRunTitle(const std::string& rTitle)
     //when the locks go out of scope they unlock
 }
 
-void FileInfo::getFileName(std::string& fName)
+void FileData::getFileName(std::string& fName)
 {
     boost::shared_lock<boost::shared_mutex> lock(nonAtomicAccess);
     fName = fileName;
     fileNameTest.store(false);
 }
 
-void FileInfo::getRunTitle(std::string& rTitle)
+void FileData::getRunTitle(std::string& rTitle)
 {
     boost::shared_lock<boost::shared_mutex> lock(nonAtomicAccess);
     rTitle = runTitle;
     runTitleTest.store(false);
 }
 
-void FileInfo::getFileNameAndRunTitle(std::string& fName, std::string& rTitle)
+void FileData::getFileNameAndRunTitle(std::string& fName, std::string& rTitle)
 {
     boost::shared_lock<boost::shared_mutex> lock(nonAtomicAccess);
     fName = fileName;
