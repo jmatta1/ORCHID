@@ -27,6 +27,7 @@
 // includes from other libraries
 #include<boost/thread.hpp>
 #include<boost/algorithm/string.hpp>
+#include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
 #include"UICommandTable.h"
 
@@ -63,14 +64,14 @@ void UIThread::operator() ()
     //start the event loop
     while(runLoop)
     {
+        //here we draw the screen
+        drawScreen();
         //here we check if a key was pressed
         if((inChar = getch()) != ERR) //if we get ERR then no key was pressed in the period
         {
             this->handleKeyPress(inChar);
         }
-        //here we draw the screen
-        //draw the command in progress
-        drawScreen();
+        //here we sleep a bit
         boost::this_thread::sleep_for(this->refreshPeriod);
     }
     delwin(this->textWindow);
@@ -299,60 +300,60 @@ void UIThread::handleCommand()
         this->persistCount = refreshRate*5;
         break;
     case UICommands::Quit:
-        this->runGracefulShutdown();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->runGracefulShutdown();
         break;
     case UICommands::TurnOn:
-        this->turnOn();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->turnOn();
         break;
     case UICommands::TurnOff:
-        this->turnOff();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->turnOff();
         break;
     case UICommands::Start:
-        this->startDataTaking();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->startDataTaking();
         break;
     case UICommands::Stop:
-        this->stopDataTaking();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->stopDataTaking();
         break;
     case UICommands::Next:
-        this->incrementRunNumber();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->incrementRunNumber();
         break;
     case UICommands::Number:
-        this->setRunNumber();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->setRunNumber();
         break;
     case UICommands::Name:
-        this->setRunName();
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
+        this->setRunName();
         break;
     case UICommands::Unavailable:
         this->persistentMessage = "Error:  Command unvailable in this mode";
@@ -488,6 +489,19 @@ void UIThread::handleKeyPress(int inChar)
     case '7':
     case '8':
     case '9':
+    case '_':
+    case '-':
+    case '(':
+    case ')':
+    case '*':
+    case '+':
+    case '=':
+    case ',':
+    case '.':
+    case '[':
+    case ']':
+    case '{':
+    case '}':
     case ' ':
         command.append(1, inChar);
         break;
@@ -527,6 +541,175 @@ void UIThread::handleKeyPress(int inChar)
             this->persistCount = refreshRate/2;
         }
         break;*/
+    default://anything not listed explicitly, ignore
+        break;
+    }
+}
+
+void UIThread::handleSetRunNumKeyPress(int inChar)
+{
+    int lastCharInd = (command.size() - 1);
+    switch(inChar)
+    {
+    case KEY_ENTER:
+    case '\r':
+    case '\n':
+    case '\f':
+    {
+        int temp;
+        std::ostringstream builder;
+        builder << "Run number set to: " << command ;
+        this->persistentMessage = builder.str();
+        this->persistColor = goodColor;
+        this->persistCount = refreshRate*2;
+        boost::spirit::qi::parse(command.begin(), command.end(), boost::spirit::qi::int_, temp);
+        //TODO: actually call the command structure to change the file thread
+        this->fileData->setRunNumber(temp);
+        this->fileData->setSequenceNumber(0);
+        command.clear();
+        this->runSubLoop = false;
+    }
+        break;
+    case KEY_RESIZE:
+        this->handleScreenResize();
+        break;
+    case KEY_BACKSPACE:
+    case KEY_DC:
+        if(lastCharInd >= 0)
+        {
+            mvwprintw(this->messageWindow, 3, lastCharInd+3, " ");
+            command.erase(lastCharInd, 1);   
+        }
+        break;
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        command.append(1, inChar);
+        break;
+ 
+    default://anything not listed explicitly, ignore
+        break;
+    }
+}
+
+void UIThread::handleSetRunTitleKeyPress(int inChar)
+{
+    int lastCharInd = (command.size() - 1);
+    switch(inChar)
+    {
+    case KEY_ENTER:
+    case '\r':
+    case '\n':
+    case '\f':
+    {
+        //TODO: actually call the command structure to change the file thread
+        std::ostringstream builder;
+        builder << "Run title set to: " << command ;
+        this->persistentMessage = builder.str();
+        this->persistColor = goodColor;
+        this->persistCount = refreshRate*2;
+        this->fileData->setRunTitle(this->command);
+        this->fileData->setSequenceNumber(0);
+        command.clear();
+        this->runSubLoop = false;
+    }
+        break;
+    case KEY_RESIZE:
+        this->handleScreenResize();
+        break;
+    case KEY_BACKSPACE:
+    case KEY_DC:
+        if(lastCharInd >= 0)
+        {
+            mvwprintw(this->messageWindow, 3, lastCharInd+3, " ");
+            command.erase(lastCharInd, 1);   
+        }
+        break;
+    case 'a'://I know it is probably a bit dumb, but this was my first thought
+    case 'b'://on how to make certain that only non silly characters make it
+    case 'c'://to the command with this all the meta characters etc are filtered
+    case 'd':
+    case 'e':
+    case 'f':
+    case 'g':
+    case 'h':
+    case 'i':
+    case 'j':
+    case 'k':
+    case 'l':
+    case 'm':
+    case 'n':
+    case 'o':
+    case 'p':
+    case 'q':
+    case 'r':
+    case 's':
+    case 't':
+    case 'u':
+    case 'v':
+    case 'w':
+    case 'x':
+    case 'y':
+    case 'z':
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+    case 'G':
+    case 'H':
+    case 'I':
+    case 'J':
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'O':
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+    case 'T':
+    case 'U':
+    case 'V':
+    case 'W':
+    case 'X':
+    case 'Y':
+    case 'Z':
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case '_':
+    case '-':
+    case '(':
+    case ')':
+    case '*':
+    case '+':
+    case '=':
+    case ',':
+    case '.':
+    case '[':
+    case ']':
+        command.append(1, inChar);
+        break;
+    case ' ':
+        command.append(1, '_');
+        break;
     default://anything not listed explicitly, ignore
         break;
     }
@@ -580,7 +763,8 @@ void UIThread::stopDataTaking()
 void UIThread::incrementRunNumber()
 {
     this->stopDataTaking();
-    //TODO write code to increment the run number and set the sequence # to 0
+    //TODO call actual file thread control structure
+    this->fileData->incrementRunNumber();
     this->startDataTaking();
     //this->startLine = 0;
     wclear(this->textWindow);
@@ -588,14 +772,52 @@ void UIThread::incrementRunNumber()
 
 void UIThread::setRunNumber()
 {
-    //TODO write code to get a new run number from the user and then set the
     //run number to that and the sequence number to zero
+    int inChar;
+    this->runSubLoop = true;
+    while(runSubLoop)
+    {
+        //here we draw the screen
+        wclear(this->textWindow);
+        mvwprintw(this->textWindow, 0, 0, "Please enter a run number");
+        wrefresh(this->textWindow);
+        this->drawPersistentMessage();
+        this->drawCommandInProgress();
+        wrefresh(this->messageWindow);
+        //here we check if a key was pressed
+        if((inChar = getch()) != ERR) //if we get ERR then no key was pressed in the period
+        {
+            this->handleSetRunNumKeyPress(inChar);
+        }
+        //now sleep for a bit
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    wclear(this->messageWindow);
 }
 
 void UIThread::setRunName()
 {
-    //TODO write code to get a new run name from the user and then set the run
-    // name to that and reset the run number and sequence number to 0
+    //run number to that and the sequence number to zero
+    int inChar;
+    this->runSubLoop = true;
+    while(runSubLoop)
+    {
+        //here we draw the screen
+        wclear(this->textWindow);
+        mvwprintw(this->textWindow, 0, 0, "Please enter a run title");
+        wrefresh(this->textWindow);
+        this->drawPersistentMessage();
+        this->drawCommandInProgress();
+        wrefresh(this->messageWindow);
+        //here we check if a key was pressed
+        if((inChar = getch()) != ERR) //if we get ERR then no key was pressed in the period
+        {
+            this->handleSetRunTitleKeyPress(inChar);
+        }
+        //now pause for a bit
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    wclear(this->messageWindow);
 }
 
 }

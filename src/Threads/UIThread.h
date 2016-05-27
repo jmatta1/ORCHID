@@ -54,6 +54,10 @@ private:
     void initScreen();
     //This function is used to handle key presses
     void handleKeyPress(int inChar);
+    //this function is used to handle key presses in set run number
+    void handleSetRunNumKeyPress(int inChar);
+    //this function is used to handle key presses in set run title
+    void handleSetRunTitleKeyPress(int inChar);
     //This function handles commands when the user presses enter
     void handleCommand();
     //this function selects the appropriate draw function based on mode
@@ -137,6 +141,8 @@ private:
     std::string command;
     //flag to continue or kill loop
     bool runLoop;
+    //flag to continue or kill a subloop
+    bool runSubLoop;
     //enum to hold what mode we are in
     UIMode mode;
     
