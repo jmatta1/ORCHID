@@ -58,7 +58,12 @@ docs: $(patsubst %,$(SRC_DIR)/%,$(SOURCES)) $(patsubst %,$(SRC_DIR)/%,$(HEADERS)
 #this removes the object directories files and the prequisite directory and files
 .PHONY: clean
 clean:
-	-rm -rf $(OBJ_DIR)
+	-rm -rf $(OBJ_DIR)/plain/*
+	-rm -rf $(OBJ_DIR)/debug/*
+	-rm -rf $(OBJ_DIR)/opt_debug/*
+	-rm -rf $(OBJ_DIR)/release/*
+	-rm -rf $(OBJ_DIR)/warn/*
+	-rm -rf $(OBJ_DIR)/warn_opt/*
 
 #this removes the obj directory, the prereqs files, and the executable file
 .PHONY: cleanall
