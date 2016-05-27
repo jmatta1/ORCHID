@@ -42,20 +42,16 @@ public:
     ~MpodController(){}
     
     //global modification functions
-    void setCrateStatus(bool online);
-    bool setupAllChannels(); //returns false if the crate is offline
-    
-    //individual module and channel modification functions
-    bool setChannelStatus(int module, int channel, bool online); //returns false if the crate is offline
-    bool setChannelVoltage(int module, int channel, float voltage); //returns false if the crate is offline
-    bool setRiseRate(int module, int channel, float riseRate); //returns false if the crate is offline
-    bool setFallRate(int module, int channel, float fallRate); //returns false if the crate is offline
+    bool turnCrateOn();
+    bool turnCrateOff();
+    bool activateAllChannels();
+    bool deactivateAllChannels();
     
     
 private:
     //programs the various maximums into the system, called every time the crate
     //is turned on
-    bool doMaxSetup(); //returns false if the crate is offline
+    bool setupChannels();
     
     SnmpUtilControl* snmpController;
     MpodChannelData* channelData;
