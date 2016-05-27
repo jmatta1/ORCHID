@@ -23,6 +23,7 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<string>
+#include<sstream>
 // includes from other libraries
 // includes from ORCHID
 #include"SnmpUtilCommands.h"
@@ -60,5 +61,75 @@ private:
     std::string ipAddress;
     std::string mibLocation;
 };
+
+template<class Number>
+std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command,
+                                           Number value) const
+{
+    if(CmdLookup::GLOBAL_SET_TYPES.at(command) == 'i')
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::GLOBAL_SET_USERS.at(command),
+                                                   this->buildSetGlobalParameter(
+                                                       CmdLookup::GLOBAL_SET_COMMANDS.at(command),
+                                                       "i", (int)value) ));
+    }
+    else
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::GLOBAL_SET_USERS.at(command),
+                                                   this->buildSetGlobalParameter(
+                                                       CmdLookup::GLOBAL_SET_COMMANDS.at(command),
+                                                       "F", (float)value) ));
+    }
+}
+
+template<class Number>
+std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command,
+                                            int board, int channel,
+                                            Number value) const
+{
+    if(CmdLookup::CHANNEL_SET_TYPES.at(command) == 'i')
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::CHANNEL_SET_USERS.at(command),
+                                                   this->buildSetChannelParameter(
+                                                       CmdLookup::CHANNEL_SET_COMMANDS.at(command),
+                                                       this->convertToUniversalChannel(board, channel),
+                                                       "i", (int)value) ));
+    }
+    else
+    {
+        return this->runCommand(this->buildCommand("snmpset",
+                                                   CmdLookup::CHANNEL_SET_USERS.at(command),
+                                                   this->buildSetChannelParameter(
+                                                       CmdLookup::CHANNEL_SET_COMMANDS.at(command),
+                                                       this->convertToUniversalChannel(board, channel),
+                                                       "F", (float)value) ));
+    }
+    
+}
+
+template<class Number>
+std::string SnmpUtilControl::buildSetChannelParameter(const std::string& paramName,
+                                                      const std::string& channel,
+                                                      const std::string& type,
+                                                      Number value) const
+{
+    std::ostringstream parameterBuilder;
+    parameterBuilder << paramName << channel << " " << type << " " << value;
+    return parameterBuilder.str();
+}
+
+template<class Number>
+std::string SnmpUtilControl::buildSetGlobalParameter(const std::string& paramName,
+                                                     const std::string& type,
+                                                     Number value) const
+{
+    std::ostringstream parameterBuilder;
+    parameterBuilder << paramName << " " << type << " " << value;
+    return parameterBuilder.str();
+}
+
 }
 #endif //ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
