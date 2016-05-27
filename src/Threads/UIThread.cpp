@@ -37,14 +37,13 @@ namespace Threads
 static const int errorColor = 1;
 static const int goodColor = 2;
 
-UIThread::UIThread(InterThread::SlowData* slDat,
-                   InterThread::RateData* rtDat,
-                   InterThread::FileData* fiDat,
+UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
+                   InterThread::FileData* fiDat, SlowControls::MpodController* mpCtrl,
                    int refreshFrequency):
-    slowData(slDat), rateData(rtDat), fileData(fiDat), persistCount(-1),
-    lastFileSize(0), command(""), persistentMessage(""), runLoop(true),
-    refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
-    messageWindow(nullptr)
+    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodController(mpCtrl),
+    persistCount(-1), lastFileSize(0), command(""), persistentMessage(""),
+    runLoop(true), refreshRate(refreshFrequency), mode(UIMode::Init),
+    textWindow(nullptr), messageWindow(nullptr)
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
@@ -717,8 +716,13 @@ void UIThread::handleSetRunTitleKeyPress(int inChar)
 
 void UIThread::runGracefulShutdown()
 {
-    if(mode != UIMode::Init)
+    if(mode == UIMode::Idle)
     {
+        turnOff();
+    }
+    else if(mode == UIMode::Running)
+    {
+        stopDataTaking();
         turnOff();
     }
     this->runLoop = false;
@@ -726,8 +730,26 @@ void UIThread::runGracefulShutdown()
 
 void UIThread::turnOn()
 {
-    //TODO write code to handle connecting to the digitizer and shutting
-    //down the MPOD
+    if(!this->mpodController->turnCrateOn())
+    {
+        this->persistentMessage = "Critical Error:  MPOD either did not turn on or did not initialize";
+        this->persistColor = errorColor;
+        this->persistCount = refreshRate*10;
+        this->mpodController->turnCrateOff();//Undo anything that may have happened
+        return; //then return without changing mode
+    }
+    if(!this->mpodController->activateAllChannels())
+    {
+        this->persistentMessage = "Critical Error:  Error in turning on HV channels";
+        this->persistColor = errorColor;
+        this->persistCount = refreshRate*10;
+        this->mpodController->deactivateAllChannels();
+        this->mpodController->turnCrateOff();//Undo anything that may have happened
+        return; //then return without changing mode
+    }
+    //TODO write code to put slow controls thread into polling but not recording mode
+    //TODO write code to handle waiting for rampup of the mpod channels
+    //TODO write code to connect to digitizer
     mode = UIMode::Idle;
     //this->startLine = 0;
     wclear(this->textWindow);
@@ -735,8 +757,10 @@ void UIThread::turnOn()
 
 void UIThread::turnOff()
 {
-    //TODO write code to handle disconnecting from the digitizer and shutting
-    //down the MPOD
+    this->mpodController->deactivateAllChannels();
+    //TODO write code to handle waiting for rampdown of the mpod channels
+    this->mpodController->turnCrateOff();
+    //TODO write code to handle disconnecting from the digitizer
     mode = UIMode::Init;
     //this->startLine = 0;
     wclear(this->textWindow);
@@ -744,8 +768,12 @@ void UIThread::turnOff()
 
 void UIThread::startDataTaking()
 {
-    //TODO write code to put the digitizer in acquire mode, start the processing
-    //threads, start the file thread, and start the slow controls polling thread
+    //TODO put the file thread into running data mode
+    //TODO put the event processing threads into running mode
+    //TODO put the slow controls thread into recording mode
+    //TODO put the digitizer thread into running mode
+    //TODO put the digitizer into running mode
+    
     mode = UIMode::Running;
     //this->startLine = 0;
     wclear(this->textWindow);
@@ -753,8 +781,12 @@ void UIThread::startDataTaking()
 
 void UIThread::stopDataTaking()
 {
-    //TODO write the code to put the digitizer in stopped mode, halt the processing
-    //threads, halt the file thread, and stop the slow controls polling
+    //TODO put the digitizer into stopped mode
+    //TODO put the digitizer thread into stopped mode
+    //TODO put the event processing threads into finish and stop mode
+    //TODO put the slow controls polling into poll but no record more
+    //TODO put in wait for processing threads to stop
+    //TODO put the file thread into finish and stop mode
     mode = UIMode::Idle;
     //this->startLine = 0;
     wclear(this->textWindow);

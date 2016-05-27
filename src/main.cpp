@@ -17,6 +17,9 @@ HFIR background monitoring wall.
 // ORCHID interprocess communication objects
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
+// ORCHID device objects
+#include"SlowControls/HVLib/MpodController.h"
+#include"SlowControls/HVLib/SnmpUtilCommands.h"
 // ORCHID threads
 #include"Threads/UIThread.h"
 
@@ -106,7 +109,9 @@ int main(int argc, char* argv[])
      */
     std::cout << "Building device control data structures" << std::endl;
     // For Controlling the MPOD (The temperature system needs no control)
-    
+    SlowControls::SnmpUtilControl* mpodSnmpController = new SlowControls::SnmpUtilControl(params.powerBlock->mpodIpAddress,
+                                                                                          params.powerBlock->weinerMibFileDirectory);
+    SlowControls::MpodController* mpodController = new SlowControls::MpodController(mpodSnmpController, &mpodChannelData, &mpodModuleData);
     
     // For Controlling the digitizer
     
@@ -141,7 +146,8 @@ int main(int argc, char* argv[])
             new Threads::UIThread(slowData, rateData, fileData,
                       //Future:   digitizerThreadControl, slowControlsThreadControl,
                       //Future:   fileThreadControl, eventProcThreadControl,
-                      //Future:   digitizerControl, mpodControl
+                      //Future:   digitizerControl, mpodController
+                                  mpodController,
                                   params.generalBlock->updateFrequency);
     //make the file thread callable
     //Threads::FileThread* fileThreadCallable = new FileThread(...);
@@ -198,6 +204,8 @@ int main(int argc, char* argv[])
 
     //delete the device control structures
     std::cout << "Deleting device controls" << std::endl;
+    delete mpodController;
+    delete mpodSnmpController;
     
     //delete the thread control structures
     std::cout << "Deleting thread controls" << std::endl;

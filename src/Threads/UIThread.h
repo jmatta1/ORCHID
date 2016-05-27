@@ -31,6 +31,7 @@
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
 #include"InterThreadComm/Data/FileData.h"
+#include"SlowControls/HVLib/MpodController.h"
 namespace Threads
 {
 //An enumeration for the modes the display might be in
@@ -39,7 +40,8 @@ enum class UIMode : char {Init, Idle, Running};
 class UIThread
 {
 public:
-    UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat, InterThread::FileData* fiDat,
+    UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
+             InterThread::FileData* fiDat, SlowControls::MpodController* mpCtrl,
              int refreshFrequency);
     ~UIThread(){}
 
@@ -111,6 +113,7 @@ private:
     InterThread::SlowData* slowData;
     InterThread::RateData* rateData;
     InterThread::FileData* fileData;
+    SlowControls::MpodController* mpodController;
     //multiplier for calculating rate from number of triggers
     float rateMultiplier;
     
