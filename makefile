@@ -73,5 +73,5 @@ cleanall: clean
 #this runs cleanall and then removes the obj directory
 .PHONY: superclean
 superclean: cleanall
-    -rm -rf $(OBJ_DIR)
+	-rm -rf $(OBJ_DIR)
 
