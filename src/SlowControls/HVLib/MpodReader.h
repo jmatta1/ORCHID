@@ -27,6 +27,7 @@
 #include"SnmpUtilControl.h"
 #include"VoltageData.h"
 #include"InterThreadComm/Data/SlowData.h"
+#include"InputLib/Blocks/MpodChannelData.h"
 
 namespace SlowControls
 {
@@ -34,7 +35,8 @@ class MpodReader
 {
 public:
     MpodReader(SnmpUtilControl* snmpCtrl,
-               InputParser::MpodChannelData* mpodChannelData);
+               InputParser::MpodChannelData* mpodChannelData):
+        snmpControl(snmpCtrl), voltageData(mpodChannelData->board.size()){}
     ~MpodReader(){}
     
     VoltageData voltageData;

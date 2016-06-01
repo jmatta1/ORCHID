@@ -27,13 +27,6 @@
 namespace SlowControls
 {
 
-MpodReader::MpodReader(SnmpUtilControl* snmpCtrl,
-                       InputParser::MpodChannelData* mpodChannelData):
-    snmpControl(snmpCtrl), slowData(slDat)
-{
-    voltageData = new VoltageData(mpodChannelData->channel.size());
-}
-
 void MpodReader::readAll()
 {
     this->walkTerminalVoltages();
