@@ -36,7 +36,7 @@ namespace SlowControls
 {
 class SnmpUtilControl
 {
-public://TODO wrap access to commands in a multi reader, single writer mutex
+public:
     SnmpUtilControl(const std::string& ip, const std::string& mibLoc):
         ipAddress(ip), mibLocation(mibLoc) {}
     ~SnmpUtilControl(){}
