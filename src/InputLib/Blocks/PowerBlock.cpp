@@ -104,7 +104,7 @@ return os << "[PowerBlock]\n"
     << "    PerChannelParameterFile  = "   << pb.perChannelParameterFile << "\n"
     << "    IPAddress                = "   << pb.mpodIpAddress           << "\n"
     << "    WienerMibFileDirectory   = "   << pb.weinerMibFileDirectory  << "\n"
-    << "    pollingRate              = "   << pb.pollingRate             << "\n"
+    << "    PollingRate              = "   << pb.pollingRate             << "\n"
     << "[EndBlock]";
 }
 
