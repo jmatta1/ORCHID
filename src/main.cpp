@@ -14,14 +14,18 @@ HFIR background monitoring wall.
 // ORCHID utilities
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
-// ORCHID interprocess communication objects
+// ORCHID interprocess communication data objects
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
+#include"InterThreadComm/Data/FileData.h"
+// ORCHID interprocess communication control objects
+#include"InterThreadComm/Control/SlowControlsThreadController.h"
 // ORCHID device objects
 #include"SlowControls/HVLib/MpodController.h"
 #include"SlowControls/HVLib/SnmpUtilCommands.h"
 // ORCHID threads
 #include"Threads/UIThread.h"
+#include"Threads/SlowControlsThread.h"
 
 int main(int argc, char* argv[])
 {
@@ -99,6 +103,7 @@ int main(int argc, char* argv[])
     // For controlling DigitizerThread
     
     // For controlling SlowControlsThread
+    InterThread::SlowControlsThreadController* sctController = new InterThread::SlowControlsThreadController();
     
     // For controlling FileOutputThread
     
@@ -112,6 +117,7 @@ int main(int argc, char* argv[])
     SlowControls::SnmpUtilControl* mpodSnmpController = new SlowControls::SnmpUtilControl(params.powerBlock->mpodIpAddress,
                                                                                           params.powerBlock->weinerMibFileDirectory);
     SlowControls::MpodController* mpodController = new SlowControls::MpodController(mpodSnmpController, &mpodChannelData, &mpodModuleData);
+    SlowControls::MpodReader* mpodReader = new SlowControls::MpodReader(mpodSnmpController, &mpodChannelData);
     
     // For Controlling the digitizer
     
@@ -144,11 +150,13 @@ int main(int argc, char* argv[])
     //make the UI thread callable
     Threads::UIThread* uiThreadCallable =
             new Threads::UIThread(slowData, rateData, fileData,
-                      //Future:   digitizerThreadControl, slowControlsThreadControl,
+                      //Future:   digitizerThreadControl,
+                                  sctController,
                       //Future:   fileThreadControl, eventProcThreadControl,
-                      //Future:   digitizerControl, mpodController
+                      //Future:   digitizerControl
                                   mpodController,
                                   params.generalBlock->updateFrequency);
+    Threads::SlowControlsThread* scThreadCallable = new Threads::SlowControlsThread(mpodReader, slowData, sctController, params.powerBlock->pollingRate);
     //make the file thread callable
     //Threads::FileThread* fileThreadCallable = new FileThread(...);
     
@@ -174,6 +182,7 @@ int main(int argc, char* argv[])
      */
     std::cout << "Building threads\n" << std::endl;
     // Make the threads
+    boost::thread scThread(*scThreadCallable);
     boost::thread uiThread(*uiThreadCallable);
     //boost::thread fileThread(fileThreadCallable);
     //boost::thread slowControlsThread(slowControlsThreadCallable);
@@ -186,6 +195,7 @@ int main(int argc, char* argv[])
     
     
     // Detach all threads except the IO thread
+    scThread.detach();
     
 
     //Wait to join the IO thread
@@ -197,6 +207,7 @@ int main(int argc, char* argv[])
     std::cout << "Deleting thread callable objects" << std::endl;
     //delete the thread callable objects
     delete uiThreadCallable;
+    delete scThreadCallable;
 
     //delete the data queues
     std::cout << "Deleting interthread data queues" << std::endl;
@@ -205,10 +216,12 @@ int main(int argc, char* argv[])
     //delete the device control structures
     std::cout << "Deleting device controls" << std::endl;
     delete mpodController;
+    delete mpodReader;
     delete mpodSnmpController;
     
     //delete the thread control structures
     std::cout << "Deleting thread controls" << std::endl;
+    delete sctController;
     
     std::cout << "Deleting statistics accumulators\n" << std::endl;
     //delete shared objects generated for interprocess communication
