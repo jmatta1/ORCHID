@@ -1,7 +1,7 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file UIThread.h
+** @file SlowControlsThread.h
 ** @author James Till Matta
 ** @date 01 June, 2016
 ** @brief
@@ -12,8 +12,8 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds the definition of the slow controls class used to poll the
-** voltage and temperature controls
+** @details Holds the definition of the slow controls thread class used to poll
+** the slow controls like voltage and temperature
 **
 ********************************************************************************
 *******************************************************************************/
@@ -27,6 +27,7 @@
 // includes from ORCHID
 #include"SlowControls/HVLib/MpodReader.h"
 #include"InterThreadComm/Data/SlowData.h"
+#include"InterThreadComm/Control/SlowControlsThreadController.h"
 
 namespace Threads
 {
@@ -35,15 +36,18 @@ class SlowControlsThread
 {
 public:
     //construction and destruction
-    SlowControlsThread(SlowControls::MpodReader* mRead, InterThread::SlowData* slDat, int refreshRate);
-    ~SlowControlsThread();
+    SlowControlsThread(SlowControls::MpodReader* mRead, InterThread::SlowData* slDat, InterThread::SlowControlsThreadController* sctCtrl, int refreshRate);
+    ~SlowControlsThread(){}
     
     // the function that makes this object callable which actually executes the thread
     void operator() ();
 private:
     SlowControls::MpodReader* mpodReader;
     InterThread::SlowData* slowData;
+    InterThread::SlowControlsThreadController* sctControl;
     boost::chrono::nanoseconds refreshPeriod;
+    
+    bool notTerminated;
 };
 
 }
