@@ -30,7 +30,7 @@ namespace InputParser
 
 PowerBlock::PowerBlock() : perChannelParameterFile(""),
     mpodIpAddress(""), perChannelParameterFileSet_(false),
-    mpodIpAddressSet_(false) {}
+    mpodIpAddressSet_(false), pollingRate(1) {}
 
 // required parameters
 void PowerBlock::perChannelParameterFileSet(const std::string& input)
@@ -57,12 +57,18 @@ void PowerBlock::weinerMibFileDirectorySet(const std::string& input)
     weinerMibFileDirectorySet_ = true;
 }
 
+void PowerBlock::pollingRateSet(int input)
+{
+    pollingRate = input;
+}
+
 bool PowerBlock::validate()
 {
     return (perChannelParameterFileSet_ &&
             perModuleParameterFileSet_ &&
             mpodIpAddressSet_&&
-            weinerMibFileDirectorySet_);
+            weinerMibFileDirectorySet_ &&
+            (pollingRate > 0));
 }
 
 void PowerBlock::printValidationErrors()
@@ -84,6 +90,10 @@ void PowerBlock::printValidationErrors()
     {
         std::cout << "    MIB file directory was not set\n";
     }
+    if(!(pollingRate > 0))
+    {
+        std::cout << "    Polling rate must be greater than 0\n";
+    }
     std::cout << "End PowerBlock Validation Errors\n";
 }
 
@@ -94,6 +104,7 @@ return os << "[PowerBlock]\n"
     << "    PerChannelParameterFile  = "   << pb.perChannelParameterFile << "\n"
     << "    IPAddress                = "   << pb.mpodIpAddress           << "\n"
     << "    WienerMibFileDirectory   = "   << pb.weinerMibFileDirectory  << "\n"
+    << "    pollingRate              = "   << pb.pollingRate             << "\n"
     << "[EndBlock]";
 }
 

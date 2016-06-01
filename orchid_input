@@ -3,7 +3,8 @@
 # adding a test comment to the file
 
 [GeneralBlock] # this block of parameters holds the basic values that control the overall running of the DAQ
-RunTitle = "Test_Run", WarnRate = 20000
+RunTitle = "Test_Run"
+WarnRate = 20000   # this is the rate at will we issue warning about the digitizer running too fast
 UpdateFrequency = 20
 BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
 [EndBlock]
@@ -20,6 +21,7 @@ PerChannelParameterFile = "./mpod_channel_params.csv"
 PerModuleParameterFile = "./mpod_module_params.csv"
 MpodIPAddress = 192.168.11.11
 WienerMibFileDirectory = "/usr/share/snmp/mibs"
+PollingRate = 1
 [EndBlock]
 
 [End]
