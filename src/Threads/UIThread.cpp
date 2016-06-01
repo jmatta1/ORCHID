@@ -748,7 +748,19 @@ void UIThread::turnOn()
         return; //then return without changing mode
     }
     //TODO write code to put slow controls thread into polling but not recording mode
-    //TODO write code to handle waiting for rampup of the mpod channels
+    bool stillRamping = true;
+    while(stillRamping)
+    {
+        //here we sleep a bit
+        boost::this_thread::sleep_for(this->refreshPeriod);
+        //here we check if there are any channels still ramping their voltages
+        int rampCount = std::count(this->slowData->outputRampUp,
+                                   &(this->slowData->outputRampUp[this->slowData->numVoltageChannels]), true);
+        if(rampCount == 0)
+        {
+            stillRamping = false;
+        }
+    }
     //TODO write code to connect to digitizer
     mode = UIMode::Idle;
     //this->startLine = 0;
@@ -757,10 +769,23 @@ void UIThread::turnOn()
 
 void UIThread::turnOff()
 {
-    this->mpodController->deactivateAllChannels();
-    //TODO write code to handle waiting for rampdown of the mpod channels
-    this->mpodController->turnCrateOff();
     //TODO write code to handle disconnecting from the digitizer
+    //TODO write code to put digitizer into polling but not writing mode
+    this->mpodController->deactivateAllChannels();
+    bool stillRamping = true;
+    while(stillRamping)
+    {
+        //here we sleep a bit
+        boost::this_thread::sleep_for(this->refreshPeriod);
+        //here we check if there are any channels still ramping their voltages
+        int rampCount = std::count(this->slowData->outputRampDown,
+                                   &(this->slowData->outputRampDown[this->slowData->numVoltageChannels]),true);
+        if(rampCount == 0)
+        {
+            stillRamping = false;
+        }
+    }
+    this->mpodController->turnCrateOff();
     mode = UIMode::Init;
     //this->startLine = 0;
     wclear(this->textWindow);
