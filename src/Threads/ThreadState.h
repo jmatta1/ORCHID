@@ -30,8 +30,8 @@ using std::atomic;
 namespace Threads
 {
 
-enum class TState  : char {Running, Waiting, Stopping};
-typedef atomic<TState> ThreadState;
+enum class SlowControlsThreadState  : char {Stopped, Polling, Writing};
+typedef atomic<SlowControlsThreadState> SlowControlsState;
 
 }
 #endif //ORCHID_SRC_THREADS_THREADSTATE_H
