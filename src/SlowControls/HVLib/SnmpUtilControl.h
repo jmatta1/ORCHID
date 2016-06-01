@@ -41,15 +41,15 @@ public://TODO wrap access to commands in a multi reader, single writer mutex
         ipAddress(ip), mibLocation(mibLoc) {}
     ~SnmpUtilControl(){}
     
-    std::string snmpGlobalGet(MpodGlobalGetParam command) const;
-    std::string snmpChannelGet(MpodChannelGetParam command, int board, int channel) const;
-    std::string snmpChannelWalk(MpodChannelGetParam command) const;
+    std::string snmpGlobalGet(MpodGlobalGetParam command);
+    std::string snmpChannelGet(MpodChannelGetParam command, int board, int channel);
+    std::string snmpChannelWalk(MpodChannelGetParam command);
 
     
     template<class Number>
-    std::string snmpGlobalSet(MpodGlobalSetParam command, Number value) const;
+    std::string snmpGlobalSet(MpodGlobalSetParam command, Number value);
     template<class Number>
-    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, Number value) const;
+    std::string snmpChannelSet(MpodChannelSetParam command, int board, int channel, Number value);
 
 private:
     template<class Number>
@@ -60,7 +60,7 @@ private:
 
 
     std::string convertToUniversalChannel(int board, int channel) const;
-    std::string runCommand(const std::string& command) const;
+    std::string runCommand(const std::string& command);
 
     //member variables
     //data for creating commands
@@ -79,7 +79,7 @@ private:
 
 template<class Number>
 std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command,
-                                           Number value) const
+                                           Number value)
 {
     if(CmdLookup::GLOBAL_SET_TYPES.at(command) == 'i')
     {
@@ -102,7 +102,7 @@ std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command,
 template<class Number>
 std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command,
                                             int board, int channel,
-                                            Number value) const
+                                            Number value)
 {
     if(CmdLookup::CHANNEL_SET_TYPES.at(command) == 'i')
     {

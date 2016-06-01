@@ -30,14 +30,14 @@
 // includes from ORCHID
 namespace SlowControls
 {
-std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command) const
+std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command)
 {
     return this->runCommand(this->buildCommand("snmpget", "guru",
                                                CmdLookup::GLOBAL_GET_COMMANDS.at(command)));
 }
 
 std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command,
-                                            int board, int channel) const
+                                            int board, int channel)
 {
     std::ostringstream parameterBuilder;
     parameterBuilder << CmdLookup::CHANNEL_GET_COMMANDS.at(command);
@@ -46,7 +46,7 @@ std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command,
                                                parameterBuilder.str()));
 }
 
-std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command) const
+std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command)
 {
     return this->runCommand(this->buildCommand("snmpwalk", "guru",
                                                CmdLookup::CHANNEL_GET_COMMANDS.at(command)));
@@ -64,14 +64,14 @@ std::string SnmpUtilControl::buildCommand(const std::string& command,
 }
 
 
-std::string SnmpUtilControl::runCommand(const std::string& command) const
+std::string SnmpUtilControl::runCommand(const std::string& command)
 {
     //prep the buffer that will hold direct pipe commands
     char buffer[128];
     //prep the string that will be returned as a result
     std::string result = "";
     //lock the command running mutex
-    boost::lock_guard<boost::mutex> lock(mutex);
+    boost::lock_guard<boost::mutex> lock(this->commandMutex);
     //open a pipe that takes the output of the snmp command to be run
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe) throw std::runtime_error("popen() failed in SnmpUtilControl!");
