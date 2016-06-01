@@ -20,10 +20,15 @@
 #ifndef ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
 #define ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
 
+//TODO: convert to asio based direct communication rather than using the snmp
+// utils as intermediates, this will require some work and interfacing with the
+// open snmp library directly
+
 // includes for C system headers
 // includes for C++ system headers
 #include<string>
 #include<sstream>
+#include<boost/thread.hpp>
 // includes from other libraries
 // includes from ORCHID
 #include"SnmpUtilCommands.h"
@@ -31,7 +36,7 @@ namespace SlowControls
 {
 class SnmpUtilControl
 {
-public:
+public://TODO wrap access to commands in a multi reader, single writer mutex
     SnmpUtilControl(const std::string& ip, const std::string& mibLoc):
         ipAddress(ip), mibLocation(mibLoc) {}
     ~SnmpUtilControl(){}
@@ -57,9 +62,19 @@ private:
     std::string convertToUniversalChannel(int board, int channel) const;
     std::string runCommand(const std::string& command) const;
 
-    //member variables with data for creating commands
+    //member variables
+    //data for creating commands
     std::string ipAddress;
     std::string mibLocation;
+    
+    //threading protection
+    // this mutex will be infrequently locked, when it is locked it will be for a
+    // relativelyfor long period of time (milliseconds), and since we should
+    // probably not have two snmp commands trying to talk to the mpod
+    // simultaneously (and yet we need to have two threads be able to access
+    // the mpod at a given time) we use an exclusive mutex to guard commands
+    // sent to the digitizer
+    boost::mutex commandMutex;
 };
 
 template<class Number>

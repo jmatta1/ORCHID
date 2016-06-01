@@ -66,8 +66,13 @@ std::string SnmpUtilControl::buildCommand(const std::string& command,
 
 std::string SnmpUtilControl::runCommand(const std::string& command) const
 {
+    //prep the buffer that will hold direct pipe commands
     char buffer[128];
+    //prep the string that will be returned as a result
     std::string result = "";
+    //lock the command running mutex
+    boost::lock_guard<boost::mutex> lock(mutex);
+    //open a pipe that takes the output of the snmp command to be run
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe) throw std::runtime_error("popen() failed in SnmpUtilControl!");
     while (!feof(pipe.get()))
@@ -78,6 +83,8 @@ std::string SnmpUtilControl::runCommand(const std::string& command) const
         }
     }
     return result;
+    //lock guard is destructed when this function returns, therefor the mutex
+    // is unlocked when the function exits
 }
 
 std::string SnmpUtilControl::convertToUniversalChannel(int board,
