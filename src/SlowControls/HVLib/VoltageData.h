@@ -103,7 +103,7 @@ class VoltageData
 {
 public:
     VoltageData(int channels);
-    ~VoltageData();
+    ~VoltageData(){}
     
     std::vector<float>         terminalVoltage;
     std::vector<float>         senseVoltage;
