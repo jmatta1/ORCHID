@@ -28,10 +28,11 @@
 #define NCURSES_MOUSE_VERSION 1
 #include<ncurses.h>
 // includes from ORCHID
+#include"SlowControls/HVLib/MpodController.h"
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
 #include"InterThreadComm/Data/FileData.h"
-#include"SlowControls/HVLib/MpodController.h"
+#include"InterThreadComm/Control/SlowControlsThreadController.h"
 namespace Threads
 {
 //An enumeration for the modes the display might be in
@@ -41,7 +42,8 @@ class UIThread
 {
 public:
     UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
-             InterThread::FileData* fiDat, SlowControls::MpodController* mpCtrl,
+             InterThread::FileData* fiDat, InterThread::SlowControlsThreadController* sctCtrl,
+             SlowControls::MpodController* mpCtrl,
              int refreshFrequency);
     ~UIThread(){}
 
@@ -84,6 +86,10 @@ private:
     //window too small
     void waitForResize();
     
+    //** Wait For Other Threads Functions **/
+    void waitForAllTerminations();
+    void waitForSlowControlsThreadTermination();
+    
     /** Command functions **/
     //shuts down orchid, disconnecting from digitizer and ramping down voltages
     //if it has not already been done
@@ -113,6 +119,7 @@ private:
     InterThread::SlowData* slowData;
     InterThread::RateData* rateData;
     InterThread::FileData* fileData;
+    InterThread::SlowControlsThreadController* sctControl;
     SlowControls::MpodController* mpodController;
     //multiplier for calculating rate from number of triggers
     float rateMultiplier;

@@ -38,18 +38,18 @@ static const int errorColor = 1;
 static const int goodColor = 2;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
-                   InterThread::FileData* fiDat, SlowControls::MpodController* mpCtrl,
-                   int refreshFrequency):
-    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodController(mpCtrl),
-    persistCount(-1), lastFileSize(0), command(""), persistentMessage(""),
-    runLoop(true), refreshRate(refreshFrequency), mode(UIMode::Init),
-    textWindow(nullptr), messageWindow(nullptr)
+                   InterThread::FileData* fiDat, InterThread::SlowControlsThreadController* sctCtrl,
+                   SlowControls::MpodController* mpCtrl, int refreshFrequency):
+    slowData(slDat), rateData(rtDat), fileData(fiDat), sctControl(sctCtrl),
+    mpodController(mpCtrl), persistCount(-1), lastFileSize(0), command(""),
+    persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
+    mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr)
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
-    float refPeriod = 1000000000.0*(1.0/static_cast<float>(refreshFrequency));
+    long long int refPeriod = (1000000000/refreshFrequency);
     this->rateMultiplier = static_cast<float>(refreshFrequency);
-    this->refreshPeriod = boost::chrono::nanoseconds(static_cast<long long int>(refPeriod));
+    this->refreshPeriod = boost::chrono::nanoseconds(refPeriod);
 }
 
 void UIThread::operator() ()
@@ -73,6 +73,7 @@ void UIThread::operator() ()
         //here we sleep a bit
         boost::this_thread::sleep_for(this->refreshPeriod);
     }
+    this->waitForAllTerminations();
     delwin(this->textWindow);
     delwin(this->messageWindow);
     endwin();
@@ -714,6 +715,29 @@ void UIThread::handleSetRunTitleKeyPress(int inChar)
     }
 }
 
+void UIThread::waitForAllTerminations()
+{
+    this->waitForSlowControlsThreadTermination();
+    //this->waitForDigitizerThreadTermination();
+    //this->waitForEventProcessingThreadsTermination();
+    //this->waitForFileThreadTermination();
+}
+
+void UIThread::waitForSlowControlsThreadTermination()
+{
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Termination of Slow Controls Thread");
+    wrefresh(this->textWindow);
+    wclear(this->messageWindow);
+    wrefresh(this->messageWindow);
+    sctControl->setToTerminate();
+    //loop until we see the terminate signal from the slow controls thread
+    while(!(sctControl->isDone()))
+    {
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+}
+
 void UIThread::runGracefulShutdown()
 {
     if(mode == UIMode::Idle)
@@ -747,10 +771,13 @@ void UIThread::turnOn()
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
-    //TODO write code to put slow controls thread into polling but not recording mode
+    this->sctControl->setToPolling();
     bool stillRamping = true;
     while(stillRamping)
     {
+        wclear(this->textWindow);
+        mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp up");
+        wrefresh(this->textWindow);
         //here we sleep a bit
         boost::this_thread::sleep_for(this->refreshPeriod);
         //here we check if there are any channels still ramping their voltages
@@ -770,24 +797,28 @@ void UIThread::turnOn()
 void UIThread::turnOff()
 {
     //TODO write code to handle disconnecting from the digitizer
-    //TODO write code to put digitizer into polling but not writing mode
+    this->sctControl->setToStop();
     this->mpodController->deactivateAllChannels();
     bool stillRamping = true;
     while(stillRamping)
     {
+        wclear(this->textWindow);
+        mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp down");
+        wrefresh(this->textWindow);
         //here we sleep a bit
         boost::this_thread::sleep_for(this->refreshPeriod);
         //here we check if there are any channels still ramping their voltages
         int rampCount = std::count(this->slowData->outputRampDown,
-                                   &(this->slowData->outputRampDown[this->slowData->numVoltageChannels]),true);
+                                   &(this->slowData->outputRampDown[this->slowData->numVoltageChannels]), true);
+        
         if(rampCount == 0)
         {
             stillRamping = false;
         }
     }
+    this->sctControl->setToStop();
     this->mpodController->turnCrateOff();
     mode = UIMode::Init;
-    //this->startLine = 0;
     wclear(this->textWindow);
 }
 
@@ -795,7 +826,7 @@ void UIThread::startDataTaking()
 {
     //TODO put the file thread into running data mode
     //TODO put the event processing threads into running mode
-    //TODO put the slow controls thread into recording mode
+    this->sctControl->setToWriting();
     //TODO put the digitizer thread into running mode
     //TODO put the digitizer into running mode
     
@@ -809,9 +840,10 @@ void UIThread::stopDataTaking()
     //TODO put the digitizer into stopped mode
     //TODO put the digitizer thread into stopped mode
     //TODO put the event processing threads into finish and stop mode
-    //TODO put the slow controls polling into poll but no record more
+    this->sctControl->setToPolling();
     //TODO put in wait for processing threads to stop
     //TODO put the file thread into finish and stop mode
+    //TODO wait for file thread to stop
     mode = UIMode::Idle;
     //this->startLine = 0;
     wclear(this->textWindow);
