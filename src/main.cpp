@@ -156,13 +156,15 @@ int main(int argc, char* argv[])
                       //Future:   digitizerControl
                                   mpodController,
                                   params.generalBlock->updateFrequency);
-    Threads::SlowControlsThread* scThreadCallable = new Threads::SlowControlsThread(mpodReader, slowData, sctController, params.powerBlock->pollingRate);
+
     //make the file thread callable
     //Threads::FileThread* fileThreadCallable = new FileThread(...);
     
     //make the slow controls callable
-    //Threads::SlowControlsThread slowControlsThreadCallable =
-    //          new SlowControlsThread(...);
+    Threads::SlowControlsThread* scThreadCallable =
+            new Threads::SlowControlsThread(mpodReader, slowData, sctController,
+                                //Future    voltageEventOutQueue, voltageEventInQueue,
+                                            params.powerBlock->pollingRate);
     
     //make the digitizer reader callable
     //Threads::DigitizerThread* digitizerThreadCallable =
@@ -192,10 +194,6 @@ int main(int argc, char* argv[])
     {
         eventProcessingThreads.create_thread(*(evProcThreadCallable[i]));
     }*/
-    
-    
-    // Detach all threads except the IO thread
-    scThread.detach();
     
 
     //Wait to join the IO thread
