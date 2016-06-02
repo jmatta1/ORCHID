@@ -204,4 +204,77 @@ void SlowData::readVoltageData(const SlowControls::VoltageData& data)
     this->crateSupplyDerating.store(            data.crateStatus.supplyDerating, std::memory_order_relaxed);
     this->crateSupplyFailure.store(             data.crateStatus.supplyFailure, std::memory_order_relaxed);
 }
+
+void SlowData::genCrateInfoString(std::string& output)
+{
+    std::ostringstream output;
+    if(this->crateMainOn)
+    {
+        output << "On ";
+    }
+    if(this->crateMainInhibit)
+    {
+        output << "Inhibit ";
+    }
+    if(this->crateLocalControlOnly)
+    {
+        output << "Lcl_Ctrl_Only ";
+    }
+    if(     this->crateInputFailure   || this->crateOutputFailure           || 
+            this->crateFantrayFailure || this->crateSensorFailure           ||
+            this->crateVmeSysFailure  || this->cratePlugAndPlayIncompatible ||
+            this->crateSupplyDerating || this->crateSupplyFailure)
+    {
+        output << "Failure: ( ";
+        if(this->crateInputFailure) output << "input ";
+        if(this->crateOutputFailure) output << "output ";
+        if(this->crateFantrayFailure) output << "fantray ";
+        if(this->crateSensorFailure) output << "sensor ";
+        if(this->crateVmeSysFailure) output << "VME_Sys ";
+        if(this->cratePlugAndPlayIncompatible) output << "PnP_Incompat ";
+        if(this->crateSupplyDerating) output << "PS_derating ";
+        if(this->crateSupplyFailure) output << "PS_failure ";
+        output << ") ";
+        
+    }
+    if(this->crateBusReset)
+    {
+        output << "Bus_Reset ";
+    }
+    return output.str();
+}
+
+void SlowData::genChannelInfoString(int channel, std::string& output)
+{
+    std::ostringstream output;
+    if(outputOn[channel]) output << "On ";
+    if(outputInhibit[channel]) output << "Inhibit ";
+    if(outputFailureMinSenseVoltage[channel] || outputFailureMaxSenseVoltage[channel] ||
+            outputFailureMaxTerminalVoltage[channel] || outputFailureMaxCurrent ||
+            outputFailureMaxTemperature || outputFailureMaxPower ||
+            outputFailureTimeout || outputEmergencyOff ||
+            outputCurrentBoundsExceeded || outputFailureCurrentLimit)
+    {
+        output << "Failure: ( ";
+        if(outputFailureMinSenseVoltage) output << "MinSense ";
+        if(outputFailureMaxSenseVoltage) output << "MaxSense ";
+        if(outputFailureMaxTerminalVoltage) output << "MaxTerm ";
+        if(outputFailureMaxCurrent) output << "MaxCurr ";
+        if(outputFailureMaxTemperature) output << "MaxTemp ";
+        if(outputFailureMaxPower) output << "MaxPower ";
+        if(outputFailureTimeout) output << "FailTimout ";
+        if(outputEmergencyOff) output << "EmerOff ";
+        if(outputCurrentBoundsExceeded) output << "OutOfCurrBounds ";
+        if(outputFailureCurrentLimit) output << "CurrLimFail ";
+        output << ") ";
+        
+    }
+    if(outputCurrentLimited) output << "OutCurLim ";
+    if(outputRampUp) output << "RampUp ";
+    if(outputRampDown) output << "RampDown ";
+    if(outputAdjusting) output << "FineAdj ";
+    if(outputConstantVoltage) output << "ConstCurr ";
+    return output.str();
+}
+
 }

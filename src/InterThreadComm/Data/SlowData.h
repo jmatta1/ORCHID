@@ -24,6 +24,7 @@
 // includes for C++ system headers
 #include<atomic>
 using std::atomic;
+#include<string>
 // includes from other libraries
 // includes from ORCHID
 #include"SlowControls/HVLib/VoltageData.h"
@@ -34,8 +35,18 @@ struct SlowData
 {
     SlowData(int numVolChan, int numTempChan);
     ~SlowData();
+    //function to read the mpod slow control info from the voltage data struct
     void readVoltageData(const SlowControls::VoltageData& data);
-
+    //function to read the temperature slow control data from the temp struct
+    //void readTemperatureData(const SlowControls::TemperatureData& data);
+    
+    //function to generate a descriptive string from the crate information
+    void genCrateInfoString(std::string& output);
+    
+    //function to generate a descriptive string from the channel information
+    void genChannelInfoString(int channel, std::string& output);
+    
+    
     //all stored data in this class is std::atomic for thread safety
 
     //MPOD Information
