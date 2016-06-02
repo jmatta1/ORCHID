@@ -62,12 +62,12 @@ std::string CrateStatus::getStatusString()
         if(plugAndPlayIncompatible) output << "PnP_Incompatibility ";
         if(supplyDerating) output << "PS_derating ";
         if(supplyFailure) output << "PS_failure ";
-        output << ") "
+        output << ") ";
         
     }
     if(busReset)
     {
-        output << "Bus_Reset "
+        output << "Bus_Reset ";
     }
     return output.str();
 }
@@ -106,7 +106,35 @@ ChannelStatus::ChannelStatus():          outputOn(false),
 //TODO: Parse channel status into nice string format for UI
 std::string ChannelStatus::getStatusString()
 {
-    return std::string("");
+    std::ostringstream output;
+    if(outputOn) output << "On ";
+    if(outputInhibit) output << "Inhibit ";
+    if(outputFailureMinSenseVoltage || outputFailureMaxSenseVoltage ||
+            outputFailureMaxTerminalVoltage || outputFailureMaxCurrent ||
+            outputFailureMaxTemperature || outputFailureMaxPower ||
+            outputFailureTimeout || outputEmergencyOff ||
+            outputCurrentBoundsExceeded || outputFailureCurrentLimit)
+    {
+        output << "Failure: ( ";
+        if(outputFailureMinSenseVoltage) output << "MinSense ";
+        if(outputFailureMaxSenseVoltage) output << "MaxSense ";
+        if(outputFailureMaxTerminalVoltage) output << "MaxTerm ";
+        if(outputFailureMaxCurrent) output << "MaxCurr ";
+        if(outputFailureMaxTemperature) output << "MaxTemp ";
+        if(outputFailureMaxPower) output << "MaxPower ";
+        if(outputFailureTimeout) output << "FailTimout ";
+        if(outputEmergencyOff) output << "EmerOff ";
+        if(outputCurrentBoundsExceeded) output << "OutOfCurrBounds ";
+        if(outputFailureCurrentLimit) output << "CurrLimFail ";
+        output << ") ";
+        
+    }
+    if(outputCurrentLimited) output << "OutCurLim ";
+    if(outputRampUp) output << "RampUp ";
+    if(outputRampDown) output << "RampDown ";
+    if(outputAdjusting) output << "FineAdj ";
+    if(outputConstantVoltage) output << "ConstCurr ";
+    return output.str();
 }
 
 
