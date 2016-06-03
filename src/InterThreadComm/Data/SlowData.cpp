@@ -273,7 +273,7 @@ void SlowData::genChannelInfoString(int channel, std::string& out)
     if(outputRampUp) output << "RampUp ";
     if(outputRampDown) output << "RampDown ";
     if(outputAdjusting) output << "FineAdj ";
-    if(outputConstantVoltage) output << "ConstCurr ";
+    if(outputConstantVoltage) output << "ConstVoltage ";
     out = output.str();
 }
 
