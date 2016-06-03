@@ -42,7 +42,6 @@ void SlowControlsThread::operator ()()
     while(notTerminated)
     {
         //TODO: add actual querying of the temperature controller
-        //TODO: add actual querying of the mpod reader
         boost::this_thread::sleep_for(this->refreshPeriod);
         switch(this->sctControl->getState())
         {
@@ -56,11 +55,11 @@ void SlowControlsThread::operator ()()
             break;
         case InterThread::SlowControlsThreadState::Polling:
             //here we poll the mpod but do not send any voltage events
-            //this->mpodReader->readAll();
+            this->mpodReader->readAll();
             slowData->readVoltageData(this->mpodReader->voltageData);
             break;
         case InterThread::SlowControlsThreadState::Writing:
-            //this->mpodReader->readAll();
+            this->mpodReader->readAll();
             slowData->readVoltageData(this->mpodReader->voltageData);
             //TODO: write code to package slow controls data for event queue
             break;
