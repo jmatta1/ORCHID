@@ -28,8 +28,6 @@ namespace SlowControls
 
 bool MpodController::turnCrateOn()
 {
-    //TODO remove this faking of a good return
-    return true;
     //TODO interpret return string
     this->snmpController->snmpGlobalSet(MpodGlobalSetParam::SysMainSwitch, 1);
     return this->setupChannels();
@@ -37,8 +35,6 @@ bool MpodController::turnCrateOn()
 
 bool MpodController::turnCrateOff()
 {
-    //TODO remove this faking of a good return
-    return true;
     //TODO interpret return string
     this->snmpController->snmpGlobalSet(MpodGlobalSetParam::SysMainSwitch, 0);
     return true;
@@ -46,8 +42,6 @@ bool MpodController::turnCrateOff()
 
 bool MpodController::activateAllChannels()
 {
-    //TODO remove this faking of a good return
-    return true;
     int numBoards = this->moduleData->board.size();
     int channelIndexOffset = 0;
     for(int i=0; i < numBoards; ++i)
@@ -74,8 +68,6 @@ bool MpodController::activateAllChannels()
 
 bool MpodController::deactivateAllChannels()
 {
-    //TODO remove this faking of a good return
-    return true;
     int numBoards = this->moduleData->board.size();
     int channelIndexOffset = 0;
     for(int i=0; i < numBoards; ++i)
@@ -102,8 +94,6 @@ bool MpodController::deactivateAllChannels()
 
 bool MpodController::setupChannels()
 {
-    //TODO remove this faking of a good return
-    return true;
     int numBoards = this->moduleData->board.size();
     int channelIndexOffset = 0;
     for(int i=0; i < numBoards; ++i)
