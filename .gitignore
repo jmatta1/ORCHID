@@ -4,3 +4,4 @@ build
 CMakeLists.txt.user
 orchid
 *.autosave
+orchid_*.log
