@@ -41,10 +41,10 @@ struct SlowData
     //void readTemperatureData(const SlowControls::TemperatureData& data);
     
     //function to generate a descriptive string from the crate information
-    void genCrateInfoString(std::string& output);
+    void genCrateInfoString(std::string& out);
     
     //function to generate a descriptive string from the channel information
-    void genChannelInfoString(int channel, std::string& output);
+    void genChannelInfoString(int channel, std::string& out);
     
     
     //all stored data in this class is std::atomic for thread safety

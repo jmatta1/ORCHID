@@ -205,7 +205,7 @@ void SlowData::readVoltageData(const SlowControls::VoltageData& data)
     this->crateSupplyFailure.store(             data.crateStatus.supplyFailure, std::memory_order_relaxed);
 }
 
-void SlowData::genCrateInfoString(std::string& output)
+void SlowData::genCrateInfoString(std::string& out)
 {
     std::ostringstream output;
     if(this->crateMainOn)
@@ -241,10 +241,10 @@ void SlowData::genCrateInfoString(std::string& output)
     {
         output << "Bus_Reset ";
     }
-    return output.str();
+    out = output.str();
 }
 
-void SlowData::genChannelInfoString(int channel, std::string& output)
+void SlowData::genChannelInfoString(int channel, std::string& out)
 {
     std::ostringstream output;
     if(outputOn[channel]) output << "On ";
@@ -274,7 +274,7 @@ void SlowData::genChannelInfoString(int channel, std::string& output)
     if(outputRampDown) output << "RampDown ";
     if(outputAdjusting) output << "FineAdj ";
     if(outputConstantVoltage) output << "ConstCurr ";
-    return output.str();
+    out = output.str();
 }
 
 }
