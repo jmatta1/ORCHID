@@ -34,6 +34,8 @@
 #include"SnmpUtilCommands.h"
 namespace SlowControls
 {
+
+//TODO: Remove spoofing of MPOD connection from this class
 class SnmpUtilControl
 {
 public:
