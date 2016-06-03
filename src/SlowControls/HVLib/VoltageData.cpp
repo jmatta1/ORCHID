@@ -24,6 +24,7 @@
 #include<string>
 #include<algorithm>
 #include<cctype>
+#include<iomanip>
 // includes from other libraries
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
@@ -132,7 +133,7 @@ std::string ChannelStatus::getStatusString()
     if(outputRampUp) output << "RampUp ";
     if(outputRampDown) output << "RampDown ";
     if(outputAdjusting) output << "FineAdj ";
-    if(outputConstantVoltage) output << "ConstCurr ";
+    if(outputConstantVoltage) output << "ConstVoltage ";
     return output.str();
 }
 
@@ -272,7 +273,7 @@ unsigned int VoltageData::parseBitsLine(const std::string& line, int nibbleCount
     intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(), [](char x){return std::isspace(x);}), intermediate.end());
     //since mpod does not return a trailing byte if its value is zero (ie no bits set)
     //calculate how many bits we need to push to result up to have a '4*nibbleCount-bit' integer
-    int push = (4 * (nibbleCount -  intermediate.size()));
+    int push = (4 * (nibbleCount -  intermediate.find_first_of('[')));
     //parse into an integer from hex format
     unsigned int final;
     parse(intermediate.begin(), intermediate.end(), hex, final);
