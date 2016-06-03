@@ -39,7 +39,7 @@ enum class MpodGlobalGetParam: char{SysMainSwitch, SysStatus};
 enum class MpodChannelGetParam: char{OutputStatus, OutputSwitch, SenseVoltage, TerminalVoltage,
                                      Temperature, SetVoltage, Current, RampUp,
                                      RampDown, MaxTerminalVoltage, MaxCurrent,
-                                     SetCurrent, MaxCurrentTripTime,};
+                                     SetCurrent, MaxCurrentTripTime};
 
 enum class MpodGlobalSetParam: char{SysMainSwitch};
 

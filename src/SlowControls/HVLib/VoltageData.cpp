@@ -103,7 +103,6 @@ ChannelStatus::ChannelStatus():          outputOn(false),
     reserved2(false),                    outputCurrentBoundsExceeded(false),
     outputFailureCurrentLimit(false) {}
 
-//TODO: Parse channel status into nice string format for UI
 std::string ChannelStatus::getStatusString()
 {
     std::ostringstream output;
