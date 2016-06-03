@@ -63,11 +63,11 @@ static const unsigned int MaskOutputOn=0x800000,                         MaskOut
 static const unsigned int MaskOutputFailureMinSenseVoltage=0x200000,     MaskOutputFailureMaxSenseVoltage=0x100000;
 static const unsigned int MaskOutputFailureMaxTerminalVoltage=0x080000,  MaskOutputFailureMaxCurrent=0x040000;
 static const unsigned int MaskOutputFailureMaxTemperature=0x020000,      MaskOutputFailureMaxPower=0x010000;
-static const unsigned int MaskOutputFailureTimeout=0x008000,             MaskOutputCurrentLimited=0x004000;
-static const unsigned int MaskOutputRampUp=0x002000,                     MaskOutputRampDown=0x001000;
-static const unsigned int MaskOutputEnableKill=0x000800,                 MaskOutputEmergencyOff=0x000400;
-static const unsigned int MaskOutputAdjusting=0x000400,                  MaskOutputConstantVoltage=0x000200;
-static const unsigned int MaskOutputCurrentBoundsExceeded=0x000100,      MaskOutputFailureCurrentLimit=0x000010;
+static const unsigned int MaskOutputFailureTimeout=0x004000,             MaskOutputCurrentLimited=0x002000;
+static const unsigned int MaskOutputRampUp=0x001000,                     MaskOutputRampDown=0x000800;
+static const unsigned int MaskOutputEnableKill=0x000400,                 MaskOutputEmergencyOff=0x000200;
+static const unsigned int MaskOutputAdjusting=0x000100,                  MaskOutputConstantVoltage=0x000080;
+static const unsigned int MaskOutputCurrentBoundsExceeded=0x000020,      MaskOutputFailureCurrentLimit=0x000010;
 }
 
 class ChannelStatus
