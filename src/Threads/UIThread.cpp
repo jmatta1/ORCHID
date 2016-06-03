@@ -36,6 +36,7 @@ namespace Threads
 
 static const int errorColor = 1;
 static const int goodColor = 2;
+static const int gridStartLine = 5;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
                    InterThread::FileData* fiDat, InterThread::SlowControlsThreadController* sctCtrl,
@@ -219,11 +220,35 @@ void UIThread::drawFileInfo()
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
 }
 
+void UIThread::drawGlobalSlowControlsInformation()
+{
+    std::ostringstream builder;
+    //since we do not want to constantly regenerate and resize this variable
+    //plus we want to avoid having too many class members (there are a crapton already)
+    static std::string mpodCrateStatus = "Status Not Updating";
+    this->slowData->genCrateInfoString(mpodCrateStatus);
+    builder << "MPOD Crate Status: " << mpodCrateStatus;
+    static std::string temperatureReaderStatus = "Not Updating";
+    //this->slowData->genTempReaderInfoString(temperatureReaderStatus);
+    builder << " | Temperature Reader Status: " << temperatureReaderStatus;
+    mvwprintw(this->textWindow, 3, 0, builder.str().c_str());
+}
+
+void UIThread::drawSlowControlsGrid()
+{
+    
+}
+
 void UIThread::drawRunningScreen()
 {
     //draw the file information line
     this->drawFileInfo();
+    //draw the digitizer info line
     
+    //draw the slow controls global info line
+    this->drawGlobalSlowControlsInformation();
+    //draw the slow controls info grid();
+    this->drawSlowControlsGrid();
     this->drawPersistentMessage();
     this->drawCommandInProgress();
 }

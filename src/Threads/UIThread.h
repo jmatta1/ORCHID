@@ -74,10 +74,16 @@ private:
     void drawRunningScreen();
     //This function draws the file information across the top of the text window
     void drawFileInfo();
-    //This function handles drawing the command in progress
+    //This function draws the overall digitizer information on the second line of the text window
+    //void drawDigitizerInfo();
+    //This function draws the global slow controls information on the third line of the text window
+    void drawGlobalSlowControlsInformation();
+    //this function draws the slow controls information tables
+    void drawSlowControlsGrid();
+    //This function handles drawing the command in progress in the message window
     void drawCommandInProgress();
     //This function handles drawing any persistent message that may need to
-    //be drawn
+    //be drawn in the message window
     void drawPersistentMessage();
     //This function does screen sizing stuff and figures out how to position
     //things, or how to yell at the user to fix it if the screen is too small
