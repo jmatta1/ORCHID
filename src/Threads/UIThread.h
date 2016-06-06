@@ -33,6 +33,8 @@
 #include"InterThreadComm/Data/RateData.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
+#include"Utility/OrchidLogger.h"
+
 namespace Threads
 {
 //An enumeration for the modes the display might be in
@@ -44,7 +46,7 @@ public:
     UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
              InterThread::FileData* fiDat, InterThread::SlowControlsThreadController* sctCtrl,
              SlowControls::MpodController* mpCtrl,
-             int refreshFrequency);
+             int refreshFrequency, int pollingRate);
     ~UIThread(){}
 
     //this is the function that is called by boost::thread when making a thread
@@ -153,6 +155,9 @@ private:
     /**  Variables for managing the user interface**/
     //amount of time to sleep for
     boost::chrono::nanoseconds refreshPeriod;
+    //amount of time to sleep for to make certain that the slow controls thread
+    //has gotten its act together
+    boost::chrono::nanoseconds slowControlsPollingWaitPeriod;
     //string to hold commands in
     std::string command;
     //flag to continue or kill loop
@@ -167,6 +172,7 @@ private:
     int numCols;
     WINDOW* textWindow;
     WINDOW* messageWindow;
+    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
     //int startLine;
     //int sizeDiff;
 };

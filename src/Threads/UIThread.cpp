@@ -30,6 +30,7 @@
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
 #include"UICommandTable.h"
+#include"Utility/OrchidLogger.h"
 
 namespace Threads
 {
@@ -40,17 +41,20 @@ static const int gridStartLine = 5;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
                    InterThread::FileData* fiDat, InterThread::SlowControlsThreadController* sctCtrl,
-                   SlowControls::MpodController* mpCtrl, int refreshFrequency):
+                   SlowControls::MpodController* mpCtrl, int refreshFrequency, int pollingRate):
     slowData(slDat), rateData(rtDat), fileData(fiDat), sctControl(sctCtrl),
     mpodController(mpCtrl), persistCount(-1), lastFileSize(0), command(""),
     persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
-    mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr)
+    mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr), lg(OrchidLog::get())
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
     long long int refPeriod = (1000000000/refreshFrequency);
     this->rateMultiplier = static_cast<float>(refreshFrequency);
     this->refreshPeriod = boost::chrono::nanoseconds(refPeriod);
+    
+    long long int pollPeriod = static_cast<long long int>(1.5*static_cast<float>(1000000000/pollingRate));
+    this->slowControlsPollingWaitPeriod = boost::chrono::nanoseconds(pollPeriod);
 }
 
 void UIThread::operator() ()
@@ -285,6 +289,8 @@ void UIThread::handleCommand()
 {
     //normalize the command to lowercase
     boost::to_lower(command);
+    // log that we have a command
+    BOOST_LOG_SEV(this->lg, Information) << "Got Command: " << command;
     //look up the command inside dispatch map
     std::map<std::string, UICommands>::const_iterator cmdFind = UI_COMMAND_DISPATCH.find(command);
     //clear the command and screen
@@ -310,11 +316,15 @@ void UIThread::handleCommand()
         }
         if(!okFlag)
         {
+            BOOST_LOG_SEV(this->lg, Information) << "Command is unavailable in current mode";
             cmd = UICommands::Unavailable;
         }
     }
     else
-    { cmd = UICommands::Invalid; }
+    {
+        BOOST_LOG_SEV(this->lg, Information) << "Command is invalid";
+        cmd = UICommands::Invalid;
+    }
     
     // switch on the command enum to figure out what to do
     switch(cmd)
@@ -386,7 +396,8 @@ void UIThread::handleCommand()
         this->persistCount = refreshRate*5;
         break;
     default:
-        this->persistentMessage = "Critical Error: Got to command loop default case. This should be IMPOSSIBLE!";
+        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error: Got to command switch default case. This should not be possible";
+        this->persistentMessage = "Critical Error: Got to command switch default case. This should be IMPOSSIBLE!";
         this->persistColor = errorColor;
         this->persistCount = refreshRate*60;
         break;
@@ -530,42 +541,6 @@ void UIThread::handleKeyPress(int inChar)
     case ' ':
         command.append(1, inChar);
         break;
-    /*case KEY_UP:
-        if(this->startLine > 0 && this->sizeDiff != 0)
-        {
-            --(this->startLine);
-        }
-        else if(this->sizeDiff == 0)
-        {
-            this->persistentMessage = "Error: No scrolling in this mode";
-            this->persistColor = errorColor;
-            this->persistCount = refreshRate*1;
-        }
-        else
-        {
-            this->persistentMessage = "Cannot Scroll Further";
-            this->persistColor = errorColor;
-            this->persistCount = refreshRate/2;
-        }
-        break;
-    case KEY_DOWN:
-        if(this->startLine < this->sizeDiff && this->sizeDiff != 0)
-        {
-            ++(this->startLine);
-        }
-        else if(this->sizeDiff == 0)
-        {
-            this->persistentMessage = "Error: No scrolling in this mode";
-            this->persistColor = errorColor;
-            this->persistCount = refreshRate*1;
-        }
-        else
-        {
-            this->persistentMessage = "Cannot Scroll Further";
-            this->persistColor = errorColor;
-            this->persistCount = refreshRate/2;
-        }
-        break;*/
     default://anything not listed explicitly, ignore
         break;
     }
@@ -765,6 +740,7 @@ void UIThread::waitForSlowControlsThreadTermination()
 
 void UIThread::runGracefulShutdown()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Running Graceful Shutdown";
     if(mode == UIMode::Idle)
     {
         turnOff();
@@ -775,20 +751,25 @@ void UIThread::runGracefulShutdown()
         turnOff();
     }
     this->runLoop = false;
+    BOOST_LOG_SEV(this->lg, Information) << "Graceful Shutdown Complete";
 }
 
 void UIThread::turnOn()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Turning on the MPOD Crate";
     if(!this->mpodController->turnCrateOn())
     {
-        this->persistentMessage = "Critical Error:  MPOD either did not turn on or did not initialize";
+        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error: MPOD either did not turn on or did not initialize";
+        this->persistentMessage = "Critical Error: MPOD either did not turn on or did not initialize";
         this->persistColor = errorColor;
         this->persistCount = refreshRate*10;
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
+    BOOST_LOG_SEV(this->lg, Information) << "Turning on the HV channels";
     if(!this->mpodController->activateAllChannels())
     {
+        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error:  Error in turning on HV channels";
         this->persistentMessage = "Critical Error:  Error in turning on HV channels";
         this->persistColor = errorColor;
         this->persistCount = refreshRate*10;
@@ -796,7 +777,14 @@ void UIThread::turnOn()
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
+    BOOST_LOG_SEV(this->lg, Information) << "Setting Slow Controls thread to polling";
     this->sctControl->setToPolling();
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp up");
+    wrefresh(this->textWindow);
+    //sleep for 1.5 * poll period to give the slow controls thread a chance to
+    //read when the ramp up is running
+    boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
     bool stillRamping = true;
     while(stillRamping)
     {
@@ -813,6 +801,7 @@ void UIThread::turnOn()
             stillRamping = false;
         }
     }
+    BOOST_LOG_SEV(this->lg, Information) << "HV done ramping, connecting to digitizer";
     //TODO write code to connect to digitizer
     mode = UIMode::Idle;
     //this->startLine = 0;
@@ -821,9 +810,18 @@ void UIThread::turnOn()
 
 void UIThread::turnOff()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Disconnecting from digitizer";
     //TODO write code to handle disconnecting from the digitizer
-    this->sctControl->setToStop();
+    BOOST_LOG_SEV(this->lg, Information) << "Putting Slow Controls thread into polling mode";
+    this->sctControl->setToPolling();
+    BOOST_LOG_SEV(this->lg, Information) << "Starting channel ramp down";
     this->mpodController->deactivateAllChannels();
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp down");
+    wrefresh(this->textWindow);
+    //sleep for 1.5 * poll period to give the slow controls thread a chance to
+    //read when the ramp down is running
+    boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
     bool stillRamping = true;
     while(stillRamping)
     {
@@ -841,6 +839,7 @@ void UIThread::turnOff()
             stillRamping = false;
         }
     }
+    BOOST_LOG_SEV(this->lg, Information) << "Done Ramping, stopping slow controls thread";
     this->sctControl->setToStop();
     this->mpodController->turnCrateOff();
     mode = UIMode::Init;
@@ -849,11 +848,16 @@ void UIThread::turnOff()
 
 void UIThread::startDataTaking()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Starting File Writing";
     //TODO put the file thread into running data mode
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Event Processing";
     //TODO put the event processing threads into running mode
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Slow Controls Event Generation";
     this->sctControl->setToWriting();
     //TODO put the digitizer thread into running mode
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Digitizer Thread Acquisition";
     //TODO put the digitizer into running mode
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Digitizer Run";
     
     mode = UIMode::Running;
     //this->startLine = 0;
@@ -862,11 +866,16 @@ void UIThread::startDataTaking()
 
 void UIThread::stopDataTaking()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Stopping Digitzer Run";
     //TODO put the digitizer into stopped mode
+    BOOST_LOG_SEV(this->lg, Information) << "Digitizer Thread Set To Stop";
     //TODO put the digitizer thread into stopped mode
+    BOOST_LOG_SEV(this->lg, Information) << "Event Processing Threads Set To Stop";
     //TODO put the event processing threads into finish and stop mode
-    this->sctControl->setToPolling();
     //TODO put in wait for processing threads to stop
+    BOOST_LOG_SEV(this->lg, Information) << "Slow Controls Set To Polling Only";
+    this->sctControl->setToPolling();
+    BOOST_LOG_SEV(this->lg, Information) << "File Thread Set To Stop";
     //TODO put the file thread into finish and stop mode
     //TODO wait for file thread to stop
     mode = UIMode::Idle;
@@ -876,6 +885,7 @@ void UIThread::stopDataTaking()
 
 void UIThread::incrementRunNumber()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Incrementing Run Number";
     this->stopDataTaking();
     //TODO call actual file thread control structure
     this->fileData->incrementRunNumber();
@@ -886,6 +896,7 @@ void UIThread::incrementRunNumber()
 
 void UIThread::setRunNumber()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Setting Run Number";
     //run number to that and the sequence number to zero
     int inChar;
     this->runSubLoop = true;
@@ -911,6 +922,7 @@ void UIThread::setRunNumber()
 
 void UIThread::setRunName()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Setting Run Name";
     //run number to that and the sequence number to zero
     int inChar;
     this->runSubLoop = true;
