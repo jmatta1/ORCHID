@@ -12,8 +12,8 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds the defintion of the reentrant base class for events that are
-** sent to the file output thread
+** @details Holds the definition of the interface superclass that all events
+** being passed to the file IO thread must implement
 **
 ********************************************************************************
 *******************************************************************************/
