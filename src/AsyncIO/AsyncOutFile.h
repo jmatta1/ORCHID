@@ -121,7 +121,7 @@ private:
  */
 template <typename RetQueueType>
 AsyncOutFileWriteThread<RetQueueType>::AsyncOutFileWriteThread(AsyncOutFile<RetQueueType>* aof):
-    aOutFile(aof), count(0) {}
+    aOutFile(aof) {}
 
 template <typename RetQueueType>
 void AsyncOutFileWriteThread<RetQueueType>::operator ()()
@@ -170,7 +170,6 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
             {
                 this->aOutFile->producerWaitCondition.notify_one();
             }
-            ++count;
         }
         //if we are here there either was data and we popped a piece and wrote it
         //or we recieved a terminate signal (or both) so let the loop either exit
@@ -192,7 +191,6 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
         // write queue then the must be space for it in the return queue
         //this allows it to be deleted by the destructor
         this->aOutFile->returnQueue.push(temp);
-        ++count;
         //don't bother waking the producer thread, if we are being terminated
         //then we are being destroyed and the producer thread is not waiting on
         //a wait condition, merely for this thread to terminate
@@ -211,7 +209,7 @@ AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueTy
     outFile(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc),
     writerWaiting(false), producerWaiting(false), callBackQueue(cbQueue),
     terminateWhenEmpty(false), writeTerminated(false), writeCallable(nullptr),
-    writeThread(nullptr), count(0)
+    writeThread(nullptr)
 {
     //load the return queue with spare BSCTriples
     for(int i=0; i<QueueCapacity; ++i)
