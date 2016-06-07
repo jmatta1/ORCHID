@@ -259,11 +259,10 @@ int main(int argc, char* argv[])
     delete rateData;
     delete fileData;
 
-    BOOST_LOG_SEV(lg, Debug)  << "Testing the asynchronous file thing\n" << std::flush;
+    BOOST_LOG_SEV(lg, Debug)  << "Testing Synchro File writing\n" << std::flush;
     
-    boost::lockfree::queue<char*, boost::lockfree::capacity<1000> > returnQueue;
     {//code block to force destruction of async file (and force us to wait for the async file to close
-        AsyncIO::AsyncOutFile<boost::lockfree::queue<char*, boost::lockfree::capacity<1000> > > outFileTest("./testFile.out_tester.txt", &returnQueue);
+        std::ofstream tester("./testFile.out_tester.txt", std::ios_base::trunc | std::ios_base::binary);
         int tempSize = Resources::titleString.size();
         char* temp = new char[tempSize];
         for(int i=0; i<tempSize; ++i)
@@ -273,16 +272,10 @@ int main(int argc, char* argv[])
         
         for(int i=0; i<1000; ++i)
         {
-            outFileTest.writeBuf(temp, tempSize);
+            tester.write(temp, tempSize);
         }
-        outFileTest.closeAndTerminate();
-        outFileTest.joinWrite();
+        tester.close();
         delete[] temp;
-    }
-    for(int i=0; i<1000; ++i)
-    {
-        char* temp;
-        returnQueue.pop(temp);
     }
 
     BOOST_LOG_SEV(lg, Debug)  << "ORCHID has successfully shut down, have a nice day! :-)\n\n" << std::flush;
