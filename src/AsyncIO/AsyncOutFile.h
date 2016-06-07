@@ -116,6 +116,7 @@ private:
     //thread callable and object
     AsyncOutFileWriteThread<RetQueueType>* writeCallable;
     boost::thread* writeThread;
+    long count;
 };
 
 /*
@@ -216,7 +217,7 @@ AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueTy
     outFile(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc),
     writerWaiting(false), producerWaiting(false), callBackQueue(cbQueue),
     terminateWhenEmpty(false), writeTerminated(false), writeCallable(nullptr),
-    writeThread(nullptr)
+    writeThread(nullptr), count(0)
 {
     //load the return queue with spare BSCTriples
     for(int i=0; i<QueueCapacity; ++i)
@@ -278,7 +279,7 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
     BufferPair* temp;
     while(!(this->returnQueue.pop(temp)))
     {//there are no pairs available
-        BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Waiting to add data";
+        BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Waiting to add data " << count;
         //first make certain that the write thread is awake and working so that we will eventually be woken
         if(this->writerWaiting.load())
         {
@@ -290,14 +291,19 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
         this->producerWaiting.store(true);
         this->producerWaitCondition.wait(producerLock);
     }
-    BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Adding data";
+    BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Adding data " << count;
     this->producerWaiting.store(false);
     //now that we have a triple, prep it and push it onto the write queue
     temp->buffer = outBuffer;
     temp->size = size;
     //if we acquired a triple from the return queue, then we have a slot available in the write queue
     this->writeQueue.push(temp);
-    
+    //since there is now data, make certain that the write thread is processing it
+    if(this->writerWaiting.load())
+    {
+        this->writeWaitCondition.notify_one();//just use notify 1 since there is only ever one thread waiting
+    }
+    ++count;
 }
 
 }
