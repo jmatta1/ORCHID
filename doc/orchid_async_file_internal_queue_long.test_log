@@ -1,0 +1,2149 @@
+[2016-Jun-07 12:26:04.618311] <0>: 
+
+  OOOO           kk              RRRR            dd                         
+OO    OO         kk              RR  RR   ii     dd         eeee            
+OO    OO   aa    kk  kk          RR  RR          dd        ee  ee           
+OO    OO aa  aa  kkkk            RRRR     ii  ddddd  ggggg eeeee            
+OO    OO aa  aa  kk  kk          RR RR    ii dd  dd gg  gg ee               
+  OOOO     aa aa kk   kk         RR  RR   ii  ddddd  ggggg  eeeee           
+                                                        gg                  
+                                                      gggg                  
+                                                                            
+bb               CCCC kk                                               dd   
+bb              CC    kk                                               dd   
+bbbb     aa    CC     kk  kk         rrrrr    oo   uu  uu  nn nn     dddd   
+bb  bb aa  aa  CC     kkkk     ggggg rr  rr oo  oo uu  uu  nnn  nn dd  dd   
+bb  bb aa  aa   CC    kk  kk  gg  gg rr     oo  oo uu  uu  nn   nn dd  dd   
+bbbb     aa aa   CCCC kk   kk  ggggg rr       oo     uu uu nn   nn   dddd   
+                                  gg                                        
+                                gggg                                        
+                                                                            
+          tt           HH  HH   fff  IIIIII                                 
+          tt           HH  HH  ff ff   II                                   
+  aa    tttttt         HHHHHH  ff      II   rrrrr                           
+aa  aa    tt           HH  HH ffff     II   rr  rr                          
+aa  aa    tt           HH  HH  ff      II   rr                              
+  aa aa   tt           HH  HH  ff    IIIIII rr                              
+                                                                            
+DDDD                                                                        
+DD  DD                                                                      
+DD   DD   aa      qq                                                        
+DD   DD aa  aa  qq  qq                                                      
+DD  DD  aa  aa  qq  qq                                                      
+DDDD      aa aa   qqqq                                                      
+                    qq qq                                                   
+                    qqqq                                                    
+                                                                            
+============================================================================
+============================================================================
+=                                                                          =
+=                                                                          =
+=     OOOO     RRRRRR          CCCCCC  HH      HH  IIIIIIIIII  DDDDD       =
+=   OOO  OOO   RR   RRR      CCC       HH      HH  IIIIIIIIII  DD  DDD     =
+=  OO      OO  RR      RR   CCC        HH      HH      II      DD    DDD   =
+=  OO      OO  RR      RR  CCC         HH      HH      II      DD      DD  =
+=  OO      OO  RR   RRR    CCC         HHHHHHHHHH      II      DD      DD  =
+=  OO      OO  RRRRRR      CCC         HHHHHHHHHH      II      DD      DD  =
+=  OO      OO  RR   RR     CCC         HH      HH      II      DD      DD  =
+=  OO      OO  RR    RR     CCC        HH      HH      II      DD    DDD   =
+=   OOO  OOO   RR     RR     CCC       HH      HH  IIIIIIIIII  DD  DDD     =
+=     OOOO     RR      RR      CCCCCC  HH      HH  IIIIIIIIII  DDDDD       =
+=                                                                          =
+=                                                                          =
+============================================================================
+============================================================================
+    Version:                                                                
+            0.1.0
+    Build Mode:                                                             
+               Plain
+
+
+[2016-Jun-07 12:26:04.623153] <2>: 
+
+Input Parameters
+[2016-Jun-07 12:26:04.623252] <2>: ================================================================================
+
+[2016-Jun-07 12:26:04.623278] <2>: --------------------------------------------------------------------------------
+[2016-Jun-07 12:26:04.623299] <2>: Base Parameter Input File
+[2016-Jun-07 12:26:04.623319] <2>: [Start]
+[GeneralBlock]
+    RunTitle            = "Test_Run"
+    WarnRate            = 20000
+    UpdateFrequency     = 20
+    BaseOutputDirectory = /home/jmatta1/code/ORCHID/data/
+[EndBlock]
+[DigitizerBlock]
+    GlobalCfdFraction        = 0.2
+    BoardAddressList         = 0x00000000
+                               0x00010000
+    TotalChannelsAvailable   = 16
+    PerChannelParameterFile  = ./digitizer_params.csv
+[EndBlock]
+[PowerBlock]
+    PerModuleParameterFile   = ./mpod_module_params.csv
+    PerChannelParameterFile  = ./mpod_channel_params.csv
+    IPAddress                = 192.168.11.11
+    WienerMibFileDirectory   = /usr/share/snmp/mibs
+    PollingRate              = 1
+[EndBlock]
+[End]
+[2016-Jun-07 12:26:04.623403] <2>: --------------------------------------------------------------------------------
+[2016-Jun-07 12:26:04.623425] <2>: --------------------------------------------------------------------------------
+[2016-Jun-07 12:26:04.623445] <2>: MPOD Module Input File
+[2016-Jun-07 12:26:04.623465] <2>: Module, Channels, On, Max Rise(V/s), Max Fall(V/s), Max Set V(V), Max Set I(uA), Max Trip Time(ms)
+     1,       16,  T,         100.0,         100.0,       2000.0,         320.0,               250
+
+[2016-Jun-07 12:26:04.623503] <2>: --------------------------------------------------------------------------------
+[2016-Jun-07 12:26:04.623524] <2>: --------------------------------------------------------------------------------
+[2016-Jun-07 12:26:04.623544] <2>: MPOD Channel Input File
+[2016-Jun-07 12:26:04.623574] <2>: Board, Chan, On, Rise Rate(V/s), Fall Rate(V/s), Voltage(V), Max I(uA), Trip Time(ms)
+    1,    1,  T,           50.0,           50.0,     1200.0,     310.0,            10
+    1,    2,  T,           50.0,           50.0,     1200.0,     310.0,            10
+    1,    3,  T,           50.0,           50.0,     1200.0,     310.0,            10
+    1,    4,  T,           50.0,           50.0,     1200.0,     310.0,            10
+    1,    5,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,    6,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,    7,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,    8,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,    9,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,   10,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,   11,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,   12,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,   13,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,   14,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,   15,  F,            0.0,            0.0,        0.0,       0.0,            10
+    1,   16,  F,            0.0,            0.0,        0.0,       0.0,            10
+
+[2016-Jun-07 12:26:04.623772] <2>: --------------------------------------------------------------------------------
+[2016-Jun-07 12:26:04.623890] <0>: 
+Ready to start!
+[2016-Jun-07 12:26:04.623921] <0>: Press enter to continue
+
+[2016-Jun-07 12:26:05.657729] <0>: Proceeding
+[2016-Jun-07 12:26:05.657892] <1>: Building statistics accumulators
+[2016-Jun-07 12:26:05.657993] <1>: Building thread control data structures
+[2016-Jun-07 12:26:05.658039] <1>: Building device control data structures
+[2016-Jun-07 12:26:05.658100] <1>: Building interthread data queues
+[2016-Jun-07 12:26:05.658131] <1>: Building callable objects
+[2016-Jun-07 12:26:05.658164] <1>: Building threads
+
+[2016-Jun-07 12:26:05.658331] <1>: Starting UI Thread, stopping console logging
+
+[2016-Jun-07 12:26:08.056372] <2>: Got Command: quit
+[2016-Jun-07 12:26:08.056613] <2>: Running Graceful Shutdown
+[2016-Jun-07 12:26:08.056639] <2>: Graceful Shutdown Complete
+[2016-Jun-07 12:26:09.126526] <0>: UI thread has rejoined main the thread. Resuming console logging.
+[2016-Jun-07 12:26:09.126714] <0>: Other threads should have terminated.
+
+[2016-Jun-07 12:26:09.126814] <1>: Deleting thread callable objects
+[2016-Jun-07 12:26:09.126890] <1>: Deleting interthread data queues
+[2016-Jun-07 12:26:09.126964] <1>: Deleting device controls
+[2016-Jun-07 12:26:09.127050] <1>: Deleting thread controls
+[2016-Jun-07 12:26:09.127129] <1>: Deleting statistics accumulators
+
+[2016-Jun-07 12:26:09.127265] <1>: Testing the asynchronous file thing
+
+[2016-Jun-07 12:26:09.129247] <1>: Adding data 0
+[2016-Jun-07 12:26:09.129296] <1>: Adding data 1
+[2016-Jun-07 12:26:09.129247] <1>: Waiting for data
+[2016-Jun-07 12:26:09.129327] <1>: Adding data 2
+[2016-Jun-07 12:26:09.129428] <1>: Adding data 3
+[2016-Jun-07 12:26:09.129449] <1>: Popping Data in main loop: 0
+[2016-Jun-07 12:26:09.129496] <1>: Adding data 4
+[2016-Jun-07 12:26:09.129573] <1>: Adding data 5
+[2016-Jun-07 12:26:09.129605] <1>: Adding data 6
+[2016-Jun-07 12:26:09.129772] <1>: Adding data 7
+[2016-Jun-07 12:26:09.129635] <1>: Popping Data in main loop: 1
+[2016-Jun-07 12:26:09.129873] <1>: Popping Data in main loop: 2
+[2016-Jun-07 12:26:09.129897] <1>: Adding data 8
+[2016-Jun-07 12:26:09.129934] <1>: Adding data 9
+[2016-Jun-07 12:26:09.129956] <1>: Adding data 10
+[2016-Jun-07 12:26:09.129934] <1>: Popping Data in main loop: 3
+[2016-Jun-07 12:26:09.130011] <1>: Adding data 11
+[2016-Jun-07 12:26:09.130042] <1>: Adding data 12
+[2016-Jun-07 12:26:09.130064] <1>: Adding data 13
+[2016-Jun-07 12:26:09.130041] <1>: Popping Data in main loop: 4
+[2016-Jun-07 12:26:09.130115] <1>: Adding data 14
+[2016-Jun-07 12:26:09.130145] <1>: Adding data 15
+[2016-Jun-07 12:26:09.130168] <1>: Adding data 16
+[2016-Jun-07 12:26:09.130145] <1>: Popping Data in main loop: 5
+[2016-Jun-07 12:26:09.130232] <1>: Adding data 17
+[2016-Jun-07 12:26:09.130263] <1>: Adding data 18
+[2016-Jun-07 12:26:09.130286] <1>: Adding data 19
+[2016-Jun-07 12:26:09.130262] <1>: Popping Data in main loop: 6
+[2016-Jun-07 12:26:09.130338] <1>: Adding data 20
+[2016-Jun-07 12:26:09.130367] <1>: Adding data 21
+[2016-Jun-07 12:26:09.130389] <1>: Adding data 22
+[2016-Jun-07 12:26:09.130367] <1>: Popping Data in main loop: 7
+[2016-Jun-07 12:26:09.130441] <1>: Adding data 23
+[2016-Jun-07 12:26:09.130471] <1>: Adding data 24
+[2016-Jun-07 12:26:09.130494] <1>: Adding data 25
+[2016-Jun-07 12:26:09.130471] <1>: Popping Data in main loop: 8
+[2016-Jun-07 12:26:09.130564] <1>: Adding data 26
+[2016-Jun-07 12:26:09.130590] <1>: Popping Data in main loop: 9
+[2016-Jun-07 12:26:09.130596] <1>: Adding data 27
+[2016-Jun-07 12:26:09.130670] <1>: Popping Data in main loop: 10
+[2016-Jun-07 12:26:09.130681] <1>: Adding data 28
+[2016-Jun-07 12:26:09.130714] <1>: Adding data 29
+[2016-Jun-07 12:26:09.130721] <1>: Popping Data in main loop: 11
+[2016-Jun-07 12:26:09.130757] <1>: Adding data 30
+[2016-Jun-07 12:26:09.130773] <1>: Popping Data in main loop: 12
+[2016-Jun-07 12:26:09.130786] <1>: Adding data 31
+[2016-Jun-07 12:26:09.130807] <1>: Adding data 32
+[2016-Jun-07 12:26:09.130816] <1>: Popping Data in main loop: 13
+[2016-Jun-07 12:26:09.130827] <1>: Adding data 33
+[2016-Jun-07 12:26:09.130847] <1>: Adding data 34
+[2016-Jun-07 12:26:09.130860] <1>: Popping Data in main loop: 14
+[2016-Jun-07 12:26:09.130866] <1>: Adding data 35
+[2016-Jun-07 12:26:09.130886] <1>: Adding data 36
+[2016-Jun-07 12:26:09.130903] <1>: Popping Data in main loop: 15
+[2016-Jun-07 12:26:09.130905] <1>: Adding data 37
+[2016-Jun-07 12:26:09.130945] <1>: Adding data 38
+[2016-Jun-07 12:26:09.130953] <1>: Popping Data in main loop: 16
+[2016-Jun-07 12:26:09.130972] <1>: Adding data 39
+[2016-Jun-07 12:26:09.130993] <1>: Adding data 40
+[2016-Jun-07 12:26:09.130997] <1>: Popping Data in main loop: 17
+[2016-Jun-07 12:26:09.131013] <1>: Adding data 41
+[2016-Jun-07 12:26:09.131033] <1>: Adding data 42
+[2016-Jun-07 12:26:09.131040] <1>: Popping Data in main loop: 18
+[2016-Jun-07 12:26:09.131071] <1>: Adding data 43
+[2016-Jun-07 12:26:09.131089] <1>: Popping Data in main loop: 19
+[2016-Jun-07 12:26:09.131099] <1>: Adding data 44
+[2016-Jun-07 12:26:09.131120] <1>: Adding data 45
+[2016-Jun-07 12:26:09.131131] <1>: Popping Data in main loop: 20
+[2016-Jun-07 12:26:09.131140] <1>: Adding data 46
+[2016-Jun-07 12:26:09.131160] <1>: Adding data 47
+[2016-Jun-07 12:26:09.131174] <1>: Popping Data in main loop: 21
+[2016-Jun-07 12:26:09.131179] <1>: Adding data 48
+[2016-Jun-07 12:26:09.131226] <1>: Adding data 49
+[2016-Jun-07 12:26:09.131239] <1>: Popping Data in main loop: 22
+[2016-Jun-07 12:26:09.131247] <1>: Adding data 50
+[2016-Jun-07 12:26:09.131268] <1>: Adding data 51
+[2016-Jun-07 12:26:09.131285] <1>: Popping Data in main loop: 23
+[2016-Jun-07 12:26:09.131288] <1>: Adding data 52
+[2016-Jun-07 12:26:09.131330] <1>: Adding data 53
+[2016-Jun-07 12:26:09.131337] <1>: Popping Data in main loop: 24
+[2016-Jun-07 12:26:09.131358] <1>: Adding data 54
+[2016-Jun-07 12:26:09.131379] <1>: Adding data 55
+[2016-Jun-07 12:26:09.131398] <1>: Adding data 56
+[2016-Jun-07 12:26:09.131381] <1>: Popping Data in main loop: 25
+[2016-Jun-07 12:26:09.131452] <1>: Adding data 57
+[2016-Jun-07 12:26:09.131482] <1>: Adding data 58
+[2016-Jun-07 12:26:09.131503] <1>: Adding data 59
+[2016-Jun-07 12:26:09.131481] <1>: Popping Data in main loop: 26
+[2016-Jun-07 12:26:09.131572] <1>: Adding data 60
+[2016-Jun-07 12:26:09.131597] <1>: Popping Data in main loop: 27
+[2016-Jun-07 12:26:09.131604] <1>: Adding data 61
+[2016-Jun-07 12:26:09.131641] <1>: Adding data 62
+[2016-Jun-07 12:26:09.131659] <1>: Popping Data in main loop: 28
+[2016-Jun-07 12:26:09.131666] <1>: Adding data 63
+[2016-Jun-07 12:26:09.131687] <1>: Adding data 64
+[2016-Jun-07 12:26:09.131703] <1>: Popping Data in main loop: 29
+[2016-Jun-07 12:26:09.131706] <1>: Adding data 65
+[2016-Jun-07 12:26:09.131727] <1>: Adding data 66
+[2016-Jun-07 12:26:09.131747] <1>: Adding data 67
+[2016-Jun-07 12:26:09.131746] <1>: Popping Data in main loop: 30
+[2016-Jun-07 12:26:09.131768] <1>: Adding data 68
+[2016-Jun-07 12:26:09.131788] <1>: Adding data 69
+[2016-Jun-07 12:26:09.131807] <1>: Adding data 70
+[2016-Jun-07 12:26:09.131790] <1>: Popping Data in main loop: 31
+[2016-Jun-07 12:26:09.131861] <1>: Adding data 71
+[2016-Jun-07 12:26:09.131890] <1>: Adding data 72
+[2016-Jun-07 12:26:09.131912] <1>: Adding data 73
+[2016-Jun-07 12:26:09.131889] <1>: Popping Data in main loop: 32
+[2016-Jun-07 12:26:09.131964] <1>: Adding data 74
+[2016-Jun-07 12:26:09.131993] <1>: Adding data 75
+[2016-Jun-07 12:26:09.132016] <1>: Adding data 76
+[2016-Jun-07 12:26:09.131992] <1>: Popping Data in main loop: 33
+[2016-Jun-07 12:26:09.132067] <1>: Adding data 77
+[2016-Jun-07 12:26:09.132097] <1>: Adding data 78
+[2016-Jun-07 12:26:09.132119] <1>: Adding data 79
+[2016-Jun-07 12:26:09.132097] <1>: Popping Data in main loop: 34
+[2016-Jun-07 12:26:09.132171] <1>: Adding data 80
+[2016-Jun-07 12:26:09.132215] <1>: Adding data 81
+[2016-Jun-07 12:26:09.132217] <1>: Popping Data in main loop: 35
+[2016-Jun-07 12:26:09.132239] <1>: Adding data 82
+[2016-Jun-07 12:26:09.132259] <1>: Adding data 83
+[2016-Jun-07 12:26:09.132271] <1>: Popping Data in main loop: 36
+[2016-Jun-07 12:26:09.132280] <1>: Adding data 84
+[2016-Jun-07 12:26:09.132300] <1>: Adding data 85
+[2016-Jun-07 12:26:09.132314] <1>: Popping Data in main loop: 37
+[2016-Jun-07 12:26:09.132383] <1>: Adding data 86
+[2016-Jun-07 12:26:09.132407] <1>: Popping Data in main loop: 38
+[2016-Jun-07 12:26:09.132416] <1>: Adding data 87
+[2016-Jun-07 12:26:09.132438] <1>: Adding data 88
+[2016-Jun-07 12:26:09.132457] <1>: Adding data 89
+[2016-Jun-07 12:26:09.132478] <1>: Adding data 90
+[2016-Jun-07 12:26:09.132459] <1>: Popping Data in main loop: 39
+[2016-Jun-07 12:26:09.132559] <1>: Adding data 91
+[2016-Jun-07 12:26:09.132581] <1>: Popping Data in main loop: 40
+[2016-Jun-07 12:26:09.132593] <1>: Adding data 92
+[2016-Jun-07 12:26:09.132614] <1>: Adding data 93
+[2016-Jun-07 12:26:09.132633] <1>: Adding data 94
+[2016-Jun-07 12:26:09.132637] <1>: Popping Data in main loop: 41
+[2016-Jun-07 12:26:09.132654] <1>: Adding data 95
+[2016-Jun-07 12:26:09.132674] <1>: Adding data 96
+[2016-Jun-07 12:26:09.132682] <1>: Popping Data in main loop: 42
+[2016-Jun-07 12:26:09.132693] <1>: Adding data 97
+[2016-Jun-07 12:26:09.132713] <1>: Adding data 98
+[2016-Jun-07 12:26:09.132724] <1>: Popping Data in main loop: 43
+[2016-Jun-07 12:26:09.132732] <1>: Adding data 99
+[2016-Jun-07 12:26:09.132752] <1>: Adding data 100
+[2016-Jun-07 12:26:09.132766] <1>: Popping Data in main loop: 44
+[2016-Jun-07 12:26:09.132772] <1>: Adding data 101
+[2016-Jun-07 12:26:09.132791] <1>: Adding data 102
+[2016-Jun-07 12:26:09.132809] <1>: Popping Data in main loop: 45
+[2016-Jun-07 12:26:09.132811] <1>: Adding data 103
+[2016-Jun-07 12:26:09.132853] <1>: Adding data 104
+[2016-Jun-07 12:26:09.132880] <1>: Adding data 105
+[2016-Jun-07 12:26:09.132860] <1>: Popping Data in main loop: 46
+[2016-Jun-07 12:26:09.132934] <1>: Adding data 106
+[2016-Jun-07 12:26:09.132980] <1>: Adding data 107
+[2016-Jun-07 12:26:09.132985] <1>: Popping Data in main loop: 47
+[2016-Jun-07 12:26:09.133019] <1>: Adding data 108
+[2016-Jun-07 12:26:09.133065] <1>: Adding data 109
+[2016-Jun-07 12:26:09.133089] <1>: Popping Data in main loop: 48
+[2016-Jun-07 12:26:09.133104] <1>: Adding data 110
+[2016-Jun-07 12:26:09.133180] <1>: Adding data 111
+[2016-Jun-07 12:26:09.133216] <1>: Popping Data in main loop: 49
+[2016-Jun-07 12:26:09.133242] <1>: Adding data 112
+[2016-Jun-07 12:26:09.133302] <1>: Adding data 113
+[2016-Jun-07 12:26:09.133321] <1>: Popping Data in main loop: 50
+[2016-Jun-07 12:26:09.133346] <1>: Adding data 114
+[2016-Jun-07 12:26:09.133405] <1>: Adding data 115
+[2016-Jun-07 12:26:09.133426] <1>: Popping Data in main loop: 51
+[2016-Jun-07 12:26:09.133449] <1>: Adding data 116
+[2016-Jun-07 12:26:09.133513] <1>: Adding data 117
+[2016-Jun-07 12:26:09.133554] <1>: Adding data 118
+[2016-Jun-07 12:26:09.133563] <1>: Popping Data in main loop: 52
+[2016-Jun-07 12:26:09.133638] <1>: Adding data 119
+[2016-Jun-07 12:26:09.133657] <1>: Popping Data in main loop: 53
+[2016-Jun-07 12:26:09.133689] <1>: Adding data 120
+[2016-Jun-07 12:26:09.133735] <1>: Adding data 121
+[2016-Jun-07 12:26:09.133760] <1>: Popping Data in main loop: 54
+[2016-Jun-07 12:26:09.133774] <1>: Adding data 122
+[2016-Jun-07 12:26:09.133849] <1>: Adding data 123
+[2016-Jun-07 12:26:09.133871] <1>: Popping Data in main loop: 55
+[2016-Jun-07 12:26:09.133894] <1>: Adding data 124
+[2016-Jun-07 12:26:09.133976] <1>: Adding data 125
+[2016-Jun-07 12:26:09.133981] <1>: Popping Data in main loop: 56
+[2016-Jun-07 12:26:09.134032] <1>: Adding data 126
+[2016-Jun-07 12:26:09.134079] <1>: Adding data 127
+[2016-Jun-07 12:26:09.134086] <1>: Popping Data in main loop: 57
+[2016-Jun-07 12:26:09.134119] <1>: Adding data 128
+[2016-Jun-07 12:26:09.134164] <1>: Adding data 129
+[2016-Jun-07 12:26:09.134216] <1>: Adding data 130
+[2016-Jun-07 12:26:09.134188] <1>: Popping Data in main loop: 58
+[2016-Jun-07 12:26:09.134264] <1>: Adding data 131
+[2016-Jun-07 12:26:09.134309] <1>: Adding data 132
+[2016-Jun-07 12:26:09.134322] <1>: Popping Data in main loop: 59
+[2016-Jun-07 12:26:09.134350] <1>: Adding data 133
+[2016-Jun-07 12:26:09.134410] <1>: Adding data 134
+[2016-Jun-07 12:26:09.134430] <1>: Popping Data in main loop: 60
+[2016-Jun-07 12:26:09.134454] <1>: Adding data 135
+[2016-Jun-07 12:26:09.134522] <1>: Adding data 136
+[2016-Jun-07 12:26:09.134532] <1>: Popping Data in main loop: 61
+[2016-Jun-07 12:26:09.134601] <1>: Adding data 137
+[2016-Jun-07 12:26:09.134621] <1>: Popping Data in main loop: 62
+[2016-Jun-07 12:26:09.134652] <1>: Adding data 138
+[2016-Jun-07 12:26:09.134697] <1>: Adding data 139
+[2016-Jun-07 12:26:09.134737] <1>: Adding data 140
+[2016-Jun-07 12:26:09.134747] <1>: Popping Data in main loop: 63
+[2016-Jun-07 12:26:09.134812] <1>: Adding data 141
+[2016-Jun-07 12:26:09.134815] <1>: Popping Data in main loop: 64
+[2016-Jun-07 12:26:09.134878] <1>: Adding data 142
+[2016-Jun-07 12:26:09.134887] <1>: Popping Data in main loop: 65
+[2016-Jun-07 12:26:09.134947] <1>: Adding data 143
+[2016-Jun-07 12:26:09.134962] <1>: Popping Data in main loop: 66
+[2016-Jun-07 12:26:09.135019] <1>: Adding data 144
+[2016-Jun-07 12:26:09.135036] <1>: Popping Data in main loop: 67
+[2016-Jun-07 12:26:09.135092] <1>: Adding data 145
+[2016-Jun-07 12:26:09.135107] <1>: Popping Data in main loop: 68
+[2016-Jun-07 12:26:09.135164] <1>: Adding data 146
+[2016-Jun-07 12:26:09.135183] <1>: Popping Data in main loop: 69
+[2016-Jun-07 12:26:09.135251] <1>: Adding data 147
+[2016-Jun-07 12:26:09.135266] <1>: Popping Data in main loop: 70
+[2016-Jun-07 12:26:09.135323] <1>: Adding data 148
+[2016-Jun-07 12:26:09.135340] <1>: Popping Data in main loop: 71
+[2016-Jun-07 12:26:09.135374] <1>: Adding data 149
+[2016-Jun-07 12:26:09.135389] <1>: Popping Data in main loop: 72
+[2016-Jun-07 12:26:09.135420] <1>: Adding data 150
+[2016-Jun-07 12:26:09.135436] <1>: Popping Data in main loop: 73
+[2016-Jun-07 12:26:09.135454] <1>: Adding data 151
+[2016-Jun-07 12:26:09.135513] <1>: Popping Data in main loop: 74
+[2016-Jun-07 12:26:09.135529] <1>: Adding data 152
+[2016-Jun-07 12:26:09.135583] <1>: Adding data 153
+[2016-Jun-07 12:26:09.135631] <1>: Popping Data in main loop: 75
+[2016-Jun-07 12:26:09.135636] <1>: Adding data 154
+[2016-Jun-07 12:26:09.135693] <1>: Adding data 155
+[2016-Jun-07 12:26:09.135705] <1>: Popping Data in main loop: 76
+[2016-Jun-07 12:26:09.135763] <1>: Adding data 156
+[2016-Jun-07 12:26:09.135780] <1>: Popping Data in main loop: 77
+[2016-Jun-07 12:26:09.135835] <1>: Adding data 157
+[2016-Jun-07 12:26:09.135853] <1>: Popping Data in main loop: 78
+[2016-Jun-07 12:26:09.135886] <1>: Adding data 158
+[2016-Jun-07 12:26:09.135905] <1>: Popping Data in main loop: 79
+[2016-Jun-07 12:26:09.135921] <1>: Adding data 159
+[2016-Jun-07 12:26:09.135971] <1>: Popping Data in main loop: 80
+[2016-Jun-07 12:26:09.135980] <1>: Adding data 160
+[2016-Jun-07 12:26:09.136040] <1>: Adding data 161
+[2016-Jun-07 12:26:09.136043] <1>: Popping Data in main loop: 81
+[2016-Jun-07 12:26:09.136100] <1>: Adding data 162
+[2016-Jun-07 12:26:09.136121] <1>: Popping Data in main loop: 82
+[2016-Jun-07 12:26:09.136311] <1>: Adding data 163
+[2016-Jun-07 12:26:09.136331] <1>: Popping Data in main loop: 83
+[2016-Jun-07 12:26:09.136354] <1>: Adding data 164
+[2016-Jun-07 12:26:09.136417] <1>: Adding data 165
+[2016-Jun-07 12:26:09.136433] <1>: Popping Data in main loop: 84
+[2016-Jun-07 12:26:09.136457] <1>: Adding data 166
+[2016-Jun-07 12:26:09.136523] <1>: Popping Data in main loop: 85
+[2016-Jun-07 12:26:09.136539] <1>: Adding data 167
+[2016-Jun-07 12:26:09.137022] <1>: Adding data 168
+[2016-Jun-07 12:26:09.137039] <1>: Popping Data in main loop: 86
+[2016-Jun-07 12:26:09.137062] <1>: Adding data 169
+[2016-Jun-07 12:26:09.137115] <1>: Adding data 170
+[2016-Jun-07 12:26:09.137147] <1>: Adding data 171
+[2016-Jun-07 12:26:09.137178] <1>: Adding data 172
+[2016-Jun-07 12:26:09.137232] <1>: Adding data 173
+[2016-Jun-07 12:26:09.137265] <1>: Adding data 174
+[2016-Jun-07 12:26:09.137295] <1>: Adding data 175
+[2016-Jun-07 12:26:09.137325] <1>: Adding data 176
+[2016-Jun-07 12:26:09.137355] <1>: Adding data 177
+[2016-Jun-07 12:26:09.137385] <1>: Adding data 178
+[2016-Jun-07 12:26:09.137415] <1>: Adding data 179
+[2016-Jun-07 12:26:09.137445] <1>: Adding data 180
+[2016-Jun-07 12:26:09.137474] <1>: Adding data 181
+[2016-Jun-07 12:26:09.137504] <1>: Adding data 182
+[2016-Jun-07 12:26:09.137534] <1>: Adding data 183
+[2016-Jun-07 12:26:09.137630] <1>: Adding data 184
+[2016-Jun-07 12:26:09.137670] <1>: Adding data 185
+[2016-Jun-07 12:26:09.137700] <1>: Adding data 186
+[2016-Jun-07 12:26:09.137730] <1>: Adding data 187
+[2016-Jun-07 12:26:09.137760] <1>: Adding data 188
+[2016-Jun-07 12:26:09.137790] <1>: Adding data 189
+[2016-Jun-07 12:26:09.137820] <1>: Adding data 190
+[2016-Jun-07 12:26:09.137850] <1>: Adding data 191
+[2016-Jun-07 12:26:09.137880] <1>: Adding data 192
+[2016-Jun-07 12:26:09.137910] <1>: Adding data 193
+[2016-Jun-07 12:26:09.137940] <1>: Adding data 194
+[2016-Jun-07 12:26:09.137969] <1>: Adding data 195
+[2016-Jun-07 12:26:09.137999] <1>: Adding data 196
+[2016-Jun-07 12:26:09.138029] <1>: Adding data 197
+[2016-Jun-07 12:26:09.138059] <1>: Adding data 198
+[2016-Jun-07 12:26:09.138089] <1>: Adding data 199
+[2016-Jun-07 12:26:09.138119] <1>: Adding data 200
+[2016-Jun-07 12:26:09.138149] <1>: Adding data 201
+[2016-Jun-07 12:26:09.138179] <1>: Adding data 202
+[2016-Jun-07 12:26:09.138233] <1>: Adding data 203
+[2016-Jun-07 12:26:09.138266] <1>: Adding data 204
+[2016-Jun-07 12:26:09.138297] <1>: Adding data 205
+[2016-Jun-07 12:26:09.138327] <1>: Adding data 206
+[2016-Jun-07 12:26:09.138357] <1>: Adding data 207
+[2016-Jun-07 12:26:09.138386] <1>: Adding data 208
+[2016-Jun-07 12:26:09.138416] <1>: Adding data 209
+[2016-Jun-07 12:26:09.138446] <1>: Adding data 210
+[2016-Jun-07 12:26:09.138476] <1>: Adding data 211
+[2016-Jun-07 12:26:09.138506] <1>: Adding data 212
+[2016-Jun-07 12:26:09.138536] <1>: Adding data 213
+[2016-Jun-07 12:26:09.138566] <1>: Adding data 214
+[2016-Jun-07 12:26:09.138596] <1>: Adding data 215
+[2016-Jun-07 12:26:09.138626] <1>: Adding data 216
+[2016-Jun-07 12:26:09.138656] <1>: Adding data 217
+[2016-Jun-07 12:26:09.138686] <1>: Adding data 218
+[2016-Jun-07 12:26:09.138715] <1>: Adding data 219
+[2016-Jun-07 12:26:09.138745] <1>: Adding data 220
+[2016-Jun-07 12:26:09.138775] <1>: Adding data 221
+[2016-Jun-07 12:26:09.138806] <1>: Adding data 222
+[2016-Jun-07 12:26:09.138835] <1>: Adding data 223
+[2016-Jun-07 12:26:09.138865] <1>: Adding data 224
+[2016-Jun-07 12:26:09.138895] <1>: Adding data 225
+[2016-Jun-07 12:26:09.138925] <1>: Adding data 226
+[2016-Jun-07 12:26:09.138955] <1>: Adding data 227
+[2016-Jun-07 12:26:09.139034] <1>: Adding data 228
+[2016-Jun-07 12:26:09.139117] <1>: Adding data 229
+[2016-Jun-07 12:26:09.139227] <1>: Adding data 230
+[2016-Jun-07 12:26:09.139312] <1>: Adding data 231
+[2016-Jun-07 12:26:09.139393] <1>: Adding data 232
+[2016-Jun-07 12:26:09.139473] <1>: Adding data 233
+[2016-Jun-07 12:26:09.139553] <1>: Adding data 234
+[2016-Jun-07 12:26:09.139633] <1>: Adding data 235
+[2016-Jun-07 12:26:09.139713] <1>: Adding data 236
+[2016-Jun-07 12:26:09.139793] <1>: Adding data 237
+[2016-Jun-07 12:26:09.139873] <1>: Adding data 238
+[2016-Jun-07 12:26:09.139953] <1>: Adding data 239
+[2016-Jun-07 12:26:09.140034] <1>: Adding data 240
+[2016-Jun-07 12:26:09.140114] <1>: Adding data 241
+[2016-Jun-07 12:26:09.140219] <1>: Adding data 242
+[2016-Jun-07 12:26:09.140353] <1>: Adding data 243
+[2016-Jun-07 12:26:09.140442] <1>: Popping Data in main loop: 87
+[2016-Jun-07 12:26:09.140483] <1>: Adding data 244
+[2016-Jun-07 12:26:09.140596] <1>: Popping Data in main loop: 88
+[2016-Jun-07 12:26:09.140669] <1>: Adding data 245
+[2016-Jun-07 12:26:09.140734] <1>: Popping Data in main loop: 89
+[2016-Jun-07 12:26:09.140797] <1>: Adding data 246
+[2016-Jun-07 12:26:09.140883] <1>: Popping Data in main loop: 90
+[2016-Jun-07 12:26:09.140922] <1>: Adding data 247
+[2016-Jun-07 12:26:09.141006] <1>: Popping Data in main loop: 91
+[2016-Jun-07 12:26:09.141050] <1>: Adding data 248
+[2016-Jun-07 12:26:09.141427] <1>: Adding data 249
+[2016-Jun-07 12:26:09.141098] <1>: Popping Data in main loop: 92
+[2016-Jun-07 12:26:09.141535] <1>: Popping Data in main loop: 93
+[2016-Jun-07 12:26:09.141674] <1>: Popping Data in main loop: 94
+[2016-Jun-07 12:26:09.141682] <1>: Adding data 250
+[2016-Jun-07 12:26:09.141805] <1>: Adding data 251
+[2016-Jun-07 12:26:09.141852] <1>: Popping Data in main loop: 95
+[2016-Jun-07 12:26:09.141978] <1>: Popping Data in main loop: 96
+[2016-Jun-07 12:26:09.141980] <1>: Adding data 252
+[2016-Jun-07 12:26:09.142088] <1>: Adding data 253
+[2016-Jun-07 12:26:09.142136] <1>: Popping Data in main loop: 97
+[2016-Jun-07 12:26:09.142243] <1>: Popping Data in main loop: 98
+[2016-Jun-07 12:26:09.142269] <1>: Adding data 254
+[2016-Jun-07 12:26:09.142312] <1>: Popping Data in main loop: 99
+[2016-Jun-07 12:26:09.142460] <1>: Popping Data in main loop: 100
+[2016-Jun-07 12:26:09.142463] <1>: Adding data 255
+[2016-Jun-07 12:26:09.142626] <1>: Adding data 256
+[2016-Jun-07 12:26:09.142610] <1>: Popping Data in main loop: 101
+[2016-Jun-07 12:26:09.142784] <1>: Popping Data in main loop: 102
+[2016-Jun-07 12:26:09.142788] <1>: Adding data 257
+[2016-Jun-07 12:26:09.142888] <1>: Adding data 258
+[2016-Jun-07 12:26:09.142934] <1>: Popping Data in main loop: 103
+[2016-Jun-07 12:26:09.143060] <1>: Popping Data in main loop: 104
+[2016-Jun-07 12:26:09.143063] <1>: Adding data 259
+[2016-Jun-07 12:26:09.143173] <1>: Adding data 260
+[2016-Jun-07 12:26:09.143230] <1>: Popping Data in main loop: 105
+[2016-Jun-07 12:26:09.143320] <1>: Popping Data in main loop: 106
+[2016-Jun-07 12:26:09.143346] <1>: Adding data 261
+[2016-Jun-07 12:26:09.143392] <1>: Popping Data in main loop: 107
+[2016-Jun-07 12:26:09.143537] <1>: Popping Data in main loop: 108
+[2016-Jun-07 12:26:09.143551] <1>: Adding data 262
+[2016-Jun-07 12:26:09.143666] <1>: Adding data 263
+[2016-Jun-07 12:26:09.143712] <1>: Popping Data in main loop: 109
+[2016-Jun-07 12:26:09.143838] <1>: Popping Data in main loop: 110
+[2016-Jun-07 12:26:09.143841] <1>: Adding data 264
+[2016-Jun-07 12:26:09.143950] <1>: Adding data 265
+[2016-Jun-07 12:26:09.143996] <1>: Popping Data in main loop: 111
+[2016-Jun-07 12:26:09.144121] <1>: Popping Data in main loop: 112
+[2016-Jun-07 12:26:09.144125] <1>: Adding data 266
+[2016-Jun-07 12:26:09.144236] <1>: Adding data 267
+[2016-Jun-07 12:26:09.144281] <1>: Popping Data in main loop: 113
+[2016-Jun-07 12:26:09.144407] <1>: Popping Data in main loop: 114
+[2016-Jun-07 12:26:09.144410] <1>: Adding data 268
+[2016-Jun-07 12:26:09.144566] <1>: Popping Data in main loop: 115
+[2016-Jun-07 12:26:09.144578] <1>: Adding data 269
+[2016-Jun-07 12:26:09.144695] <1>: Adding data 270
+[2016-Jun-07 12:26:09.144742] <1>: Popping Data in main loop: 116
+[2016-Jun-07 12:26:09.144867] <1>: Popping Data in main loop: 117
+[2016-Jun-07 12:26:09.144870] <1>: Adding data 271
+[2016-Jun-07 12:26:09.144979] <1>: Adding data 272
+[2016-Jun-07 12:26:09.145025] <1>: Popping Data in main loop: 118
+[2016-Jun-07 12:26:09.145153] <1>: Adding data 273
+[2016-Jun-07 12:26:09.145154] <1>: Popping Data in main loop: 119
+[2016-Jun-07 12:26:09.145340] <1>: Adding data 274
+[2016-Jun-07 12:26:09.145341] <1>: Popping Data in main loop: 120
+[2016-Jun-07 12:26:09.145471] <1>: Popping Data in main loop: 121
+[2016-Jun-07 12:26:09.145471] <1>: Adding data 275
+[2016-Jun-07 12:26:09.145651] <1>: Adding data 276
+[2016-Jun-07 12:26:09.145636] <1>: Popping Data in main loop: 122
+[2016-Jun-07 12:26:09.145797] <1>: Popping Data in main loop: 123
+[2016-Jun-07 12:26:09.145802] <1>: Adding data 277
+[2016-Jun-07 12:26:09.145902] <1>: Adding data 278
+[2016-Jun-07 12:26:09.145948] <1>: Popping Data in main loop: 124
+[2016-Jun-07 12:26:09.146074] <1>: Popping Data in main loop: 125
+[2016-Jun-07 12:26:09.146077] <1>: Adding data 279
+[2016-Jun-07 12:26:09.146232] <1>: Adding data 280
+[2016-Jun-07 12:26:09.146233] <1>: Popping Data in main loop: 126
+[2016-Jun-07 12:26:09.146342] <1>: Popping Data in main loop: 127
+[2016-Jun-07 12:26:09.146412] <1>: Popping Data in main loop: 128
+[2016-Jun-07 12:26:09.146420] <1>: Adding data 281
+[2016-Jun-07 12:26:09.146594] <1>: Popping Data in main loop: 129
+[2016-Jun-07 12:26:09.146604] <1>: Adding data 282
+[2016-Jun-07 12:26:09.146704] <1>: Adding data 283
+[2016-Jun-07 12:26:09.146750] <1>: Popping Data in main loop: 130
+[2016-Jun-07 12:26:09.146875] <1>: Popping Data in main loop: 131
+[2016-Jun-07 12:26:09.146879] <1>: Adding data 284
+[2016-Jun-07 12:26:09.146989] <1>: Adding data 285
+[2016-Jun-07 12:26:09.147035] <1>: Popping Data in main loop: 132
+[2016-Jun-07 12:26:09.147165] <1>: Adding data 286
+[2016-Jun-07 12:26:09.147214] <1>: Popping Data in main loop: 133
+[2016-Jun-07 12:26:09.147282] <1>: Adding data 287
+[2016-Jun-07 12:26:09.147356] <1>: Popping Data in main loop: 134
+[2016-Jun-07 12:26:09.147407] <1>: Adding data 288
+[2016-Jun-07 12:26:09.147456] <1>: Popping Data in main loop: 135
+[2016-Jun-07 12:26:09.147616] <1>: Adding data 289
+[2016-Jun-07 12:26:09.147615] <1>: Popping Data in main loop: 136
+[2016-Jun-07 12:26:09.147757] <1>: Popping Data in main loop: 137
+[2016-Jun-07 12:26:09.147764] <1>: Adding data 290
+[2016-Jun-07 12:26:09.147880] <1>: Adding data 291
+[2016-Jun-07 12:26:09.147926] <1>: Popping Data in main loop: 138
+[2016-Jun-07 12:26:09.148052] <1>: Popping Data in main loop: 139
+[2016-Jun-07 12:26:09.148053] <1>: Adding data 292
+[2016-Jun-07 12:26:09.148163] <1>: Adding data 293
+[2016-Jun-07 12:26:09.148267] <1>: Popping Data in main loop: 140
+[2016-Jun-07 12:26:09.148303] <1>: Adding data 294
+[2016-Jun-07 12:26:09.148353] <1>: Popping Data in main loop: 141
+[2016-Jun-07 12:26:09.148498] <1>: Adding data 295
+[2016-Jun-07 12:26:09.148498] <1>: Popping Data in main loop: 142
+[2016-Jun-07 12:26:09.148665] <1>: Popping Data in main loop: 143
+[2016-Jun-07 12:26:09.148665] <1>: Adding data 296
+[2016-Jun-07 12:26:09.148766] <1>: Adding data 297
+[2016-Jun-07 12:26:09.148812] <1>: Popping Data in main loop: 144
+[2016-Jun-07 12:26:09.148937] <1>: Popping Data in main loop: 145
+[2016-Jun-07 12:26:09.148941] <1>: Adding data 298
+[2016-Jun-07 12:26:09.149050] <1>: Adding data 299
+[2016-Jun-07 12:26:09.149097] <1>: Popping Data in main loop: 146
+[2016-Jun-07 12:26:09.149166] <1>: Adding data 300
+[2016-Jun-07 12:26:09.149190] <1>: Popping Data in main loop: 147
+[2016-Jun-07 12:26:09.149224] <1>: Adding data 301
+[2016-Jun-07 12:26:09.149277] <1>: Popping Data in main loop: 148
+[2016-Jun-07 12:26:09.149286] <1>: Adding data 302
+[2016-Jun-07 12:26:09.149347] <1>: Adding data 303
+[2016-Jun-07 12:26:09.149349] <1>: Popping Data in main loop: 149
+[2016-Jun-07 12:26:09.149403] <1>: Adding data 304
+[2016-Jun-07 12:26:09.149422] <1>: Popping Data in main loop: 150
+[2016-Jun-07 12:26:09.149442] <1>: Adding data 305
+[2016-Jun-07 12:26:09.149506] <1>: Popping Data in main loop: 151
+[2016-Jun-07 12:26:09.149514] <1>: Adding data 306
+[2016-Jun-07 12:26:09.149573] <1>: Adding data 307
+[2016-Jun-07 12:26:09.149578] <1>: Popping Data in main loop: 152
+[2016-Jun-07 12:26:09.149634] <1>: Adding data 308
+[2016-Jun-07 12:26:09.149654] <1>: Popping Data in main loop: 153
+[2016-Jun-07 12:26:09.149674] <1>: Adding data 309
+[2016-Jun-07 12:26:09.149721] <1>: Popping Data in main loop: 154
+[2016-Jun-07 12:26:09.149734] <1>: Adding data 310
+[2016-Jun-07 12:26:09.149798] <1>: Adding data 311
+[2016-Jun-07 12:26:09.149801] <1>: Popping Data in main loop: 155
+[2016-Jun-07 12:26:09.149857] <1>: Adding data 312
+[2016-Jun-07 12:26:09.149878] <1>: Popping Data in main loop: 156
+[2016-Jun-07 12:26:09.149897] <1>: Adding data 313
+[2016-Jun-07 12:26:09.149944] <1>: Popping Data in main loop: 157
+[2016-Jun-07 12:26:09.149956] <1>: Adding data 314
+[2016-Jun-07 12:26:09.150017] <1>: Adding data 315
+[2016-Jun-07 12:26:09.150027] <1>: Popping Data in main loop: 158
+[2016-Jun-07 12:26:09.150051] <1>: Adding data 316
+[2016-Jun-07 12:26:09.150101] <1>: Popping Data in main loop: 159
+[2016-Jun-07 12:26:09.150112] <1>: Adding data 317
+[2016-Jun-07 12:26:09.150172] <1>: Adding data 318
+[2016-Jun-07 12:26:09.150173] <1>: Popping Data in main loop: 160
+[2016-Jun-07 12:26:09.150243] <1>: Adding data 319
+[2016-Jun-07 12:26:09.150256] <1>: Popping Data in main loop: 161
+[2016-Jun-07 12:26:09.150291] <1>: Adding data 320
+[2016-Jun-07 12:26:09.150308] <1>: Popping Data in main loop: 162
+[2016-Jun-07 12:26:09.150327] <1>: Adding data 321
+[2016-Jun-07 12:26:09.150374] <1>: Popping Data in main loop: 163
+[2016-Jun-07 12:26:09.150388] <1>: Adding data 322
+[2016-Jun-07 12:26:09.150450] <1>: Adding data 323
+[2016-Jun-07 12:26:09.150453] <1>: Popping Data in main loop: 164
+[2016-Jun-07 12:26:09.150535] <1>: Adding data 324
+[2016-Jun-07 12:26:09.150557] <1>: Popping Data in main loop: 165
+[2016-Jun-07 12:26:09.150576] <1>: Adding data 325
+[2016-Jun-07 12:26:09.150625] <1>: Popping Data in main loop: 166
+[2016-Jun-07 12:26:09.150637] <1>: Adding data 326
+[2016-Jun-07 12:26:09.150698] <1>: Adding data 327
+[2016-Jun-07 12:26:09.150698] <1>: Popping Data in main loop: 167
+[2016-Jun-07 12:26:09.150753] <1>: Adding data 328
+[2016-Jun-07 12:26:09.150772] <1>: Popping Data in main loop: 168
+[2016-Jun-07 12:26:09.150791] <1>: Adding data 329
+[2016-Jun-07 12:26:09.150839] <1>: Popping Data in main loop: 169
+[2016-Jun-07 12:26:09.150852] <1>: Adding data 330
+[2016-Jun-07 12:26:09.150913] <1>: Adding data 331
+[2016-Jun-07 12:26:09.150912] <1>: Popping Data in main loop: 170
+[2016-Jun-07 12:26:09.150966] <1>: Adding data 332
+[2016-Jun-07 12:26:09.150986] <1>: Popping Data in main loop: 171
+[2016-Jun-07 12:26:09.151004] <1>: Adding data 333
+[2016-Jun-07 12:26:09.151053] <1>: Popping Data in main loop: 172
+[2016-Jun-07 12:26:09.151065] <1>: Adding data 334
+[2016-Jun-07 12:26:09.151126] <1>: Adding data 335
+[2016-Jun-07 12:26:09.151127] <1>: Popping Data in main loop: 173
+[2016-Jun-07 12:26:09.151246] <1>: Popping Data in main loop: 174
+[2016-Jun-07 12:26:09.151183] <1>: Adding data 336
+[2016-Jun-07 12:26:09.151320] <1>: Popping Data in main loop: 175
+[2016-Jun-07 12:26:09.151381] <1>: Adding data 337
+[2016-Jun-07 12:26:09.151395] <1>: Popping Data in main loop: 176
+[2016-Jun-07 12:26:09.151453] <1>: Adding data 338
+[2016-Jun-07 12:26:09.151469] <1>: Popping Data in main loop: 177
+[2016-Jun-07 12:26:09.151543] <1>: Adding data 339
+[2016-Jun-07 12:26:09.151567] <1>: Popping Data in main loop: 178
+[2016-Jun-07 12:26:09.151583] <1>: Adding data 340
+[2016-Jun-07 12:26:09.151634] <1>: Popping Data in main loop: 179
+[2016-Jun-07 12:26:09.151641] <1>: Adding data 341
+[2016-Jun-07 12:26:09.151702] <1>: Adding data 342
+[2016-Jun-07 12:26:09.151706] <1>: Popping Data in main loop: 180
+[2016-Jun-07 12:26:09.151762] <1>: Adding data 343
+[2016-Jun-07 12:26:09.151782] <1>: Popping Data in main loop: 181
+[2016-Jun-07 12:26:09.151801] <1>: Adding data 344
+[2016-Jun-07 12:26:09.151849] <1>: Popping Data in main loop: 182
+[2016-Jun-07 12:26:09.151863] <1>: Adding data 345
+[2016-Jun-07 12:26:09.151926] <1>: Adding data 346
+[2016-Jun-07 12:26:09.151929] <1>: Popping Data in main loop: 183
+[2016-Jun-07 12:26:09.151985] <1>: Adding data 347
+[2016-Jun-07 12:26:09.152005] <1>: Popping Data in main loop: 184
+[2016-Jun-07 12:26:09.152024] <1>: Adding data 348
+[2016-Jun-07 12:26:09.152073] <1>: Popping Data in main loop: 185
+[2016-Jun-07 12:26:09.152085] <1>: Adding data 349
+[2016-Jun-07 12:26:09.152146] <1>: Adding data 350
+[2016-Jun-07 12:26:09.152146] <1>: Popping Data in main loop: 186
+[2016-Jun-07 12:26:09.152211] <1>: Adding data 351
+[2016-Jun-07 12:26:09.152237] <1>: Popping Data in main loop: 187
+[2016-Jun-07 12:26:09.152251] <1>: Adding data 352
+[2016-Jun-07 12:26:09.152305] <1>: Adding data 353
+[2016-Jun-07 12:26:09.152326] <1>: Popping Data in main loop: 188
+[2016-Jun-07 12:26:09.152347] <1>: Adding data 354
+[2016-Jun-07 12:26:09.152399] <1>: Popping Data in main loop: 189
+[2016-Jun-07 12:26:09.152405] <1>: Adding data 355
+[2016-Jun-07 12:26:09.152466] <1>: Adding data 356
+[2016-Jun-07 12:26:09.152470] <1>: Popping Data in main loop: 190
+[2016-Jun-07 12:26:09.152550] <1>: Adding data 357
+[2016-Jun-07 12:26:09.152572] <1>: Popping Data in main loop: 191
+[2016-Jun-07 12:26:09.152591] <1>: Adding data 358
+[2016-Jun-07 12:26:09.152641] <1>: Popping Data in main loop: 192
+[2016-Jun-07 12:26:09.152652] <1>: Adding data 359
+[2016-Jun-07 12:26:09.152713] <1>: Adding data 360
+[2016-Jun-07 12:26:09.152713] <1>: Popping Data in main loop: 193
+[2016-Jun-07 12:26:09.152768] <1>: Adding data 361
+[2016-Jun-07 12:26:09.152805] <1>: Adding data 362
+[2016-Jun-07 12:26:09.152837] <1>: Adding data 363
+[2016-Jun-07 12:26:09.152867] <1>: Adding data 364
+[2016-Jun-07 12:26:09.152898] <1>: Adding data 365
+[2016-Jun-07 12:26:09.152929] <1>: Adding data 366
+[2016-Jun-07 12:26:09.152959] <1>: Adding data 367
+[2016-Jun-07 12:26:09.152975] <1>: Popping Data in main loop: 194
+[2016-Jun-07 12:26:09.153065] <1>: Adding data 368
+[2016-Jun-07 12:26:09.153099] <1>: Popping Data in main loop: 195
+[2016-Jun-07 12:26:09.153106] <1>: Adding data 369
+[2016-Jun-07 12:26:09.153138] <1>: Adding data 370
+[2016-Jun-07 12:26:09.153172] <1>: Popping Data in main loop: 196
+[2016-Jun-07 12:26:09.153249] <1>: Popping Data in main loop: 197
+[2016-Jun-07 12:26:09.153415] <1>: Popping Data in main loop: 198
+[2016-Jun-07 12:26:09.153750] <1>: Popping Data in main loop: 199
+[2016-Jun-07 12:26:09.153797] <1>: Popping Data in main loop: 200
+[2016-Jun-07 12:26:09.153841] <1>: Popping Data in main loop: 201
+[2016-Jun-07 12:26:09.153883] <1>: Popping Data in main loop: 202
+[2016-Jun-07 12:26:09.153925] <1>: Popping Data in main loop: 203
+[2016-Jun-07 12:26:09.153968] <1>: Popping Data in main loop: 204
+[2016-Jun-07 12:26:09.154010] <1>: Popping Data in main loop: 205
+[2016-Jun-07 12:26:09.154052] <1>: Popping Data in main loop: 206
+[2016-Jun-07 12:26:09.154094] <1>: Popping Data in main loop: 207
+[2016-Jun-07 12:26:09.154136] <1>: Popping Data in main loop: 208
+[2016-Jun-07 12:26:09.154178] <1>: Popping Data in main loop: 209
+[2016-Jun-07 12:26:09.154247] <1>: Popping Data in main loop: 210
+[2016-Jun-07 12:26:09.154292] <1>: Popping Data in main loop: 211
+[2016-Jun-07 12:26:09.154335] <1>: Popping Data in main loop: 212
+[2016-Jun-07 12:26:09.154377] <1>: Popping Data in main loop: 213
+[2016-Jun-07 12:26:09.154421] <1>: Popping Data in main loop: 214
+[2016-Jun-07 12:26:09.154464] <1>: Popping Data in main loop: 215
+[2016-Jun-07 12:26:09.154506] <1>: Popping Data in main loop: 216
+[2016-Jun-07 12:26:09.154548] <1>: Popping Data in main loop: 217
+[2016-Jun-07 12:26:09.154597] <1>: Popping Data in main loop: 218
+[2016-Jun-07 12:26:09.154640] <1>: Popping Data in main loop: 219
+[2016-Jun-07 12:26:09.154682] <1>: Popping Data in main loop: 220
+[2016-Jun-07 12:26:09.154724] <1>: Popping Data in main loop: 221
+[2016-Jun-07 12:26:09.154766] <1>: Popping Data in main loop: 222
+[2016-Jun-07 12:26:09.154808] <1>: Popping Data in main loop: 223
+[2016-Jun-07 12:26:09.154849] <1>: Popping Data in main loop: 224
+[2016-Jun-07 12:26:09.154892] <1>: Popping Data in main loop: 225
+[2016-Jun-07 12:26:09.154934] <1>: Popping Data in main loop: 226
+[2016-Jun-07 12:26:09.154976] <1>: Popping Data in main loop: 227
+[2016-Jun-07 12:26:09.155019] <1>: Popping Data in main loop: 228
+[2016-Jun-07 12:26:09.155061] <1>: Popping Data in main loop: 229
+[2016-Jun-07 12:26:09.155103] <1>: Popping Data in main loop: 230
+[2016-Jun-07 12:26:09.155413] <1>: Adding data 371
+[2016-Jun-07 12:26:09.155521] <1>: Adding data 372
+[2016-Jun-07 12:26:09.155610] <1>: Adding data 373
+[2016-Jun-07 12:26:09.155699] <1>: Adding data 374
+[2016-Jun-07 12:26:09.155783] <1>: Adding data 375
+[2016-Jun-07 12:26:09.155867] <1>: Adding data 376
+[2016-Jun-07 12:26:09.155951] <1>: Adding data 377
+[2016-Jun-07 12:26:09.156036] <1>: Adding data 378
+[2016-Jun-07 12:26:09.156124] <1>: Adding data 379
+[2016-Jun-07 12:26:09.156280] <1>: Adding data 380
+[2016-Jun-07 12:26:09.156369] <1>: Adding data 381
+[2016-Jun-07 12:26:09.156450] <1>: Adding data 382
+[2016-Jun-07 12:26:09.156531] <1>: Adding data 383
+[2016-Jun-07 12:26:09.156612] <1>: Adding data 384
+[2016-Jun-07 12:26:09.156693] <1>: Adding data 385
+[2016-Jun-07 12:26:09.156774] <1>: Adding data 386
+[2016-Jun-07 12:26:09.156855] <1>: Adding data 387
+[2016-Jun-07 12:26:09.156936] <1>: Adding data 388
+[2016-Jun-07 12:26:09.157017] <1>: Adding data 389
+[2016-Jun-07 12:26:09.157098] <1>: Adding data 390
+[2016-Jun-07 12:26:09.157179] <1>: Adding data 391
+[2016-Jun-07 12:26:09.157293] <1>: Adding data 392
+[2016-Jun-07 12:26:09.157375] <1>: Adding data 393
+[2016-Jun-07 12:26:09.157456] <1>: Adding data 394
+[2016-Jun-07 12:26:09.157536] <1>: Adding data 395
+[2016-Jun-07 12:26:09.157617] <1>: Adding data 396
+[2016-Jun-07 12:26:09.157698] <1>: Adding data 397
+[2016-Jun-07 12:26:09.157779] <1>: Adding data 398
+[2016-Jun-07 12:26:09.157860] <1>: Adding data 399
+[2016-Jun-07 12:26:09.157940] <1>: Adding data 400
+[2016-Jun-07 12:26:09.158021] <1>: Adding data 401
+[2016-Jun-07 12:26:09.158101] <1>: Adding data 402
+[2016-Jun-07 12:26:09.158182] <1>: Adding data 403
+[2016-Jun-07 12:26:09.158294] <1>: Adding data 404
+[2016-Jun-07 12:26:09.158376] <1>: Adding data 405
+[2016-Jun-07 12:26:09.158457] <1>: Adding data 406
+[2016-Jun-07 12:26:09.158539] <1>: Adding data 407
+[2016-Jun-07 12:26:09.158619] <1>: Adding data 408
+[2016-Jun-07 12:26:09.158701] <1>: Adding data 409
+[2016-Jun-07 12:26:09.158785] <1>: Adding data 410
+[2016-Jun-07 12:26:09.158869] <1>: Adding data 411
+[2016-Jun-07 12:26:09.158953] <1>: Adding data 412
+[2016-Jun-07 12:26:09.159037] <1>: Adding data 413
+[2016-Jun-07 12:26:09.159123] <1>: Adding data 414
+[2016-Jun-07 12:26:09.159324] <1>: Adding data 415
+[2016-Jun-07 12:26:09.159428] <1>: Adding data 416
+[2016-Jun-07 12:26:09.159515] <1>: Adding data 417
+[2016-Jun-07 12:26:09.159600] <1>: Adding data 418
+[2016-Jun-07 12:26:09.159683] <1>: Adding data 419
+[2016-Jun-07 12:26:09.159769] <1>: Adding data 420
+[2016-Jun-07 12:26:09.159854] <1>: Adding data 421
+[2016-Jun-07 12:26:09.159937] <1>: Adding data 422
+[2016-Jun-07 12:26:09.160018] <1>: Adding data 423
+[2016-Jun-07 12:26:09.160159] <1>: Adding data 424
+[2016-Jun-07 12:26:09.160185] <1>: Popping Data in main loop: 231
+[2016-Jun-07 12:26:09.160275] <1>: Adding data 425
+[2016-Jun-07 12:26:09.160327] <1>: Popping Data in main loop: 232
+[2016-Jun-07 12:26:09.160455] <1>: Adding data 426
+[2016-Jun-07 12:26:09.160463] <1>: Popping Data in main loop: 233
+[2016-Jun-07 12:26:09.160584] <1>: Popping Data in main loop: 234
+[2016-Jun-07 12:26:09.160660] <1>: Popping Data in main loop: 235
+[2016-Jun-07 12:26:09.160618] <1>: Adding data 427
+[2016-Jun-07 12:26:09.160761] <1>: Adding data 428
+[2016-Jun-07 12:26:09.160852] <1>: Adding data 429
+[2016-Jun-07 12:26:09.160916] <1>: Popping Data in main loop: 236
+[2016-Jun-07 12:26:09.160983] <1>: Adding data 430
+[2016-Jun-07 12:26:09.161063] <1>: Popping Data in main loop: 237
+[2016-Jun-07 12:26:09.161112] <1>: Adding data 431
+[2016-Jun-07 12:26:09.161564] <1>: Adding data 432
+[2016-Jun-07 12:26:09.161676] <1>: Adding data 433
+[2016-Jun-07 12:26:09.161758] <1>: Adding data 434
+[2016-Jun-07 12:26:09.161157] <1>: Popping Data in main loop: 238
+[2016-Jun-07 12:26:09.161838] <1>: Adding data 435
+[2016-Jun-07 12:26:09.161860] <1>: Popping Data in main loop: 239
+[2016-Jun-07 12:26:09.161934] <1>: Adding data 436
+[2016-Jun-07 12:26:09.162004] <1>: Popping Data in main loop: 240
+[2016-Jun-07 12:26:09.162061] <1>: Adding data 437
+[2016-Jun-07 12:26:09.162134] <1>: Popping Data in main loop: 241
+[2016-Jun-07 12:26:09.162205] <1>: Adding data 438
+[2016-Jun-07 12:26:09.162262] <1>: Popping Data in main loop: 242
+[2016-Jun-07 12:26:09.162338] <1>: Popping Data in main loop: 243
+[2016-Jun-07 12:26:09.162374] <1>: Adding data 439
+[2016-Jun-07 12:26:09.162419] <1>: Popping Data in main loop: 244
+[2016-Jun-07 12:26:09.162602] <1>: Popping Data in main loop: 245
+[2016-Jun-07 12:26:09.162605] <1>: Adding data 440
+[2016-Jun-07 12:26:09.162705] <1>: Adding data 441
+[2016-Jun-07 12:26:09.163006] <1>: Adding data 442
+[2016-Jun-07 12:26:09.163091] <1>: Adding data 443
+[2016-Jun-07 12:26:09.163175] <1>: Adding data 444
+[2016-Jun-07 12:26:09.163285] <1>: Adding data 445
+[2016-Jun-07 12:26:09.163370] <1>: Adding data 446
+[2016-Jun-07 12:26:09.163453] <1>: Adding data 447
+[2016-Jun-07 12:26:09.163536] <1>: Adding data 448
+[2016-Jun-07 12:26:09.163619] <1>: Adding data 449
+[2016-Jun-07 12:26:09.163703] <1>: Adding data 450
+[2016-Jun-07 12:26:09.163786] <1>: Adding data 451
+[2016-Jun-07 12:26:09.163870] <1>: Adding data 452
+[2016-Jun-07 12:26:09.163954] <1>: Adding data 453
+[2016-Jun-07 12:26:09.164038] <1>: Adding data 454
+[2016-Jun-07 12:26:09.164120] <1>: Adding data 455
+[2016-Jun-07 12:26:09.164291] <1>: Adding data 456
+[2016-Jun-07 12:26:09.162751] <1>: Popping Data in main loop: 246
+[2016-Jun-07 12:26:09.164380] <1>: Adding data 457
+[2016-Jun-07 12:26:09.164462] <1>: Adding data 458
+[2016-Jun-07 12:26:09.164472] <1>: Popping Data in main loop: 247
+[2016-Jun-07 12:26:09.164672] <1>: Adding data 459
+[2016-Jun-07 12:26:09.164694] <1>: Popping Data in main loop: 248
+[2016-Jun-07 12:26:09.164775] <1>: Adding data 460
+[2016-Jun-07 12:26:09.164843] <1>: Popping Data in main loop: 249
+[2016-Jun-07 12:26:09.164902] <1>: Adding data 461
+[2016-Jun-07 12:26:09.164964] <1>: Popping Data in main loop: 250
+[2016-Jun-07 12:26:09.165036] <1>: Adding data 462
+[2016-Jun-07 12:26:09.165105] <1>: Popping Data in main loop: 251
+[2016-Jun-07 12:26:09.165163] <1>: Adding data 463
+[2016-Jun-07 12:26:09.165233] <1>: Popping Data in main loop: 252
+[2016-Jun-07 12:26:09.165308] <1>: Adding data 464
+[2016-Jun-07 12:26:09.165380] <1>: Popping Data in main loop: 253
+[2016-Jun-07 12:26:09.165432] <1>: Adding data 465
+[2016-Jun-07 12:26:09.165586] <1>: Adding data 466
+[2016-Jun-07 12:26:09.165668] <1>: Adding data 467
+[2016-Jun-07 12:26:09.165693] <1>: Popping Data in main loop: 254
+[2016-Jun-07 12:26:09.165764] <1>: Adding data 468
+[2016-Jun-07 12:26:09.165833] <1>: Popping Data in main loop: 255
+[2016-Jun-07 12:26:09.165890] <1>: Adding data 469
+[2016-Jun-07 12:26:09.165953] <1>: Popping Data in main loop: 256
+[2016-Jun-07 12:26:09.166024] <1>: Adding data 470
+[2016-Jun-07 12:26:09.166092] <1>: Popping Data in main loop: 257
+[2016-Jun-07 12:26:09.166151] <1>: Adding data 471
+[2016-Jun-07 12:26:09.166222] <1>: Popping Data in main loop: 258
+[2016-Jun-07 12:26:09.166296] <1>: Adding data 472
+[2016-Jun-07 12:26:09.166367] <1>: Popping Data in main loop: 259
+[2016-Jun-07 12:26:09.166423] <1>: Adding data 473
+[2016-Jun-07 12:26:09.166511] <1>: Popping Data in main loop: 260
+[2016-Jun-07 12:26:09.166583] <1>: Adding data 474
+[2016-Jun-07 12:26:09.166650] <1>: Popping Data in main loop: 261
+[2016-Jun-07 12:26:09.166722] <1>: Adding data 475
+[2016-Jun-07 12:26:09.166781] <1>: Popping Data in main loop: 262
+[2016-Jun-07 12:26:09.166859] <1>: Popping Data in main loop: 263
+[2016-Jun-07 12:26:09.166893] <1>: Adding data 476
+[2016-Jun-07 12:26:09.166939] <1>: Popping Data in main loop: 264
+[2016-Jun-07 12:26:09.167084] <1>: Popping Data in main loop: 265
+[2016-Jun-07 12:26:09.167086] <1>: Adding data 477
+[2016-Jun-07 12:26:09.167185] <1>: Adding data 478
+[2016-Jun-07 12:26:09.167238] <1>: Popping Data in main loop: 266
+[2016-Jun-07 12:26:09.167331] <1>: Popping Data in main loop: 267
+[2016-Jun-07 12:26:09.167353] <1>: Adding data 479
+[2016-Jun-07 12:26:09.167401] <1>: Popping Data in main loop: 268
+[2016-Jun-07 12:26:09.167507] <1>: Adding data 480
+[2016-Jun-07 12:26:09.167512] <1>: Popping Data in main loop: 269
+[2016-Jun-07 12:26:09.167569] <1>: Adding data 481
+[2016-Jun-07 12:26:09.167587] <1>: Popping Data in main loop: 270
+[2016-Jun-07 12:26:09.167609] <1>: Adding data 482
+[2016-Jun-07 12:26:09.167655] <1>: Popping Data in main loop: 271
+[2016-Jun-07 12:26:09.167669] <1>: Adding data 483
+[2016-Jun-07 12:26:09.167729] <1>: Adding data 484
+[2016-Jun-07 12:26:09.167739] <1>: Popping Data in main loop: 272
+[2016-Jun-07 12:26:09.167802] <1>: Adding data 485
+[2016-Jun-07 12:26:09.167814] <1>: Popping Data in main loop: 273
+[2016-Jun-07 12:26:09.167875] <1>: Adding data 486
+[2016-Jun-07 12:26:09.167889] <1>: Popping Data in main loop: 274
+[2016-Jun-07 12:26:09.167947] <1>: Adding data 487
+[2016-Jun-07 12:26:09.167962] <1>: Popping Data in main loop: 275
+[2016-Jun-07 12:26:09.168018] <1>: Adding data 488
+[2016-Jun-07 12:26:09.168047] <1>: Popping Data in main loop: 276
+[2016-Jun-07 12:26:09.168058] <1>: Adding data 489
+[2016-Jun-07 12:26:09.168113] <1>: Adding data 490
+[2016-Jun-07 12:26:09.168127] <1>: Popping Data in main loop: 277
+[2016-Jun-07 12:26:09.168186] <1>: Adding data 491
+[2016-Jun-07 12:26:09.168230] <1>: Popping Data in main loop: 278
+[2016-Jun-07 12:26:09.168242] <1>: Adding data 492
+[2016-Jun-07 12:26:09.168300] <1>: Adding data 493
+[2016-Jun-07 12:26:09.168304] <1>: Popping Data in main loop: 279
+[2016-Jun-07 12:26:09.168360] <1>: Adding data 494
+[2016-Jun-07 12:26:09.168383] <1>: Popping Data in main loop: 280
+[2016-Jun-07 12:26:09.168400] <1>: Adding data 495
+[2016-Jun-07 12:26:09.168451] <1>: Popping Data in main loop: 281
+[2016-Jun-07 12:26:09.168458] <1>: Adding data 496
+[2016-Jun-07 12:26:09.168539] <1>: Popping Data in main loop: 282
+[2016-Jun-07 12:26:09.168546] <1>: Adding data 497
+[2016-Jun-07 12:26:09.168612] <1>: Adding data 498
+[2016-Jun-07 12:26:09.168612] <1>: Popping Data in main loop: 283
+[2016-Jun-07 12:26:09.168669] <1>: Adding data 499
+[2016-Jun-07 12:26:09.168686] <1>: Popping Data in main loop: 284
+[2016-Jun-07 12:26:09.168707] <1>: Adding data 500
+[2016-Jun-07 12:26:09.168753] <1>: Popping Data in main loop: 285
+[2016-Jun-07 12:26:09.168768] <1>: Adding data 501
+[2016-Jun-07 12:26:09.168826] <1>: Adding data 502
+[2016-Jun-07 12:26:09.168838] <1>: Popping Data in main loop: 286
+[2016-Jun-07 12:26:09.168897] <1>: Adding data 503
+[2016-Jun-07 12:26:09.168913] <1>: Popping Data in main loop: 287
+[2016-Jun-07 12:26:09.168969] <1>: Adding data 504
+[2016-Jun-07 12:26:09.168988] <1>: Popping Data in main loop: 288
+[2016-Jun-07 12:26:09.169021] <1>: Adding data 505
+[2016-Jun-07 12:26:09.169037] <1>: Popping Data in main loop: 289
+[2016-Jun-07 12:26:09.169056] <1>: Adding data 506
+[2016-Jun-07 12:26:09.169102] <1>: Popping Data in main loop: 290
+[2016-Jun-07 12:26:09.169118] <1>: Adding data 507
+[2016-Jun-07 12:26:09.169177] <1>: Adding data 508
+[2016-Jun-07 12:26:09.169233] <1>: Adding data 509
+[2016-Jun-07 12:26:09.169267] <1>: Adding data 510
+[2016-Jun-07 12:26:09.169299] <1>: Adding data 511
+[2016-Jun-07 12:26:09.169187] <1>: Popping Data in main loop: 291
+[2016-Jun-07 12:26:09.169364] <1>: Adding data 512
+[2016-Jun-07 12:26:09.169380] <1>: Popping Data in main loop: 292
+[2016-Jun-07 12:26:09.169436] <1>: Adding data 513
+[2016-Jun-07 12:26:09.169457] <1>: Popping Data in main loop: 293
+[2016-Jun-07 12:26:09.169477] <1>: Adding data 514
+[2016-Jun-07 12:26:09.169614] <1>: Popping Data in main loop: 294
+[2016-Jun-07 12:26:09.169631] <1>: Adding data 515
+[2016-Jun-07 12:26:09.169690] <1>: Popping Data in main loop: 295
+[2016-Jun-07 12:26:09.169695] <1>: Adding data 516
+[2016-Jun-07 12:26:09.169753] <1>: Adding data 517
+[2016-Jun-07 12:26:09.169759] <1>: Popping Data in main loop: 296
+[2016-Jun-07 12:26:09.169815] <1>: Adding data 518
+[2016-Jun-07 12:26:09.169835] <1>: Popping Data in main loop: 297
+[2016-Jun-07 12:26:09.169854] <1>: Adding data 519
+[2016-Jun-07 12:26:09.169902] <1>: Popping Data in main loop: 298
+[2016-Jun-07 12:26:09.170106] <1>: Adding data 520
+[2016-Jun-07 12:26:09.170153] <1>: Adding data 521
+[2016-Jun-07 12:26:09.170186] <1>: Adding data 522
+[2016-Jun-07 12:26:09.170254] <1>: Adding data 523
+[2016-Jun-07 12:26:09.170287] <1>: Adding data 524
+[2016-Jun-07 12:26:09.170318] <1>: Adding data 525
+[2016-Jun-07 12:26:09.170349] <1>: Adding data 526
+[2016-Jun-07 12:26:09.170380] <1>: Adding data 527
+[2016-Jun-07 12:26:09.170411] <1>: Adding data 528
+[2016-Jun-07 12:26:09.170441] <1>: Adding data 529
+[2016-Jun-07 12:26:09.170477] <1>: Adding data 530
+[2016-Jun-07 12:26:09.170542] <1>: Popping Data in main loop: 299
+[2016-Jun-07 12:26:09.170549] <1>: Adding data 531
+[2016-Jun-07 12:26:09.170615] <1>: Adding data 532
+[2016-Jun-07 12:26:09.170618] <1>: Popping Data in main loop: 300
+[2016-Jun-07 12:26:09.170675] <1>: Adding data 533
+[2016-Jun-07 12:26:09.170696] <1>: Popping Data in main loop: 301
+[2016-Jun-07 12:26:09.170714] <1>: Adding data 534
+[2016-Jun-07 12:26:09.170765] <1>: Popping Data in main loop: 302
+[2016-Jun-07 12:26:09.170775] <1>: Adding data 535
+[2016-Jun-07 12:26:09.170837] <1>: Adding data 536
+[2016-Jun-07 12:26:09.170836] <1>: Popping Data in main loop: 303
+[2016-Jun-07 12:26:09.170893] <1>: Adding data 537
+[2016-Jun-07 12:26:09.170910] <1>: Popping Data in main loop: 304
+[2016-Jun-07 12:26:09.170944] <1>: Adding data 538
+[2016-Jun-07 12:26:09.170960] <1>: Popping Data in main loop: 305
+[2016-Jun-07 12:26:09.170991] <1>: Adding data 539
+[2016-Jun-07 12:26:09.171007] <1>: Popping Data in main loop: 306
+[2016-Jun-07 12:26:09.171027] <1>: Adding data 540
+[2016-Jun-07 12:26:09.171081] <1>: Popping Data in main loop: 307
+[2016-Jun-07 12:26:09.171088] <1>: Adding data 541
+[2016-Jun-07 12:26:09.171154] <1>: Popping Data in main loop: 308
+[2016-Jun-07 12:26:09.171241] <1>: Adding data 542
+[2016-Jun-07 12:26:09.171287] <1>: Adding data 543
+[2016-Jun-07 12:26:09.171299] <1>: Popping Data in main loop: 309
+[2016-Jun-07 12:26:09.171316] <1>: Adding data 544
+[2016-Jun-07 12:26:09.171371] <1>: Adding data 545
+[2016-Jun-07 12:26:09.171384] <1>: Popping Data in main loop: 310
+[2016-Jun-07 12:26:09.171443] <1>: Adding data 546
+[2016-Jun-07 12:26:09.171460] <1>: Popping Data in main loop: 311
+[2016-Jun-07 12:26:09.171518] <1>: Adding data 547
+[2016-Jun-07 12:26:09.171551] <1>: Popping Data in main loop: 312
+[2016-Jun-07 12:26:09.171558] <1>: Adding data 548
+[2016-Jun-07 12:26:09.171617] <1>: Adding data 549
+[2016-Jun-07 12:26:09.171618] <1>: Popping Data in main loop: 313
+[2016-Jun-07 12:26:09.171673] <1>: Adding data 550
+[2016-Jun-07 12:26:09.171693] <1>: Popping Data in main loop: 314
+[2016-Jun-07 12:26:09.171712] <1>: Adding data 551
+[2016-Jun-07 12:26:09.171759] <1>: Popping Data in main loop: 315
+[2016-Jun-07 12:26:09.171773] <1>: Adding data 552
+[2016-Jun-07 12:26:09.171836] <1>: Adding data 553
+[2016-Jun-07 12:26:09.171871] <1>: Adding data 554
+[2016-Jun-07 12:26:09.171886] <1>: Popping Data in main loop: 316
+[2016-Jun-07 12:26:09.171903] <1>: Adding data 555
+[2016-Jun-07 12:26:09.171961] <1>: Adding data 556
+[2016-Jun-07 12:26:09.171968] <1>: Popping Data in main loop: 317
+[2016-Jun-07 12:26:09.172029] <1>: Adding data 557
+[2016-Jun-07 12:26:09.172044] <1>: Popping Data in main loop: 318
+[2016-Jun-07 12:26:09.172101] <1>: Adding data 558
+[2016-Jun-07 12:26:09.172119] <1>: Popping Data in main loop: 319
+[2016-Jun-07 12:26:09.172174] <1>: Adding data 559
+[2016-Jun-07 12:26:09.172191] <1>: Popping Data in main loop: 320
+[2016-Jun-07 12:26:09.172264] <1>: Adding data 560
+[2016-Jun-07 12:26:09.172281] <1>: Popping Data in main loop: 321
+[2016-Jun-07 12:26:09.172337] <1>: Adding data 561
+[2016-Jun-07 12:26:09.172354] <1>: Popping Data in main loop: 322
+[2016-Jun-07 12:26:09.172389] <1>: Adding data 562
+[2016-Jun-07 12:26:09.172406] <1>: Popping Data in main loop: 323
+[2016-Jun-07 12:26:09.172424] <1>: Adding data 563
+[2016-Jun-07 12:26:09.172471] <1>: Popping Data in main loop: 324
+[2016-Jun-07 12:26:09.172485] <1>: Adding data 564
+[2016-Jun-07 12:26:09.172563] <1>: Adding data 565
+[2016-Jun-07 12:26:09.172568] <1>: Popping Data in main loop: 325
+[2016-Jun-07 12:26:09.172630] <1>: Adding data 566
+[2016-Jun-07 12:26:09.172645] <1>: Popping Data in main loop: 326
+[2016-Jun-07 12:26:09.172721] <1>: Popping Data in main loop: 327
+[2016-Jun-07 12:26:09.172783] <1>: Adding data 567
+[2016-Jun-07 12:26:09.172856] <1>: Popping Data in main loop: 328
+[2016-Jun-07 12:26:09.172900] <1>: Adding data 568
+[2016-Jun-07 12:26:09.173052] <1>: Adding data 569
+[2016-Jun-07 12:26:09.173124] <1>: Adding data 570
+[2016-Jun-07 12:26:09.172946] <1>: Popping Data in main loop: 329
+[2016-Jun-07 12:26:09.173229] <1>: Adding data 571
+[2016-Jun-07 12:26:09.173240] <1>: Popping Data in main loop: 330
+[2016-Jun-07 12:26:09.173358] <1>: Adding data 572
+[2016-Jun-07 12:26:09.173392] <1>: Popping Data in main loop: 331
+[2016-Jun-07 12:26:09.173472] <1>: Popping Data in main loop: 332
+[2016-Jun-07 12:26:09.173489] <1>: Adding data 573
+[2016-Jun-07 12:26:09.173587] <1>: Popping Data in main loop: 333
+[2016-Jun-07 12:26:09.173665] <1>: Popping Data in main loop: 334
+[2016-Jun-07 12:26:09.173671] <1>: Adding data 574
+[2016-Jun-07 12:26:09.173869] <1>: Adding data 575
+[2016-Jun-07 12:26:09.173885] <1>: Popping Data in main loop: 335
+[2016-Jun-07 12:26:09.173993] <1>: Popping Data in main loop: 336
+[2016-Jun-07 12:26:09.173991] <1>: Adding data 576
+[2016-Jun-07 12:26:09.174099] <1>: Popping Data in main loop: 337
+[2016-Jun-07 12:26:09.174113] <1>: Adding data 577
+[2016-Jun-07 12:26:09.174629] <1>: Adding data 578
+[2016-Jun-07 12:26:09.174220] <1>: Popping Data in main loop: 338
+[2016-Jun-07 12:26:09.174798] <1>: Adding data 579
+[2016-Jun-07 12:26:09.174831] <1>: Popping Data in main loop: 339
+[2016-Jun-07 12:26:09.174871] <1>: Adding data 580
+[2016-Jun-07 12:26:09.174919] <1>: Popping Data in main loop: 340
+[2016-Jun-07 12:26:09.175041] <1>: Adding data 581
+[2016-Jun-07 12:26:09.175065] <1>: Popping Data in main loop: 341
+[2016-Jun-07 12:26:09.175157] <1>: Adding data 582
+[2016-Jun-07 12:26:09.175169] <1>: Popping Data in main loop: 342
+[2016-Jun-07 12:26:09.175299] <1>: Adding data 583
+[2016-Jun-07 12:26:09.175321] <1>: Popping Data in main loop: 343
+[2016-Jun-07 12:26:09.175397] <1>: Adding data 584
+[2016-Jun-07 12:26:09.175421] <1>: Popping Data in main loop: 344
+[2016-Jun-07 12:26:09.175488] <1>: Adding data 585
+[2016-Jun-07 12:26:09.175499] <1>: Popping Data in main loop: 345
+[2016-Jun-07 12:26:09.175608] <1>: Adding data 586
+[2016-Jun-07 12:26:09.175618] <1>: Popping Data in main loop: 346
+[2016-Jun-07 12:26:09.175674] <1>: Adding data 587
+[2016-Jun-07 12:26:09.175692] <1>: Popping Data in main loop: 347
+[2016-Jun-07 12:26:09.175713] <1>: Adding data 588
+[2016-Jun-07 12:26:09.175759] <1>: Popping Data in main loop: 348
+[2016-Jun-07 12:26:09.175773] <1>: Adding data 589
+[2016-Jun-07 12:26:09.175837] <1>: Adding data 590
+[2016-Jun-07 12:26:09.175843] <1>: Popping Data in main loop: 349
+[2016-Jun-07 12:26:09.175904] <1>: Adding data 591
+[2016-Jun-07 12:26:09.175919] <1>: Popping Data in main loop: 350
+[2016-Jun-07 12:26:09.175977] <1>: Adding data 592
+[2016-Jun-07 12:26:09.175993] <1>: Popping Data in main loop: 351
+[2016-Jun-07 12:26:09.176050] <1>: Adding data 593
+[2016-Jun-07 12:26:09.176067] <1>: Popping Data in main loop: 352
+[2016-Jun-07 12:26:09.176124] <1>: Adding data 594
+[2016-Jun-07 12:26:09.176141] <1>: Popping Data in main loop: 353
+[2016-Jun-07 12:26:09.176212] <1>: Adding data 595
+[2016-Jun-07 12:26:09.176225] <1>: Popping Data in main loop: 354
+[2016-Jun-07 12:26:09.176286] <1>: Adding data 596
+[2016-Jun-07 12:26:09.176306] <1>: Popping Data in main loop: 355
+[2016-Jun-07 12:26:09.176326] <1>: Adding data 597
+[2016-Jun-07 12:26:09.176374] <1>: Popping Data in main loop: 356
+[2016-Jun-07 12:26:09.176387] <1>: Adding data 598
+[2016-Jun-07 12:26:09.176451] <1>: Adding data 599
+[2016-Jun-07 12:26:09.176455] <1>: Popping Data in main loop: 357
+[2016-Jun-07 12:26:09.176531] <1>: Adding data 600
+[2016-Jun-07 12:26:09.176550] <1>: Popping Data in main loop: 358
+[2016-Jun-07 12:26:09.176572] <1>: Adding data 601
+[2016-Jun-07 12:26:09.176619] <1>: Popping Data in main loop: 359
+[2016-Jun-07 12:26:09.176632] <1>: Adding data 602
+[2016-Jun-07 12:26:09.176696] <1>: Adding data 603
+[2016-Jun-07 12:26:09.176700] <1>: Popping Data in main loop: 360
+[2016-Jun-07 12:26:09.176755] <1>: Adding data 604
+[2016-Jun-07 12:26:09.176776] <1>: Popping Data in main loop: 361
+[2016-Jun-07 12:26:09.176795] <1>: Adding data 605
+[2016-Jun-07 12:26:09.176847] <1>: Popping Data in main loop: 362
+[2016-Jun-07 12:26:09.176855] <1>: Adding data 606
+[2016-Jun-07 12:26:09.176914] <1>: Adding data 607
+[2016-Jun-07 12:26:09.176919] <1>: Popping Data in main loop: 363
+[2016-Jun-07 12:26:09.176974] <1>: Adding data 608
+[2016-Jun-07 12:26:09.176995] <1>: Popping Data in main loop: 364
+[2016-Jun-07 12:26:09.177013] <1>: Adding data 609
+[2016-Jun-07 12:26:09.177063] <1>: Popping Data in main loop: 365
+[2016-Jun-07 12:26:09.177072] <1>: Adding data 610
+[2016-Jun-07 12:26:09.177132] <1>: Adding data 611
+[2016-Jun-07 12:26:09.177135] <1>: Popping Data in main loop: 366
+[2016-Jun-07 12:26:09.177202] <1>: Adding data 612
+[2016-Jun-07 12:26:09.177224] <1>: Popping Data in main loop: 367
+[2016-Jun-07 12:26:09.177246] <1>: Adding data 613
+[2016-Jun-07 12:26:09.177297] <1>: Popping Data in main loop: 368
+[2016-Jun-07 12:26:09.177307] <1>: Adding data 614
+[2016-Jun-07 12:26:09.177367] <1>: Adding data 615
+[2016-Jun-07 12:26:09.177370] <1>: Popping Data in main loop: 369
+[2016-Jun-07 12:26:09.177425] <1>: Adding data 616
+[2016-Jun-07 12:26:09.177447] <1>: Popping Data in main loop: 370
+[2016-Jun-07 12:26:09.177465] <1>: Adding data 617
+[2016-Jun-07 12:26:09.177532] <1>: Popping Data in main loop: 371
+[2016-Jun-07 12:26:09.177600] <1>: Adding data 618
+[2016-Jun-07 12:26:09.177608] <1>: Popping Data in main loop: 372
+[2016-Jun-07 12:26:09.177666] <1>: Adding data 619
+[2016-Jun-07 12:26:09.177740] <1>: Popping Data in main loop: 373
+[2016-Jun-07 12:26:09.177744] <1>: Adding data 620
+[2016-Jun-07 12:26:09.177815] <1>: Adding data 621
+[2016-Jun-07 12:26:09.177815] <1>: Popping Data in main loop: 374
+[2016-Jun-07 12:26:09.177872] <1>: Adding data 622
+[2016-Jun-07 12:26:09.177889] <1>: Popping Data in main loop: 375
+[2016-Jun-07 12:26:09.177924] <1>: Adding data 623
+[2016-Jun-07 12:26:09.177941] <1>: Popping Data in main loop: 376
+[2016-Jun-07 12:26:09.177960] <1>: Adding data 624
+[2016-Jun-07 12:26:09.178006] <1>: Popping Data in main loop: 377
+[2016-Jun-07 12:26:09.178022] <1>: Adding data 625
+[2016-Jun-07 12:26:09.178079] <1>: Adding data 626
+[2016-Jun-07 12:26:09.178091] <1>: Popping Data in main loop: 378
+[2016-Jun-07 12:26:09.178151] <1>: Adding data 627
+[2016-Jun-07 12:26:09.178168] <1>: Popping Data in main loop: 379
+[2016-Jun-07 12:26:09.178230] <1>: Adding data 628
+[2016-Jun-07 12:26:09.178248] <1>: Popping Data in main loop: 380
+[2016-Jun-07 12:26:09.178306] <1>: Adding data 629
+[2016-Jun-07 12:26:09.178321] <1>: Popping Data in main loop: 381
+[2016-Jun-07 12:26:09.178379] <1>: Adding data 630
+[2016-Jun-07 12:26:09.178396] <1>: Popping Data in main loop: 382
+[2016-Jun-07 12:26:09.178453] <1>: Adding data 631
+[2016-Jun-07 12:26:09.178469] <1>: Popping Data in main loop: 383
+[2016-Jun-07 12:26:09.178536] <1>: Adding data 632
+[2016-Jun-07 12:26:09.178562] <1>: Popping Data in main loop: 384
+[2016-Jun-07 12:26:09.178577] <1>: Adding data 633
+[2016-Jun-07 12:26:09.178634] <1>: Adding data 634
+[2016-Jun-07 12:26:09.178642] <1>: Popping Data in main loop: 385
+[2016-Jun-07 12:26:09.178703] <1>: Adding data 635
+[2016-Jun-07 12:26:09.178718] <1>: Popping Data in main loop: 386
+[2016-Jun-07 12:26:09.178776] <1>: Adding data 636
+[2016-Jun-07 12:26:09.178793] <1>: Popping Data in main loop: 387
+[2016-Jun-07 12:26:09.178849] <1>: Adding data 637
+[2016-Jun-07 12:26:09.178867] <1>: Popping Data in main loop: 388
+[2016-Jun-07 12:26:09.178889] <1>: Adding data 638
+[2016-Jun-07 12:26:09.178935] <1>: Popping Data in main loop: 389
+[2016-Jun-07 12:26:09.178951] <1>: Adding data 639
+[2016-Jun-07 12:26:09.179008] <1>: Adding data 640
+[2016-Jun-07 12:26:09.179020] <1>: Popping Data in main loop: 390
+[2016-Jun-07 12:26:09.179079] <1>: Adding data 641
+[2016-Jun-07 12:26:09.179096] <1>: Popping Data in main loop: 391
+[2016-Jun-07 12:26:09.179153] <1>: Adding data 642
+[2016-Jun-07 12:26:09.179170] <1>: Popping Data in main loop: 392
+[2016-Jun-07 12:26:09.179244] <1>: Popping Data in main loop: 393
+[2016-Jun-07 12:26:09.179239] <1>: Adding data 643
+[2016-Jun-07 12:26:09.179327] <1>: Popping Data in main loop: 394
+[2016-Jun-07 12:26:09.179338] <1>: Adding data 644
+[2016-Jun-07 12:26:09.179407] <1>: Adding data 645
+[2016-Jun-07 12:26:09.179413] <1>: Popping Data in main loop: 395
+[2016-Jun-07 12:26:09.179469] <1>: Adding data 646
+[2016-Jun-07 12:26:09.179489] <1>: Popping Data in main loop: 396
+[2016-Jun-07 12:26:09.179508] <1>: Adding data 647
+[2016-Jun-07 12:26:09.179581] <1>: Adding data 648
+[2016-Jun-07 12:26:09.179583] <1>: Popping Data in main loop: 397
+[2016-Jun-07 12:26:09.179643] <1>: Adding data 649
+[2016-Jun-07 12:26:09.179658] <1>: Popping Data in main loop: 398
+[2016-Jun-07 12:26:09.179720] <1>: Adding data 650
+[2016-Jun-07 12:26:09.179742] <1>: Popping Data in main loop: 399
+[2016-Jun-07 12:26:09.179760] <1>: Adding data 651
+[2016-Jun-07 12:26:09.179809] <1>: Popping Data in main loop: 400
+[2016-Jun-07 12:26:09.179819] <1>: Adding data 652
+[2016-Jun-07 12:26:09.179880] <1>: Adding data 653
+[2016-Jun-07 12:26:09.179883] <1>: Popping Data in main loop: 401
+[2016-Jun-07 12:26:09.179938] <1>: Adding data 654
+[2016-Jun-07 12:26:09.179959] <1>: Popping Data in main loop: 402
+[2016-Jun-07 12:26:09.179978] <1>: Adding data 655
+[2016-Jun-07 12:26:09.180026] <1>: Popping Data in main loop: 403
+[2016-Jun-07 12:26:09.180038] <1>: Adding data 656
+[2016-Jun-07 12:26:09.180102] <1>: Adding data 657
+[2016-Jun-07 12:26:09.180106] <1>: Popping Data in main loop: 404
+[2016-Jun-07 12:26:09.180161] <1>: Adding data 658
+[2016-Jun-07 12:26:09.180181] <1>: Popping Data in main loop: 405
+[2016-Jun-07 12:26:09.180230] <1>: Adding data 659
+[2016-Jun-07 12:26:09.180278] <1>: Popping Data in main loop: 406
+[2016-Jun-07 12:26:09.180425] <1>: Adding data 660
+[2016-Jun-07 12:26:09.180464] <1>: Adding data 661
+[2016-Jun-07 12:26:09.180465] <1>: Popping Data in main loop: 407
+[2016-Jun-07 12:26:09.180575] <1>: Popping Data in main loop: 408
+[2016-Jun-07 12:26:09.180573] <1>: Adding data 662
+[2016-Jun-07 12:26:09.180658] <1>: Adding data 663
+[2016-Jun-07 12:26:09.180660] <1>: Popping Data in main loop: 409
+[2016-Jun-07 12:26:09.180715] <1>: Adding data 664
+[2016-Jun-07 12:26:09.180735] <1>: Popping Data in main loop: 410
+[2016-Jun-07 12:26:09.180755] <1>: Adding data 665
+[2016-Jun-07 12:26:09.180802] <1>: Popping Data in main loop: 411
+[2016-Jun-07 12:26:09.180816] <1>: Adding data 666
+[2016-Jun-07 12:26:09.180878] <1>: Adding data 667
+[2016-Jun-07 12:26:09.180881] <1>: Popping Data in main loop: 412
+[2016-Jun-07 12:26:09.180937] <1>: Adding data 668
+[2016-Jun-07 12:26:09.180958] <1>: Popping Data in main loop: 413
+[2016-Jun-07 12:26:09.180976] <1>: Adding data 669
+[2016-Jun-07 12:26:09.181026] <1>: Popping Data in main loop: 414
+[2016-Jun-07 12:26:09.181035] <1>: Adding data 670
+[2016-Jun-07 12:26:09.181096] <1>: Adding data 671
+[2016-Jun-07 12:26:09.181099] <1>: Popping Data in main loop: 415
+[2016-Jun-07 12:26:09.181155] <1>: Adding data 672
+[2016-Jun-07 12:26:09.181176] <1>: Popping Data in main loop: 416
+[2016-Jun-07 12:26:09.181215] <1>: Adding data 673
+[2016-Jun-07 12:26:09.181260] <1>: Popping Data in main loop: 417
+[2016-Jun-07 12:26:09.181282] <1>: Adding data 674
+[2016-Jun-07 12:26:09.181332] <1>: Popping Data in main loop: 418
+[2016-Jun-07 12:26:09.181342] <1>: Adding data 675
+[2016-Jun-07 12:26:09.181404] <1>: Adding data 676
+[2016-Jun-07 12:26:09.181404] <1>: Popping Data in main loop: 419
+[2016-Jun-07 12:26:09.181458] <1>: Adding data 677
+[2016-Jun-07 12:26:09.181477] <1>: Popping Data in main loop: 420
+[2016-Jun-07 12:26:09.181496] <1>: Adding data 678
+[2016-Jun-07 12:26:09.181560] <1>: Popping Data in main loop: 421
+[2016-Jun-07 12:26:09.181571] <1>: Adding data 679
+[2016-Jun-07 12:26:09.181633] <1>: Adding data 680
+[2016-Jun-07 12:26:09.181633] <1>: Popping Data in main loop: 422
+[2016-Jun-07 12:26:09.181688] <1>: Adding data 681
+[2016-Jun-07 12:26:09.181705] <1>: Popping Data in main loop: 423
+[2016-Jun-07 12:26:09.181740] <1>: Adding data 682
+[2016-Jun-07 12:26:09.181756] <1>: Popping Data in main loop: 424
+[2016-Jun-07 12:26:09.181776] <1>: Adding data 683
+[2016-Jun-07 12:26:09.181822] <1>: Popping Data in main loop: 425
+[2016-Jun-07 12:26:09.181837] <1>: Adding data 684
+[2016-Jun-07 12:26:09.181898] <1>: Adding data 685
+[2016-Jun-07 12:26:09.181902] <1>: Popping Data in main loop: 426
+[2016-Jun-07 12:26:09.181958] <1>: Adding data 686
+[2016-Jun-07 12:26:09.181979] <1>: Popping Data in main loop: 427
+[2016-Jun-07 12:26:09.181998] <1>: Adding data 687
+[2016-Jun-07 12:26:09.182054] <1>: Popping Data in main loop: 428
+[2016-Jun-07 12:26:09.182057] <1>: Adding data 688
+[2016-Jun-07 12:26:09.182110] <1>: Adding data 689
+[2016-Jun-07 12:26:09.182127] <1>: Popping Data in main loop: 429
+[2016-Jun-07 12:26:09.182184] <1>: Adding data 690
+[2016-Jun-07 12:26:09.182218] <1>: Popping Data in main loop: 430
+[2016-Jun-07 12:26:09.182276] <1>: Adding data 691
+[2016-Jun-07 12:26:09.182295] <1>: Popping Data in main loop: 431
+[2016-Jun-07 12:26:09.182316] <1>: Adding data 692
+[2016-Jun-07 12:26:09.182362] <1>: Popping Data in main loop: 432
+[2016-Jun-07 12:26:09.182376] <1>: Adding data 693
+[2016-Jun-07 12:26:09.182438] <1>: Adding data 694
+[2016-Jun-07 12:26:09.182441] <1>: Popping Data in main loop: 433
+[2016-Jun-07 12:26:09.182522] <1>: Adding data 695
+[2016-Jun-07 12:26:09.182547] <1>: Popping Data in main loop: 434
+[2016-Jun-07 12:26:09.182563] <1>: Adding data 696
+[2016-Jun-07 12:26:09.182616] <1>: Popping Data in main loop: 435
+[2016-Jun-07 12:26:09.182619] <1>: Adding data 697
+[2016-Jun-07 12:26:09.182678] <1>: Adding data 698
+[2016-Jun-07 12:26:09.182687] <1>: Popping Data in main loop: 436
+[2016-Jun-07 12:26:09.182775] <1>: Adding data 699
+[2016-Jun-07 12:26:09.182816] <1>: Adding data 700
+[2016-Jun-07 12:26:09.182813] <1>: Popping Data in main loop: 437
+[2016-Jun-07 12:26:09.182872] <1>: Adding data 701
+[2016-Jun-07 12:26:09.182910] <1>: Adding data 702
+[2016-Jun-07 12:26:09.182936] <1>: Popping Data in main loop: 438
+[2016-Jun-07 12:26:09.182942] <1>: Adding data 703
+[2016-Jun-07 12:26:09.182973] <1>: Adding data 704
+[2016-Jun-07 12:26:09.183011] <1>: Popping Data in main loop: 439
+[2016-Jun-07 12:26:09.183033] <1>: Adding data 705
+[2016-Jun-07 12:26:09.183083] <1>: Popping Data in main loop: 440
+[2016-Jun-07 12:26:09.183092] <1>: Adding data 706
+[2016-Jun-07 12:26:09.183152] <1>: Adding data 707
+[2016-Jun-07 12:26:09.183154] <1>: Popping Data in main loop: 441
+[2016-Jun-07 12:26:09.183221] <1>: Adding data 708
+[2016-Jun-07 12:26:09.183244] <1>: Popping Data in main loop: 442
+[2016-Jun-07 12:26:09.183261] <1>: Adding data 709
+[2016-Jun-07 12:26:09.183312] <1>: Popping Data in main loop: 443
+[2016-Jun-07 12:26:09.183318] <1>: Adding data 710
+[2016-Jun-07 12:26:09.183378] <1>: Adding data 711
+[2016-Jun-07 12:26:09.183384] <1>: Popping Data in main loop: 444
+[2016-Jun-07 12:26:09.183440] <1>: Adding data 712
+[2016-Jun-07 12:26:09.183459] <1>: Popping Data in main loop: 445
+[2016-Jun-07 12:26:09.183480] <1>: Adding data 713
+[2016-Jun-07 12:26:09.183543] <1>: Popping Data in main loop: 446
+[2016-Jun-07 12:26:09.183606] <1>: Adding data 714
+[2016-Jun-07 12:26:09.183618] <1>: Popping Data in main loop: 447
+[2016-Jun-07 12:26:09.183675] <1>: Adding data 715
+[2016-Jun-07 12:26:09.183695] <1>: Popping Data in main loop: 448
+[2016-Jun-07 12:26:09.183715] <1>: Adding data 716
+[2016-Jun-07 12:26:09.183763] <1>: Popping Data in main loop: 449
+[2016-Jun-07 12:26:09.183775] <1>: Adding data 717
+[2016-Jun-07 12:26:09.183839] <1>: Adding data 718
+[2016-Jun-07 12:26:09.183842] <1>: Popping Data in main loop: 450
+[2016-Jun-07 12:26:09.183898] <1>: Adding data 719
+[2016-Jun-07 12:26:09.183920] <1>: Popping Data in main loop: 451
+[2016-Jun-07 12:26:09.183938] <1>: Adding data 720
+[2016-Jun-07 12:26:09.183988] <1>: Popping Data in main loop: 452
+[2016-Jun-07 12:26:09.183998] <1>: Adding data 721
+[2016-Jun-07 12:26:09.184059] <1>: Adding data 722
+[2016-Jun-07 12:26:09.184060] <1>: Popping Data in main loop: 453
+[2016-Jun-07 12:26:09.184116] <1>: Adding data 723
+[2016-Jun-07 12:26:09.184137] <1>: Popping Data in main loop: 454
+[2016-Jun-07 12:26:09.184155] <1>: Adding data 724
+[2016-Jun-07 12:26:09.184217] <1>: Popping Data in main loop: 455
+[2016-Jun-07 12:26:09.184228] <1>: Adding data 725
+[2016-Jun-07 12:26:09.184290] <1>: Adding data 726
+[2016-Jun-07 12:26:09.184291] <1>: Popping Data in main loop: 456
+[2016-Jun-07 12:26:09.184348] <1>: Adding data 727
+[2016-Jun-07 12:26:09.184369] <1>: Popping Data in main loop: 457
+[2016-Jun-07 12:26:09.184387] <1>: Adding data 728
+[2016-Jun-07 12:26:09.184445] <1>: Popping Data in main loop: 458
+[2016-Jun-07 12:26:09.184447] <1>: Adding data 729
+[2016-Jun-07 12:26:09.184482] <1>: Adding data 730
+[2016-Jun-07 12:26:09.184534] <1>: Popping Data in main loop: 459
+[2016-Jun-07 12:26:09.184559] <1>: Adding data 731
+[2016-Jun-07 12:26:09.184607] <1>: Popping Data in main loop: 460
+[2016-Jun-07 12:26:09.184621] <1>: Adding data 732
+[2016-Jun-07 12:26:09.184684] <1>: Adding data 733
+[2016-Jun-07 12:26:09.184690] <1>: Popping Data in main loop: 461
+[2016-Jun-07 12:26:09.184751] <1>: Adding data 734
+[2016-Jun-07 12:26:09.184765] <1>: Popping Data in main loop: 462
+[2016-Jun-07 12:26:09.184823] <1>: Adding data 735
+[2016-Jun-07 12:26:09.184840] <1>: Popping Data in main loop: 463
+[2016-Jun-07 12:26:09.184895] <1>: Adding data 736
+[2016-Jun-07 12:26:09.184914] <1>: Popping Data in main loop: 464
+[2016-Jun-07 12:26:09.184947] <1>: Adding data 737
+[2016-Jun-07 12:26:09.184963] <1>: Popping Data in main loop: 465
+[2016-Jun-07 12:26:09.184982] <1>: Adding data 738
+[2016-Jun-07 12:26:09.185028] <1>: Popping Data in main loop: 466
+[2016-Jun-07 12:26:09.185043] <1>: Adding data 739
+[2016-Jun-07 12:26:09.185105] <1>: Adding data 740
+[2016-Jun-07 12:26:09.185107] <1>: Popping Data in main loop: 467
+[2016-Jun-07 12:26:09.185163] <1>: Adding data 741
+[2016-Jun-07 12:26:09.185184] <1>: Popping Data in main loop: 468
+[2016-Jun-07 12:26:09.185223] <1>: Adding data 742
+[2016-Jun-07 12:26:09.185267] <1>: Popping Data in main loop: 469
+[2016-Jun-07 12:26:09.185290] <1>: Adding data 743
+[2016-Jun-07 12:26:09.185341] <1>: Popping Data in main loop: 470
+[2016-Jun-07 12:26:09.185351] <1>: Adding data 744
+[2016-Jun-07 12:26:09.185411] <1>: Adding data 745
+[2016-Jun-07 12:26:09.185413] <1>: Popping Data in main loop: 471
+[2016-Jun-07 12:26:09.185487] <1>: Adding data 746
+[2016-Jun-07 12:26:09.185520] <1>: Popping Data in main loop: 472
+[2016-Jun-07 12:26:09.185528] <1>: Adding data 747
+[2016-Jun-07 12:26:09.188679] <1>: Adding data 748
+[2016-Jun-07 12:26:09.188812] <1>: Adding data 749
+[2016-Jun-07 12:26:09.188848] <1>: Adding data 750
+[2016-Jun-07 12:26:09.188881] <1>: Adding data 751
+[2016-Jun-07 12:26:09.188913] <1>: Adding data 752
+[2016-Jun-07 12:26:09.188945] <1>: Adding data 753
+[2016-Jun-07 12:26:09.188977] <1>: Adding data 754
+[2016-Jun-07 12:26:09.189009] <1>: Adding data 755
+[2016-Jun-07 12:26:09.189041] <1>: Adding data 756
+[2016-Jun-07 12:26:09.189075] <1>: Adding data 757
+[2016-Jun-07 12:26:09.189110] <1>: Adding data 758
+[2016-Jun-07 12:26:09.189144] <1>: Adding data 759
+[2016-Jun-07 12:26:09.189176] <1>: Adding data 760
+[2016-Jun-07 12:26:09.189261] <1>: Adding data 761
+[2016-Jun-07 12:26:09.189299] <1>: Adding data 762
+[2016-Jun-07 12:26:09.189330] <1>: Adding data 763
+[2016-Jun-07 12:26:09.189362] <1>: Adding data 764
+[2016-Jun-07 12:26:09.189392] <1>: Adding data 765
+[2016-Jun-07 12:26:09.189424] <1>: Adding data 766
+[2016-Jun-07 12:26:09.189454] <1>: Adding data 767
+[2016-Jun-07 12:26:09.189485] <1>: Adding data 768
+[2016-Jun-07 12:26:09.189516] <1>: Adding data 769
+[2016-Jun-07 12:26:09.189546] <1>: Adding data 770
+[2016-Jun-07 12:26:09.189577] <1>: Adding data 771
+[2016-Jun-07 12:26:09.189608] <1>: Adding data 772
+[2016-Jun-07 12:26:09.189639] <1>: Adding data 773
+[2016-Jun-07 12:26:09.189671] <1>: Adding data 774
+[2016-Jun-07 12:26:09.189702] <1>: Adding data 775
+[2016-Jun-07 12:26:09.189733] <1>: Adding data 776
+[2016-Jun-07 12:26:09.189764] <1>: Adding data 777
+[2016-Jun-07 12:26:09.189795] <1>: Adding data 778
+[2016-Jun-07 12:26:09.189825] <1>: Adding data 779
+[2016-Jun-07 12:26:09.189856] <1>: Adding data 780
+[2016-Jun-07 12:26:09.189888] <1>: Adding data 781
+[2016-Jun-07 12:26:09.189919] <1>: Adding data 782
+[2016-Jun-07 12:26:09.189949] <1>: Adding data 783
+[2016-Jun-07 12:26:09.189980] <1>: Adding data 784
+[2016-Jun-07 12:26:09.190011] <1>: Adding data 785
+[2016-Jun-07 12:26:09.190042] <1>: Adding data 786
+[2016-Jun-07 12:26:09.190073] <1>: Adding data 787
+[2016-Jun-07 12:26:09.190104] <1>: Adding data 788
+[2016-Jun-07 12:26:09.190134] <1>: Adding data 789
+[2016-Jun-07 12:26:09.190165] <1>: Adding data 790
+[2016-Jun-07 12:26:09.190255] <1>: Adding data 791
+[2016-Jun-07 12:26:09.190297] <1>: Adding data 792
+[2016-Jun-07 12:26:09.190347] <1>: Adding data 793
+[2016-Jun-07 12:26:09.190382] <1>: Adding data 794
+[2016-Jun-07 12:26:09.190414] <1>: Adding data 795
+[2016-Jun-07 12:26:09.190445] <1>: Adding data 796
+[2016-Jun-07 12:26:09.190476] <1>: Adding data 797
+[2016-Jun-07 12:26:09.190507] <1>: Adding data 798
+[2016-Jun-07 12:26:09.190538] <1>: Adding data 799
+[2016-Jun-07 12:26:09.190568] <1>: Adding data 800
+[2016-Jun-07 12:26:09.190599] <1>: Adding data 801
+[2016-Jun-07 12:26:09.190630] <1>: Adding data 802
+[2016-Jun-07 12:26:09.190661] <1>: Adding data 803
+[2016-Jun-07 12:26:09.190692] <1>: Adding data 804
+[2016-Jun-07 12:26:09.190723] <1>: Adding data 805
+[2016-Jun-07 12:26:09.190754] <1>: Adding data 806
+[2016-Jun-07 12:26:09.190784] <1>: Adding data 807
+[2016-Jun-07 12:26:09.190815] <1>: Adding data 808
+[2016-Jun-07 12:26:09.190846] <1>: Adding data 809
+[2016-Jun-07 12:26:09.190877] <1>: Adding data 810
+[2016-Jun-07 12:26:09.190908] <1>: Adding data 811
+[2016-Jun-07 12:26:09.191051] <1>: Adding data 812
+[2016-Jun-07 12:26:09.191092] <1>: Adding data 813
+[2016-Jun-07 12:26:09.191124] <1>: Adding data 814
+[2016-Jun-07 12:26:09.191156] <1>: Adding data 815
+[2016-Jun-07 12:26:09.191187] <1>: Adding data 816
+[2016-Jun-07 12:26:09.191331] <1>: Adding data 817
+[2016-Jun-07 12:26:09.191389] <1>: Adding data 818
+[2016-Jun-07 12:26:09.191441] <1>: Adding data 819
+[2016-Jun-07 12:26:09.191495] <1>: Adding data 820
+[2016-Jun-07 12:26:09.191769] <1>: Adding data 821
+[2016-Jun-07 12:26:09.191955] <1>: Adding data 822
+[2016-Jun-07 12:26:09.192066] <1>: Adding data 823
+[2016-Jun-07 12:26:09.192140] <1>: Adding data 824
+[2016-Jun-07 12:26:09.192231] <1>: Adding data 825
+[2016-Jun-07 12:26:09.192299] <1>: Adding data 826
+[2016-Jun-07 12:26:09.192452] <1>: Adding data 827
+[2016-Jun-07 12:26:09.192606] <1>: Adding data 828
+[2016-Jun-07 12:26:09.192674] <1>: Adding data 829
+[2016-Jun-07 12:26:09.192766] <1>: Adding data 830
+[2016-Jun-07 12:26:09.185591] <1>: Popping Data in main loop: 473
+[2016-Jun-07 12:26:09.193093] <1>: Adding data 831
+[2016-Jun-07 12:26:09.193129] <1>: Popping Data in main loop: 474
+[2016-Jun-07 12:26:09.193264] <1>: Popping Data in main loop: 475
+[2016-Jun-07 12:26:09.193282] <1>: Adding data 832
+[2016-Jun-07 12:26:09.193338] <1>: Popping Data in main loop: 476
+[2016-Jun-07 12:26:09.193356] <1>: Adding data 833
+[2016-Jun-07 12:26:09.193419] <1>: Adding data 834
+[2016-Jun-07 12:26:09.193426] <1>: Popping Data in main loop: 477
+[2016-Jun-07 12:26:09.193496] <1>: Adding data 835
+[2016-Jun-07 12:26:09.193518] <1>: Popping Data in main loop: 478
+[2016-Jun-07 12:26:09.193537] <1>: Adding data 836
+[2016-Jun-07 12:26:09.193586] <1>: Popping Data in main loop: 479
+[2016-Jun-07 12:26:09.193598] <1>: Adding data 837
+[2016-Jun-07 12:26:09.193661] <1>: Adding data 838
+[2016-Jun-07 12:26:09.193661] <1>: Popping Data in main loop: 480
+[2016-Jun-07 12:26:09.193715] <1>: Adding data 839
+[2016-Jun-07 12:26:09.193736] <1>: Popping Data in main loop: 481
+[2016-Jun-07 12:26:09.193755] <1>: Adding data 840
+[2016-Jun-07 12:26:09.193804] <1>: Popping Data in main loop: 482
+[2016-Jun-07 12:26:09.193815] <1>: Adding data 841
+[2016-Jun-07 12:26:09.193876] <1>: Adding data 842
+[2016-Jun-07 12:26:09.193881] <1>: Popping Data in main loop: 483
+[2016-Jun-07 12:26:09.193943] <1>: Adding data 843
+[2016-Jun-07 12:26:09.193956] <1>: Popping Data in main loop: 484
+[2016-Jun-07 12:26:09.194018] <1>: Adding data 844
+[2016-Jun-07 12:26:09.194031] <1>: Popping Data in main loop: 485
+[2016-Jun-07 12:26:09.194091] <1>: Adding data 845
+[2016-Jun-07 12:26:09.194106] <1>: Popping Data in main loop: 486
+[2016-Jun-07 12:26:09.194165] <1>: Adding data 846
+[2016-Jun-07 12:26:09.194406] <1>: Popping Data in main loop: 487
+[2016-Jun-07 12:26:09.194459] <1>: Adding data 847
+[2016-Jun-07 12:26:09.194493] <1>: Popping Data in main loop: 488
+[2016-Jun-07 12:26:09.194619] <1>: Popping Data in main loop: 489
+[2016-Jun-07 12:26:09.194616] <1>: Adding data 848
+[2016-Jun-07 12:26:09.194729] <1>: Popping Data in main loop: 490
+[2016-Jun-07 12:26:09.194735] <1>: Adding data 849
+[2016-Jun-07 12:26:09.194841] <1>: Popping Data in main loop: 491
+[2016-Jun-07 12:26:09.194859] <1>: Adding data 850
+[2016-Jun-07 12:26:09.194919] <1>: Popping Data in main loop: 492
+[2016-Jun-07 12:26:09.194993] <1>: Popping Data in main loop: 493
+[2016-Jun-07 12:26:09.194994] <1>: Adding data 851
+[2016-Jun-07 12:26:09.195098] <1>: Popping Data in main loop: 494
+[2016-Jun-07 12:26:09.195119] <1>: Adding data 852
+[2016-Jun-07 12:26:09.195177] <1>: Popping Data in main loop: 495
+[2016-Jun-07 12:26:09.195263] <1>: Popping Data in main loop: 496
+[2016-Jun-07 12:26:09.195265] <1>: Adding data 853
+[2016-Jun-07 12:26:09.195377] <1>: Popping Data in main loop: 497
+[2016-Jun-07 12:26:09.195381] <1>: Adding data 854
+[2016-Jun-07 12:26:09.195533] <1>: Popping Data in main loop: 498
+[2016-Jun-07 12:26:09.195574] <1>: Adding data 855
+[2016-Jun-07 12:26:09.195675] <1>: Adding data 856
+[2016-Jun-07 12:26:09.195757] <1>: Adding data 857
+[2016-Jun-07 12:26:09.195848] <1>: Popping Data in main loop: 499
+[2016-Jun-07 12:26:09.195850] <1>: Adding data 858
+[2016-Jun-07 12:26:09.196022] <1>: Adding data 859
+[2016-Jun-07 12:26:09.195925] <1>: Popping Data in main loop: 500
+[2016-Jun-07 12:26:09.196081] <1>: Adding data 860
+[2016-Jun-07 12:26:09.196103] <1>: Popping Data in main loop: 501
+[2016-Jun-07 12:26:09.196121] <1>: Adding data 861
+[2016-Jun-07 12:26:09.196178] <1>: Adding data 862
+[2016-Jun-07 12:26:09.196189] <1>: Popping Data in main loop: 502
+[2016-Jun-07 12:26:09.196260] <1>: Adding data 863
+[2016-Jun-07 12:26:09.196281] <1>: Popping Data in main loop: 503
+[2016-Jun-07 12:26:09.196300] <1>: Adding data 864
+[2016-Jun-07 12:26:09.196349] <1>: Popping Data in main loop: 504
+[2016-Jun-07 12:26:09.196360] <1>: Adding data 865
+[2016-Jun-07 12:26:09.196421] <1>: Adding data 866
+[2016-Jun-07 12:26:09.196455] <1>: Adding data 867
+[2016-Jun-07 12:26:09.196487] <1>: Adding data 868
+[2016-Jun-07 12:26:09.196488] <1>: Popping Data in main loop: 505
+[2016-Jun-07 12:26:09.196559] <1>: Adding data 869
+[2016-Jun-07 12:26:09.196568] <1>: Popping Data in main loop: 506
+[2016-Jun-07 12:26:09.196623] <1>: Adding data 870
+[2016-Jun-07 12:26:09.196643] <1>: Popping Data in main loop: 507
+[2016-Jun-07 12:26:09.196662] <1>: Adding data 871
+[2016-Jun-07 12:26:09.196710] <1>: Popping Data in main loop: 508
+[2016-Jun-07 12:26:09.196723] <1>: Adding data 872
+[2016-Jun-07 12:26:09.196787] <1>: Adding data 873
+[2016-Jun-07 12:26:09.196790] <1>: Popping Data in main loop: 509
+[2016-Jun-07 12:26:09.196852] <1>: Adding data 874
+[2016-Jun-07 12:26:09.196867] <1>: Popping Data in main loop: 510
+[2016-Jun-07 12:26:09.196924] <1>: Adding data 875
+[2016-Jun-07 12:26:09.196944] <1>: Popping Data in main loop: 511
+[2016-Jun-07 12:26:09.196965] <1>: Adding data 876
+[2016-Jun-07 12:26:09.197011] <1>: Popping Data in main loop: 512
+[2016-Jun-07 12:26:09.197026] <1>: Adding data 877
+[2016-Jun-07 12:26:09.197085] <1>: Adding data 878
+[2016-Jun-07 12:26:09.197098] <1>: Popping Data in main loop: 513
+[2016-Jun-07 12:26:09.197157] <1>: Adding data 879
+[2016-Jun-07 12:26:09.197233] <1>: Adding data 880
+[2016-Jun-07 12:26:09.197269] <1>: Adding data 881
+[2016-Jun-07 12:26:09.197267] <1>: Popping Data in main loop: 514
+[2016-Jun-07 12:26:09.197353] <1>: Adding data 882
+[2016-Jun-07 12:26:09.197380] <1>: Popping Data in main loop: 515
+[2016-Jun-07 12:26:09.197394] <1>: Adding data 883
+[2016-Jun-07 12:26:09.197450] <1>: Adding data 884
+[2016-Jun-07 12:26:09.197462] <1>: Popping Data in main loop: 516
+[2016-Jun-07 12:26:09.197551] <1>: Adding data 885
+[2016-Jun-07 12:26:09.197568] <1>: Popping Data in main loop: 517
+[2016-Jun-07 12:26:09.197626] <1>: Adding data 886
+[2016-Jun-07 12:26:09.197652] <1>: Popping Data in main loop: 518
+[2016-Jun-07 12:26:09.197666] <1>: Adding data 887
+[2016-Jun-07 12:26:09.197722] <1>: Adding data 888
+[2016-Jun-07 12:26:09.197733] <1>: Popping Data in main loop: 519
+[2016-Jun-07 12:26:09.197792] <1>: Adding data 889
+[2016-Jun-07 12:26:09.197811] <1>: Popping Data in main loop: 520
+[2016-Jun-07 12:26:09.197844] <1>: Adding data 890
+[2016-Jun-07 12:26:09.197861] <1>: Popping Data in main loop: 521
+[2016-Jun-07 12:26:09.197880] <1>: Adding data 891
+[2016-Jun-07 12:26:09.197927] <1>: Popping Data in main loop: 522
+[2016-Jun-07 12:26:09.197942] <1>: Adding data 892
+[2016-Jun-07 12:26:09.198001] <1>: Adding data 893
+[2016-Jun-07 12:26:09.198011] <1>: Popping Data in main loop: 523
+[2016-Jun-07 12:26:09.198071] <1>: Adding data 894
+[2016-Jun-07 12:26:09.198089] <1>: Popping Data in main loop: 524
+[2016-Jun-07 12:26:09.198123] <1>: Adding data 895
+[2016-Jun-07 12:26:09.198139] <1>: Popping Data in main loop: 525
+[2016-Jun-07 12:26:09.198159] <1>: Adding data 896
+[2016-Jun-07 12:26:09.198218] <1>: Popping Data in main loop: 526
+[2016-Jun-07 12:26:09.198231] <1>: Adding data 897
+[2016-Jun-07 12:26:09.198295] <1>: Adding data 898
+[2016-Jun-07 12:26:09.198298] <1>: Popping Data in main loop: 527
+[2016-Jun-07 12:26:09.198354] <1>: Adding data 899
+[2016-Jun-07 12:26:09.198375] <1>: Popping Data in main loop: 528
+[2016-Jun-07 12:26:09.198393] <1>: Adding data 900
+[2016-Jun-07 12:26:09.198443] <1>: Popping Data in main loop: 529
+[2016-Jun-07 12:26:09.198552] <1>: Adding data 901
+[2016-Jun-07 12:26:09.198588] <1>: Popping Data in main loop: 530
+[2016-Jun-07 12:26:09.198594] <1>: Adding data 902
+[2016-Jun-07 12:26:09.198626] <1>: Adding data 903
+[2016-Jun-07 12:26:09.198662] <1>: Popping Data in main loop: 531
+[2016-Jun-07 12:26:09.198687] <1>: Adding data 904
+[2016-Jun-07 12:26:09.198734] <1>: Popping Data in main loop: 532
+[2016-Jun-07 12:26:09.198747] <1>: Adding data 905
+[2016-Jun-07 12:26:09.198811] <1>: Adding data 906
+[2016-Jun-07 12:26:09.198814] <1>: Popping Data in main loop: 533
+[2016-Jun-07 12:26:09.198870] <1>: Adding data 907
+[2016-Jun-07 12:26:09.198891] <1>: Popping Data in main loop: 534
+[2016-Jun-07 12:26:09.198909] <1>: Adding data 908
+[2016-Jun-07 12:26:09.198960] <1>: Popping Data in main loop: 535
+[2016-Jun-07 12:26:09.198968] <1>: Adding data 909
+[2016-Jun-07 12:26:09.199029] <1>: Adding data 910
+[2016-Jun-07 12:26:09.199032] <1>: Popping Data in main loop: 536
+[2016-Jun-07 12:26:09.199088] <1>: Adding data 911
+[2016-Jun-07 12:26:09.199110] <1>: Popping Data in main loop: 537
+[2016-Jun-07 12:26:09.199127] <1>: Adding data 912
+[2016-Jun-07 12:26:09.199180] <1>: Popping Data in main loop: 538
+[2016-Jun-07 12:26:09.199184] <1>: Adding data 913
+[2016-Jun-07 12:26:09.199278] <1>: Adding data 914
+[2016-Jun-07 12:26:09.199277] <1>: Popping Data in main loop: 539
+[2016-Jun-07 12:26:09.199333] <1>: Adding data 915
+[2016-Jun-07 12:26:09.199351] <1>: Popping Data in main loop: 540
+[2016-Jun-07 12:26:09.199371] <1>: Adding data 916
+[2016-Jun-07 12:26:09.199417] <1>: Popping Data in main loop: 541
+[2016-Jun-07 12:26:09.199431] <1>: Adding data 917
+[2016-Jun-07 12:26:09.199507] <1>: Adding data 918
+[2016-Jun-07 12:26:09.199513] <1>: Popping Data in main loop: 542
+[2016-Jun-07 12:26:09.199575] <1>: Adding data 919
+[2016-Jun-07 12:26:09.199615] <1>: Adding data 920
+[2016-Jun-07 12:26:09.199619] <1>: Popping Data in main loop: 543
+[2016-Jun-07 12:26:09.199680] <1>: Adding data 921
+[2016-Jun-07 12:26:09.199696] <1>: Popping Data in main loop: 544
+[2016-Jun-07 12:26:09.199751] <1>: Adding data 922
+[2016-Jun-07 12:26:09.199771] <1>: Popping Data in main loop: 545
+[2016-Jun-07 12:26:09.199792] <1>: Adding data 923
+[2016-Jun-07 12:26:09.199838] <1>: Popping Data in main loop: 546
+[2016-Jun-07 12:26:09.199852] <1>: Adding data 924
+[2016-Jun-07 12:26:09.199914] <1>: Adding data 925
+[2016-Jun-07 12:26:09.199918] <1>: Popping Data in main loop: 547
+[2016-Jun-07 12:26:09.199972] <1>: Adding data 926
+[2016-Jun-07 12:26:09.199993] <1>: Popping Data in main loop: 548
+[2016-Jun-07 12:26:09.200011] <1>: Adding data 927
+[2016-Jun-07 12:26:09.200069] <1>: Popping Data in main loop: 549
+[2016-Jun-07 12:26:09.200071] <1>: Adding data 928
+[2016-Jun-07 12:26:09.200107] <1>: Adding data 929
+[2016-Jun-07 12:26:09.200141] <1>: Popping Data in main loop: 550
+[2016-Jun-07 12:26:09.200221] <1>: Adding data 930
+[2016-Jun-07 12:26:09.200237] <1>: Popping Data in main loop: 551
+[2016-Jun-07 12:26:09.200295] <1>: Adding data 931
+[2016-Jun-07 12:26:09.200317] <1>: Popping Data in main loop: 552
+[2016-Jun-07 12:26:09.200335] <1>: Adding data 932
+[2016-Jun-07 12:26:09.200386] <1>: Popping Data in main loop: 553
+[2016-Jun-07 12:26:09.200395] <1>: Adding data 933
+[2016-Jun-07 12:26:09.200456] <1>: Adding data 934
+[2016-Jun-07 12:26:09.200458] <1>: Popping Data in main loop: 554
+[2016-Jun-07 12:26:09.200525] <1>: Adding data 935
+[2016-Jun-07 12:26:09.200564] <1>: Popping Data in main loop: 555
+[2016-Jun-07 12:26:09.200568] <1>: Adding data 936
+[2016-Jun-07 12:26:09.200622] <1>: Adding data 937
+[2016-Jun-07 12:26:09.200633] <1>: Popping Data in main loop: 556
+[2016-Jun-07 12:26:09.200692] <1>: Adding data 938
+[2016-Jun-07 12:26:09.200708] <1>: Popping Data in main loop: 557
+[2016-Jun-07 12:26:09.200764] <1>: Adding data 939
+[2016-Jun-07 12:26:09.200783] <1>: Popping Data in main loop: 558
+[2016-Jun-07 12:26:09.200804] <1>: Adding data 940
+[2016-Jun-07 12:26:09.200850] <1>: Popping Data in main loop: 559
+[2016-Jun-07 12:26:09.200864] <1>: Adding data 941
+[2016-Jun-07 12:26:09.200926] <1>: Adding data 942
+[2016-Jun-07 12:26:09.200930] <1>: Popping Data in main loop: 560
+[2016-Jun-07 12:26:09.200985] <1>: Adding data 943
+[2016-Jun-07 12:26:09.201006] <1>: Popping Data in main loop: 561
+[2016-Jun-07 12:26:09.201024] <1>: Adding data 944
+[2016-Jun-07 12:26:09.201075] <1>: Popping Data in main loop: 562
+[2016-Jun-07 12:26:09.201083] <1>: Adding data 945
+[2016-Jun-07 12:26:09.201143] <1>: Adding data 946
+[2016-Jun-07 12:26:09.201147] <1>: Popping Data in main loop: 563
+[2016-Jun-07 12:26:09.201229] <1>: Adding data 947
+[2016-Jun-07 12:26:09.201252] <1>: Popping Data in main loop: 564
+[2016-Jun-07 12:26:09.201271] <1>: Adding data 948
+[2016-Jun-07 12:26:09.201324] <1>: Popping Data in main loop: 565
+[2016-Jun-07 12:26:09.201329] <1>: Adding data 949
+[2016-Jun-07 12:26:09.201389] <1>: Adding data 950
+[2016-Jun-07 12:26:09.201396] <1>: Popping Data in main loop: 566
+[2016-Jun-07 12:26:09.201456] <1>: Adding data 951
+[2016-Jun-07 12:26:09.201471] <1>: Popping Data in main loop: 567
+[2016-Jun-07 12:26:09.201537] <1>: Adding data 952
+[2016-Jun-07 12:26:09.201576] <1>: Popping Data in main loop: 568
+[2016-Jun-07 12:26:09.201581] <1>: Adding data 953
+[2016-Jun-07 12:26:09.201636] <1>: Adding data 954
+[2016-Jun-07 12:26:09.201645] <1>: Popping Data in main loop: 569
+[2016-Jun-07 12:26:09.201705] <1>: Adding data 955
+[2016-Jun-07 12:26:09.201720] <1>: Popping Data in main loop: 570
+[2016-Jun-07 12:26:09.201776] <1>: Adding data 956
+[2016-Jun-07 12:26:09.201794] <1>: Popping Data in main loop: 571
+[2016-Jun-07 12:26:09.201828] <1>: Adding data 957
+[2016-Jun-07 12:26:09.201844] <1>: Popping Data in main loop: 572
+[2016-Jun-07 12:26:09.201863] <1>: Adding data 958
+[2016-Jun-07 12:26:09.201923] <1>: Adding data 959
+[2016-Jun-07 12:26:09.201937] <1>: Popping Data in main loop: 573
+[2016-Jun-07 12:26:09.201958] <1>: Adding data 960
+[2016-Jun-07 12:26:09.202011] <1>: Popping Data in main loop: 574
+[2016-Jun-07 12:26:09.202012] <1>: Adding data 961
+[2016-Jun-07 12:26:09.202070] <1>: Adding data 962
+[2016-Jun-07 12:26:09.202085] <1>: Popping Data in main loop: 575
+[2016-Jun-07 12:26:09.202142] <1>: Adding data 963
+[2016-Jun-07 12:26:09.202160] <1>: Popping Data in main loop: 576
+[2016-Jun-07 12:26:09.202211] <1>: Adding data 964
+[2016-Jun-07 12:26:09.202229] <1>: Popping Data in main loop: 577
+[2016-Jun-07 12:26:09.202290] <1>: Adding data 965
+[2016-Jun-07 12:26:09.202331] <1>: Adding data 966
+[2016-Jun-07 12:26:09.202334] <1>: Popping Data in main loop: 578
+[2016-Jun-07 12:26:09.202396] <1>: Adding data 967
+[2016-Jun-07 12:26:09.202422] <1>: Popping Data in main loop: 579
+[2016-Jun-07 12:26:09.202435] <1>: Adding data 968
+[2016-Jun-07 12:26:09.202502] <1>: Adding data 969
+[2016-Jun-07 12:26:09.202505] <1>: Popping Data in main loop: 580
+[2016-Jun-07 12:26:09.202568] <1>: Adding data 970
+[2016-Jun-07 12:26:09.202578] <1>: Popping Data in main loop: 581
+[2016-Jun-07 12:26:09.202636] <1>: Adding data 971
+[2016-Jun-07 12:26:09.202652] <1>: Popping Data in main loop: 582
+[2016-Jun-07 12:26:09.202706] <1>: Adding data 972
+[2016-Jun-07 12:26:09.202726] <1>: Popping Data in main loop: 583
+[2016-Jun-07 12:26:09.202746] <1>: Adding data 973
+[2016-Jun-07 12:26:09.202793] <1>: Popping Data in main loop: 584
+[2016-Jun-07 12:26:09.203085] <1>: Adding data 974
+[2016-Jun-07 12:26:09.203110] <1>: Popping Data in main loop: 585
+[2016-Jun-07 12:26:09.203126] <1>: Adding data 975
+[2016-Jun-07 12:26:09.203180] <1>: Adding data 976
+[2016-Jun-07 12:26:09.203194] <1>: Popping Data in main loop: 586
+[2016-Jun-07 12:26:09.203275] <1>: Adding data 977
+[2016-Jun-07 12:26:09.203519] <1>: Adding data 978
+[2016-Jun-07 12:26:09.203541] <1>: Popping Data in main loop: 587
+[2016-Jun-07 12:26:09.203615] <1>: Adding data 979
+[2016-Jun-07 12:26:09.203639] <1>: Popping Data in main loop: 588
+[2016-Jun-07 12:26:09.203712] <1>: Adding data 980
+[2016-Jun-07 12:26:09.203775] <1>: Adding data 981
+[2016-Jun-07 12:26:09.203787] <1>: Popping Data in main loop: 589
+[2016-Jun-07 12:26:09.203833] <1>: Adding data 982
+[2016-Jun-07 12:26:09.203951] <1>: Adding data 983
+[2016-Jun-07 12:26:09.204067] <1>: Adding data 984
+[2016-Jun-07 12:26:09.204073] <1>: Popping Data in main loop: 590
+[2016-Jun-07 12:26:09.204163] <1>: Adding data 985
+[2016-Jun-07 12:26:09.204187] <1>: Popping Data in main loop: 591
+[2016-Jun-07 12:26:09.204269] <1>: Adding data 986
+[2016-Jun-07 12:26:09.204280] <1>: Popping Data in main loop: 592
+[2016-Jun-07 12:26:09.204337] <1>: Adding data 987
+[2016-Jun-07 12:26:09.204357] <1>: Popping Data in main loop: 593
+[2016-Jun-07 12:26:09.204377] <1>: Adding data 988
+[2016-Jun-07 12:26:09.204424] <1>: Popping Data in main loop: 594
+[2016-Jun-07 12:26:09.204438] <1>: Adding data 989
+[2016-Jun-07 12:26:09.204529] <1>: Adding data 990
+[2016-Jun-07 12:26:09.204532] <1>: Popping Data in main loop: 595
+[2016-Jun-07 12:26:09.204618] <1>: Popping Data in main loop: 596
+[2016-Jun-07 12:26:09.204664] <1>: Popping Data in main loop: 597
+[2016-Jun-07 12:26:09.204707] <1>: Popping Data in main loop: 598
+[2016-Jun-07 12:26:09.204750] <1>: Popping Data in main loop: 599
+[2016-Jun-07 12:26:09.204770] <1>: Adding data 991
+[2016-Jun-07 12:26:09.204816] <1>: Popping Data in main loop: 600
+[2016-Jun-07 12:26:09.204839] <1>: Adding data 992
+[2016-Jun-07 12:26:09.204889] <1>: Popping Data in main loop: 601
+[2016-Jun-07 12:26:09.204899] <1>: Adding data 993
+[2016-Jun-07 12:26:09.204959] <1>: Adding data 994
+[2016-Jun-07 12:26:09.204961] <1>: Popping Data in main loop: 602
+[2016-Jun-07 12:26:09.205018] <1>: Adding data 995
+[2016-Jun-07 12:26:09.205039] <1>: Popping Data in main loop: 603
+[2016-Jun-07 12:26:09.205057] <1>: Adding data 996
+[2016-Jun-07 12:26:09.205107] <1>: Popping Data in main loop: 604
+[2016-Jun-07 12:26:09.205117] <1>: Adding data 997
+[2016-Jun-07 12:26:09.205177] <1>: Adding data 998
+[2016-Jun-07 12:26:09.205180] <1>: Popping Data in main loop: 605
+[2016-Jun-07 12:26:09.205244] <1>: Adding data 999
+[2016-Jun-07 12:26:09.205269] <1>: Popping Data in main loop: 606
+[2016-Jun-07 12:26:09.205320] <1>: Popping Data in terminate: 607
+[2016-Jun-07 12:26:09.205388] <1>: Popping Data in terminate: 608
+[2016-Jun-07 12:26:09.205467] <1>: Popping Data in terminate: 609
+[2016-Jun-07 12:26:09.205553] <1>: Popping Data in terminate: 610
+[2016-Jun-07 12:26:09.205626] <1>: Popping Data in terminate: 611
+[2016-Jun-07 12:26:09.205697] <1>: Popping Data in terminate: 612
+[2016-Jun-07 12:26:09.205772] <1>: Popping Data in terminate: 613
+[2016-Jun-07 12:26:09.205844] <1>: Popping Data in terminate: 614
+[2016-Jun-07 12:26:09.205915] <1>: Popping Data in terminate: 615
+[2016-Jun-07 12:26:09.205987] <1>: Popping Data in terminate: 616
+[2016-Jun-07 12:26:09.206058] <1>: Popping Data in terminate: 617
+[2016-Jun-07 12:26:09.206129] <1>: Popping Data in terminate: 618
+[2016-Jun-07 12:26:09.206215] <1>: Popping Data in terminate: 619
+[2016-Jun-07 12:26:09.206289] <1>: Popping Data in terminate: 620
+[2016-Jun-07 12:26:09.206361] <1>: Popping Data in terminate: 621
+[2016-Jun-07 12:26:09.206432] <1>: Popping Data in terminate: 622
+[2016-Jun-07 12:26:09.206517] <1>: Popping Data in terminate: 623
+[2016-Jun-07 12:26:09.206590] <1>: Popping Data in terminate: 624
+[2016-Jun-07 12:26:09.206662] <1>: Popping Data in terminate: 625
+[2016-Jun-07 12:26:09.206733] <1>: Popping Data in terminate: 626
+[2016-Jun-07 12:26:09.206805] <1>: Popping Data in terminate: 627
+[2016-Jun-07 12:26:09.206876] <1>: Popping Data in terminate: 628
+[2016-Jun-07 12:26:09.206947] <1>: Popping Data in terminate: 629
+[2016-Jun-07 12:26:09.207018] <1>: Popping Data in terminate: 630
+[2016-Jun-07 12:26:09.207092] <1>: Popping Data in terminate: 631
+[2016-Jun-07 12:26:09.207163] <1>: Popping Data in terminate: 632
+[2016-Jun-07 12:26:09.207245] <1>: Popping Data in terminate: 633
+[2016-Jun-07 12:26:09.207318] <1>: Popping Data in terminate: 634
+[2016-Jun-07 12:26:09.207389] <1>: Popping Data in terminate: 635
+[2016-Jun-07 12:26:09.207461] <1>: Popping Data in terminate: 636
+[2016-Jun-07 12:26:09.207546] <1>: Popping Data in terminate: 637
+[2016-Jun-07 12:26:09.207618] <1>: Popping Data in terminate: 638
+[2016-Jun-07 12:26:09.207698] <1>: Popping Data in terminate: 639
+[2016-Jun-07 12:26:09.207770] <1>: Popping Data in terminate: 640
+[2016-Jun-07 12:26:09.207842] <1>: Popping Data in terminate: 641
+[2016-Jun-07 12:26:09.207916] <1>: Popping Data in terminate: 642
+[2016-Jun-07 12:26:09.207988] <1>: Popping Data in terminate: 643
+[2016-Jun-07 12:26:09.208060] <1>: Popping Data in terminate: 644
+[2016-Jun-07 12:26:09.208131] <1>: Popping Data in terminate: 645
+[2016-Jun-07 12:26:09.208222] <1>: Popping Data in terminate: 646
+[2016-Jun-07 12:26:09.208328] <1>: Popping Data in terminate: 647
+[2016-Jun-07 12:26:09.208382] <1>: Popping Data in terminate: 648
+[2016-Jun-07 12:26:09.208450] <1>: Popping Data in terminate: 649
+[2016-Jun-07 12:26:09.208535] <1>: Popping Data in terminate: 650
+[2016-Jun-07 12:26:09.208610] <1>: Popping Data in terminate: 651
+[2016-Jun-07 12:26:09.208683] <1>: Popping Data in terminate: 652
+[2016-Jun-07 12:26:09.208754] <1>: Popping Data in terminate: 653
+[2016-Jun-07 12:26:09.208826] <1>: Popping Data in terminate: 654
+[2016-Jun-07 12:26:09.208898] <1>: Popping Data in terminate: 655
+[2016-Jun-07 12:26:09.208969] <1>: Popping Data in terminate: 656
+[2016-Jun-07 12:26:09.209041] <1>: Popping Data in terminate: 657
+[2016-Jun-07 12:26:09.209113] <1>: Popping Data in terminate: 658
+[2016-Jun-07 12:26:09.209184] <1>: Popping Data in terminate: 659
+[2016-Jun-07 12:26:09.209289] <1>: Popping Data in terminate: 660
+[2016-Jun-07 12:26:09.209390] <1>: Popping Data in terminate: 661
+[2016-Jun-07 12:26:09.209467] <1>: Popping Data in terminate: 662
+[2016-Jun-07 12:26:09.209551] <1>: Popping Data in terminate: 663
+[2016-Jun-07 12:26:09.209624] <1>: Popping Data in terminate: 664
+[2016-Jun-07 12:26:09.209696] <1>: Popping Data in terminate: 665
+[2016-Jun-07 12:26:09.209767] <1>: Popping Data in terminate: 666
+[2016-Jun-07 12:26:09.209839] <1>: Popping Data in terminate: 667
+[2016-Jun-07 12:26:09.209912] <1>: Popping Data in terminate: 668
+[2016-Jun-07 12:26:09.209983] <1>: Popping Data in terminate: 669
+[2016-Jun-07 12:26:09.210065] <1>: Popping Data in terminate: 670
+[2016-Jun-07 12:26:09.210137] <1>: Popping Data in terminate: 671
+[2016-Jun-07 12:26:09.210232] <1>: Popping Data in terminate: 672
+[2016-Jun-07 12:26:09.210306] <1>: Popping Data in terminate: 673
+[2016-Jun-07 12:26:09.210380] <1>: Popping Data in terminate: 674
+[2016-Jun-07 12:26:09.210453] <1>: Popping Data in terminate: 675
+[2016-Jun-07 12:26:09.210538] <1>: Popping Data in terminate: 676
+[2016-Jun-07 12:26:09.210611] <1>: Popping Data in terminate: 677
+[2016-Jun-07 12:26:09.210683] <1>: Popping Data in terminate: 678
+[2016-Jun-07 12:26:09.210755] <1>: Popping Data in terminate: 679
+[2016-Jun-07 12:26:09.210827] <1>: Popping Data in terminate: 680
+[2016-Jun-07 12:26:09.210899] <1>: Popping Data in terminate: 681
+[2016-Jun-07 12:26:09.210971] <1>: Popping Data in terminate: 682
+[2016-Jun-07 12:26:09.211042] <1>: Popping Data in terminate: 683
+[2016-Jun-07 12:26:09.211115] <1>: Popping Data in terminate: 684
+[2016-Jun-07 12:26:09.211186] <1>: Popping Data in terminate: 685
+[2016-Jun-07 12:26:09.211293] <1>: Popping Data in terminate: 686
+[2016-Jun-07 12:26:09.211367] <1>: Popping Data in terminate: 687
+[2016-Jun-07 12:26:09.211440] <1>: Popping Data in terminate: 688
+[2016-Jun-07 12:26:09.211527] <1>: Popping Data in terminate: 689
+[2016-Jun-07 12:26:09.211600] <1>: Popping Data in terminate: 690
+[2016-Jun-07 12:26:09.211672] <1>: Popping Data in terminate: 691
+[2016-Jun-07 12:26:09.211744] <1>: Popping Data in terminate: 692
+[2016-Jun-07 12:26:09.211815] <1>: Popping Data in terminate: 693
+[2016-Jun-07 12:26:09.211887] <1>: Popping Data in terminate: 694
+[2016-Jun-07 12:26:09.211958] <1>: Popping Data in terminate: 695
+[2016-Jun-07 12:26:09.212029] <1>: Popping Data in terminate: 696
+[2016-Jun-07 12:26:09.212101] <1>: Popping Data in terminate: 697
+[2016-Jun-07 12:26:09.212172] <1>: Popping Data in terminate: 698
+[2016-Jun-07 12:26:09.212261] <1>: Popping Data in terminate: 699
+[2016-Jun-07 12:26:09.212341] <1>: Popping Data in terminate: 700
+[2016-Jun-07 12:26:09.212459] <1>: Popping Data in terminate: 701
+[2016-Jun-07 12:26:09.212547] <1>: Popping Data in terminate: 702
+[2016-Jun-07 12:26:09.212620] <1>: Popping Data in terminate: 703
+[2016-Jun-07 12:26:09.212691] <1>: Popping Data in terminate: 704
+[2016-Jun-07 12:26:09.212763] <1>: Popping Data in terminate: 705
+[2016-Jun-07 12:26:09.212834] <1>: Popping Data in terminate: 706
+[2016-Jun-07 12:26:09.212905] <1>: Popping Data in terminate: 707
+[2016-Jun-07 12:26:09.212976] <1>: Popping Data in terminate: 708
+[2016-Jun-07 12:26:09.213051] <1>: Popping Data in terminate: 709
+[2016-Jun-07 12:26:09.213123] <1>: Popping Data in terminate: 710
+[2016-Jun-07 12:26:09.213208] <1>: Popping Data in terminate: 711
+[2016-Jun-07 12:26:09.213305] <1>: Popping Data in terminate: 712
+[2016-Jun-07 12:26:09.213392] <1>: Popping Data in terminate: 713
+[2016-Jun-07 12:26:09.213465] <1>: Popping Data in terminate: 714
+[2016-Jun-07 12:26:09.213552] <1>: Popping Data in terminate: 715
+[2016-Jun-07 12:26:09.213626] <1>: Popping Data in terminate: 716
+[2016-Jun-07 12:26:09.213698] <1>: Popping Data in terminate: 717
+[2016-Jun-07 12:26:09.213770] <1>: Popping Data in terminate: 718
+[2016-Jun-07 12:26:09.213842] <1>: Popping Data in terminate: 719
+[2016-Jun-07 12:26:09.213914] <1>: Popping Data in terminate: 720
+[2016-Jun-07 12:26:09.213986] <1>: Popping Data in terminate: 721
+[2016-Jun-07 12:26:09.214058] <1>: Popping Data in terminate: 722
+[2016-Jun-07 12:26:09.214130] <1>: Popping Data in terminate: 723
+[2016-Jun-07 12:26:09.214219] <1>: Popping Data in terminate: 724
+[2016-Jun-07 12:26:09.214295] <1>: Popping Data in terminate: 725
+[2016-Jun-07 12:26:09.214369] <1>: Popping Data in terminate: 726
+[2016-Jun-07 12:26:09.214442] <1>: Popping Data in terminate: 727
+[2016-Jun-07 12:26:09.214535] <1>: Popping Data in terminate: 728
+[2016-Jun-07 12:26:09.214607] <1>: Popping Data in terminate: 729
+[2016-Jun-07 12:26:09.214679] <1>: Popping Data in terminate: 730
+[2016-Jun-07 12:26:09.214751] <1>: Popping Data in terminate: 731
+[2016-Jun-07 12:26:09.214823] <1>: Popping Data in terminate: 732
+[2016-Jun-07 12:26:09.214894] <1>: Popping Data in terminate: 733
+[2016-Jun-07 12:26:09.214966] <1>: Popping Data in terminate: 734
+[2016-Jun-07 12:26:09.215038] <1>: Popping Data in terminate: 735
+[2016-Jun-07 12:26:09.215110] <1>: Popping Data in terminate: 736
+[2016-Jun-07 12:26:09.215182] <1>: Popping Data in terminate: 737
+[2016-Jun-07 12:26:09.215268] <1>: Popping Data in terminate: 738
+[2016-Jun-07 12:26:09.215340] <1>: Popping Data in terminate: 739
+[2016-Jun-07 12:26:09.215411] <1>: Popping Data in terminate: 740
+[2016-Jun-07 12:26:09.215499] <1>: Popping Data in terminate: 741
+[2016-Jun-07 12:26:09.215571] <1>: Popping Data in terminate: 742
+[2016-Jun-07 12:26:09.215643] <1>: Popping Data in terminate: 743
+[2016-Jun-07 12:26:09.215715] <1>: Popping Data in terminate: 744
+[2016-Jun-07 12:26:09.215764] <1>: Popping Data in terminate: 745
+[2016-Jun-07 12:26:09.215807] <1>: Popping Data in terminate: 746
+[2016-Jun-07 12:26:09.215848] <1>: Popping Data in terminate: 747
+[2016-Jun-07 12:26:09.215889] <1>: Popping Data in terminate: 748
+[2016-Jun-07 12:26:09.215933] <1>: Popping Data in terminate: 749
+[2016-Jun-07 12:26:09.215976] <1>: Popping Data in terminate: 750
+[2016-Jun-07 12:26:09.216017] <1>: Popping Data in terminate: 751
+[2016-Jun-07 12:26:09.216059] <1>: Popping Data in terminate: 752
+[2016-Jun-07 12:26:09.216101] <1>: Popping Data in terminate: 753
+[2016-Jun-07 12:26:09.216144] <1>: Popping Data in terminate: 754
+[2016-Jun-07 12:26:09.216186] <1>: Popping Data in terminate: 755
+[2016-Jun-07 12:26:09.216254] <1>: Popping Data in terminate: 756
+[2016-Jun-07 12:26:09.216298] <1>: Popping Data in terminate: 757
+[2016-Jun-07 12:26:09.216348] <1>: Popping Data in terminate: 758
+[2016-Jun-07 12:26:09.216391] <1>: Popping Data in terminate: 759
+[2016-Jun-07 12:26:09.216472] <1>: Popping Data in terminate: 760
+[2016-Jun-07 12:26:09.216560] <1>: Popping Data in terminate: 761
+[2016-Jun-07 12:26:09.216646] <1>: Popping Data in terminate: 762
+[2016-Jun-07 12:26:09.216739] <1>: Popping Data in terminate: 763
+[2016-Jun-07 12:26:09.216829] <1>: Popping Data in terminate: 764
+[2016-Jun-07 12:26:09.216917] <1>: Popping Data in terminate: 765
+[2016-Jun-07 12:26:09.217006] <1>: Popping Data in terminate: 766
+[2016-Jun-07 12:26:09.217095] <1>: Popping Data in terminate: 767
+[2016-Jun-07 12:26:09.217189] <1>: Popping Data in terminate: 768
+[2016-Jun-07 12:26:09.217386] <1>: Popping Data in terminate: 769
+[2016-Jun-07 12:26:09.217474] <1>: Popping Data in terminate: 770
+[2016-Jun-07 12:26:09.217561] <1>: Popping Data in terminate: 771
+[2016-Jun-07 12:26:09.217647] <1>: Popping Data in terminate: 772
+[2016-Jun-07 12:26:09.217726] <1>: Popping Data in terminate: 773
+[2016-Jun-07 12:26:09.217791] <1>: Popping Data in terminate: 774
+[2016-Jun-07 12:26:09.217873] <1>: Popping Data in terminate: 775
+[2016-Jun-07 12:26:09.217954] <1>: Popping Data in terminate: 776
+[2016-Jun-07 12:26:09.218036] <1>: Popping Data in terminate: 777
+[2016-Jun-07 12:26:09.218119] <1>: Popping Data in terminate: 778
+[2016-Jun-07 12:26:09.218277] <1>: Popping Data in terminate: 779
+[2016-Jun-07 12:26:09.218383] <1>: Popping Data in terminate: 780
+[2016-Jun-07 12:26:09.218464] <1>: Popping Data in terminate: 781
+[2016-Jun-07 12:26:09.218551] <1>: Popping Data in terminate: 782
+[2016-Jun-07 12:26:09.218634] <1>: Popping Data in terminate: 783
+[2016-Jun-07 12:26:09.218718] <1>: Popping Data in terminate: 784
+[2016-Jun-07 12:26:09.218801] <1>: Popping Data in terminate: 785
+[2016-Jun-07 12:26:09.218885] <1>: Popping Data in terminate: 786
+[2016-Jun-07 12:26:09.223487] <1>: Popping Data in terminate: 787
+[2016-Jun-07 12:26:09.223733] <1>: Popping Data in terminate: 788
+[2016-Jun-07 12:26:09.223835] <1>: Popping Data in terminate: 789
+[2016-Jun-07 12:26:09.223939] <1>: Popping Data in terminate: 790
+[2016-Jun-07 12:26:09.224078] <1>: Popping Data in terminate: 791
+[2016-Jun-07 12:26:09.224233] <1>: Popping Data in terminate: 792
+[2016-Jun-07 12:26:09.224384] <1>: Popping Data in terminate: 793
+[2016-Jun-07 12:26:09.224594] <1>: Popping Data in terminate: 794
+[2016-Jun-07 12:26:09.224766] <1>: Popping Data in terminate: 795
+[2016-Jun-07 12:26:09.224918] <1>: Popping Data in terminate: 796
+[2016-Jun-07 12:26:09.225067] <1>: Popping Data in terminate: 797
+[2016-Jun-07 12:26:09.225190] <1>: Popping Data in terminate: 798
+[2016-Jun-07 12:26:09.225314] <1>: Popping Data in terminate: 799
+[2016-Jun-07 12:26:09.225445] <1>: Popping Data in terminate: 800
+[2016-Jun-07 12:26:09.225558] <1>: Popping Data in terminate: 801
+[2016-Jun-07 12:26:09.225620] <1>: Popping Data in terminate: 802
+[2016-Jun-07 12:26:09.225676] <1>: Popping Data in terminate: 803
+[2016-Jun-07 12:26:09.225730] <1>: Popping Data in terminate: 804
+[2016-Jun-07 12:26:09.225785] <1>: Popping Data in terminate: 805
+[2016-Jun-07 12:26:09.225839] <1>: Popping Data in terminate: 806
+[2016-Jun-07 12:26:09.225893] <1>: Popping Data in terminate: 807
+[2016-Jun-07 12:26:09.225947] <1>: Popping Data in terminate: 808
+[2016-Jun-07 12:26:09.226002] <1>: Popping Data in terminate: 809
+[2016-Jun-07 12:26:09.226056] <1>: Popping Data in terminate: 810
+[2016-Jun-07 12:26:09.226110] <1>: Popping Data in terminate: 811
+[2016-Jun-07 12:26:09.226164] <1>: Popping Data in terminate: 812
+[2016-Jun-07 12:26:09.226240] <1>: Popping Data in terminate: 813
+[2016-Jun-07 12:26:09.226301] <1>: Popping Data in terminate: 814
+[2016-Jun-07 12:26:09.226356] <1>: Popping Data in terminate: 815
+[2016-Jun-07 12:26:09.226410] <1>: Popping Data in terminate: 816
+[2016-Jun-07 12:26:09.226464] <1>: Popping Data in terminate: 817
+[2016-Jun-07 12:26:09.226518] <1>: Popping Data in terminate: 818
+[2016-Jun-07 12:26:09.226635] <1>: Popping Data in terminate: 819
+[2016-Jun-07 12:26:09.226736] <1>: Popping Data in terminate: 820
+[2016-Jun-07 12:26:09.226806] <1>: Popping Data in terminate: 821
+[2016-Jun-07 12:26:09.226863] <1>: Popping Data in terminate: 822
+[2016-Jun-07 12:26:09.226920] <1>: Popping Data in terminate: 823
+[2016-Jun-07 12:26:09.226978] <1>: Popping Data in terminate: 824
+[2016-Jun-07 12:26:09.227034] <1>: Popping Data in terminate: 825
+[2016-Jun-07 12:26:09.227169] <1>: Popping Data in terminate: 826
+[2016-Jun-07 12:26:09.227307] <1>: Popping Data in terminate: 827
+[2016-Jun-07 12:26:09.227374] <1>: Popping Data in terminate: 828
+[2016-Jun-07 12:26:09.227431] <1>: Popping Data in terminate: 829
+[2016-Jun-07 12:26:09.227489] <1>: Popping Data in terminate: 830
+[2016-Jun-07 12:26:09.227546] <1>: Popping Data in terminate: 831
+[2016-Jun-07 12:26:09.227603] <1>: Popping Data in terminate: 832
+[2016-Jun-07 12:26:09.227661] <1>: Popping Data in terminate: 833
+[2016-Jun-07 12:26:09.227718] <1>: Popping Data in terminate: 834
+[2016-Jun-07 12:26:09.227775] <1>: Popping Data in terminate: 835
+[2016-Jun-07 12:26:09.227832] <1>: Popping Data in terminate: 836
+[2016-Jun-07 12:26:09.227889] <1>: Popping Data in terminate: 837
+[2016-Jun-07 12:26:09.227945] <1>: Popping Data in terminate: 838
+[2016-Jun-07 12:26:09.228003] <1>: Popping Data in terminate: 839
+[2016-Jun-07 12:26:09.228058] <1>: Popping Data in terminate: 840
+[2016-Jun-07 12:26:09.228114] <1>: Popping Data in terminate: 841
+[2016-Jun-07 12:26:09.228169] <1>: Popping Data in terminate: 842
+[2016-Jun-07 12:26:09.228309] <1>: Popping Data in terminate: 843
+[2016-Jun-07 12:26:09.228381] <1>: Popping Data in terminate: 844
+[2016-Jun-07 12:26:09.228436] <1>: Popping Data in terminate: 845
+[2016-Jun-07 12:26:09.228490] <1>: Popping Data in terminate: 846
+[2016-Jun-07 12:26:09.228544] <1>: Popping Data in terminate: 847
+[2016-Jun-07 12:26:09.228598] <1>: Popping Data in terminate: 848
+[2016-Jun-07 12:26:09.228653] <1>: Popping Data in terminate: 849
+[2016-Jun-07 12:26:09.228707] <1>: Popping Data in terminate: 850
+[2016-Jun-07 12:26:09.228761] <1>: Popping Data in terminate: 851
+[2016-Jun-07 12:26:09.228815] <1>: Popping Data in terminate: 852
+[2016-Jun-07 12:26:09.228869] <1>: Popping Data in terminate: 853
+[2016-Jun-07 12:26:09.228924] <1>: Popping Data in terminate: 854
+[2016-Jun-07 12:26:09.228978] <1>: Popping Data in terminate: 855
+[2016-Jun-07 12:26:09.229031] <1>: Popping Data in terminate: 856
+[2016-Jun-07 12:26:09.229085] <1>: Popping Data in terminate: 857
+[2016-Jun-07 12:26:09.229139] <1>: Popping Data in terminate: 858
+[2016-Jun-07 12:26:09.229192] <1>: Popping Data in terminate: 859
+[2016-Jun-07 12:26:09.229282] <1>: Popping Data in terminate: 860
+[2016-Jun-07 12:26:09.229337] <1>: Popping Data in terminate: 861
+[2016-Jun-07 12:26:09.229392] <1>: Popping Data in terminate: 862
+[2016-Jun-07 12:26:09.229447] <1>: Popping Data in terminate: 863
+[2016-Jun-07 12:26:09.229500] <1>: Popping Data in terminate: 864
+[2016-Jun-07 12:26:09.229553] <1>: Popping Data in terminate: 865
+[2016-Jun-07 12:26:09.229606] <1>: Popping Data in terminate: 866
+[2016-Jun-07 12:26:09.229664] <1>: Popping Data in terminate: 867
+[2016-Jun-07 12:26:09.229718] <1>: Popping Data in terminate: 868
+[2016-Jun-07 12:26:09.229771] <1>: Popping Data in terminate: 869
+[2016-Jun-07 12:26:09.229825] <1>: Popping Data in terminate: 870
+[2016-Jun-07 12:26:09.229879] <1>: Popping Data in terminate: 871
+[2016-Jun-07 12:26:09.229933] <1>: Popping Data in terminate: 872
+[2016-Jun-07 12:26:09.229987] <1>: Popping Data in terminate: 873
+[2016-Jun-07 12:26:09.230041] <1>: Popping Data in terminate: 874
+[2016-Jun-07 12:26:09.230096] <1>: Popping Data in terminate: 875
+[2016-Jun-07 12:26:09.230150] <1>: Popping Data in terminate: 876
+[2016-Jun-07 12:26:09.230409] <1>: Popping Data in terminate: 877
+[2016-Jun-07 12:26:09.230483] <1>: Popping Data in terminate: 878
+[2016-Jun-07 12:26:09.230544] <1>: Popping Data in terminate: 879
+[2016-Jun-07 12:26:09.230600] <1>: Popping Data in terminate: 880
+[2016-Jun-07 12:26:09.230655] <1>: Popping Data in terminate: 881
+[2016-Jun-07 12:26:09.230709] <1>: Popping Data in terminate: 882
+[2016-Jun-07 12:26:09.230763] <1>: Popping Data in terminate: 883
+[2016-Jun-07 12:26:09.230816] <1>: Popping Data in terminate: 884
+[2016-Jun-07 12:26:09.230870] <1>: Popping Data in terminate: 885
+[2016-Jun-07 12:26:09.230924] <1>: Popping Data in terminate: 886
+[2016-Jun-07 12:26:09.230978] <1>: Popping Data in terminate: 887
+[2016-Jun-07 12:26:09.231034] <1>: Popping Data in terminate: 888
+[2016-Jun-07 12:26:09.231088] <1>: Popping Data in terminate: 889
+[2016-Jun-07 12:26:09.231142] <1>: Popping Data in terminate: 890
+[2016-Jun-07 12:26:09.231363] <1>: Popping Data in terminate: 891
+[2016-Jun-07 12:26:09.231456] <1>: Popping Data in terminate: 892
+[2016-Jun-07 12:26:09.231527] <1>: Popping Data in terminate: 893
+[2016-Jun-07 12:26:09.231587] <1>: Popping Data in terminate: 894
+[2016-Jun-07 12:26:09.231642] <1>: Popping Data in terminate: 895
+[2016-Jun-07 12:26:09.231696] <1>: Popping Data in terminate: 896
+[2016-Jun-07 12:26:09.231750] <1>: Popping Data in terminate: 897
+[2016-Jun-07 12:26:09.231804] <1>: Popping Data in terminate: 898
+[2016-Jun-07 12:26:09.231857] <1>: Popping Data in terminate: 899
+[2016-Jun-07 12:26:09.231911] <1>: Popping Data in terminate: 900
+[2016-Jun-07 12:26:09.231965] <1>: Popping Data in terminate: 901
+[2016-Jun-07 12:26:09.232018] <1>: Popping Data in terminate: 902
+[2016-Jun-07 12:26:09.232071] <1>: Popping Data in terminate: 903
+[2016-Jun-07 12:26:09.232125] <1>: Popping Data in terminate: 904
+[2016-Jun-07 12:26:09.232178] <1>: Popping Data in terminate: 905
+[2016-Jun-07 12:26:09.232272] <1>: Popping Data in terminate: 906
+[2016-Jun-07 12:26:09.232331] <1>: Popping Data in terminate: 907
+[2016-Jun-07 12:26:09.232386] <1>: Popping Data in terminate: 908
+[2016-Jun-07 12:26:09.232440] <1>: Popping Data in terminate: 909
+[2016-Jun-07 12:26:09.232495] <1>: Popping Data in terminate: 910
+[2016-Jun-07 12:26:09.232550] <1>: Popping Data in terminate: 911
+[2016-Jun-07 12:26:09.232605] <1>: Popping Data in terminate: 912
+[2016-Jun-07 12:26:09.232660] <1>: Popping Data in terminate: 913
+[2016-Jun-07 12:26:09.232715] <1>: Popping Data in terminate: 914
+[2016-Jun-07 12:26:09.232769] <1>: Popping Data in terminate: 915
+[2016-Jun-07 12:26:09.232824] <1>: Popping Data in terminate: 916
+[2016-Jun-07 12:26:09.232878] <1>: Popping Data in terminate: 917
+[2016-Jun-07 12:26:09.232932] <1>: Popping Data in terminate: 918
+[2016-Jun-07 12:26:09.232987] <1>: Popping Data in terminate: 919
+[2016-Jun-07 12:26:09.233042] <1>: Popping Data in terminate: 920
+[2016-Jun-07 12:26:09.233098] <1>: Popping Data in terminate: 921
+[2016-Jun-07 12:26:09.233153] <1>: Popping Data in terminate: 922
+[2016-Jun-07 12:26:09.233236] <1>: Popping Data in terminate: 923
+[2016-Jun-07 12:26:09.233300] <1>: Popping Data in terminate: 924
+[2016-Jun-07 12:26:09.233355] <1>: Popping Data in terminate: 925
+[2016-Jun-07 12:26:09.233409] <1>: Popping Data in terminate: 926
+[2016-Jun-07 12:26:09.233464] <1>: Popping Data in terminate: 927
+[2016-Jun-07 12:26:09.233519] <1>: Popping Data in terminate: 928
+[2016-Jun-07 12:26:09.233573] <1>: Popping Data in terminate: 929
+[2016-Jun-07 12:26:09.233627] <1>: Popping Data in terminate: 930
+[2016-Jun-07 12:26:09.233682] <1>: Popping Data in terminate: 931
+[2016-Jun-07 12:26:09.233736] <1>: Popping Data in terminate: 932
+[2016-Jun-07 12:26:09.233789] <1>: Popping Data in terminate: 933
+[2016-Jun-07 12:26:09.233843] <1>: Popping Data in terminate: 934
+[2016-Jun-07 12:26:09.233898] <1>: Popping Data in terminate: 935
+[2016-Jun-07 12:26:09.233953] <1>: Popping Data in terminate: 936
+[2016-Jun-07 12:26:09.234007] <1>: Popping Data in terminate: 937
+[2016-Jun-07 12:26:09.234062] <1>: Popping Data in terminate: 938
+[2016-Jun-07 12:26:09.234116] <1>: Popping Data in terminate: 939
+[2016-Jun-07 12:26:09.234170] <1>: Popping Data in terminate: 940
+[2016-Jun-07 12:26:09.234256] <1>: Popping Data in terminate: 941
+[2016-Jun-07 12:26:09.234316] <1>: Popping Data in terminate: 942
+[2016-Jun-07 12:26:09.234370] <1>: Popping Data in terminate: 943
+[2016-Jun-07 12:26:09.234424] <1>: Popping Data in terminate: 944
+[2016-Jun-07 12:26:09.234478] <1>: Popping Data in terminate: 945
+[2016-Jun-07 12:26:09.234535] <1>: Popping Data in terminate: 946
+[2016-Jun-07 12:26:09.234590] <1>: Popping Data in terminate: 947
+[2016-Jun-07 12:26:09.234646] <1>: Popping Data in terminate: 948
+[2016-Jun-07 12:26:09.234700] <1>: Popping Data in terminate: 949
+[2016-Jun-07 12:26:09.234755] <1>: Popping Data in terminate: 950
+[2016-Jun-07 12:26:09.234859] <1>: Popping Data in terminate: 951
+[2016-Jun-07 12:26:09.234920] <1>: Popping Data in terminate: 952
+[2016-Jun-07 12:26:09.234975] <1>: Popping Data in terminate: 953
+[2016-Jun-07 12:26:09.235030] <1>: Popping Data in terminate: 954
+[2016-Jun-07 12:26:09.235084] <1>: Popping Data in terminate: 955
+[2016-Jun-07 12:26:09.235138] <1>: Popping Data in terminate: 956
+[2016-Jun-07 12:26:09.235193] <1>: Popping Data in terminate: 957
+[2016-Jun-07 12:26:09.235284] <1>: Popping Data in terminate: 958
+[2016-Jun-07 12:26:09.235339] <1>: Popping Data in terminate: 959
+[2016-Jun-07 12:26:09.235395] <1>: Popping Data in terminate: 960
+[2016-Jun-07 12:26:09.235450] <1>: Popping Data in terminate: 961
+[2016-Jun-07 12:26:09.235504] <1>: Popping Data in terminate: 962
+[2016-Jun-07 12:26:09.235559] <1>: Popping Data in terminate: 963
+[2016-Jun-07 12:26:09.235613] <1>: Popping Data in terminate: 964
+[2016-Jun-07 12:26:09.235667] <1>: Popping Data in terminate: 965
+[2016-Jun-07 12:26:09.235722] <1>: Popping Data in terminate: 966
+[2016-Jun-07 12:26:09.235777] <1>: Popping Data in terminate: 967
+[2016-Jun-07 12:26:09.235832] <1>: Popping Data in terminate: 968
+[2016-Jun-07 12:26:09.235886] <1>: Popping Data in terminate: 969
+[2016-Jun-07 12:26:09.235941] <1>: Popping Data in terminate: 970
+[2016-Jun-07 12:26:09.235995] <1>: Popping Data in terminate: 971
+[2016-Jun-07 12:26:09.236049] <1>: Popping Data in terminate: 972
+[2016-Jun-07 12:26:09.236103] <1>: Popping Data in terminate: 973
+[2016-Jun-07 12:26:09.236159] <1>: Popping Data in terminate: 974
+[2016-Jun-07 12:26:09.236243] <1>: Popping Data in terminate: 975
+[2016-Jun-07 12:26:09.236305] <1>: Popping Data in terminate: 976
+[2016-Jun-07 12:26:09.236360] <1>: Popping Data in terminate: 977
+[2016-Jun-07 12:26:09.236422] <1>: Popping Data in terminate: 978
+[2016-Jun-07 12:26:09.236476] <1>: Popping Data in terminate: 979
+[2016-Jun-07 12:26:09.236534] <1>: Popping Data in terminate: 980
+[2016-Jun-07 12:26:09.236589] <1>: Popping Data in terminate: 981
+[2016-Jun-07 12:26:09.236846] <1>: Popping Data in terminate: 982
+[2016-Jun-07 12:26:09.236903] <1>: Popping Data in terminate: 983
+[2016-Jun-07 12:26:09.236958] <1>: Popping Data in terminate: 984
+[2016-Jun-07 12:26:09.237016] <1>: Popping Data in terminate: 985
+[2016-Jun-07 12:26:09.237071] <1>: Popping Data in terminate: 986
+[2016-Jun-07 12:26:09.237128] <1>: Popping Data in terminate: 987
+[2016-Jun-07 12:26:09.237183] <1>: Popping Data in terminate: 988
+[2016-Jun-07 12:26:09.237263] <1>: Popping Data in terminate: 989
+[2016-Jun-07 12:26:09.237320] <1>: Popping Data in terminate: 990
+[2016-Jun-07 12:26:09.237418] <1>: Popping Data in terminate: 991
+[2016-Jun-07 12:26:09.237482] <1>: Popping Data in terminate: 992
+[2016-Jun-07 12:26:09.237538] <1>: Popping Data in terminate: 993
+[2016-Jun-07 12:26:09.237593] <1>: Popping Data in terminate: 994
+[2016-Jun-07 12:26:09.237648] <1>: Popping Data in terminate: 995
+[2016-Jun-07 12:26:09.237703] <1>: Popping Data in terminate: 996
+[2016-Jun-07 12:26:09.237757] <1>: Popping Data in terminate: 997
+[2016-Jun-07 12:26:09.237812] <1>: Popping Data in terminate: 998
+[2016-Jun-07 12:26:09.237867] <1>: Popping Data in terminate: 999
+[2016-Jun-07 12:26:09.241824] <1>: ORCHID has successfully shut down, have a nice day! :-)
+
+
