@@ -259,25 +259,6 @@ int main(int argc, char* argv[])
     delete rateData;
     delete fileData;
 
-    BOOST_LOG_SEV(lg, Debug)  << "Testing Synchro File writing\n" << std::flush;
-    
-    {//code block to force destruction of async file (and force us to wait for the async file to close
-        std::ofstream tester("./testFile.out_tester.txt", std::ios_base::trunc | std::ios_base::binary);
-        int tempSize = Resources::titleString.size();
-        char* temp = new char[tempSize];
-        for(int i=0; i<tempSize; ++i)
-        {
-            temp[i] = Resources::titleString.c_str()[i];
-        }
-        
-        for(int i=0; i<1000; ++i)
-        {
-            tester.write(temp, tempSize);
-        }
-        tester.close();
-        delete[] temp;
-    }
-
     BOOST_LOG_SEV(lg, Debug)  << "ORCHID has successfully shut down, have a nice day! :-)\n\n" << std::flush;
 
     return 0;
