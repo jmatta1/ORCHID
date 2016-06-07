@@ -17,8 +17,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_ASYNCIO_ASYNCOUTFILE_H
-#define ORCHID_SRC_ASYNCIO_ASYNCOUTFILE_H
+#ifndef ORCHID_SRC_EVENTS_EVENTINTERFACE_H
+#define ORCHID_SRC_EVENTS_EVENTINTERFACE_H
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -46,3 +46,5 @@ public:
 };
 
 }
+
+#endif //ORCHID_SRC_EVENTS_EVENTINTERFACE_H
