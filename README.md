@@ -16,6 +16,10 @@ This is a Data Acquisiton and Control program for handling the CAEN digitizer vi
  - TODO: Update UI Thread as more things are implemented
  - TODO: Clean up the format and structure of the ui thread when everything else is done
  - TODO: Perform code cleanup and burn the cruft out of the code
+ - TODO: Find or implement a faster lock-free SPSC Queue
+ - TODO: Find or implement a faster lock-free SPMC Queue
+ - TODO: Find or implement a faster lock-free MPSC Queue
+ - TODO: Find or implement a faster lock-free MPMC Queue
 
 In essense there are several threads that will perform data handling:
 
