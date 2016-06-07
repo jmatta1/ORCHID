@@ -10,6 +10,7 @@ HFIR background monitoring wall.
 #include<algorithm>
 // includes from other libraries
 #include<boost/thread.hpp>
+#include<boost/lockfree/queue.hpp>
 #define BOOST_LOG_DYN_LINK 1
 #include<boost/log/utility/setup.hpp>
 #include<boost/log/utility/setup/file.hpp>
@@ -33,6 +34,7 @@ HFIR background monitoring wall.
 // ORCHID threads
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
+#include"AsyncIO/AsyncOutFile.h"
 
 int main(int argc, char* argv[])
 {
@@ -257,6 +259,31 @@ int main(int argc, char* argv[])
     delete rateData;
     delete fileData;
 
+    BOOST_LOG_SEV(lg, Debug)  << "Testing the asynchronous file thing\n" << std::flush;
+    
+    boost::lockfree::queue<char*, boost::lockfree::capacity<1000> > returnQueue;
+    {//code block to force destruction of async file (and force us to wait for the async file to close
+        AsyncIO::AsyncOutFile<boost::lockfree::queue<char*, boost::lockfree::capacity<1000> > > outFileTest("./testFile.out_tester.txt", &returnQueue);
+        int tempSize = Resources::titleString.size();
+        char* temp = new char[tempSize];
+        for(int i=0; i<tempSize; ++i)
+        {
+            temp[i] = Resources::titleString.c_str()[i];
+        }
+        
+        for(int i=0; i<1000; ++i)
+        {
+            outFileTest.writeBuf(temp, tempSize);
+        }
+        outFileTest.closeAndTerminate();
+        outFileTest.joinWrite();
+        delete[] temp;
+    }
+    for(int i=0; i<1000; ++i)
+    {
+        char* temp;
+        returnQueue.pop(temp);
+    }
 
     BOOST_LOG_SEV(lg, Debug)  << "ORCHID has successfully shut down, have a nice day! :-)\n\n" << std::flush;
 
