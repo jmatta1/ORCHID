@@ -42,7 +42,7 @@ public:
     virtual int getSizeOfAsciiRepresentation() = 0;
     //the buffer provided to this function will be at *least* the size returned
     //by getSizeOfAsciiRepresentation
-    virtual void getAsciiRepresentation() = 0;
+    virtual void getAsciiRepresentation(char* buff) = 0;
 };
 
 }
