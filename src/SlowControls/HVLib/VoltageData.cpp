@@ -75,21 +75,36 @@ std::string CrateStatus::getStatusString()
 
 void CrateStatus::loadFromValue(unsigned int value)
 {
-    mainOn                  = ((value & CrateMasks::MaskMainOn)                  != 0);
-    mainInhibit             = ((value & CrateMasks::MaskMainInhibit)             != 0);
-    localControlOnly        = ((value & CrateMasks::MaskLocalControlOnly)        != 0);
-    inputFailure            = ((value & CrateMasks::MaskInputFailure)            != 0);
-    outputFailure           = ((value & CrateMasks::MaskOutputFailure)           != 0);
-    fantrayFailure          = ((value & CrateMasks::MaskFantrayFailue)           != 0);
-    sensorFailure           = ((value & CrateMasks::MaskSensorFailure)           != 0);
-    vmeSysFailure           = ((value & CrateMasks::MaskVmeSysFailure)           != 0);
-    plugAndPlayIncompatible = ((value & CrateMasks::MaskPlugAndPlayIncompatible) != 0);
-    busReset                = ((value & CrateMasks::MaskBusReset)                != 0);
-    supplyDerating          = ((value & CrateMasks::MaskSupplyDerating)          != 0);
-    supplyFailure           = ((value & CrateMasks::MaskSupplyFailure)           != 0);
+    this->mainOn                  = ((value & CrateMasks::MaskMainOn)                  != 0);
+    this->mainInhibit             = ((value & CrateMasks::MaskMainInhibit)             != 0);
+    this->localControlOnly        = ((value & CrateMasks::MaskLocalControlOnly)        != 0);
+    this->inputFailure            = ((value & CrateMasks::MaskInputFailure)            != 0);
+    this->outputFailure           = ((value & CrateMasks::MaskOutputFailure)           != 0);
+    this->fantrayFailure          = ((value & CrateMasks::MaskFantrayFailue)           != 0);
+    this->sensorFailure           = ((value & CrateMasks::MaskSensorFailure)           != 0);
+    this->vmeSysFailure           = ((value & CrateMasks::MaskVmeSysFailure)           != 0);
+    this->plugAndPlayIncompatible = ((value & CrateMasks::MaskPlugAndPlayIncompatible) != 0);
+    this->busReset                = ((value & CrateMasks::MaskBusReset)                != 0);
+    this->supplyDerating          = ((value & CrateMasks::MaskSupplyDerating)          != 0);
+    this->supplyFailure           = ((value & CrateMasks::MaskSupplyFailure)           != 0);
 }
 
-
+CrateStatus& CrateStatus::operator=(const CrateStatus& rhs)
+{
+    this->mainOn                  = rhs.mainOn;
+    this->mainInhibit             = rhs.mainInhibit;
+    this->localControlOnly        = rhs.localControlOnly;
+    this->inputFailure            = rhs.inputFailure;
+    this->outputFailure           = rhs.outputFailure;
+    this->fantrayFailure          = rhs.fantrayFailure;
+    this->sensorFailure           = rhs.sensorFailure;
+    this->vmeSysFailure           = rhs.vmeSysFailure;
+    this->plugAndPlayIncompatible = rhs.plugAndPlayIncompatible;
+    this->busReset                = rhs.busReset;
+    this->supplyDerating          = rhs.supplyDerating;
+    this->supplyFailure           = rhs.supplyFailure;
+    return *this;
+}
 
 
 ChannelStatus::ChannelStatus():          outputOn(false),
@@ -140,27 +155,48 @@ std::string ChannelStatus::getStatusString()
 
 void ChannelStatus::loadFromValue(unsigned int value)
 {
-    outputOn                        = ((value & ChannelMasks::MaskOutputOn)                        != 0);
-    outputInhibit                   = ((value & ChannelMasks::MaskOutputInhibit)                   != 0);
-    outputFailureMinSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMinSenseVoltage)    != 0);
-    outputFailureMaxSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMaxSenseVoltage)    != 0);
-    outputFailureMaxTerminalVoltage = ((value & ChannelMasks::MaskOutputFailureMaxTerminalVoltage) != 0);
-    outputFailureMaxCurrent         = ((value & ChannelMasks::MaskOutputFailureMaxCurrent)         != 0);
-    outputFailureMaxTemperature     = ((value & ChannelMasks::MaskOutputFailureMaxTemperature)     != 0);
-    outputFailureMaxPower           = ((value & ChannelMasks::MaskOutputFailureMaxPower)           != 0);
-    outputFailureTimeout            = ((value & ChannelMasks::MaskOutputFailureTimeout)            != 0);
-    outputCurrentLimited            = ((value & ChannelMasks::MaskOutputCurrentLimited)            != 0);
-    outputRampUp                    = ((value & ChannelMasks::MaskOutputRampUp)                    != 0);
-    outputRampDown                  = ((value & ChannelMasks::MaskOutputRampDown)                  != 0);
-    outputEnableKill                = ((value & ChannelMasks::MaskOutputEnableKill)                != 0);
-    outputEmergencyOff              = ((value & ChannelMasks::MaskOutputEmergencyOff)              != 0);
-    outputAdjusting                 = ((value & ChannelMasks::MaskOutputAdjusting)                 != 0);
-    outputConstantVoltage           = ((value & ChannelMasks::MaskOutputConstantVoltage)           != 0);
-    outputCurrentBoundsExceeded     = ((value & ChannelMasks::MaskOutputCurrentBoundsExceeded)     != 0);
-    outputFailureCurrentLimit       = ((value & ChannelMasks::MaskOutputFailureCurrentLimit)       != 0);
+    this->outputOn                        = ((value & ChannelMasks::MaskOutputOn)                        != 0);
+    this->outputInhibit                   = ((value & ChannelMasks::MaskOutputInhibit)                   != 0);
+    this->outputFailureMinSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMinSenseVoltage)    != 0);
+    this->outputFailureMaxSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMaxSenseVoltage)    != 0);
+    this->outputFailureMaxTerminalVoltage = ((value & ChannelMasks::MaskOutputFailureMaxTerminalVoltage) != 0);
+    this->outputFailureMaxCurrent         = ((value & ChannelMasks::MaskOutputFailureMaxCurrent)         != 0);
+    this->outputFailureMaxTemperature     = ((value & ChannelMasks::MaskOutputFailureMaxTemperature)     != 0);
+    this->outputFailureMaxPower           = ((value & ChannelMasks::MaskOutputFailureMaxPower)           != 0);
+    this->outputFailureTimeout            = ((value & ChannelMasks::MaskOutputFailureTimeout)            != 0);
+    this->outputCurrentLimited            = ((value & ChannelMasks::MaskOutputCurrentLimited)            != 0);
+    this->outputRampUp                    = ((value & ChannelMasks::MaskOutputRampUp)                    != 0);
+    this->outputRampDown                  = ((value & ChannelMasks::MaskOutputRampDown)                  != 0);
+    this->outputEnableKill                = ((value & ChannelMasks::MaskOutputEnableKill)                != 0);
+    this->outputEmergencyOff              = ((value & ChannelMasks::MaskOutputEmergencyOff)              != 0);
+    this->outputAdjusting                 = ((value & ChannelMasks::MaskOutputAdjusting)                 != 0);
+    this->outputConstantVoltage           = ((value & ChannelMasks::MaskOutputConstantVoltage)           != 0);
+    this->outputCurrentBoundsExceeded     = ((value & ChannelMasks::MaskOutputCurrentBoundsExceeded)     != 0);
+    this->outputFailureCurrentLimit       = ((value & ChannelMasks::MaskOutputFailureCurrentLimit)       != 0);
 }
 
-
+ChannelStatus& ChannelStatus::operator=(const ChannelStatus& rhs)
+{
+    this->outputOn                        = rhs.outputOn;
+    this->outputInhibit                   = rhs.outputInhibit;
+    this->outputFailureMinSenseVoltage    = rhs.outputFailureMinSenseVoltage;
+    this->outputFailureMaxSenseVoltage    = rhs.outputFailureMaxSenseVoltage;
+    this->outputFailureMaxTerminalVoltage = rhs.outputFailureMaxTerminalVoltage;
+    this->outputFailureMaxCurrent         = rhs.outputFailureMaxCurrent;
+    this->outputFailureMaxTemperature     = rhs.outputFailureMaxTemperature;
+    this->outputFailureMaxPower           = rhs.outputFailureMaxPower;
+    this->outputFailureTimeout            = rhs.outputFailureTimeout;
+    this->outputCurrentLimited            = rhs.outputCurrentLimited;
+    this->outputRampUp                    = rhs.outputRampUp;
+    this->outputRampDown                  = rhs.outputRampDown;
+    this->outputEnableKill                = rhs.outputEnableKill;
+    this->outputEmergencyOff              = rhs.outputEmergencyOff;
+    this->outputAdjusting                 = rhs.outputAdjusting;
+    this->outputConstantVoltage           = rhs.outputConstantVoltage;
+    this->outputCurrentBoundsExceeded     = rhs.outputCurrentBoundsExceeded;
+    this->outputFailureCurrentLimit       = rhs.outputFailureCurrentLimit;
+    return *this;
+}
 
 
 VoltageData::VoltageData(int channels):                terminalVoltage(channels),
