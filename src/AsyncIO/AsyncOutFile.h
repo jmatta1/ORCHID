@@ -29,11 +29,13 @@
 // includes from other libraries
 #include<boost/thread.hpp>
 #include<boost/lockfree/spsc_queue.hpp>
+#include<boost/lockfree/queue.hpp>
 // includes from ORCHID
 
-template <typename FunctorType>
 namespace AsyncIO
 {
+
+enum{QueueCapacity = 100};
 
 //just a function used by boost thread to run the write loop along with a ptr
 //to the data structure with the actual information in it
@@ -46,27 +48,16 @@ private:
     AsyncOutFile* aOutFile;
 };
 
-
-template <typename FunctorType>
-struct BSCTriple
-{
-public:
-    BSCTriple();
-};
-
-
-template <typename FunctorType>
 class AsyncOutFile
 {
 public:
-    AsyncOutFile(const std::string& filePath);
+    AsyncOutFile(const std::string& filePath, boost::lockfree::queue* cbQueue);
     ~AsyncOutFile();
     
     //waits until writes are done and then stops writes, and makes a new file
     void newFile(const std::string& filePath);
     //enqueue a buffer for writing
-    template <typename FunctorType>
-    void writeBuf(char* outBuffer, int bufferSize, FunctorType* callBack);
+    void writeBuf(char* outBuffer, int bufferSize);
     
     //used to check for write thread terminate exit
     bool hasTerminated(){return this->writeTerminated.load();}
@@ -91,8 +82,9 @@ private:
     
     //this queue is used to hold data to be written to the file, we fix its capacity to 100 so that there cannot be more than 100 queued file writes
     //TODO: Investigate writing own lock free queue for faster data transfer
-    boost::lockfree::spsc_queue<std::pair<char*, int>, boost::lockfree::capacity<100> > writeQueue;
-    boost::lockfree::spsc_queue<std::pair<char*, int>, boost::lockfree::capacity<100> > returnQueue;
+    boost::lockfree::queue* callBackQueue;
+    boost::lockfree::spsc_queue<BufferPair*, boost::lockfree::capacity<QueueCapacity> > writeQueue;
+    boost::lockfree::spsc_queue<BufferPair*, boost::lockfree::capacity<QueueCapacity> > returnQueue;
     
     //this is used to tell the write thread to exit when the write queue is empty
     std::atomic_bool terminateWhenEmpty;
@@ -104,55 +96,16 @@ private:
     boost::thread* writeThread;
 };
 
-template <typename FunctorType>
-AsyncOutFileWriteThread<FunctorType>::AsyncOutFileWriteThread(AsyncOutFile *aof):
-    aOutFile(aof) {}
 
-template <typename FunctorType>
-void AsyncOutFileWriteThread<FunctorType>::operator ()()
+//utility class used inside async file out
+struct BufferPair
 {
-    
-}
-
-template <typename FunctorType>
-AsyncOutFile<FunctorType>::AsyncOutFile(const std::string &filePath):
-    outFile(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc),
-    writerWaiting(false), producerWaiting(false), terminateWhenEmpty(false), writeTerminated(false),
-    writeCallable(nullptr), writeThread(nullptr)
-{
-    writeCallable = new AsyncOutFileWriteThread(this);
-    writeThread = new boost::thread(*writeCallable);
-}
-
-template <typename FunctorType>
-void AsyncOutFile<FunctorType>::newFile(const std::string& filePath)
-{
-    //first we try to lock the writeMutex.
-    //If we manage that then the write thread is waiting for data.
-    //If we have to wait that is ok because we should be the only write thread
-    //therefor we block any addition to the write queue until the mutex is locked by us anyways
-    boost::unique_lock<boost::mutex> consLock(consMutex);
-    //once we have the lock, we have control of the fstream
-    outFile.close();
-    outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
-    //our changes are done
-    //the lock should release on deconstruction
-}
-
-
-template <typename FunctorType>
-void AsyncOutFile<FunctorType>::writeBuf(char* outBuffer, int size, FunctorType* callBack)
-{
-    std::pair<char*, int> temp = std::make_pair<char*, int>(outBuffer, size);
-    //test to see if there is space to write the buffer pair
-    while(!(this->writeQueue.write_available()))
-    {
-        //if there is no space, wait for there to be space
-        boost::unique_lock<boost::mutex> producerLock(this->producerMutex);
-          
-    }
-
-}
+public:
+    BufferPair():buffer(nullptr), size(0){}
+    void clear(){buffer = nullptr; size = 0;}
+    char* buffer;
+    int size;
+};
 
 }
 #endif //ORCHID_SRC_ASYNCIO_ASYNCOUTFILE_H
