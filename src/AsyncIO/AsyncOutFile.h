@@ -31,7 +31,6 @@
 #include<boost/lockfree/spsc_queue.hpp>
 #include<boost/lockfree/queue.hpp>
 // includes from ORCHID
-#include"Utility/OrchidLogger.h"
 
 namespace AsyncIO
 {
@@ -62,7 +61,6 @@ public:
     void operator()();
 private:
     AsyncOutFile<RetQueueType>* aOutFile;
-    long count;
 };
 
 
@@ -116,7 +114,6 @@ private:
     //thread callable and object
     AsyncOutFileWriteThread<RetQueueType>* writeCallable;
     boost::thread* writeThread;
-    long count;
 };
 
 /*
@@ -142,7 +139,6 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
         //(and terminate signals)
         while(!(this->aOutFile->writeQueue.read_available()) && !(this->aOutFile->terminateWhenEmpty.load()))
         {
-            BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Waiting for data";
             //first make certain the writer thread is not waiting for some reason
             if(this->aOutFile->producerWaiting.load())
             {
@@ -159,7 +155,6 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
         //if there is data available, grab it and write it
         if(this->aOutFile->writeQueue.pop(temp))
         {
-            BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Popping Data in main loop: " << count;
             //write the buffer
             this->aOutFile->outFile.write(temp->buffer, temp->size);
             //run the call back to return the buffer to whoever owns it
@@ -185,7 +180,6 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
     //if we are here we have a terminate signal, so empty the write buffer first
     while(this->aOutFile->writeQueue.pop(temp))
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Popping Data in terminate: " << count;
         //if we are in here then there is data in the buffer to empty before
         //termination
         //write the buffer
@@ -279,7 +273,6 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
     BufferPair* temp;
     while(!(this->returnQueue.pop(temp)))
     {//there are no pairs available
-        BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Waiting to add data " << count;
         //first make certain that the write thread is awake and working so that we will eventually be woken
         if(this->writerWaiting.load())
         {
@@ -291,7 +284,6 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
         this->producerWaiting.store(true);
         this->producerWaitCondition.wait(producerLock);
     }
-    BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Adding data " << count;
     this->producerWaiting.store(false);
     //now that we have a triple, prep it and push it onto the write queue
     temp->buffer = outBuffer;
@@ -303,7 +295,6 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
     {
         this->writeWaitCondition.notify_one();//just use notify 1 since there is only ever one thread waiting
     }
-    ++count;
 }
 
 }
