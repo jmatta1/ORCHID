@@ -31,13 +31,25 @@
 #include<boost/lockfree/spsc_queue.hpp>
 #include<boost/lockfree/queue.hpp>
 // includes from ORCHID
+#include"Utility/OrchidLogger.h"
 
 namespace AsyncIO
 {
 
 enum{QueueCapacity = 100};
 
+//utility class used inside async file out
+struct BufferPair
+{
+public:
+    BufferPair():buffer(nullptr), size(0){}
+    void clear(){buffer = nullptr; size = 0;}
+    char* buffer;
+    int size;
+};
+
 //predeclare AsyncOutFile so that AsyncOutFileWriteThread knows about it
+template <typename RetQueueType>
 class AsyncOutFile;
 
 //just a function used by boost thread to run the write loop along with a ptr
@@ -46,10 +58,11 @@ template <typename RetQueueType>
 class AsyncOutFileWriteThread
 {
 public:
-    AsyncOutFileWriteThread(AsyncOutFile* aof);
+    AsyncOutFileWriteThread(AsyncOutFile<RetQueueType>* aof);
     void operator()();
 private:
     AsyncOutFile<RetQueueType>* aOutFile;
+    long count;
 };
 
 
@@ -65,12 +78,15 @@ public:
     //enqueue a buffer for writing
     void writeBuf(char* outBuffer, int bufferSize);
     
+    //shutdown the write thread and close the file
+    void closeAndTerminate();
+    
     //used to check for write thread terminate exit
     bool hasTerminated(){return this->writeTerminated.load();}
     //used to wait for write thread terminate
     void joinWrite(){this->writeThread->join();}
     
-    friend class AsyncOutFileWriteThread;
+    friend class AsyncOutFileWriteThread<RetQueueType>;
 private:
     
     //the actual fstream to write the file
@@ -98,27 +114,16 @@ private:
     std::atomic_bool writeTerminated;
     
     //thread callable and object
-    AsyncOutFileWriteThread* writeCallable;
+    AsyncOutFileWriteThread<RetQueueType>* writeCallable;
     boost::thread* writeThread;
-};
-
-
-//utility class used inside async file out
-struct BufferPair
-{
-public:
-    BufferPair():buffer(nullptr), size(0){}
-    void clear(){buffer = nullptr; size = 0;}
-    char* buffer;
-    int size;
 };
 
 /*
  * Implementation of the AsyncOutFileWriteThread
  */
 template <typename RetQueueType>
-AsyncOutFileWriteThread<RetQueueType>::AsyncOutFileWriteThread(AsyncOutFile *aof):
-    aOutFile(aof) {}
+AsyncOutFileWriteThread<RetQueueType>::AsyncOutFileWriteThread(AsyncOutFile<RetQueueType>* aof):
+    aOutFile(aof), count(0) {}
 
 template <typename RetQueueType>
 void AsyncOutFileWriteThread<RetQueueType>::operator ()()
@@ -136,6 +141,7 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
         //(and terminate signals)
         while(!(this->aOutFile->writeQueue.read_available()) && !(this->aOutFile->terminateWhenEmpty.load()))
         {
+            BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Waiting for data";
             //first make certain the writer thread is not waiting for some reason
             if(this->aOutFile->producerWaiting.load())
             {
@@ -152,6 +158,7 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
         //if there is data available, grab it and write it
         if(this->aOutFile->writeQueue.pop(temp))
         {
+            BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Popping Data in main loop: " << count;
             //write the buffer
             this->aOutFile->outFile.write(temp->buffer, temp->size);
             //run the call back to return the buffer to whoever owns it
@@ -167,6 +174,7 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
             {
                 this->aOutFile->producerWaitCondition.notify_one();
             }
+            ++count;
         }
         //if we are here there either was data and we popped a piece and wrote it
         //or we recieved a terminate signal (or both) so let the loop either exit
@@ -176,16 +184,20 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
     //if we are here we have a terminate signal, so empty the write buffer first
     while(this->aOutFile->writeQueue.pop(temp))
     {
+        BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Popping Data in terminate: " << count;
         //if we are in here then there is data in the buffer to empty before
         //termination
         //write the buffer
         this->aOutFile->outFile.write(temp->buffer, temp->size);
         //run the call back to return the buffer to whoever owns it
-        temp->cb(temp->buffer);
+        this->aOutFile->callBackQueue->bounded_push(temp->buffer);
+        //clear the pair
+        temp->clear();
         //return the BSCTriple to the return queue if we took this out of the
         // write queue then the must be space for it in the return queue
         //this allows it to be deleted by the destructor
         this->aOutFile->returnQueue.push(temp);
+        ++count;
         //don't bother waking the producer thread, if we are being terminated
         //then we are being destroyed and the producer thread is not waiting on
         //a wait condition, merely for this thread to terminate
@@ -200,10 +212,11 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
  */
 
 template <typename RetQueueType>
-AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath):
+AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueType* cbQueue):
     outFile(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc),
-    writerWaiting(false), producerWaiting(false), terminateWhenEmpty(false),
-    writeTerminated(false), writeCallable(nullptr), writeThread(nullptr)
+    writerWaiting(false), producerWaiting(false), callBackQueue(cbQueue),
+    terminateWhenEmpty(false), writeTerminated(false), writeCallable(nullptr),
+    writeThread(nullptr)
 {
     //load the return queue with spare BSCTriples
     for(int i=0; i<QueueCapacity; ++i)
@@ -218,6 +231,20 @@ AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath):
 template <typename RetQueueType>
 AsyncOutFile<RetQueueType>::~AsyncOutFile()
 {
+    this->closeAndTerminate();
+    //delete all the BSCTriples we allocated initially
+    BufferPair* temp;
+    while(returnQueue.pop(temp))
+    {
+        delete[] temp;
+    }
+    delete writeThread;
+    delete writeCallable;
+}
+
+template <typename RetQueueType>
+void AsyncOutFile<RetQueueType>::closeAndTerminate()
+{
     //terminate the write thread if it is not already terminated
     this->terminateWhenEmpty.store(true);
     //if we need to wake the thread for it to terminate, do so
@@ -227,12 +254,6 @@ AsyncOutFile<RetQueueType>::~AsyncOutFile()
     }
     //wait for the termination
     if(!(this->writeTerminated.load())) writeThread->join();
-    //delete all the BSCTriples we allocated initially
-    BufferPair* temp;
-    while(returnQueue.pop(temp))
-    {
-        delete[] temp;
-    }
 }
 
 template <typename RetQueueType>
@@ -242,7 +263,7 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     //If we manage that then the write thread is waiting for data.
     //If we have to wait that is ok because we should be the only write thread
     //therefor we block any addition to the write queue until the mutex is locked by us anyways
-    boost::unique_lock<boost::mutex> consLock(consMutex);
+    boost::unique_lock<boost::mutex> writeLock(this->writeMutex);
     //once we have the lock, we have control of the fstream
     outFile.close();
     outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
@@ -256,7 +277,8 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
     //first get the blank BSCTriple from the return queue
     BufferPair* temp;
     while(!(this->returnQueue.pop(temp)))
-    {//there are no triples available
+    {//there are no pairs available
+        BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Waiting to add data";
         //first make certain that the write thread is awake and working so that we will eventually be woken
         if(this->writerWaiting.load())
         {
@@ -268,6 +290,7 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
         this->producerWaiting.store(true);
         this->producerWaitCondition.wait(producerLock);
     }
+    BOOST_LOG_SEV(OrchidLog::get(), Debug)  << "Adding data";
     this->producerWaiting.store(false);
     //now that we have a triple, prep it and push it onto the write queue
     temp->buffer = outBuffer;
