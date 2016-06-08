@@ -41,28 +41,32 @@ public:
     ~SlowControlsThreadController(){}
     
     //functions for the slow controls thread to access
-    SlowControlsThreadState getState(){return currentState.load();}
+    SlowControlsThreadState getState(){return this->currentState.load();}
     void waitForNewState();
-    void setDone(){threadDone.store(true);}
+    void setDone(){this->threadDone.store(true);}
     
     //functions for the UI thread to access
-    void setToTerminate(){
+    void setToTerminate()
+    {
         this->currentState.store(SlowControlsThreadState::Terminate);
         this->waitCondition.notify_all();
     }
-    void setToStop(){
+    void setToStop()
+    {
         this->currentState.store(SlowControlsThreadState::Stopped);
         this->waitCondition.notify_all();
     }
-    void setToPolling(){
+    void setToPolling()
+    {
         this->currentState.store(SlowControlsThreadState::Polling);
         this->waitCondition.notify_all();
     }
-    void setToWriting(){
+    void setToWriting()
+    {
         this->currentState.store(SlowControlsThreadState::Writing);
         this->waitCondition.notify_all();
     }
-    bool isDone(){return threadDone.load();}
+    bool isDone(){return this->threadDone.load();}
     
 private:
     std::atomic<SlowControlsThreadState> currentState;
