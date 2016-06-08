@@ -22,9 +22,11 @@
 namespace Events
 {
 
-static const int FileEventCode = 0x00000000;
+namespace Codes
+{
 static const int SlowControlsEventCode = 0x00000001;
 static const int DigitizerPsdEventCode = 0x00000002;
+}
 
 }
 
