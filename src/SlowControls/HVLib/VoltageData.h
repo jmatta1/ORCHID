@@ -56,6 +56,7 @@ public:
     std::string getStatusString();
     void loadFromValue(unsigned int value);
     CrateStatus& operator=(const CrateStatus& rhs);
+    unsigned int giveIntRepresentation();
 };
 
 namespace ChannelMasks 
@@ -99,6 +100,7 @@ public:
     std::string getStatusString();
     void loadFromValue(unsigned int value);
     ChannelStatus& operator=(const ChannelStatus& rhs);
+    unsigned int giveIntRepresentation();
 };
 
 class VoltageData

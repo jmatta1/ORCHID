@@ -106,6 +106,24 @@ CrateStatus& CrateStatus::operator=(const CrateStatus& rhs)
     return *this;
 }
 
+unsigned int CrateStatus::giveIntRepresentation()
+{
+    unsigned int output = 0x00000000;
+    output |= ((this->mainOn)                   ?MaskMainOn                 :0x00000000);
+    output |= ((this->mainInhibit)              ?MaskMainInhibit            :0x00000000);
+    output |= ((this->localControlOnly)         ?MaskLocalControlOnly       :0x00000000);
+    output |= ((this->inputFailure)             ?MaskInputFailure           :0x00000000);
+    output |= ((this->outputFailure)            ?MaskOutputFailure          :0x00000000);
+    output |= ((this->fantrayFailure)           ?MaskFantrayFailue          :0x00000000);
+    output |= ((this->sensorFailure)            ?MaskSensorFailure          :0x00000000);
+    output |= ((this->vmeSysFailure)            ?MaskVmeSysFailure          :0x00000000);
+    output |= ((this->plugAndPlayIncompatible)  ?MaskPlugAndPlayIncompatible:0x00000000);
+    output |= ((this->busReset)                 ?MaskBusReset               :0x00000000);
+    output |= ((this->supplyDerating)           ?MaskSupplyDerating         :0x00000000);
+    output |= ((this->supplyFailure)            ?MaskSupplyFailure          :0x00000000);
+    return output;
+}
+
 
 ChannelStatus::ChannelStatus():          outputOn(false),
     outputInhibit(false),                outputFailureMinSenseVoltage(false),
@@ -198,6 +216,29 @@ ChannelStatus& ChannelStatus::operator=(const ChannelStatus& rhs)
     return *this;
 }
 
+unsigned int ChannelStatus::giveIntRepresentation()
+{
+    unsigned int output = 0x00000000;
+    output |= ((this->outputOn)                         ?MaskOutputOn                         :0x00000000);
+    output |= ((this->outputInhibit)                    ?MaskOutputInhibit                    :0x00000000);
+    output |= ((this->outputFailureMinSenseVoltage)     ?MaskOutputFailureMinSenseVoltage     :0x00000000);
+    output |= ((this->outputFailureMaxSenseVoltage)     ?MaskOutputFailureMaxSenseVoltage     :0x00000000);
+    output |= ((this->outputFailureMaxTerminalVoltage)  ?MaskOutputFailureMaxTerminalVoltage  :0x00000000);
+    output |= ((this->outputFailureMaxCurrent)          ?MaskOutputFailureMaxCurrent          :0x00000000);
+    output |= ((this->outputFailureMaxTemperature)      ?MaskOutputFailureMaxTemperature      :0x00000000);
+    output |= ((this->outputFailureMaxPower)            ?MaskOutputFailureMaxPower            :0x00000000);
+    output |= ((this->outputFailureTimeout)             ?MaskOutputFailureTimeout             :0x00000000);
+    output |= ((this->outputCurrentLimited)             ?MaskOutputCurrentLimited             :0x00000000);
+    output |= ((this->outputRampUp)                     ?MaskOutputRampUp                     :0x00000000);
+    output |= ((this->outputRampDown)                   ?MaskOutputRampDown                   :0x00000000);
+    output |= ((this->outputEnableKill)                 ?MaskOutputEnableKill                 :0x00000000);
+    output |= ((this->outputEmergencyOff)               ?MaskOutputEmergencyOff               :0x00000000);
+    output |= ((this->outputAdjusting)                  ?MaskOutputAdjusting                  :0x00000000);
+    output |= ((this->outputConstantVoltage)            ?MaskOutputConstantVoltage            :0x00000000);
+    output |= ((this->outputCurrentBoundsExceeded)      ?MaskOutputCurrentBoundsExceeded      :0x00000000);
+    output |= ((this->outputFailureCurrentLimit)        ?MaskOutputFailureCurrentLimit        :0x00000000);
+    return output;
+}
 
 VoltageData::VoltageData(int channels):                terminalVoltage(channels),
     senseVoltage(channels), setVoltage(channels),      temperature(channels),
