@@ -35,8 +35,8 @@ enum class QueueSizes : int
     ProcessingToFile        = 20000
 };
 
-//here is a quick implementation to cast the strongly typed enums to ints for
-//purposes of accessing the numbers
+//here is a quick template meta program to cast the strongly typed enums to ints
+//for purposes of accessing the actual values
 template<typename Enum>
 constexpr typename std::underlying_type<Enum>::type getEnumVal(Enum val)
 {
