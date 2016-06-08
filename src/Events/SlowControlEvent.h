@@ -41,12 +41,6 @@ public:
     //returned by getSizeOfBinaryRepresentation
     virtual void getBinaryRepresentation(char* buff);
     
-    //functions to retrieve the ascii representation
-    virtual int getSizeOfAsciiRepresentation();
-    //the buffer provided to this function will be at *least* the size returned
-    //by getSizeOfAsciiRepresentation
-    virtual void getAsciiRepresentation(char* buff);
-    
     void ReadVoltageData(const SlowControls::VoltageData& voltageData);
     //void ReadTemperatureData()
 private:
