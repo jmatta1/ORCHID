@@ -5,16 +5,15 @@
 This is a Data Acquisiton and Control program for handling the CAEN digitizer via optical link and handling the MPOD HV system.
 
 ####Programming ToDo List
- - TODO: Implement File Output With Asio
- - TODO: Implement Compressing buffer
- - TODO: Implement a lock free queue with waiting for data
- - TODO: Implement Digitizer Reader and Controller
- - TODO: Remove MPOD spoofing from SnmpUtilController once testing with actual MPOD
- - TODO: Implement the Digitizer Thread
  - TODO: Implement the File Writing Thread
+ - TODO: Implement Digitizer Reader and Controller
+ - TODO: Implement the Digitizer Thread
  - TODO: Implement the Event Processing Thread(s)
  - TODO: Update UI Thread as more things are implemented
- - TODO: Clean up the format and structure of the ui thread when everything else is done
+ - TODO: Implement Compressing buffer
+ - TODO: Clean up the format and structure of the ui thread
+ - TODO: Remove MPOD spoofing from SnmpUtilController once testing with actual MPOD
+ - TODO: Convert MPOD reader / controller to use Boost::Asio
  - TODO: Perform code cleanup and burn the cruft out of the code
  - TODO: Find or implement a faster lock-free SPSC Queue
  - TODO: Find or implement a faster lock-free SPMC Queue
