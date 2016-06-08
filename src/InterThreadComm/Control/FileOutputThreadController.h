@@ -29,12 +29,47 @@
 namespace InterThread
 {
 
+enum class FileOutputThreadState : char {Terminate, Waiting, Writing};
+
 class FileOutputThreadController
 {
 public:
+    FileOutputThreadController():
+        currentState(FileOutputThreadState::Waiting),
+        threadDone(){}
+    ~FileOutputThreadController(){}
     
+    //functions for the file thread to access
+    FileOutputThreadState getCurrentState(){return this->currentState.load();}
+    void waitForNewState();
+    void setThreadDone(){this->threadDone.store(true);}
+    
+    void setToTerminate()
+    {
+        this->currentState.store(FileOutputThreadState::Terminate);
+        this->waitCondition.notify_all();
+    }
+    void setToWaiting()
+    {
+        this->currentState.store(FileOutputThreadState::Waiting);
+        this->waitCondition.notify_all();
+    }
+    void setToWriting()
+    {
+        this->currentState.store(FileOutputThreadState::Writing);
+        this->waitCondition.notify_all();
+    }
+    bool isDone(){return this->threadDone.load();}
 private:
+    //state variable
+    std::atomic<FileOutputThreadState> currentState;
     
+    //variables for waiting to wake up
+    boost::mutex waitMutex;
+    boost::condition_variable waitCondition;
+    
+    //termination checking
+    std::atomic_bool threadDone;
 };
 
 }
