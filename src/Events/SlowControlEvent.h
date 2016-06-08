@@ -41,7 +41,7 @@ public:
     //returned by getSizeOfBinaryRepresentation
     virtual void getBinaryRepresentation(char* buff);
     
-    void ReadVoltageData(const SlowControls::VoltageData& voltageData);
+    void ReadVoltageData(const SlowControls::VoltageData& data);
     //void ReadTemperatureData()
 private:
     
