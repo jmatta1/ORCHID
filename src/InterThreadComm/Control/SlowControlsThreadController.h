@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_INTERTHREADCOMM_SLOWCONTROLSTHREADCONTROL_H
-#define ORCHID_SRC_INTERTHREADCOMM_SLOWCONTROLSTHREADCONTROL_H
+#ifndef ORCHID_SRC_INTERTHREADCOMM_CONTROLS_SLOWCONTROLSTHREADCONTROL_H
+#define ORCHID_SRC_INTERTHREADCOMM_CONTROLS_SLOWCONTROLSTHREADCONTROL_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -77,4 +77,4 @@ private:
 
 }
 
-#endif //ORCHID_SRC_INTERTHREADCOMM_SLOWCONTROLSTHREADCONTROL_H
+#endif //ORCHID_SRC_INTERTHREADCOMM_CONTROLS_SLOWCONTROLSTHREADCONTROL_H
