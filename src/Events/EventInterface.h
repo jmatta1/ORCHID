@@ -37,12 +37,6 @@ public:
     //the buffer provided to this function will be at *least* the size
     //returned by getSizeOfBinaryRepresentation
     virtual void getBinaryRepresentation(char* buff) = 0;
-    
-    //functions to retrieve the ascii representation
-    virtual int getSizeOfAsciiRepresentation() = 0;
-    //the buffer provided to this function will be at *least* the size returned
-    //by getSizeOfAsciiRepresentation
-    virtual void getAsciiRepresentation(char* buff) = 0;
 };
 
 }
