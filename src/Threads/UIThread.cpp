@@ -126,7 +126,7 @@ void UIThread::initScreen()
     init_color(COLOR_BLACK, 0, 0, 0);
     init_color(COLOR_RED, 1000, 0, 0);
     init_color(COLOR_GREEN, 0, 1000, 0);
-    init_color(COLOR_GLUE, 0, 0, 1000);
+    init_color(COLOR_BLUE, 0, 0, 1000);
     init_color(COLOR_WHITE, 1000, 1000, 1000);
     init_pair(errorColor, COLOR_RED, COLOR_BLACK);
     init_pair(goodColor, COLOR_GREEN, COLOR_BLACK);
@@ -260,7 +260,7 @@ void UIThread::drawSlowControlsGrid()
     ++currentRow;
     //now loop through the temp sensors
     int currDataLine = currentRow;
-    int stopLine = currentRow + 2*this->slowData->numTemperatureChannels;
+    int stopLine = currentRow + this->slowData->numTemperatureChannels;
     int chanInd = 0;
     while(currDataLine < stopLine)
     {
@@ -268,29 +268,31 @@ void UIThread::drawSlowControlsGrid()
         //TODO: write out temp information
         ++currDataLine;
     }
-    mvwprintw(this->textWindow, currDataLine, tempStartCol, "================");
+    mvwprintw(this->textWindow, currDataLine, tempStartCol, "===============");
     //now loop through the voltage sensors
     currDataLine = currentRow;
-    stopLine = currentRow + 2*this->slowData->numVoltageChannels;
+    stopLine = currentRow + this->slowData->numVoltageChannels;
     chanInd = 0;
     while(currDataLine < stopLine)
     {
         //build the voltage data string
         std::ostringstream builder;
         //first add the channel in the usual format
-        builder << "| u" << (this->mpodMapper->moduleNum[chanInd] - 1) << (this->mpodMapper->channelNum[chanInd] - 1) << " | ";
+        builder << "| u" << (this->mpodMapper->moduleNum[chanInd] - 1);
+        builder << std::setw(2) << std::setfill('0') << (this->mpodMapper->channelNum[chanInd] - 1) << " | " << std::setfill(' ');
         //add the voltage
-        builder << std::setw(4) << std::setprecision(2) << (this->slowData->terminalVoltage[chanInd]/1000.0) <<"kV | ";
+        builder << std::fixed << std::setw(4) << std::setprecision(2) << (this->slowData->terminalVoltage[chanInd]/1000.0) <<"kV | ";
         //add the current
-        builder << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
+        builder << std::fixed << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
         //add the status
         std::string statusString;
-        this->slowData->genChannelInfoString(i, statusString);
+        this->slowData->genChannelInfoString(chanInd, statusString);
         builder << statusString;
-        mvwprintw(this->textWindow, currentRow, volStartCol, builder.str().c_str());
+        mvwprintw(this->textWindow, currDataLine, volStartCol, builder.str().c_str());
         ++chanInd;
+        ++currDataLine;
     }
-    
+    currentRow = currDataLine;
     mvwprintw(this->textWindow, currentRow, volStartCol, "=======================================");
     
 }
