@@ -37,21 +37,21 @@ class FileOutputThreadController
 public:
     FileOutputThreadController():
         currentState(FileOutputThreadState::Waiting),
-        threadDone(){}
+        fileThreadWaiting(false), threadDone(false){}
     ~FileOutputThreadController(){}
     
     //functions for the file thread to access
+    FileOutputThreadState getCurrentState(){return this->currentState.load();}
     void waitForNewState();
     void setThreadDone(){this->threadDone.store(true);}
-    
-    //function for both UI thread and File output thread
-    FileOutputThreadState getCurrentState(){return this->currentState.load();}
+    void getRunNumber(int& rNum){rNum=this->runNumber; this->currentState = this->priorState;}
+    void getRunTitle(std::string& rTitle){rTitle=this->runTitle; this->currentState = this->priorState;}
     
     //files for the UI thread
     void setToTerminate()
     {
         this->currentState.store(FileOutputThreadState::Terminate);
-        this->waitCondition.notify_all();
+        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
     }
     bool setNewRunNumber(int runNum)
     {
@@ -65,7 +65,7 @@ public:
         this->runNumber = runNum;
         this->priorState.store(this->currentState.load());
         this->currentState.store(FileOutputThreadState::NewRunParams);
-        this->waitCondition.notify_all();
+        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
         return true;
     }
     bool setNewRunTitle(const std::string& rTitle)
@@ -80,18 +80,18 @@ public:
         this->runTitle = rTitle;
         this->priorState.store(this->currentState.load());
         this->currentState.store(FileOutputThreadState::NewRunParams);
-        this->waitCondition.notify_all();
+        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
         return true;
     }
     void setToWaiting()
     {
         this->currentState.store(FileOutputThreadState::Waiting);
-        this->waitCondition.notify_all();
+        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
     }
     void setToWriting()
     {
         this->currentState.store(FileOutputThreadState::Writing);
-        this->waitCondition.notify_all();
+        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
     }
     bool isDone(){return this->threadDone.load();}
 private:
@@ -103,6 +103,7 @@ private:
     //variables for waiting to wake up
     boost::mutex waitMutex;
     boost::condition_variable waitCondition;
+    std::atomic_bool fileThreadWaiting;
     
     //termination checking
     std::atomic_bool threadDone;

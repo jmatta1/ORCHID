@@ -35,7 +35,11 @@ void FileOutputThreadController::waitForNewState()
     //since spurious wake up event are possible put the wait inside a loop to
     //check for the condition that made us wait in the first place
     while(oldState == this->currentState.load())
+    {
+        this->fileThreadWaiting.store(true);
         this->waitCondition.wait(waitLock);
+    }
+    this->fileThreadWaiting.store(false);
 }
 
 }
