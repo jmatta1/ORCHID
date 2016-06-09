@@ -38,8 +38,8 @@ namespace Threads
 static const int errorColor = 1;
 static const int goodColor = 2;
 static const int gridStartLine = 5;
-static const int tempStartCol = 20;
-static const int volStartCol = 36;
+static const int tempStartCol = 21;
+static const int volStartCol = 40;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
@@ -245,6 +245,7 @@ void UIThread::drawGlobalSlowControlsInformation()
 
 void UIThread::drawSlowControlsGrid()
 {
+    //TODO: Add highligting of params outside range
     int currentRow = gridStartLine;
     //now draw the topmost separators
     mvwprintw(this->textWindow, currentRow, tempStartCol, "--------------");
@@ -252,7 +253,7 @@ void UIThread::drawSlowControlsGrid()
     ++currentRow;
     //now draw the column headers
     mvwprintw(this->textWindow, currentRow, tempStartCol, "|Chan|  Temp |");
-    mvwprintw(this->textWindow, currentRow, volStartCol, "| Chan | TerVol | Current | Status");
+    mvwprintw(this->textWindow, currentRow, volStartCol, "| Chan | TermVol | Current | Status");
     ++currentRow;
     //more separators
     mvwprintw(this->textWindow, currentRow, tempStartCol, "==============");
@@ -268,7 +269,7 @@ void UIThread::drawSlowControlsGrid()
         //TODO: write out temp information
         ++currDataLine;
     }
-    mvwprintw(this->textWindow, currDataLine, tempStartCol, "===============");
+    mvwprintw(this->textWindow, currDataLine, tempStartCol, "==============");
     //now loop through the voltage sensors
     currDataLine = currentRow;
     stopLine = currentRow + this->slowData->numVoltageChannels;
@@ -281,7 +282,15 @@ void UIThread::drawSlowControlsGrid()
         builder << "| u" << (this->mpodMapper->moduleNum[chanInd] - 1);
         builder << std::setw(2) << std::setfill('0') << (this->mpodMapper->channelNum[chanInd] - 1) << " | " << std::setfill(' ');
         //add the voltage
-        builder << std::fixed << std::setw(4) << std::setprecision(2) << (this->slowData->terminalVoltage[chanInd]/1000.0) <<"kV | ";
+        float termVol =  this->slowData->terminalVoltage[chanInd];
+        if(termVol >= 1000.0)
+        {
+            builder << std::fixed << std::setw(5) << std::setprecision(3) << (termVol/1000.0) <<"kV | ";
+        }
+        else
+        {
+            builder << std::fixed << std::setw(5) << std::setprecision(1) << termVol <<"V | ";
+        }
         //add the current
         builder << std::fixed << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
         //add the status

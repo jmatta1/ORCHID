@@ -114,7 +114,8 @@ int main(int argc, char* argv[])
     int numVoltageChannels = std::count(mpodChannelData.online.begin(),
                                         mpodChannelData.online.end(), true);
     //count the number of temperature channels
-    int numTemperatureChannels = 4;
+    //TODO: Stop Spoofing temperature channels
+    int numTemperatureChannels = 0;
     //Make the slow controls data structure
     InterThread::SlowData* slowData = new InterThread::SlowData(numVoltageChannels,
                                                                  numTemperatureChannels);
