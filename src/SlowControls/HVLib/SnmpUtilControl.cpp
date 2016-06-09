@@ -28,6 +28,8 @@
 #include<iostream>
 // includes from other libraries
 // includes from ORCHID
+#include"Utility/OrchidLogger.h"
+
 namespace SlowControls
 {
 
@@ -263,7 +265,11 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     boost::lock_guard<boost::mutex> lock(this->commandMutex);
     //open a pipe that takes the output of the snmp command to be run
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
-    if (!pipe) throw std::runtime_error("popen() failed in SnmpUtilControl!");
+    if (!pipe)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create run directory. Check admin permissions";
+        throw std::runtime_error("popen() failed in SnmpUtilControl!");
+    }
     while (!feof(pipe.get()))
     {
         if(fgets(buffer, 128, pipe.get()) != NULL)
