@@ -22,6 +22,7 @@ HFIR background monitoring wall.
 #include"Utility/TitleString.h"
 #include"Utility/ParseAndValidate.h"
 #include"Utility/OrchidLogger.h"
+#include"Utility/MpodMapper.h"
 // ORCHID interprocess communication data objects
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
@@ -147,6 +148,8 @@ int main(int argc, char* argv[])
                                                                                           params.powerBlock->weinerMibFileDirectory);
     SlowControls::MpodController* mpodController = new SlowControls::MpodController(mpodSnmpController, &mpodChannelData, &mpodModuleData);
     SlowControls::MpodReader* mpodReader = new SlowControls::MpodReader(mpodSnmpController, &mpodChannelData);
+    Utility::MpodMapper* mpodMapper = new Utility::MpodMapper();
+    mpodMapper->loadFromData(&mpodChannelData);
     
     // For Controlling the digitizer
     
@@ -178,7 +181,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Debug)  << "Building callable objects" << std::flush;
     //make the UI thread callable
     Threads::UIThread* uiThreadCallable =
-            new Threads::UIThread(slowData, rateData, fileData,
+            new Threads::UIThread(slowData, rateData, fileData, mpodMapper,
                       //Future:   digitizerThreadControl,
                                   sctController,
                       //Future:   fileThreadControl, eventProcThreadControl,
@@ -245,6 +248,7 @@ int main(int argc, char* argv[])
 
     //delete the device control structures
     BOOST_LOG_SEV(lg, Debug)  << "Deleting device controls" << std::flush;
+    delete mpodMapper;
     delete mpodController;
     delete mpodReader;
     delete mpodSnmpController;
