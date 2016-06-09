@@ -109,18 +109,18 @@ CrateStatus& CrateStatus::operator=(const CrateStatus& rhs)
 unsigned int CrateStatus::giveIntRepresentation()
 {
     unsigned int output = 0x00000000;
-    output |= ((this->mainOn)                   ?MaskMainOn                 :0x00000000);
-    output |= ((this->mainInhibit)              ?MaskMainInhibit            :0x00000000);
-    output |= ((this->localControlOnly)         ?MaskLocalControlOnly       :0x00000000);
-    output |= ((this->inputFailure)             ?MaskInputFailure           :0x00000000);
-    output |= ((this->outputFailure)            ?MaskOutputFailure          :0x00000000);
-    output |= ((this->fantrayFailure)           ?MaskFantrayFailue          :0x00000000);
-    output |= ((this->sensorFailure)            ?MaskSensorFailure          :0x00000000);
-    output |= ((this->vmeSysFailure)            ?MaskVmeSysFailure          :0x00000000);
-    output |= ((this->plugAndPlayIncompatible)  ?MaskPlugAndPlayIncompatible:0x00000000);
-    output |= ((this->busReset)                 ?MaskBusReset               :0x00000000);
-    output |= ((this->supplyDerating)           ?MaskSupplyDerating         :0x00000000);
-    output |= ((this->supplyFailure)            ?MaskSupplyFailure          :0x00000000);
+    output |= ((this->mainOn)                   ?CrateMasks::MaskMainOn                 :0x00000000);
+    output |= ((this->mainInhibit)              ?CrateMasks::MaskMainInhibit            :0x00000000);
+    output |= ((this->localControlOnly)         ?CrateMasks::MaskLocalControlOnly       :0x00000000);
+    output |= ((this->inputFailure)             ?CrateMasks::MaskInputFailure           :0x00000000);
+    output |= ((this->outputFailure)            ?CrateMasks::MaskOutputFailure          :0x00000000);
+    output |= ((this->fantrayFailure)           ?CrateMasks::MaskFantrayFailue          :0x00000000);
+    output |= ((this->sensorFailure)            ?CrateMasks::MaskSensorFailure          :0x00000000);
+    output |= ((this->vmeSysFailure)            ?CrateMasks::MaskVmeSysFailure          :0x00000000);
+    output |= ((this->plugAndPlayIncompatible)  ?CrateMasks::MaskPlugAndPlayIncompatible:0x00000000);
+    output |= ((this->busReset)                 ?CrateMasks::MaskBusReset               :0x00000000);
+    output |= ((this->supplyDerating)           ?CrateMasks::MaskSupplyDerating         :0x00000000);
+    output |= ((this->supplyFailure)            ?CrateMasks::MaskSupplyFailure          :0x00000000);
     return output;
 }
 
@@ -219,24 +219,24 @@ ChannelStatus& ChannelStatus::operator=(const ChannelStatus& rhs)
 unsigned int ChannelStatus::giveIntRepresentation()
 {
     unsigned int output = 0x00000000;
-    output |= ((this->outputOn)                         ?MaskOutputOn                         :0x00000000);
-    output |= ((this->outputInhibit)                    ?MaskOutputInhibit                    :0x00000000);
-    output |= ((this->outputFailureMinSenseVoltage)     ?MaskOutputFailureMinSenseVoltage     :0x00000000);
-    output |= ((this->outputFailureMaxSenseVoltage)     ?MaskOutputFailureMaxSenseVoltage     :0x00000000);
-    output |= ((this->outputFailureMaxTerminalVoltage)  ?MaskOutputFailureMaxTerminalVoltage  :0x00000000);
-    output |= ((this->outputFailureMaxCurrent)          ?MaskOutputFailureMaxCurrent          :0x00000000);
-    output |= ((this->outputFailureMaxTemperature)      ?MaskOutputFailureMaxTemperature      :0x00000000);
-    output |= ((this->outputFailureMaxPower)            ?MaskOutputFailureMaxPower            :0x00000000);
-    output |= ((this->outputFailureTimeout)             ?MaskOutputFailureTimeout             :0x00000000);
-    output |= ((this->outputCurrentLimited)             ?MaskOutputCurrentLimited             :0x00000000);
-    output |= ((this->outputRampUp)                     ?MaskOutputRampUp                     :0x00000000);
-    output |= ((this->outputRampDown)                   ?MaskOutputRampDown                   :0x00000000);
-    output |= ((this->outputEnableKill)                 ?MaskOutputEnableKill                 :0x00000000);
-    output |= ((this->outputEmergencyOff)               ?MaskOutputEmergencyOff               :0x00000000);
-    output |= ((this->outputAdjusting)                  ?MaskOutputAdjusting                  :0x00000000);
-    output |= ((this->outputConstantVoltage)            ?MaskOutputConstantVoltage            :0x00000000);
-    output |= ((this->outputCurrentBoundsExceeded)      ?MaskOutputCurrentBoundsExceeded      :0x00000000);
-    output |= ((this->outputFailureCurrentLimit)        ?MaskOutputFailureCurrentLimit        :0x00000000);
+    output |= ((this->outputOn)                         ?ChannelMasks::MaskOutputOn                         :0x00000000);
+    output |= ((this->outputInhibit)                    ?ChannelMasks::MaskOutputInhibit                    :0x00000000);
+    output |= ((this->outputFailureMinSenseVoltage)     ?ChannelMasks::MaskOutputFailureMinSenseVoltage     :0x00000000);
+    output |= ((this->outputFailureMaxSenseVoltage)     ?ChannelMasks::MaskOutputFailureMaxSenseVoltage     :0x00000000);
+    output |= ((this->outputFailureMaxTerminalVoltage)  ?ChannelMasks::MaskOutputFailureMaxTerminalVoltage  :0x00000000);
+    output |= ((this->outputFailureMaxCurrent)          ?ChannelMasks::MaskOutputFailureMaxCurrent          :0x00000000);
+    output |= ((this->outputFailureMaxTemperature)      ?ChannelMasks::MaskOutputFailureMaxTemperature      :0x00000000);
+    output |= ((this->outputFailureMaxPower)            ?ChannelMasks::MaskOutputFailureMaxPower            :0x00000000);
+    output |= ((this->outputFailureTimeout)             ?ChannelMasks::MaskOutputFailureTimeout             :0x00000000);
+    output |= ((this->outputCurrentLimited)             ?ChannelMasks::MaskOutputCurrentLimited             :0x00000000);
+    output |= ((this->outputRampUp)                     ?ChannelMasks::MaskOutputRampUp                     :0x00000000);
+    output |= ((this->outputRampDown)                   ?ChannelMasks::MaskOutputRampDown                   :0x00000000);
+    output |= ((this->outputEnableKill)                 ?ChannelMasks::MaskOutputEnableKill                 :0x00000000);
+    output |= ((this->outputEmergencyOff)               ?ChannelMasks::MaskOutputEmergencyOff               :0x00000000);
+    output |= ((this->outputAdjusting)                  ?ChannelMasks::MaskOutputAdjusting                  :0x00000000);
+    output |= ((this->outputConstantVoltage)            ?ChannelMasks::MaskOutputConstantVoltage            :0x00000000);
+    output |= ((this->outputCurrentBoundsExceeded)      ?ChannelMasks::MaskOutputCurrentBoundsExceeded      :0x00000000);
+    output |= ((this->outputFailureCurrentLimit)        ?ChannelMasks::MaskOutputFailureCurrentLimit        :0x00000000);
     return output;
 }
 
