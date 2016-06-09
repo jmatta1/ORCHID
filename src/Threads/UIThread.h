@@ -28,6 +28,7 @@
 #define NCURSES_MOUSE_VERSION 1
 #include<ncurses.h>
 // includes from ORCHID
+#include"Utility/MpodMapper.h"
 #include"SlowControls/HVLib/MpodController.h"
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
@@ -44,7 +45,8 @@ class UIThread
 {
 public:
     UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
-             InterThread::FileData* fiDat, InterThread::SlowControlsThreadController* sctCtrl,
+             InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
+             InterThread::SlowControlsThreadController* sctCtrl,
              SlowControls::MpodController* mpCtrl,
              int refreshFrequency, int pollingRate);
     ~UIThread(){}
@@ -129,6 +131,7 @@ private:
     InterThread::FileData* fileData;
     InterThread::SlowControlsThreadController* sctControl;
     SlowControls::MpodController* mpodController;
+    Utility::MpodMapper* mpodMapper;
     //multiplier for calculating rate from number of triggers
     float rateMultiplier;
     

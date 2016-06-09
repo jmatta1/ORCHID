@@ -38,11 +38,15 @@ namespace Threads
 static const int errorColor = 1;
 static const int goodColor = 2;
 static const int gridStartLine = 5;
+static const int tempStartCol = 20;
+static const int volStartCol = 36;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
-                   InterThread::FileData* fiDat, InterThread::SlowControlsThreadController* sctCtrl,
-                   SlowControls::MpodController* mpCtrl, int refreshFrequency, int pollingRate):
-    slowData(slDat), rateData(rtDat), fileData(fiDat), sctControl(sctCtrl),
+                   InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
+                   InterThread::SlowControlsThreadController* sctCtrl,
+                   SlowControls::MpodController* mpCtrl, int refreshFrequency,
+                   int pollingRate):
+    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodMapper(mpodMap), sctControl(sctCtrl),
     mpodController(mpCtrl), persistCount(-1), lastFileSize(0), command(""),
     persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
     mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr), lg(OrchidLog::get())
@@ -122,6 +126,7 @@ void UIThread::initScreen()
     init_color(COLOR_BLACK, 0, 0, 0);
     init_color(COLOR_RED, 1000, 0, 0);
     init_color(COLOR_GREEN, 0, 1000, 0);
+    init_color(COLOR_GLUE, 0, 0, 1000);
     init_color(COLOR_WHITE, 1000, 1000, 1000);
     init_pair(errorColor, COLOR_RED, COLOR_BLACK);
     init_pair(goodColor, COLOR_GREEN, COLOR_BLACK);
@@ -240,6 +245,53 @@ void UIThread::drawGlobalSlowControlsInformation()
 
 void UIThread::drawSlowControlsGrid()
 {
+    int currentRow = gridStartLine;
+    //now draw the topmost separators
+    mvwprintw(this->textWindow, currentRow, tempStartCol, "--------------");
+    mvwprintw(this->textWindow, currentRow, volStartCol, "---------------------------------------");
+    ++currentRow;
+    //now draw the column headers
+    mvwprintw(this->textWindow, currentRow, tempStartCol, "|Chan|  Temp |");
+    mvwprintw(this->textWindow, currentRow, volStartCol, "| Chan | TerVol | Current | Status");
+    ++currentRow;
+    //more separators
+    mvwprintw(this->textWindow, currentRow, tempStartCol, "==============");
+    mvwprintw(this->textWindow, currentRow, volStartCol, "=======================================");
+    ++currentRow;
+    //now loop through the temp sensors
+    int currDataLine = currentRow;
+    int stopLine = currentRow + 2*this->slowData->numTemperatureChannels;
+    int chanInd = 0;
+    while(currDataLine < stopLine)
+    {
+        mvwprintw(this->textWindow, currDataLine, tempStartCol, "|    |       |");
+        //TODO: write out temp information
+        ++currDataLine;
+    }
+    mvwprintw(this->textWindow, currDataLine, tempStartCol, "================");
+    //now loop through the voltage sensors
+    currDataLine = currentRow;
+    stopLine = currentRow + 2*this->slowData->numVoltageChannels;
+    chanInd = 0;
+    while(currDataLine < stopLine)
+    {
+        //build the voltage data string
+        std::ostringstream builder;
+        //first add the channel in the usual format
+        builder << "| u" << (this->mpodMapper->moduleNum[chanInd] - 1) << (this->mpodMapper->channelNum[chanInd] - 1) << " | ";
+        //add the voltage
+        builder << std::setw(4) << std::setprecision(2) << (this->slowData->terminalVoltage[chanInd]/1000.0) <<"kV | ";
+        //add the current
+        builder << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
+        //add the status
+        std::string statusString;
+        this->slowData->genChannelInfoString(i, statusString);
+        builder << statusString;
+        mvwprintw(this->textWindow, currentRow, volStartCol, builder.str().c_str());
+        ++chanInd;
+    }
+    
+    mvwprintw(this->textWindow, currentRow, volStartCol, "=======================================");
     
 }
 
@@ -253,6 +305,7 @@ void UIThread::drawRunningScreen()
     this->drawGlobalSlowControlsInformation();
     //draw the slow controls info grid();
     this->drawSlowControlsGrid();
+    //draw the message stuff
     this->drawPersistentMessage();
     this->drawCommandInProgress();
 }
@@ -409,7 +462,7 @@ void UIThread::handleScreenResize()
     //get the terminal size, if it is not big enough force the user to resize
     //the terminal until we get at least the minimum size
     this->numRows = LINES; this->numCols = COLS;
-    while((this->numRows < 14) || (this->numCols < 72))
+    while((this->numRows < 14) || (this->numCols < 80))
     {
         wclear(this->textWindow);
         wclear(this->messageWindow);
