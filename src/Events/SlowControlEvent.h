@@ -47,20 +47,20 @@ private:
     
     //MPOD Information
     //Per Channel information
-    float*         terminalVoltage;
-    float*         senseVoltage;
-    float*         setVoltage;
-    float*         current;
-    float*         rampUpRate;
-    float*         rampDownRate;
-    float*         maxCurrent;
-    float*         maxVoltage;
-    int*           currentTripTime;
-    int*           temperature;
-    int*           maxTemperature;
-    bool*          outputSwitch;
-    ChannelStatus* channelStatus;
-    CrateStatus      crateStatus;
+    float*  terminalVoltage;
+    float*  senseVoltage;
+    float*  setVoltage;
+    float*  current;
+    float*  rampUpRate;
+    float*  rampDownRate;
+    float*  maxCurrent;
+    float*  maxVoltage;
+    int*    currentTripTime;
+    int*    temperature;
+    int*    maxTemperature;
+    bool*   outputSwitch;
+    SlowControls::ChannelStatus*   channelStatus;
+    SlowControls::CrateStatus      crateStatus;
 
     //Temperature Sensor Information
 

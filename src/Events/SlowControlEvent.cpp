@@ -45,7 +45,7 @@ SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
     this->temperature     = new int[numVolChannels];
     this->maxTemperature  = new int[numVolChannels];
     this->outputSwitch    = new bool[numVolChannels];
-    this->channelStatus   = new ChannelStatus[numVolChannels];
+    this->channelStatus   = new SlowControls::ChannelStatus[numVolChannels];
 }
 
 SlowControlsEvent::~SlowControlsEvent()
@@ -100,7 +100,7 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
     *(reinterpret_cast<int*>(&(buff[index]))) = this->numTemperatureChannels;
     index += sizeof(int);
     //now write the power crate information
-    *(reinterpret_cast<unsigned int*>(&(buff[index]))) = this->crateStatus->giveIntRepresentation();
+    *(reinterpret_cast<unsigned int*>(&(buff[index]))) = this->crateStatus.giveIntRepresentation();
     index += sizeof(unsigned int);
     //now write the rest of the power information channel by channel
     for(int i =0; i<numVoltageChannels; ++i)
@@ -129,7 +129,7 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
         index += sizeof(int);
         *(reinterpret_cast<bool*>(&(buff[index]))) = this->outputSwitch[i];
         index += sizeof(bool);
-        *(reinterpret_cast<unsigned int*>(&(buff[index]))) = this->channelStatus[i]->giveIntRepresentation();
+        *(reinterpret_cast<unsigned int*>(&(buff[index]))) = this->channelStatus[i].giveIntRepresentation();
         index += sizeof(unsigned int);
     }
     //now write the the temperature information
