@@ -249,31 +249,32 @@ void SlowData::genChannelInfoString(int channel, std::string& out)
     std::ostringstream output;
     if(outputOn[channel]) output << "On ";
     if(outputInhibit[channel]) output << "Inhibit ";
+
     if(outputFailureMinSenseVoltage[channel] || outputFailureMaxSenseVoltage[channel] ||
-            outputFailureMaxTerminalVoltage[channel] || outputFailureMaxCurrent ||
-            outputFailureMaxTemperature || outputFailureMaxPower ||
-            outputFailureTimeout || outputEmergencyOff ||
-            outputCurrentBoundsExceeded || outputFailureCurrentLimit)
+            outputFailureMaxTerminalVoltage[channel] || outputFailureMaxCurrent[channel] ||
+            outputFailureMaxTemperature[channel] || outputFailureMaxPower[channel] ||
+            outputFailureTimeout[channel] || outputEmergencyOff[channel] ||
+            outputCurrentBoundsExceeded[channel] || outputFailureCurrentLimit[channel])
     {
         output << "Failure: ( ";
-        if(outputFailureMinSenseVoltage) output << "MinSense ";
-        if(outputFailureMaxSenseVoltage) output << "MaxSense ";
-        if(outputFailureMaxTerminalVoltage) output << "MaxTerm ";
-        if(outputFailureMaxCurrent) output << "MaxCurr ";
-        if(outputFailureMaxTemperature) output << "MaxTemp ";
-        if(outputFailureMaxPower) output << "MaxPower ";
-        if(outputFailureTimeout) output << "FailTimout ";
-        if(outputEmergencyOff) output << "EmerOff ";
-        if(outputCurrentBoundsExceeded) output << "OutOfCurrBounds ";
-        if(outputFailureCurrentLimit) output << "CurrLimFail ";
+        if(outputFailureMinSenseVoltage[channel]) output << "MinSense ";
+        if(outputFailureMaxSenseVoltage[channel]) output << "MaxSense ";
+        if(outputFailureMaxTerminalVoltage[channel]) output << "MaxTerm ";
+        if(outputFailureMaxCurrent[channel]) output << "MaxCurr ";
+        if(outputFailureMaxTemperature[channel]) output << "MaxTemp ";
+        if(outputFailureMaxPower[channel]) output << "MaxPower ";
+        if(outputFailureTimeout[channel]) output << "FailTimout ";
+        if(outputEmergencyOff[channel]) output << "EmerOff ";
+        if(outputCurrentBoundsExceeded[channel]) output << "OutOfCurrBounds ";
+        if(outputFailureCurrentLimit[channel]) output << "CurrLimFail ";
         output << ") ";
         
     }
-    if(outputCurrentLimited) output << "OutCurLim ";
-    if(outputRampUp) output << "RampUp ";
-    if(outputRampDown) output << "RampDown ";
-    if(outputAdjusting) output << "FineAdj ";
-    if(outputConstantVoltage) output << "ConstVoltage ";
+    if(outputCurrentLimited[channel]) output << "OutCurLim ";
+    if(outputRampUp[channel]) output << "RampUp ";
+    if(outputRampDown[channel]) output << "RampDown ";
+    if(!outputAdjusting[channel]) output << "No_FineAdj ";
+    if(!outputConstantVoltage[channel]) output << "No_ConstVoltage ";
     out = output.str();
 }
 
