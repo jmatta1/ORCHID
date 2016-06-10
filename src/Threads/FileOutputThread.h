@@ -32,7 +32,7 @@
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"AsyncIO/AsyncOutFile.h"
 #include"InterThreadComm/InterThreadQueueSizes.h"
-#include"Events/SlowControlEvent.h"
+#include"Events/SlowControlsEvent.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"Events/TriggerEvent.h"
 #include"InputLib/Blocks/GeneralBlock.h"
@@ -42,7 +42,7 @@ namespace Threads
 //256MB of memory for buffers, approx 2 second of HDD write
 enum {BufferCount=128, BufferSizeMB=2};
 //typedef boost::lockfree::spsc_queue<TriggerEvent*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > ProcessedEventQueue;
-typedef boost::lockfree::spsc_queue<SlowControlEvent*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > SlowControlEventQueue;
+typedef boost::lockfree::spsc_queue<Events::SlowControlsEvent*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > SlowControlEventQueue;
 typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount> > BufferQueue;
 
 class FileOutputThread
@@ -61,15 +61,23 @@ private:
     void prepNewRunFolder();
     //make the file name based on run info
     void buildFileName();
+    //this function handles new parameters
+    void grabNewRunParameters();
+    //this function handles the actual writing loop
+    void doWriteLoop();
     
     /*
      * File Data
      */
     //this is the underlying asynchronous file that we use to dump full buffers
-    AsyncIO::AsyncOutFile* outFile;
+    AsyncIO::AsyncOutFile<BufferQueue>* outFile;
     //this is the underlying queue full of buffers to store data to be sent to
     //the file when the time comes
     BufferQueue bufferQueue;
+    //current buffer to fill
+    char* currentBuffer;
+    //index into the current buffer
+    int buffInd;
     //the directory for all data (sub directories hold different runs)
     std::string outDirectory;
     //the directory that we are currently writing to (outDirectory/runTitle/filename.dat.#)
@@ -102,6 +110,11 @@ private:
     InterThread::FileData* fileData;
     //this is the variable that points to the control structure for this thread
     InterThread::FileOutputThreadController* fileThreadController;
+    
+    /*
+     * Loop Control
+     */
+    bool notTerminated;
 };
 }
 #endif //ORCHID_SRC_THREADS_FILEOUTPUTTHREAD_H

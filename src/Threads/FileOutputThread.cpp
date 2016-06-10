@@ -29,6 +29,7 @@
 #include<boost/filesystem.hpp>
 // includes from ORCHID
 #include"Utility/OrchidLogger.h"
+#include"Events/EventInterface.h"
 
 namespace Threads
 {
@@ -41,10 +42,10 @@ FileOutputThread::FileOutputThread(SlowControlEventQueue* incomingSlowControlEve
                                    InterThread::FileOutputThreadController* fileThreadCtrl,
                                    InputParser::GeneralBlock* generalBlock):
     outFile(nullptr), outDirectory(generalBlock->baseOutputDirectory), currentFileName(""),
-    currentRunTitle(generalBlock->runTitle), runNumber(0), sequenceNumber(0),
-    incomingSlowControlEventQueue(incomingSlowControlEvents),
-    returningSlowControlEventQueue(returningSlowControlEvents), fileData(fileDat),
-    fileThreadController(fileThreadCtrl)
+    currentRunTitle(generalBlock->runTitle), runNumber(0), sequenceNumber(0), buffInd(0),
+    incomingSlowControlsEventQueue(incomingSlowControlEvents),
+    returningSlowControlsEventQueue(returningSlowControlEvents), fileData(fileDat),
+    fileThreadController(fileThreadCtrl), notTerminated(true)
 {
     //make directories and prep file name
     this->prepNewRunFolder();
@@ -62,9 +63,10 @@ FileOutputThread::FileOutputThread(SlowControlEventQueue* incomingSlowControlEve
         //start until after this loop
         this->bufferQueue.push(allocBuffer);
     }
+    //pop a buffer from the queue to serve as what we are filling now
+    this->bufferQueue.pop(this->currentBuffer);
     //make the asynchronous output file
-    this->outFile = new AsyncIO::AsyncOutFile(this->currentFileName, &(this->bufferQueue));
-    
+    this->outFile = new AsyncIO::AsyncOutFile<BufferQueue>(this->currentFileName, &(this->bufferQueue));
 }
 
 FileOutputThread::~FileOutputThread()
@@ -80,6 +82,81 @@ FileOutputThread::~FileOutputThread()
 
 void FileOutputThread::operator()()
 {
+    //Prep the event loop
+    while(this->notTerminated)
+    {
+        switch(this->fileThreadController->getCurrentState())
+        {
+        case InterThread::FileOutputThreadState::Terminate:
+            this->notTerminated = false;
+            break;
+        case InterThread::FileOutputThreadState::Waiting:
+            this->fileThreadController->waitForNewState();
+            break;
+        case InterThread::FileOutputThreadState::NewRunParams:
+            this->grabNewRunParameters();
+            break;
+        case InterThread::FileOutputThreadState::Writing:
+            this->doWriteLoop();
+            break;
+        }
+    }
+    //if we are here then we are exiting
+    this->fileThreadController->setThreadDone();
+}
+
+void FileOutputThread::doWriteLoop()
+{
+    while(this->fileThreadController->getCurrentState() == InterThread::FileOutputThreadState::Writing)
+    {
+        //TODO: Modify this when we have a event processing thread
+        //check for data
+        bool gotData = false;
+        /*Events::EventInterface* fastEvent;
+        if(this->incomingDigitizerEventQueue->pop(fastEvent))
+        {
+            gotData = true;
+            
+        }*/
+        Events::EventInterface* slowEvent;
+        if(this->incomingSlowControlsEventQueue->pop(slowEvent))
+        {
+            gotData = true;
+        }
+    }
+}
+
+void FileOutputThread::grabNewRunParameters()
+{
+    std::string tempRunTitle;
+    int tempRunNumber;
+    this->fileThreadController->getNewRunParams(tempRunTitle, tempRunNumber);
+    if(tempRunTitle == this->currentRunTitle && tempRunNumber == this->runNumber)
+    {
+        //everything is the same, do nothing
+        return;
+    }
+    else if(tempRunTitle == this->currentRunTitle && tempRunNumber != this->runNumber)
+    {
+        //the run number has changed, we do not need to prep a new run folder,
+        //we merely need to build a new file name and make a new file
+        this->runNumber = tempRunNumber;
+        this->sequenceNumber = 0;
+        this->buildFileName();
+        //now make a new file
+        this->outFile->newFile(this->currentFileName);
+    }
+    else
+    {
+        //either the run title or both the run title and number have changed
+        //prep a new folder and build a new run title then set a new file
+        this->runNumber = tempRunNumber;
+        this->currentRunTitle = tempRunTitle;
+        this->sequenceNumber = 0;
+        this->prepNewRunFolder();
+        //now make a new file
+        this->outFile->newFile(this->currentFileName);
+    }
     
 }
 
