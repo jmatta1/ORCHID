@@ -16,12 +16,12 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_INTERTHREADCOMM_CONTROL_FILEOUTPUTTHREADCONTROLLER_H
-#define ORCHID_SRC_INTERTHREADCOMM_CONTROL_FILEOUTPUTTHREADCONTROLLER_H
+#ifndef ORCHID_SRC_INTERTHREADCOMM_INTERTHREADQUEUESIZES_H
+#define ORCHID_SRC_INTERTHREADCOMM_INTERTHREADQUEUESIZES_H
 
 // includes for C system headers
 // includes for C++ system headers
-#include"type_traits"
+#include<type_traits>
 // includes from other libraries
 // includes from ORCHID
 
@@ -45,4 +45,4 @@ constexpr typename std::underlying_type<Enum>::type getEnumVal(Enum val)
 
 }
 
-#endif //ORCHID_SRC_INTERTHREADCOMM_CONTROL_FILEOUTPUTTHREADCONTROLLER_H
+#endif //ORCHID_SRC_INTERTHREADCOMM_INTERTHREADQUEUESIZES_H
