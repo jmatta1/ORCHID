@@ -44,8 +44,12 @@ public:
     FileOutputThreadState getCurrentState(){return this->currentState.load();}
     void waitForNewState();
     void setThreadDone(){this->threadDone.store(true);}
-    void getRunNumber(int& rNum){rNum=this->runNumber; this->currentState.store(this->priorState.load());}
-    void getRunTitle(std::string& rTitle){rTitle=this->runTitle; this->currentState.store(this->priorState.load());}
+    void getNewRunParams(std::string& rTitle, int& rNum)
+    {
+        rTitle=this->runTitle;
+        rNum=this->runNumber;
+        this->currentState.store(this->priorState.load());
+    }
     
     //files for the UI thread
     void setToTerminate()
