@@ -18,7 +18,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"SlowControlEvent.h"
+#include"SlowControlsEvent.h"
 // includes for C system headers
 // includes for C++ system headers
 #include<sstream>
