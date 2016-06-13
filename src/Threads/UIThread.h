@@ -34,6 +34,7 @@
 #include"InterThreadComm/Data/RateData.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
+#include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"Utility/OrchidLogger.h"
 
 namespace Threads
@@ -47,6 +48,7 @@ public:
     UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
              InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
              InterThread::SlowControlsThreadController* sctCtrl,
+             InterThread::FileOutputThreadController* fileCtrl,
              SlowControls::MpodController* mpCtrl,
              int refreshFrequency, int pollingRate);
     ~UIThread(){}
@@ -112,13 +114,12 @@ private:
     void startDataTaking();
     //stops the digitizer running, and finishes handling the data in the system
     void stopDataTaking();
-    //momentarily stops the digitizer, flushes the file, changes the run number
-    // and then restarts data taking
-    void incrementRunNumber();
     // sets the run number
     void setRunNumber();
     // sets the run name
     void setRunName();
+    // sets the run name, number and description
+    void setRunParams();
     
     /*
     ** Private Member Variables
@@ -130,6 +131,7 @@ private:
     InterThread::RateData* rateData;
     InterThread::FileData* fileData;
     InterThread::SlowControlsThreadController* sctControl;
+    InterThread::FileOutputThreadController* fileControl;
     SlowControls::MpodController* mpodController;
     Utility::MpodMapper* mpodMapper;
     //multiplier for calculating rate from number of triggers
@@ -154,6 +156,10 @@ private:
     int sequenceNumber;
     //variable to store the size of the file when we check
     long long lastFileSize;
+    
+    //Variables to store temporary data when loading new run parameters
+    std::string tempRunTitle;
+    int tempRunNumber;
     
     /**  Variables for managing the user interface**/
     //amount of time to sleep for

@@ -44,10 +44,11 @@ static const int volStartCol = 40;
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
                    InterThread::SlowControlsThreadController* sctCtrl,
+                   InterThread::FileOutputThreadController* fileCtrl,
                    SlowControls::MpodController* mpCtrl, int refreshFrequency,
                    int pollingRate):
     slowData(slDat), rateData(rtDat), fileData(fiDat), mpodMapper(mpodMap), sctControl(sctCtrl),
-    mpodController(mpCtrl), persistCount(-1), lastFileSize(0), command(""),
+    fileControl(fileCtrl), mpodController(mpCtrl), persistCount(-1), lastFileSize(0), command(""),
     persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
     mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr), lg(OrchidLog::get())
 {
@@ -172,14 +173,12 @@ void UIThread::drawIdleScreen()
     mvwprintw(this->textWindow, 1, 0,  "Commands Available");
     mvwprintw(this->textWindow, 2, 4,  "start");
     mvwprintw(this->textWindow, 2, 16, "- Start taking data");
-    mvwprintw(this->textWindow, 3, 4,  "name");
-    mvwprintw(this->textWindow, 3, 16, "- Set run name");
-    mvwprintw(this->textWindow, 4, 4,  "number");
-    mvwprintw(this->textWindow, 4, 16, "- Set run number");
-    mvwprintw(this->textWindow, 5, 4,  "turnoff");
-    mvwprintw(this->textWindow, 5, 16, "- Disconnect from digitizer and shutdown MPOD");
-    mvwprintw(this->textWindow, 6, 4,  "quit/exit");
-    mvwprintw(this->textWindow, 6, 16, "- Exit ORCHID");
+    mvwprintw(this->textWindow, 3, 4,  "changerun");
+    mvwprintw(this->textWindow, 3, 16, "- Change Run Parameters");
+    mvwprintw(this->textWindow, 4, 4,  "turnoff");
+    mvwprintw(this->textWindow, 4, 16, "- Disconnect from digitizer and shutdown MPOD");
+    mvwprintw(this->textWindow, 5, 4,  "quit/exit");
+    mvwprintw(this->textWindow, 5, 16, "- Exit ORCHID");
     
     this->drawPersistentMessage();
     this->drawCommandInProgress();
@@ -433,26 +432,12 @@ void UIThread::handleCommand()
         wclrtoeol(this->messageWindow);
         this->stopDataTaking();
         break;
-    case UICommands::Next:
+    case UICommands::ChangeRun:
         this->persistCount = -1; //clear any error, clearly they fixed it
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
-        this->incrementRunNumber();
-        break;
-    case UICommands::Number:
-        this->persistCount = -1; //clear any error, clearly they fixed it
-        wmove(this->messageWindow, 1, 0);
-        persistentMessage.clear();
-        wclrtoeol(this->messageWindow);
-        this->setRunNumber();
-        break;
-    case UICommands::Name:
-        this->persistCount = -1; //clear any error, clearly they fixed it
-        wmove(this->messageWindow, 1, 0);
-        persistentMessage.clear();
-        wclrtoeol(this->messageWindow);
-        this->setRunName();
+        this->setRunParams();
         break;
     case UICommands::Unavailable:
         this->persistentMessage = "Error:  Command unvailable in this mode";
@@ -627,9 +612,7 @@ void UIThread::handleSetRunNumKeyPress(int inChar)
         this->persistColor = goodColor;
         this->persistCount = refreshRate*2;
         boost::spirit::qi::parse(command.begin(), command.end(), boost::spirit::qi::int_, temp);
-        //TODO: actually call the command structure to change the file thread
-        this->fileData->setRunNumber(temp);
-        this->fileData->setSequenceNumber(0);
+        this->tempRunNumber = temp;
         command.clear();
         this->runSubLoop = false;
     }
@@ -673,14 +656,12 @@ void UIThread::handleSetRunTitleKeyPress(int inChar)
     case '\n':
     case '\f':
     {
-        //TODO: actually call the command structure to change the file thread
         std::ostringstream builder;
         builder << "Run title set to: " << command ;
         this->persistentMessage = builder.str();
         this->persistColor = goodColor;
         this->persistCount = refreshRate*2;
-        this->fileData->setRunTitle(this->command);
-        this->fileData->setSequenceNumber(0);
+        this->tempRunTitle = this->command();
         command.clear();
         this->runSubLoop = false;
     }
@@ -779,16 +760,124 @@ void UIThread::handleSetRunTitleKeyPress(int inChar)
     }
 }
 
+void UIThread::handleSetRunDescKeyPress(int inChar)
+{
+    int lastCharInd = (command.size() - 1);
+    switch(inChar)
+    {
+    case KEY_ENTER:
+    case '\r':
+    case '\n':
+    case '\f':
+        this->tempRunTitle = this->command();
+        command.clear();
+        this->runSubLoop = false;
+        break;
+    case KEY_RESIZE:
+        this->handleScreenResize();
+        break;
+    case KEY_BACKSPACE:
+    case KEY_DC:
+        if(lastCharInd >= 0)
+        {
+            mvwprintw(this->textWindow, 3, lastCharInd+3, " ");
+            command.erase(lastCharInd, 1);   
+        }
+        break;
+    case 'a'://I know it is probably a bit dumb, but this was my first thought
+    case 'b'://on how to make certain that only non silly characters make it
+    case 'c'://to the command with this all the meta characters etc are filtered
+    case 'd':
+    case 'e':
+    case 'f':
+    case 'g':
+    case 'h':
+    case 'i':
+    case 'j':
+    case 'k':
+    case 'l':
+    case 'm':
+    case 'n':
+    case 'o':
+    case 'p':
+    case 'q':
+    case 'r':
+    case 's':
+    case 't':
+    case 'u':
+    case 'v':
+    case 'w':
+    case 'x':
+    case 'y':
+    case 'z':
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+    case 'G':
+    case 'H':
+    case 'I':
+    case 'J':
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'O':
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+    case 'T':
+    case 'U':
+    case 'V':
+    case 'W':
+    case 'X':
+    case 'Y':
+    case 'Z':
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case '_':
+    case '-':
+    case '(':
+    case ')':
+    case '*':
+    case '+':
+    case '=':
+    case ',':
+    case '.':
+    case '[':
+    case ']':
+    case ' ':
+        if(lastCharInd < 3911) command.append(1, inChar);
+        break;
+    default://anything not listed explicitly, ignore
+        break;
+    }
+}
+
 void UIThread::waitForAllTerminations()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Terminating Threads";
     this->waitForSlowControlsThreadTermination();
     //this->waitForDigitizerThreadTermination();
     //this->waitForEventProcessingThreadsTermination();
     //this->waitForFileThreadTermination();
+    BOOST_LOG_SEV(this->lg, Information) << "Done Terminating Threads";
 }
 
 void UIThread::waitForSlowControlsThreadTermination()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Terminating Slow Controls Thread";
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Termination of Slow Controls Thread");
     wrefresh(this->textWindow);
@@ -913,7 +1002,8 @@ void UIThread::turnOff()
 void UIThread::startDataTaking()
 {
     BOOST_LOG_SEV(this->lg, Information) << "Starting File Writing";
-    //TODO put the file thread into running data mode
+    this->fileControl->setToWriting();
+    //TODO Put in a wait for file thread to be waiting for data
     BOOST_LOG_SEV(this->lg, Information) << "Starting Event Processing";
     //TODO put the event processing threads into running mode
     BOOST_LOG_SEV(this->lg, Information) << "Starting Slow Controls Event Generation";
@@ -940,27 +1030,18 @@ void UIThread::stopDataTaking()
     BOOST_LOG_SEV(this->lg, Information) << "Slow Controls Set To Polling Only";
     this->sctControl->setToPolling();
     BOOST_LOG_SEV(this->lg, Information) << "File Thread Set To Stop";
-    //TODO put the file thread into finish and stop mode
-    //TODO wait for file thread to stop
+    this->fileControl->setToWaiting();
+    while(!this->fileControl->isWaiting())
+    {//until we see the file thread waiting on its wait condition, sleep and spin
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
     mode = UIMode::Idle;
-    //this->startLine = 0;
-    wclear(this->textWindow);
-}
-
-void UIThread::incrementRunNumber()
-{
-    BOOST_LOG_SEV(this->lg, Information) << "Incrementing Run Number";
-    this->stopDataTaking();
-    //TODO call actual file thread control structure
-    this->fileData->incrementRunNumber();
-    this->startDataTaking();
-    //this->startLine = 0;
     wclear(this->textWindow);
 }
 
 void UIThread::setRunNumber()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Setting Run Number";
+    BOOST_LOG_SEV(this->lg, Information) << "Getting Run Number";
     //run number to that and the sequence number to zero
     int inChar;
     this->runSubLoop = true;
@@ -986,7 +1067,7 @@ void UIThread::setRunNumber()
 
 void UIThread::setRunName()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Setting Run Name";
+    BOOST_LOG_SEV(this->lg, Information) << "Getting Run Name";
     //run number to that and the sequence number to zero
     int inChar;
     this->runSubLoop = true;
@@ -1008,6 +1089,20 @@ void UIThread::setRunName()
         boost::this_thread::sleep_for(this->refreshPeriod);
     }
     wclear(this->messageWindow);
+}
+
+
+void UIThread::setRunParams()
+{
+    this->setRunName();
+    this->setRunNumber();
+    BOOST_LOG_SEV(this->lg, Information) << "Setting All Run Info";
+    //TODO: call run changing code
+    while(!this->fileControl->setNewRunParameters(this->tempRunTitle, this->tempRunNumber))
+    {//failed at setting the new parameters, try again in a moment
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    BOOST_LOG_SEV(this->lg, Information) << "RunInfoSet";
 }
 
 }
