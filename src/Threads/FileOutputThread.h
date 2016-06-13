@@ -28,6 +28,7 @@
 #include<boost/lockfree/queue.hpp>
 #include<boost/lockfree/spsc_queue.hpp>
 #include<boost/thread.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
 // includes from ORCHID
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"AsyncIO/AsyncOutFile.h"
@@ -40,7 +41,7 @@
 namespace Threads
 {
 //256MB of memory for buffers, approx 2 second of HDD write
-enum {BufferCount=128, BufferSizeMB=2};
+enum {BufferCount=128, BufferSizeInBytes=2097152, BufferOverHead=8192, MaxBuffersPerFile=975};
 //typedef boost::lockfree::spsc_queue<TriggerEvent*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > ProcessedEventQueue;
 typedef boost::lockfree::spsc_queue<Events::SlowControlsEvent*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > SlowControlEventQueue;
 typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount> > BufferQueue;
@@ -65,6 +66,32 @@ private:
     void grabNewRunParameters();
     //this function handles the actual writing loop
     void doWriteLoop();
+    //this function simply doubles the size of the event buffer
+    void doubleEventBuffer();
+    //this function performs the necessary actions to write the event to the buffer
+    //if the buffer is full it finalizes it and sends it to disk
+    void transferData(int eventSize);
+    //takes a full buffer, and writes the checksums for its contents into the header then sends it to disk
+    void finalizeDataBuffer();
+    //write a fill sized buffer to disk
+    void writeFullSizeBufferToDisk(){this->writeBufferToDisk(BufferSizeInBytes);}
+    //write buffers of indeterminate size to disk
+    void writeBufferToDisk(int bufferSize);
+    //this function generates the file header and writes it to the disk
+    void writeFileHeader();
+    //this function pops a buffer from the buffer queue
+    //the length of the buffer queue is deliberately longer than the internal queue used
+    //by the async file to move buffers to its write thread. In this way there is always a buffer in the queue
+    void getNextBuffer()
+    {
+        this->bufferQueue.pop(this->currentBuffer);
+        ++bufferNumber;
+        this->buffInd = 0;
+        this->writeBufferHeader();
+    }
+    //this function writes the header of the buffer to the current buffer
+    void writeBufferHeader();
+    
     
     /*
      * File Data
@@ -74,10 +101,18 @@ private:
     //this is the underlying queue full of buffers to store data to be sent to
     //the file when the time comes
     BufferQueue bufferQueue;
+    //stores the size of the event buffer
+    int evBufSize;
+    //buffer to hold the event to be placed into the data stream
+    char* eventBuffer;
     //current buffer to fill
     char* currentBuffer;
     //index into the current buffer
     int buffInd;
+    //stores the current buffer number of the file
+    int bufferNumber;
+    //stores how many events are in the current buffer
+    int eventCount;
     //the directory for all data (sub directories hold different runs)
     std::string outDirectory;
     //the directory that we are currently writing to (outDirectory/runTitle/filename.dat.#)
@@ -90,6 +125,8 @@ private:
     int runNumber;
     //the sequence number for the run
     int sequenceNumber;
+    //the start time of the current file
+    boost::posix_time::ptime currFileTime;
     
     /*
      * Interthread Queues

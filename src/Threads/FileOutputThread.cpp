@@ -24,15 +24,19 @@
 // includes for C++ system headers
 #include<sstream>
 #include<iomanip>
+#include<algorithm>
 // includes from other libraries
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
 // includes from ORCHID
 #include"Utility/OrchidLogger.h"
+#include"Utility/OrchidConfig.h"
 #include"Events/EventInterface.h"
 
 namespace Threads
 {
+
+static const boost::posix_time::ptime epoch(boost::date_time::date(1970,1,1), boost::date_time::time_duration(0,0,0,0));
 
 FileOutputThread::FileOutputThread(SlowControlEventQueue* incomingSlowControlEvents,
                                    SlowControlEventQueue* returningSlowControlEvents,
@@ -41,18 +45,20 @@ FileOutputThread::FileOutputThread(SlowControlEventQueue* incomingSlowControlEve
                                    InterThread::FileData* fileDat,
                                    InterThread::FileOutputThreadController* fileThreadCtrl,
                                    InputParser::GeneralBlock* generalBlock):
-    outFile(nullptr), outDirectory(generalBlock->baseOutputDirectory), currentFileName(""),
-    currentRunTitle(generalBlock->runTitle), runNumber(0), sequenceNumber(0), buffInd(0),
+    outFile(nullptr), evBufSize(2048), eventBuffer(nullptr), 
+    outDirectory(generalBlock->baseOutputDirectory), currentFileName(""),
+    currentRunTitle(generalBlock->runTitle), runNumber(0), sequenceNumber(0),
+    buffInd(0), bufferNumber(0), eventCount(0),
     incomingSlowControlsEventQueue(incomingSlowControlEvents),
-    returningSlowControlsEventQueue(returningSlowControlEvents), fileData(fileDat),
-    fileThreadController(fileThreadCtrl), notTerminated(true)
+    returningSlowControlsEventQueue(returningSlowControlEvents),
+    fileData(fileDat), fileThreadController(fileThreadCtrl), notTerminated(true)
 {
     //make directories and prep file name
     this->prepNewRunFolder();
     //load the queue with buffers of the appropriate size
     for(int i=0; i<BufferCount ; ++i)
     {
-        char* allocBuffer = new (std::nothrow) char[BufferSizeMB*1024*1024];
+        char* allocBuffer = new (std::nothrow) char[BufferSizeInBytes];
         if(allocBuffer == nullptr)
         {
             BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Error In File Write Buffer Allocation";
@@ -64,9 +70,13 @@ FileOutputThread::FileOutputThread(SlowControlEventQueue* incomingSlowControlEve
         this->bufferQueue.push(allocBuffer);
     }
     //pop a buffer from the queue to serve as what we are filling now
-    this->bufferQueue.pop(this->currentBuffer);
+    this->getNextBuffer();
     //make the asynchronous output file
     this->outFile = new AsyncIO::AsyncOutFile<BufferQueue>(this->currentFileName, &(this->bufferQueue));
+    //write the file header
+    this->writeFileHeader();
+    //allocate the event buffer to be 2kB
+    this->eventBuffer = new char[evBufSize];
 }
 
 FileOutputThread::~FileOutputThread()
@@ -78,6 +88,7 @@ FileOutputThread::~FileOutputThread()
         this->bufferQueue.pop(allocBuffer);
         delete[] allocBuffer;
     }
+    delete[] this->eventBuffer;
 }
 
 void FileOutputThread::operator()()
@@ -122,8 +133,60 @@ void FileOutputThread::doWriteLoop()
         if(this->incomingSlowControlsEventQueue->pop(slowEvent))
         {
             gotData = true;
+            int eventSize = slowEvent->getSizeOfBinaryRepresentation();
+            //loop until we double the event buffer past the size of the event
+            while(eventSize > this->evBufSize)
+            {
+                //we need to double the size of the event buffer
+                this->doubleEventBuffer();
+            }
+            //now that we know that we have enough size
+            slowEvent->getBinaryRepresentation(this->eventBuffer);
+            //now that we have the data, write it to our large buffer
+            this->transferData(eventSize);
         }
     }
+}
+
+void FileOutputThread::transferData(int eventSize)
+{
+    //TODO implement compression when we write data to the buffer
+    if(eventSize < (BufferSizeInBytes - this->buffInd))
+    {//we have enough space, write the event to the buffer
+        std::copy(this->eventBuffer, (this->eventBuffer + eventSize), &(this->currentBuffer[this->buffInd]));
+        ++(this->eventCount);
+        this->buffInd += eventSize;
+    }
+    else
+    {//otherwise, write the buffer to disk and write this event to the next buffer
+        this->finalizeDataBuffer();
+        this->eventCount = 0;
+        //here we make certain that we are not at capacity
+        if (this->bufferNumber < MaxBuffersPerFile)
+        {
+            //increment sequence number and set up the new run
+            ++(this->sequenceNumber);
+            this->buildFileName();
+            this->outFile->newFile(this->currentFileName);
+            //reset the buffer number to 0 now that we have a new file
+            this->bufferNumber = 0;
+        }
+    }
+}
+
+void FileOutputThread::doubleEventBuffer()
+{
+    delete[] this->eventBuffer;
+    this->evBufSize *= 2;
+    this->eventBuffer = new char[this->evBufSize];
+}
+
+void FileOutputThread::finalizeDataBuffer()
+{
+    //first we load the last of the buffer with zeros
+    std::fill_n(&(this->currentBuffer[this->buffInd]), BufferSizeInBytes - this->buffInd, 0);
+    //here we go back to the beginning of the buffer and load the number of events into the header
+    
 }
 
 void FileOutputThread::grabNewRunParameters()
@@ -145,6 +208,7 @@ void FileOutputThread::grabNewRunParameters()
         this->buildFileName();
         //now make a new file
         this->outFile->newFile(this->currentFileName);
+        this->writeFileHeader();
     }
     else
     {
@@ -156,8 +220,63 @@ void FileOutputThread::grabNewRunParameters()
         this->prepNewRunFolder();
         //now make a new file
         this->outFile->newFile(this->currentFileName);
+        this->writeFileHeader();
     }
-    
+}
+
+void FileOutputThread::writeFileHeader()
+{
+    //directly manipulate the buffer to contain the header and send it to disk
+    reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd]))[0] = 0x0102040810204080ULL;
+    this->buffInd += 8;
+    reinterpret_cast<unsigned long>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000001;
+    this->buffInd += 4;
+    reinterpret_cast<unsigned short>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_MAJOR_VERSION;
+    this->buffInd += 2;
+    reinterpret_cast<unsigned short>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_MINOR_VERSION;
+    this->buffInd += 2;
+    reinterpret_cast<unsigned short>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_PATCH_VERSION;
+    this->buffInd += 2;
+    this->currFileTime = boost::posix_time::microsec_clock::universal_time();
+    boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
+    reinterpret_cast<long long>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_nanoseconds();
+    this->buffInd += 8;
+    std::string fileTimeString = boost::posix_time::to_iso_extended_string(currFileTime);
+    std::copy(fileTimeString.c_str(), fileTimeString.c_str() + 30, &this->currentBuffer[this->buffInd]);
+    this->buffInd += 30;
+    if(this->currentRunTitle.size() < 100)
+    {
+        std::copy(this->currentRunTitle.c_str(), this->currentRunTitle.c_str() + this->currentRunTitle.size(), &this->currentBuffer[this->buffInd]);
+        this->buffInd += this->currentRunTitle.size();
+        std::fill_n(&this->currentBuffer[this->buffInd], 100-this->currentRunTitle.size(), '\0');
+        this->buffInd += (100-this->currentRunTitle.size());
+    }
+    else
+    {
+        std::copy(this->currentRunTitle.c_str(), this->currentRunTitle.c_str() + 99, &this->currentBuffer[this->buffInd]);
+        this->buffInd += 99;
+        this->currentBuffer[this->buffInd] = '\0';
+        this->buffInd += 1;
+    }
+    reinterpret_cast<unsigned long>(&(this->currentBuffer[this->buffInd]))[0] = this->runNumber;
+    this->buffInd += 4;
+    reinterpret_cast<unsigned long>(&(this->currentBuffer[this->buffInd]))[0] = this->sequenceNumber;
+    this->buffInd += 4;
+    //reserve 3924 bytes in the buffer header for whatever
+    std::fill_n(&this->currentBuffer[this->buffInd], 3924, 0);
+    this->buffInd += 3924;
+    reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0F0F0F0F0ULL;
+    this->buffInd += 8;
+    //send this 4kB header to the file
+    this->writeBufferToDisk(this->buffInd);
+}
+
+void FileOutputThread::writeBufferToDisk(int bufferSize)
+{
+    this->outFile->writeBuf(this->currentBuffer, bufferSize);
+    //now that we have sent that buffer out
+    //get another for use in the actual file handling
+    this->getNextBuffer();
 }
 
 void FileOutputThread::prepNewRunFolder()
