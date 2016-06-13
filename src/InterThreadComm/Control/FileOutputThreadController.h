@@ -57,22 +57,7 @@ public:
         this->currentState.store(FileOutputThreadState::Terminate);
         if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
     }
-    bool setNewRunNumber(int runNum)
-    {
-        //check to make certain we have not already set a title change that has
-        //not yet been acknowledged, if that is the case then we cannot change
-        //parameters yet
-        if(FileOutputThreadState::NewRunParams == this->currentState.load()) return false;
-        //change the parameter *then* change the state
-        //this way the file output thread does not check the parameters
-        //while we are modifying them
-        this->runNumber = runNum;
-        this->priorState.store(this->currentState.load());
-        this->currentState.store(FileOutputThreadState::NewRunParams);
-        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
-        return true;
-    }
-    bool setNewRunTitle(const std::string& rTitle)
+    bool setNewRunParameters(const std::string& rTitle, int runNum)
     {
         //check to make certain we have not already set a title change that has
         //not yet been acknowledged, if that is the case then we cannot change
@@ -82,6 +67,7 @@ public:
         //this way the file output thread does not check the parameters
         //while we are modifying them
         this->runTitle = rTitle;
+        this->runNumber = runNum;
         this->priorState.store(this->currentState.load());
         this->currentState.store(FileOutputThreadState::NewRunParams);
         if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
@@ -98,6 +84,7 @@ public:
         if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
     }
     bool isDone(){return this->threadDone.load();}
+    bool isWaiting(){return this->fileThreadWaiting.load();}
 private:
     //state variable
     std::atomic<FileOutputThreadState> currentState;
