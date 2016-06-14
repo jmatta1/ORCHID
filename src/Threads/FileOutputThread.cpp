@@ -265,12 +265,14 @@ void FileOutputThread::doWriteLoop()
             }
             //now that we know that we have enough size
             slowEvent->getBinaryRepresentation(this->eventBuffer);
+            //now that we are done with the event pass it back to the return queue
+            this->returningSlowControlsEventQueue->push(slowEvent);
             //now that we have the data, write it to our large buffer
             this->transferData(eventSize);
         }
         if(gotData != true)
         {
-            //we got no data from either queue so wait for data
+            //we recieved no data from either queue so wait for data
             //TODO, add logic for data waits here
         }
         gotData = false;
