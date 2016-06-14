@@ -28,6 +28,7 @@
 // includes from other libraries
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
+#include<boost/crc.hpp>
 // includes from ORCHID
 #include"Utility/OrchidLogger.h"
 #include"Utility/OrchidConfig.h"
@@ -91,6 +92,46 @@ FileOutputThread::~FileOutputThread()
     delete[] this->eventBuffer;
 }
 
+void FileOutputThread::prepNewRunFolder()
+{
+    boost::filesystem::path writePath(this->outDirectory);
+    boost::system::error_code mkDirErr;
+    bool success = boost::filesystem::create_directories(writePath, mkDirErr);
+    if(!success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create data directory in file thread";
+        throw std::runtime_error("Could not create data directory in file thread");
+    }
+    writePath.append(this->currentRunTitle);
+    success = boost::filesystem::create_directories(writePath, mkDirErr);
+    if(!success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create run directory in file thread";
+        throw std::runtime_error("Could not create run directory in file thread");
+    }
+    if(!boost::filesystem::is_directory(writePath, mkDirErr))
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "No run directory detected despite creation";
+        throw std::runtime_error("No run directory detected despite creation");
+    }
+    this->writeDirectory = writePath.native();
+    this->buildFileName();
+}
+
+void FileOutputThread::buildFileName()
+{
+    std::ostringstream builder;
+    builder << this->writeDirectory;
+    if(this->writeDirectory.back()!=boost::filesystem::path::preferred_separator)
+    {
+        builder << boost::filesystem::path::preferred_separator;
+    }
+    builder << this->currentRunTitle << "_";
+    builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
+    builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
+    this->currentFileName = builder.str();
+}
+
 void FileOutputThread::operator()()
 {
     //Prep the event loop
@@ -114,79 +155,6 @@ void FileOutputThread::operator()()
     }
     //if we are here then we are exiting
     this->fileThreadController->setThreadDone();
-}
-
-void FileOutputThread::doWriteLoop()
-{
-    while(this->fileThreadController->getCurrentState() == InterThread::FileOutputThreadState::Writing)
-    {
-        //TODO: Modify this when we have a event processing thread
-        //check for data
-        bool gotData = false;
-        /*Events::EventInterface* fastEvent;
-        if(this->incomingDigitizerEventQueue->pop(fastEvent))
-        {
-            gotData = true;
-            
-        }*/
-        Events::EventInterface* slowEvent;
-        if(this->incomingSlowControlsEventQueue->pop(slowEvent))
-        {
-            gotData = true;
-            int eventSize = slowEvent->getSizeOfBinaryRepresentation();
-            //loop until we double the event buffer past the size of the event
-            while(eventSize > this->evBufSize)
-            {
-                //we need to double the size of the event buffer
-                this->doubleEventBuffer();
-            }
-            //now that we know that we have enough size
-            slowEvent->getBinaryRepresentation(this->eventBuffer);
-            //now that we have the data, write it to our large buffer
-            this->transferData(eventSize);
-        }
-    }
-}
-
-void FileOutputThread::transferData(int eventSize)
-{
-    //TODO implement compression when we write data to the buffer
-    if(eventSize < (BufferSizeInBytes - this->buffInd))
-    {//we have enough space, write the event to the buffer
-        std::copy(this->eventBuffer, (this->eventBuffer + eventSize), &(this->currentBuffer[this->buffInd]));
-        ++(this->eventCount);
-        this->buffInd += eventSize;
-    }
-    else
-    {//otherwise, write the buffer to disk and write this event to the next buffer
-        this->finalizeDataBuffer();
-        this->eventCount = 0;
-        //here we make certain that we are not at capacity
-        if (this->bufferNumber < MaxBuffersPerFile)
-        {
-            //increment sequence number and set up the new run
-            ++(this->sequenceNumber);
-            this->buildFileName();
-            this->outFile->newFile(this->currentFileName);
-            //reset the buffer number to 0 now that we have a new file
-            this->bufferNumber = 0;
-        }
-    }
-}
-
-void FileOutputThread::doubleEventBuffer()
-{
-    delete[] this->eventBuffer;
-    this->evBufSize *= 2;
-    this->eventBuffer = new char[this->evBufSize];
-}
-
-void FileOutputThread::finalizeDataBuffer()
-{
-    //first we load the last of the buffer with zeros
-    std::fill_n(&(this->currentBuffer[this->buffInd]), BufferSizeInBytes - this->buffInd, 0);
-    //here we go back to the beginning of the buffer and load the number of events into the header
-    
 }
 
 void FileOutputThread::grabNewRunParameters()
@@ -271,52 +239,140 @@ void FileOutputThread::writeFileHeader()
     this->writeBufferToDisk(this->buffInd);
 }
 
+void FileOutputThread::doWriteLoop()
+{
+    bool gotData = false;
+    while(this->fileThreadController->getCurrentState() == InterThread::FileOutputThreadState::Writing)
+    {
+        //TODO: Modify this when we have a event processing thread
+        //check for data
+        /*Events::EventInterface* fastEvent;
+        if(this->incomingDigitizerEventQueue->pop(fastEvent))
+        {
+            gotData = true;
+            
+        }*/
+        Events::EventInterface* slowEvent;
+        if(this->incomingSlowControlsEventQueue->pop(slowEvent))
+        {
+            gotData = true;
+            int eventSize = slowEvent->getSizeOfBinaryRepresentation();
+            //loop until we double the event buffer past the size of the event
+            while(eventSize > this->evBufSize)
+            {
+                //we need to double the size of the event buffer
+                this->doubleEventBuffer();
+            }
+            //now that we know that we have enough size
+            slowEvent->getBinaryRepresentation(this->eventBuffer);
+            //now that we have the data, write it to our large buffer
+            this->transferData(eventSize);
+        }
+        if(gotData != true)
+        {
+            //we got no data from either queue so wait for data
+            //TODO, add logic for data waits here
+        }
+        gotData = false;
+    }
+}
+
+void FileOutputThread::doubleEventBuffer()
+{
+    delete[] this->eventBuffer;
+    this->evBufSize *= 2;
+    this->eventBuffer = new char[this->evBufSize];
+}
+
+void FileOutputThread::transferData(int eventSize)
+{
+    //TODO implement compression when we write data to the buffer
+    if(eventSize < (BufferSizeInBytes - this->buffInd))
+    {//we have enough space, write the event to the buffer
+        std::copy(this->eventBuffer, (this->eventBuffer + eventSize), &(this->currentBuffer[this->buffInd]));
+        ++(this->eventCount);
+        this->buffInd += eventSize;
+    }
+    else
+    {//otherwise, write the buffer to disk and write this event to the next buffer
+        this->finalizeDataBuffer();//this finalizes the event and writes the buffer to disk
+        //here we make certain that we are not at capacity
+        if (this->bufferNumber < MaxBuffersPerFile)
+        {
+            //increment sequence number and set up the new run
+            ++(this->sequenceNumber);
+            this->buildFileName();
+            this->outFile->newFile(this->currentFileName);
+            //reset the buffer number to 0 now that we have a new file
+            this->bufferNumber = 0;
+            this->writeFileHeader();
+        }
+    }
+}
+
+void FileOutputThread::finalizeDataBuffer()
+{
+    //first we load the last of the buffer with zeros
+    std::fill_n(&(this->currentBuffer[this->buffInd]), BufferSizeInBytes - this->buffInd, 0);
+    //here we go back to the beginning of the buffer and load the number of events into the header
+    reinterpret_cast<unsigned int>(&(this->currentBuffer[12]))[0] = this->eventCount;
+    //now skip past the first 32 bytes of the buffer and start writing the 4 byte 32 bit crcs
+    unsigned int writeInd   = 32;
+    unsigned int writeSize  = 4;
+    unsigned int readInd    = BufferOverHead;
+    unsigned int readSize   = 1024;
+    unsigned int blockCount = (BufferSizeInBytes - BufferOverHead)/readSize;
+    //make the crc object
+    boost::crc_optimal<32,0x32583499, 0x00000000, 0x00000000, false, false> crcComputer;
+    //now cycle through the buffer calculating crc 32 values
+    for(int i=0; i<blockCount; ++i)
+    {
+        crcComputer.process_block(&(this->currentBuffer[readInd]),&(this->currentBuffer[readInd+readSize]));
+        reinterpret_cast<unsigned int>(&(this->currentBuffer[writeInd]))[0] = crcComputer.checksum();
+        writeInd += writeSize;
+        readInd += readSize;
+    }
+    //now we have written all the CRC checksumsm now we can write the buffer to disk
+    this->writeBufferToDisk(BufferSizeInBytes);
+    this->eventCount = 0;
+}
+
 void FileOutputThread::writeBufferToDisk(int bufferSize)
 {
     this->outFile->writeBuf(this->currentBuffer, bufferSize);
     //now that we have sent that buffer out
-    //get another for use in the actual file handling
+    //get another use in the actual file handling
     this->getNextBuffer();
 }
 
-void FileOutputThread::prepNewRunFolder()
+void FileOutputThread::getNextBuffer()
 {
-    boost::filesystem::path writePath(this->outDirectory);
-    boost::system::error_code mkDirErr;
-    bool success = boost::filesystem::create_directories(writePath, mkDirErr);
-    if(!success)
-    {
-        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create data directory in file thread";
-        throw std::runtime_error("Could not create data directory in file thread");
-    }
-    writePath.append(this->currentRunTitle);
-    success = boost::filesystem::create_directories(writePath, mkDirErr);
-    if(!success)
-    {
-        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create run directory in file thread";
-        throw std::runtime_error("Could not create run directory in file thread");
-    }
-    if(!boost::filesystem::is_directory(writePath, mkDirErr))
-    {
-        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "No run directory detected despite creation";
-        throw std::runtime_error("No run directory detected despite creation");
-    }
-    this->writeDirectory = writePath.native();
-    this->buildFileName();
+    this->bufferQueue.pop(this->currentBuffer);
+    ++bufferNumber;
+    this->buffInd = 0;
+    this->writeBufferHeader();
 }
 
-void FileOutputThread::buildFileName()
+void FileOutputThread::writeBufferHeader()
 {
-    std::ostringstream builder;
-    builder << this->writeDirectory;
-    if(this->writeDirectory.back()!=boost::filesystem::path::preferred_separator)
-    {
-        builder << boost::filesystem::path::preferred_separator;
-    }
-    builder << this->currentRunTitle << "_";
-    builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
-    builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
-    this->currentFileName = builder.str();
+    //first we write the buffer separator
+    reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0F0F0F0F0ULL;
+    this->buffInd += 8;
+    //then we write the buffer ID
+    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000002;
+    this->buffInd += 4;
+    //then we write a stand in for the number of events
+    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = 0;
+    this->buffInd += 4;
+    //then we write which buffer number this is in the file
+    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = this->bufferNumber;
+    this->buffInd += 4;
+    //then we write which buffer number this is in the run
+    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = ((this->sequenceNumber * MaxBuffersPerFile) + this->bufferNumber);
+    this->buffInd += 4;
+    //then we write zero to the remainder of the 8kb, since we are aligned to an 8byte boundary go in 8 byte chunks
+    std::fill_n(reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd])), ((BufferOverHead - 24)/8), 0ULL);
+    this->buffInd = BufferOverHead;
 }
 
 }

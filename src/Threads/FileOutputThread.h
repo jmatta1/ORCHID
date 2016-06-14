@@ -82,13 +82,7 @@ private:
     //this function pops a buffer from the buffer queue
     //the length of the buffer queue is deliberately longer than the internal queue used
     //by the async file to move buffers to its write thread. In this way there is always a buffer in the queue
-    void getNextBuffer()
-    {
-        this->bufferQueue.pop(this->currentBuffer);
-        ++bufferNumber;
-        this->buffInd = 0;
-        this->writeBufferHeader();
-    }
+    void getNextBuffer();
     //this function writes the header of the buffer to the current buffer
     void writeBufferHeader();
     
