@@ -43,7 +43,7 @@ namespace Threads
 //256MB of memory for buffers, approx 2 second of HDD write
 enum {BufferCount=128, BufferSizeInBytes=2097152, BufferOverHead=8192, MaxBuffersPerFile=975};
 //typedef boost::lockfree::spsc_queue<TriggerEvent*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > ProcessedEventQueue;
-typedef boost::lockfree::spsc_queue<Events::SlowControlsEvent*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > SlowControlEventQueue;
+typedef boost::lockfree::spsc_queue<Events::EventInterface*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > SlowControlEventQueue;
 typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount> > BufferQueue;
 
 class FileOutputThread

@@ -29,6 +29,7 @@ HFIR background monitoring wall.
 #include"InterThreadComm/Data/FileData.h"
 // ORCHID interprocess communication control objects
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
+#include"InterThreadComm/Control/FileOutputThreadController.h"
 // ORCHID device objects
 #include"SlowControls/HVLib/MpodController.h"
 #include"SlowControls/HVLib/SnmpUtilCommands.h"
@@ -137,6 +138,7 @@ int main(int argc, char* argv[])
     InterThread::SlowControlsThreadController* sctController = new InterThread::SlowControlsThreadController();
     
     // For controlling FileOutputThread
+    InterThread::FileOutputThreadController* fotController = new InterThread::FileOutputThreadController();
     
     // For controlling EventProcThread(s)
     
@@ -183,10 +185,9 @@ int main(int argc, char* argv[])
     //make the UI thread callable
     Threads::UIThread* uiThreadCallable =
             new Threads::UIThread(slowData, rateData, fileData, mpodMapper,
-                      //Future:   digitizerThreadControl,
-                                  sctController,
-                      //Future:   fileThreadControl, eventProcThreadControl,
-                      //Future:   digitizerControl
+                      //Future:   digitizerControl,
+                                  sctController, fotController,
+                      //Future:   eventProcThreadControl, digitizerThreadControl,
                                   mpodController,
                                   params.generalBlock->updateFrequency,
                                   params.powerBlock->pollingRate);

@@ -29,6 +29,7 @@
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
 #include<boost/crc.hpp>
+#include<boost/date_time/gregorian/gregorian.hpp>
 // includes from ORCHID
 #include"Utility/OrchidLogger.h"
 #include"Utility/OrchidConfig.h"
@@ -37,7 +38,7 @@
 namespace Threads
 {
 
-static const boost::posix_time::ptime epoch(boost::date_time::date(1970,1,1), boost::date_time::time_duration(0,0,0,0));
+static const boost::posix_time::ptime epoch(boost::gregorian::date(1970,1,1), boost::posix_time::time_duration(0,0,0,0));
 
 FileOutputThread::FileOutputThread(SlowControlEventQueue* incomingSlowControlEvents,
                                    SlowControlEventQueue* returningSlowControlEvents,
@@ -195,19 +196,19 @@ void FileOutputThread::grabNewRunParameters()
 void FileOutputThread::writeFileHeader()
 {
     //directly manipulate the buffer to contain the header and send it to disk
-    reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd]))[0] = 0x0102040810204080ULL;
+    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0x0102040810204080ULL;
     this->buffInd += 8;
-    reinterpret_cast<unsigned long>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000001;
+    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000001;
     this->buffInd += 4;
-    reinterpret_cast<unsigned short>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_MAJOR_VERSION;
+    reinterpret_cast<unsigned short*>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_MAJOR_VERSION;
     this->buffInd += 2;
-    reinterpret_cast<unsigned short>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_MINOR_VERSION;
+    reinterpret_cast<unsigned short*>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_MINOR_VERSION;
     this->buffInd += 2;
-    reinterpret_cast<unsigned short>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_PATCH_VERSION;
+    reinterpret_cast<unsigned short*>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_PATCH_VERSION;
     this->buffInd += 2;
     this->currFileTime = boost::posix_time::microsec_clock::universal_time();
     boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
-    reinterpret_cast<long long>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_nanoseconds();
+    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_nanoseconds();
     this->buffInd += 8;
     std::string fileTimeString = boost::posix_time::to_iso_extended_string(currFileTime);
     std::copy(fileTimeString.c_str(), fileTimeString.c_str() + 30, &this->currentBuffer[this->buffInd]);
@@ -226,14 +227,14 @@ void FileOutputThread::writeFileHeader()
         this->currentBuffer[this->buffInd] = '\0';
         this->buffInd += 1;
     }
-    reinterpret_cast<unsigned long>(&(this->currentBuffer[this->buffInd]))[0] = this->runNumber;
+    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = this->runNumber;
     this->buffInd += 4;
-    reinterpret_cast<unsigned long>(&(this->currentBuffer[this->buffInd]))[0] = this->sequenceNumber;
+    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = this->sequenceNumber;
     this->buffInd += 4;
     //reserve 3924 bytes in the buffer header for whatever
-    std::fill_n(&this->currentBuffer[this->buffInd], 3924, 0);
+    std::fill_n(reinterpret_cast<unsigned int*>(&this->currentBuffer[this->buffInd]), 981, 0);
     this->buffInd += 3924;
-    reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0F0F0F0F0ULL;
+    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0F0F0F0F0ULL;
     this->buffInd += 8;
     //send this 4kB header to the file
     this->writeBufferToDisk(this->buffInd);
@@ -317,7 +318,7 @@ void FileOutputThread::finalizeDataBuffer()
     //first we load the last of the buffer with zeros
     std::fill_n(&(this->currentBuffer[this->buffInd]), BufferSizeInBytes - this->buffInd, 0);
     //here we go back to the beginning of the buffer and load the number of events into the header
-    reinterpret_cast<unsigned int>(&(this->currentBuffer[12]))[0] = this->eventCount;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[12]))[0] = this->eventCount;
     //now skip past the first 32 bytes of the buffer and start writing the 4 byte 32 bit crcs
     unsigned int writeInd   = 32;
     unsigned int writeSize  = 4;
@@ -330,7 +331,7 @@ void FileOutputThread::finalizeDataBuffer()
     for(int i=0; i<blockCount; ++i)
     {
         crcComputer.process_block(&(this->currentBuffer[readInd]),&(this->currentBuffer[readInd+readSize]));
-        reinterpret_cast<unsigned int>(&(this->currentBuffer[writeInd]))[0] = crcComputer.checksum();
+        reinterpret_cast<unsigned int*>(&(this->currentBuffer[writeInd]))[0] = crcComputer.checksum();
         writeInd += writeSize;
         readInd += readSize;
     }
@@ -358,22 +359,22 @@ void FileOutputThread::getNextBuffer()
 void FileOutputThread::writeBufferHeader()
 {
     //first we write the buffer separator
-    reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0F0F0F0F0ULL;
+    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0F0F0F0F0ULL;
     this->buffInd += 8;
     //then we write the buffer ID
-    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000002;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000002;
     this->buffInd += 4;
     //then we write a stand in for the number of events
-    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = 0;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = 0;
     this->buffInd += 4;
     //then we write which buffer number this is in the file
-    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = this->bufferNumber;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = this->bufferNumber;
     this->buffInd += 4;
     //then we write which buffer number this is in the run
-    reinterpret_cast<unsigned int>(&(this->currentBuffer[this->buffInd]))[0] = ((this->sequenceNumber * MaxBuffersPerFile) + this->bufferNumber);
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = ((this->sequenceNumber * MaxBuffersPerFile) + this->bufferNumber);
     this->buffInd += 4;
     //then we write zero to the remainder of the 8kb, since we are aligned to an 8byte boundary go in 8 byte chunks
-    std::fill_n(reinterpret_cast<unsigned long long>(&(this->currentBuffer[this->buffInd])), ((BufferOverHead - 24)/8), 0ULL);
+    std::fill_n(reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd])), ((BufferOverHead - 24)/8), 0ULL);
     this->buffInd = BufferOverHead;
 }
 

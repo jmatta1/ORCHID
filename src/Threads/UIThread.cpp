@@ -661,7 +661,7 @@ void UIThread::handleSetRunTitleKeyPress(int inChar)
         this->persistentMessage = builder.str();
         this->persistColor = goodColor;
         this->persistCount = refreshRate*2;
-        this->tempRunTitle = this->command();
+        this->tempRunTitle = this->command;
         command.clear();
         this->runSubLoop = false;
     }
@@ -754,111 +754,6 @@ void UIThread::handleSetRunTitleKeyPress(int inChar)
         break;
     case ' ':
         command.append(1, '_');
-        break;
-    default://anything not listed explicitly, ignore
-        break;
-    }
-}
-
-void UIThread::handleSetRunDescKeyPress(int inChar)
-{
-    int lastCharInd = (command.size() - 1);
-    switch(inChar)
-    {
-    case KEY_ENTER:
-    case '\r':
-    case '\n':
-    case '\f':
-        this->tempRunTitle = this->command();
-        command.clear();
-        this->runSubLoop = false;
-        break;
-    case KEY_RESIZE:
-        this->handleScreenResize();
-        break;
-    case KEY_BACKSPACE:
-    case KEY_DC:
-        if(lastCharInd >= 0)
-        {
-            mvwprintw(this->textWindow, 3, lastCharInd+3, " ");
-            command.erase(lastCharInd, 1);   
-        }
-        break;
-    case 'a'://I know it is probably a bit dumb, but this was my first thought
-    case 'b'://on how to make certain that only non silly characters make it
-    case 'c'://to the command with this all the meta characters etc are filtered
-    case 'd':
-    case 'e':
-    case 'f':
-    case 'g':
-    case 'h':
-    case 'i':
-    case 'j':
-    case 'k':
-    case 'l':
-    case 'm':
-    case 'n':
-    case 'o':
-    case 'p':
-    case 'q':
-    case 'r':
-    case 's':
-    case 't':
-    case 'u':
-    case 'v':
-    case 'w':
-    case 'x':
-    case 'y':
-    case 'z':
-    case 'A':
-    case 'B':
-    case 'C':
-    case 'D':
-    case 'E':
-    case 'F':
-    case 'G':
-    case 'H':
-    case 'I':
-    case 'J':
-    case 'K':
-    case 'L':
-    case 'M':
-    case 'N':
-    case 'O':
-    case 'P':
-    case 'Q':
-    case 'R':
-    case 'S':
-    case 'T':
-    case 'U':
-    case 'V':
-    case 'W':
-    case 'X':
-    case 'Y':
-    case 'Z':
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-    case '_':
-    case '-':
-    case '(':
-    case ')':
-    case '*':
-    case '+':
-    case '=':
-    case ',':
-    case '.':
-    case '[':
-    case ']':
-    case ' ':
-        if(lastCharInd < 3911) command.append(1, inChar);
         break;
     default://anything not listed explicitly, ignore
         break;
