@@ -22,74 +22,78 @@
 
 // includes for C system headers
 // includes for C++ system headers
-#include<tuple>
+#include<atomic>
 // includes from other libraries
 #include<boost/thread.hpp>
+#include<boost/lockfree/queue.hpp>
+#include<boost/lockfree/spsc_queue.hpp>
 // includes from ORCHID
-
+#include"Events/EventInterface.h"
+#include"InterThreadComm/InterThreadQueueSizes.h"
 
 namespace InterThread
 {
 
-//a bit of template metaprogramming so that I can expand a single usage of type
-//into a parameter pack of arbitrary length
-template<int Count, typename Type, typename ...Types>
-struct TupleTypeGenRec
-{
-    typedef TupleType TuplePackGenRec<Count-1, Type, Type, Types>::TupleType;
-};
+typedef boost::lockfree::spsc_queue<Events::EventInterface*, boost::lockfree::capacity<getEnumVal(QueueSizes::SlowControlToFile)>> SlowCtrlsQueue;
+typedef boost::lockfree::queue<Events::EventInterface*, boost::lockfree::capacity<getEnumVal(QueueSizes::ProcessingToFile)>> ProcessedQueue;
 
-template<typename Type, typename ...Types>
-struct TupleTypeGenRec<0, Type, Types...>
-{
-    typedef TupleType std::tuple<Types...>;
-};
-
-//this is the type that actually needs to be called to make the magic happen
-template<int Count, typename Type>
-struct TupleTypeGen
-{
-    typedef TupleType TupleTypeGenRec<Count-1, Type, Type>::TupleType;
-};
-
-template <typename QueueContent, typename ... QueueTypes>
 class MultiQueuePair
 {
 public:
     MultiQueuePair();
     ~MultiQueuePair();
     
-    template<int QueueIndex>
-    bool consumerPush(QueueContent* data);
-    template<int QueueIndex>
-    bool consumerPop(QueueContent* data);
-    template<int QueueIndex>
-    bool producerPush(QueueContent* data);
-    template<int QueueIndex>
-    bool producerPop(QueueContent* data);
+    bool slowCtrlsPop(Events::EventInterface*& data);
+    bool processedPop(Events::EventInterface*& data);
     
-    template<int QueueIndex>
-    bool tryConsumerPush(QueueContent* data);
-    template<int QueueIndex>
-    bool tryConsumerPop(QueueContent* data);
-    template<int QueueIndex>
-    bool tryProducerPush(QueueContent* data);
-    template<int QueueIndex>
-    bool tryProducerPop(QueueContent* data);
+    bool trySlowCtrlsPop(Events::EventInterface*& data);
+    bool tryProcessedPop(Events::EventInterface*& data);
+    
+    bool slowCtrlsPush(Events::EventInterface* data);
+    bool processedPush(Events::EventInterface* data);
+    
+    bool trySlowCtrlsPush(Events::EventInterface* data);
+    bool tryProcessedPush(Events::EventInterface* data);
+    
+    
+    //functions for the file output thread to use to try to get data
+    bool tryFilePopSlowCtrls(Events::EventInterface*& data);
+    bool tryFilePopProcessed(Events::EventInterface*& data);
+    
+    bool tryFilePushSlowCtrls(Events::EventInterface* data);
+    bool tryFilePushProcessed(Events::EventInterface* data);
+    
+    //function for the file thread to use to wait for data
+    //this has no checks for the existance of data, such must be outside this class
+    void fileWaitForData();
+    
 private:
-    std::tuple<QueueTypes...> consumerQueue;
-    std::tuple<QueueTypes...> producerQueue;
+    //pair of queues for slow controls events
+    SlowCtrlsQueue slowCtrlsConsumerQueue;
+    SlowCtrlsQueue slowCtrlsProducerQueue;
     
-    //lists of threading structures necessary for waiting of the various producer threads
-    TupleTypeGen<sizeof...(QueueTypes), boost::mutex>::TupleType producerWaitMutex;
-    TupleTypeGen<sizeof...(QueueTypes), boost::condition_variable>::TupleType producerWaitCondition;
+    //pair of queues for processed events
+    ProcessedQueue processedConsumerQueue;
+    ProcessedQueue processedProducerQueue;
+    
+    //thread structures necessary for slow controls waiting
+    boost::mutex slowCtrlsMutex;
+    boost::condition_variable slowCtrlsWaitCondition;
+    std::atomic_bool slowCtrlsWaiting;
+    
+    //thread structurs necessary for processing threads waiting
+    boost::mutex processedMutex;
+    boost::condition_variable processedWaitCondition;
+    std::atomic_int processedWaiting;
     
     //threading structures necessary for the waiting of the consumer queue
-    boost::mutex consumerMutex;
-    boost::condition_variable consumerWaitCondition;
+    boost::mutex fileMutex;
+    boost::condition_variable fileWaitCondition;
+    std::atomic_bool fileWaiting;
+    
+    //hold whether or not our awakening has been forced
+    std::atomic_bool notForcedAwakening;
 };
-
-
 
 }
 
