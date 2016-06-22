@@ -1,7 +1,7 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file DataQueueWaiter.h
+** @file MultiQueuePair.h
 ** @author James Till Matta
 ** @date 21 June, 2016
 ** @brief
@@ -12,8 +12,8 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds a system that allows a single consumer to consume data of
-** multiple types of producers simultaneously
+** @details Holds definition of a system that allows a single consumer to
+** consume data of multiple types of producers simultaneously
 **
 ********************************************************************************
 *******************************************************************************/
@@ -40,8 +40,9 @@ typedef boost::lockfree::queue<Events::EventInterface*, boost::lockfree::capacit
 class MultiQueuePair
 {
 public:
-    MultiQueuePair();
-    ~MultiQueuePair();
+    MultiQueuePair():slowCtrlsWaiting(false), processedWaiting(0),
+        fileWaiting(false), notForcedAwakening(true){}
+    ~MultiQueuePair(){}
     
     bool slowCtrlsPop(Events::EventInterface*& data);
     bool processedPop(Events::EventInterface*& data);
@@ -65,7 +66,11 @@ public:
     
     //function for the file thread to use to wait for data
     //this has no checks for the existance of data, such must be outside this class
-    void fileWaitForData();
+    void fileWaitForData()
+    {
+        boost::unique_lock<boost::mutex> waitLock(this->fileMutex);
+        this->fileWaitCondition.wait(waitLock);
+    }
     
 private:
     //pair of queues for slow controls events
