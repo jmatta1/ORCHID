@@ -27,6 +27,8 @@ HFIR background monitoring wall.
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
 #include"InterThreadComm/Data/FileData.h"
+#include"InterThreadComm/MultiQueuePair.h"
+#include"InterThreadComm/QueuePair.h"
 // ORCHID interprocess communication control objects
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
