@@ -30,7 +30,6 @@
 #include<boost/lockfree/queue.hpp>
 #include<boost/thread.hpp>
 // includes from ORCHID
-#include"InterThreadComm/InterThreadQueueSizes.h"
 
 namespace InterThread
 {
@@ -47,7 +46,7 @@ namespace InterThread
 template<int Count, typename Type, typename ...Types>
 struct TupleTypeGenRec
 {
-    typedef TupleType TuplePackGenRec<Count-1, Type, Type, Types...>::TupleType;
+    typedef typename TupleTypeGenRec<Count-1, Type, Type, Types...>::TupleType TupleType;
 };
 
 //template specialization that ends the recursion
@@ -56,59 +55,15 @@ struct TupleTypeGenRec
 template<typename Type, typename ...Types>
 struct TupleTypeGenRec<0, Type, Types...>
 {
-    typedef TupleType std::tuple<Types...>;
+    typedef std::tuple<Types...> TupleType;
 };
 
 //this is the type that actually needs to be called to make the magic happen
 template<int Count, typename Type>
 struct TupleTypeGen
 {
-    typedef TupleType TupleTypeGenRec<Count-1, Type, Type>::TupleType;
+    typedef typename TupleTypeGenRec<Count-1, Type, Type>::TupleType TupleType;
 };
-
-
-
-/*
- * Generate a tuple with expanded boost lockfree queues with expanded templates
- * to the content type and the given capacity
- */
-//this is the recursive part of the template metaprogramming, the parameters are the same as before, but
-//we also have a count down integer at the end that is zero when we have everything, and a parameter pack
-//that holds the list of expanded queue types
-template<typename QueueContent, QueueSizes qSize, QueueSizes ...QSizes, typename qType, typename ...QTypes, int Count, typename ...TemplatedQueues>
-struct QueueTupleTypeGenRec
-{
-    typedef TupleType QueueTupleTypeGenRec<QueueContent, QSizes..., QTypes..., Count-1, TemplatedQueues..., qType<QueueContent, boost::lockfree::capacity<getEnumVal(qSize)>>>::TupleType;
-};
-
-//base case to end the recursion
-template<typename QueueContent, QueueSizes qSize, QueueSizes ...QSizes, typename qType, typename ...QTypes, typename TemplatedQueues>
-struct QueueTupleTypeGenRec<QueueContent, qSize, QSizes..., qType, QTypes..., 1, TemplatedQueues>
-{
-    typedef TupleType QueueTupleTypeGenFinal<TemplatedQueues..., qType<QueueContent, boost::lockfree::capacity<getEnumVal(qSize)>>>::TupleType;
-}; 
-
-//simple result of base case
-template<typename ...TemplatedQueues>
-struct QueueTupleTypeGenFinal
-{
-    typedef TupleType std::tuple<TemplatedQueues...>;
-};
-
-//this is the type that is called to generate the tuple of queues
-//this is the intial loop part of the template metaprogramming recursion where I
-//start breaking apart the parameter packs and expanding thing
-//The parameter QueueContent is the actual contents of the queue, so if you want
-//pointers to something pass a pointer, unlike the multiqueue class this does not
-//assume that it needs to convert things into pointers
-//the parameter qSize is the first parameter of the QSizes parameter pack peeled off
-//the parmeter qType is the first parmeter of the QTypes parameter pack peeled off
-template<typename QueueContent, QueueSizes qSize, QueueSizes ...QSizes, typename qType, typename ...QTypes>
-struct QueueTupleTypeGen
-{
-    typedef TupleType QueueTupleTypeGenRec<QueueContent, QSizes, QTypes, sizeof...(QTypes), qType<QueueContent, boost::lockfree::capacity<getEnumVal(qSize)>>>::TupleType;
-};
-
 
 
 /*
@@ -150,20 +105,20 @@ template<int index, int ...Indices>
 struct GenSequence: GenSequence<index - 1, index - 1, Indices...> {};
 
 template<int ...Indices>
-struct GenSequence<0, Indices...>: seq<Indices...> {};
+struct GenSequence<0, Indices...>: Sequence<Indices...> {};
 
 template<typename Type, typename FunctorType, int ...Indices>
-void forEachDetail(Type&& t, FunctorType& f, seq<Indices...>)
+void forEachDetail(Type&& t, FunctorType& f, Sequence<Indices...>)
 {
-    auto l = { f(std::get(Indices)(t))... };
+    auto l = { f(std::get<Indices>(t))... };
 }
 
 }
 
 template<typename... TupleTypes, typename FunctorType>
-void forEachInTuple(std::tuple<TuplesTypes...>& t, FunctorType& f)
+void forEachInTuple(std::tuple<TupleTypes...>& t, FunctorType& f)
 {
-    ForEachDetail::forEachDetail(t, f, detail::GenSequence<sizeof...(TupleTypes)>());
+    ForEachDetail::forEachDetail(t, f, ForEachDetail::GenSequence<sizeof...(TupleTypes)>());
 }
 
 /*
@@ -172,7 +127,7 @@ void forEachInTuple(std::tuple<TuplesTypes...>& t, FunctorType& f)
 template<typename AtomicType, AtomicType value>
 struct SetAtomicFunctor
 {
-    static void operator()(std::atomic<AtomicType>& toBeSet){toBeSet.store(value);}
+    void operator()(std::atomic<AtomicType>& toBeSet){toBeSet.store(value);}
 };
 
 /*
@@ -180,7 +135,7 @@ struct SetAtomicFunctor
  */
 struct WakeAllConditionsFunctor
 {
-    static void operator()(boost::condition_variable& condVar){condVar.notify_all();}
+    void operator()(boost::condition_variable& condVar){condVar.notify_all();}
 };
 
 }
