@@ -28,6 +28,7 @@
 #include"SlowControls/HVLib/MpodReader.h"
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
+#include"Utility/CommonTypeDefs.h"
 
 namespace Threads
 {
@@ -36,7 +37,9 @@ class SlowControlsThread
 {
 public:
     //construction and destruction
-    SlowControlsThread(SlowControls::MpodReader* mRead, InterThread::SlowData* slDat, InterThread::SlowControlsThreadController* sctCtrl, int refreshRate);
+    SlowControlsThread(SlowControls::MpodReader* mRead, InterThread::SlowData* slDat,
+                       InterThread::SlowControlsThreadController* sctCtrl,
+                       Utility::ToFileMultiQueue* toFileQueue, int refreshRate);
     ~SlowControlsThread(){}
     
     // the function that makes this object callable which actually executes the thread
@@ -45,6 +48,7 @@ private:
     SlowControls::MpodReader* mpodReader;
     InterThread::SlowData* slowData;
     InterThread::SlowControlsThreadController* sctControl;
+    Utility::ToFileMultiQueue* toFileOutputQueue;
     boost::chrono::nanoseconds refreshPeriod;
     
     bool notTerminated;
