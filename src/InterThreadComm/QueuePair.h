@@ -31,7 +31,7 @@
 namespace InterThread
 {
 
-template <typename QueueContents, typename QueueType>
+template <typename QueueContent, typename QueueType>
 class QueuePair
 {
 public:
@@ -39,15 +39,15 @@ public:
     {}
     ~QueuePair(){}
     
-    inline bool producerPush(QueueContents* data);
-    bool consumerPop(QueueContents*& data);
-    inline bool consumerPush(QueueContents* data);
-    bool producerPop(QueueContents*& data);
+    inline bool producerPush(QueueContent data);
+    bool consumerPop(QueueContent& data);
+    inline bool consumerPush(QueueContent data);
+    bool producerPop(QueueContent& data);
     
-    inline bool tryProducerPush(QueueContents* data);
-    inline bool tryConsumerPop(QueueContents*& data);
-    inline bool tryConsumerPush(QueueContents* data);
-    inline bool tryProducerPop(QueueContents*& data);
+    inline bool tryProducerPush(QueueContent data);
+    inline bool tryConsumerPop(QueueContent& data);
+    inline bool tryConsumerPush(QueueContent data);
+    inline bool tryProducerPop(QueueContent& data);
     
     void wakeOneConsumer(){if(this->consumerWaiting.load() > 0) this->consumerWaitCondition.notify_one();}
     void wakeOneProducer(){if(this->producerWaiting.load() > 0) this->producerWaitCondition.notify_one();}
@@ -80,13 +80,13 @@ private:
 };
 
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::producerPush(QueueContents* data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::producerPush(QueueContent data)
 {
     //this function pushes a filled event to the consumer queue. This should *always* succeed.
     //The guarantee of success comes because if we managed to get an empty event to fill
     //from the producer queue then there *must* be a slot open in the consumer queue to send it to
-    bool success = PushSelect<QueueType, QueueContents>::push(this->consumerQueue, data);
+    bool success = PushSelect<QueueType, QueueContent>::push(this->consumerQueue, data);
     //since we have enqueued a data object, make certain that the consumer is awake to get it
     if(this->consumerWaiting.load() > 0)//no need to check for success it is guaranteed
     {
@@ -95,8 +95,8 @@ bool QueuePair<QueueContents, QueueType>::producerPush(QueueContents* data)
     return success;
 }
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::consumerPop(QueueContents*& data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::consumerPop(QueueContent& data)
 {
     //this function trys to pop from the queue and waits until there is a data available to do so
     bool success = false;
@@ -118,13 +118,13 @@ bool QueuePair<QueueContents, QueueType>::consumerPop(QueueContents*& data)
     return success;
 }
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::consumerPush(QueueContents* data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::consumerPush(QueueContent data)
 {
     //this function tries to push to the producer queue (which returns empty objects to the producer)
     //as, by design, the producer queue has 5 extra slots relative to the consumer queue, and the producer queue
     //was only initially filled by empties to the capacity of the consumer queue, this will *always* succeed.
-    bool success = PushSelect<QueueType, QueueContents>::push(this->producerQueue, data);
+    bool success = PushSelect<QueueType, QueueContent>::push(this->producerQueue, data);
     //if we have enqueued an empty event, make certain that the producer queue knows
     if(this->producerWaiting.load() > 0)//no need to check for success it is guaranteed
     {
@@ -133,8 +133,8 @@ bool QueuePair<QueueContents, QueueType>::consumerPush(QueueContents* data)
     return success;
 }
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::producerPop(QueueContents*& data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::producerPop(QueueContent& data)
 {
     //this function tries to pop from the producer queue, if it is empty (ie all the buffers are currently in
     //the producer queue) then we wait for the consumer to make some more empties for us to use
@@ -158,11 +158,11 @@ bool QueuePair<QueueContents, QueueType>::producerPop(QueueContents*& data)
     return success;
 }
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::tryProducerPush(QueueContents* data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::tryProducerPush(QueueContent data)
 {
     //as stated above, push always works, therefor push, wake and return
-    bool success = PushSelect<QueueType, QueueContents>::push(this->consumerQueue, data);
+    bool success = PushSelect<QueueType, QueueContent>::push(this->consumerQueue, data);
     //since we have enqueued a data object, make certain that the consumer is awake to get it
     if(this->consumerWaiting.load() > 0)//no need to check for success it is guaranteed
     {
@@ -171,17 +171,17 @@ bool QueuePair<QueueContents, QueueType>::tryProducerPush(QueueContents* data)
     return success;
 }
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::tryConsumerPop(QueueContents*& data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::tryConsumerPop(QueueContent& data)
 {
     //try to pop from the consumer queue, return true for success or false for failure
     return this->consumerQueue.pop(data);
 }
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::tryConsumerPush(QueueContents* data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::tryConsumerPush(QueueContent data)
 {
-    bool success = PushSelect<QueueType, QueueContents>::push(this->producerQueue, data);
+    bool success = PushSelect<QueueType, QueueContent>::push(this->producerQueue, data);
     //since we have enqueued a data object, make certain that the consumer is awake to get it
     if(this->producerWaiting.load() > 0)//no need to check for success it is guaranteed
     {
@@ -190,8 +190,8 @@ bool QueuePair<QueueContents, QueueType>::tryConsumerPush(QueueContents* data)
     return success;
 }
 
-template <typename QueueContents, typename QueueType>
-bool QueuePair<QueueContents, QueueType>::tryProducerPop(QueueContents*& data)
+template <typename QueueContent, typename QueueType>
+bool QueuePair<QueueContent, QueueType>::tryProducerPop(QueueContent& data)
 {
     //try to pop from the producer queue
     return this->producerQueue.pop(data);

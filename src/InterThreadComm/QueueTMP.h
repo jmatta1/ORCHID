@@ -73,22 +73,22 @@ struct TupleTypeGen
 template<typename QueueType, typename QueueContent>
 struct PushSelect
 {
-    static bool push(QueueType& queue, QueueContent* data);
+    static bool push(QueueType& queue, QueueContent data);
 };
 
 //speciallization for spsc_queue
 template<typename QueueContent, typename QueueParam>
-struct PushSelect<boost::lockfree::spsc_queue<QueueContent*, QueueParam>, QueueContent>
+struct PushSelect<boost::lockfree::spsc_queue<QueueContent, QueueParam>, QueueContent>
 {
-    static bool push(boost::lockfree::spsc_queue<QueueContent*, QueueParam>& queue, QueueContent* data)
+    static bool push(boost::lockfree::spsc_queue<QueueContent, QueueParam>& queue, QueueContent data)
     {return queue.push(data);}
 };
 
 //speciallization for queue
 template<typename QueueContent, typename QueueParam>
-struct PushSelect<boost::lockfree::queue<QueueContent*, QueueParam>, QueueContent>
+struct PushSelect<boost::lockfree::queue<QueueContent, QueueParam>, QueueContent>
 {
-    static bool push(boost::lockfree::queue<QueueContent*, QueueParam>& queue, QueueContent* data)
+    static bool push(boost::lockfree::queue<QueueContent, QueueParam>& queue, QueueContent data)
     {return queue.bounded_push(data);}
 };
 
@@ -108,7 +108,7 @@ template<int ...Indices>
 struct GenSequence<0, Indices...>: Sequence<Indices...> {};
 
 template<typename Type, typename FunctorType, int ...Indices>
-void forEachDetail(Type&& t, FunctorType& f, Sequence<Indices...>)
+void forEachDetail(Type&& t, FunctorType f, Sequence<Indices...>)
 {
     auto l = { f(std::get<Indices>(t))... };
 }
@@ -116,7 +116,7 @@ void forEachDetail(Type&& t, FunctorType& f, Sequence<Indices...>)
 }
 
 template<typename... TupleTypes, typename FunctorType>
-void forEachInTuple(std::tuple<TupleTypes...>& t, FunctorType& f)
+void forEachInTuple(std::tuple<TupleTypes...>& t, FunctorType f)
 {
     ForEachDetail::forEachDetail(t, f, ForEachDetail::GenSequence<sizeof...(TupleTypes)>());
 }
@@ -127,7 +127,7 @@ void forEachInTuple(std::tuple<TupleTypes...>& t, FunctorType& f)
 template<typename AtomicType, AtomicType value>
 struct SetAtomicFunctor
 {
-    void operator()(std::atomic<AtomicType>& toBeSet){toBeSet.store(value);}
+    int operator()(std::atomic<AtomicType>& toBeSet){toBeSet.store(value); return 0;}
 };
 
 /*
@@ -135,7 +135,7 @@ struct SetAtomicFunctor
  */
 struct WakeAllConditionsFunctor
 {
-    void operator()(boost::condition_variable& condVar){condVar.notify_all();}
+    int operator()(boost::condition_variable& condVar){condVar.notify_all(); return 0;}
 };
 
 }

@@ -27,7 +27,6 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 #include"Events/EventInterface.h"
-#include"InterThreadQueueSizes.h"
 #include"QueueTMP.h"
 
 
@@ -81,11 +80,13 @@ public:
     template<int ProducerInd>
     void wakeAllProducer(){if(std::get<ProducerInd>(this->producerWaitCounters).load() > 0) std::get<ProducerInd>(this->producerWaitConditions).notify_all();}
     
-    void forceWakeAll(){notForcedAwakening.store(false); 
+    void forceWakeAll(){this->notForcedAwakening.store(false); 
                         forEachInTuple(this->producerWaitConditions, WakeAllConditionsFunctor());
                         this->consumerWaitCondition.notify_all();}
     
-    void clearForce(){this->notForcedAwakening.store(true);}
+    void setForceStayAwake(){this->notForcedAwakening.store(false);}
+    
+    void clearForceStayAwake(){this->notForcedAwakening.store(true);}
     
 private:
     //tuple full of queues for producers to send full objects to the consumer
