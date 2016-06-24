@@ -25,8 +25,6 @@
 #include<atomic>
 // includes from other libraries
 #include<boost/thread.hpp>
-#include<boost/lockfree/queue.hpp>
-#include<boost/lockfree/spsc_queue.hpp>
 // includes from ORCHID
 #include"QueueTMP.h"
 
