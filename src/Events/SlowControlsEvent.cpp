@@ -158,7 +158,6 @@ void SlowControlsEvent::ReadVoltageData(const SlowControls::VoltageData& data)
             this->temperature[j] = data.temperature[i];
             this->maxTemperature[j] = data.maxTemperature[i];
             this->outputSwitch[j] = data.outputSwitch[i];
-
             this->channelStatus[j] = data.channelStatus[i];
             ++j;
         }

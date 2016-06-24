@@ -23,12 +23,15 @@ HFIR background monitoring wall.
 #include"Utility/ParseAndValidate.h"
 #include"Utility/OrchidLogger.h"
 #include"Utility/MpodMapper.h"
+#include"Utility/CommonTypeDefs.h"
 // ORCHID interprocess communication data objects
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
 #include"InterThreadComm/Data/FileData.h"
+#include"InterThreadComm/InterThreadQueueSizes.h"
 #include"InterThreadComm/MultiQueuePair.h"
 #include"InterThreadComm/QueuePair.h"
+#include"Events/SlowControlsEvent.h"
 // ORCHID interprocess communication control objects
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
@@ -38,7 +41,10 @@ HFIR background monitoring wall.
 // ORCHID threads
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
-#include"AsyncIO/AsyncOutFile.h"
+#include"Threads/FileOutputThread.h"
+
+//pre declare event interface so we can use pointers to it as a type
+class EventInterface;
 
 int main(int argc, char* argv[])
 {
@@ -168,17 +174,24 @@ int main(int argc, char* argv[])
     // For transferring empty data buffers from the event
     // processing threads to the digitizer reader
     
-    // For transferring full event buffers from the event
-    // processing threads to the file thread
-    
-    // For transferring empty event buffers from the file
-    // thread to the event processing threads
-    
-    // For transferring full slow controls buffers from the
-    // slow control threads to the file thread
-    
-    // For transferring empty slow controls buffers from the
-    // file thread to the slow control thread
+    // transfers full slow controls events from the slow controls thread to the
+    // file output thread. Also transfers empty sc events back to sc thread. Also
+    // transfers full data events from the processing threads to the file output
+    // thread, also transfers empty data events from the file output thread to
+    // the processing threads
+    Utility::ToFileMultiQueue* toFileQueues = new Utility::ToFileMultiQueue;
+    //TODO: Load to file queue with empty trigger events
+    /*for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
+    {
+        //we use comsumer push since consumers push to the empty object return
+        toFileQueues->consumerPush<Utility::ProcessingQueueIndex>(new Events::TriggerEvent());
+    }*/
+    //here we load the queue with empty slow controls events
+    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
+    {
+        //we use comsumer push since consumers push to the empty object return
+        toFileQueues->consumerPush<Utility::SlowControlsQueueIndex>(new Events::SlowControlsEvent(numVoltageChannels, numTemperatureChannels));
+    }
     
     /*
      * Build the callable objects for boost::thread
@@ -190,18 +203,17 @@ int main(int argc, char* argv[])
                       //Future:   digitizerControl,
                                   sctController, fotController,
                       //Future:   eventProcThreadControl, digitizerThreadControl,
-                                  mpodController,
+                                  toFileQueues, mpodController,
                                   params.generalBlock->updateFrequency,
                                   params.powerBlock->pollingRate);
 
     //make the file thread callable
-    //Threads::FileThread* fileThreadCallable = new FileThread(...);
+    //Threads::FileOutputThread* fileThreadCallable = new Threads::FileOutputThread(toFileQueues, fileData, fotController, &params.generalBlock);
     
     //make the slow controls callable
     Threads::SlowControlsThread* scThreadCallable =
             new Threads::SlowControlsThread(mpodReader, slowData, sctController,
-                                //Future    voltageEventOutQueue, voltageEventInQueue,
-                                            params.powerBlock->pollingRate);
+                                            toFileQueues, params.powerBlock->pollingRate);
     
     //make the digitizer reader callable
     //Threads::DigitizerThread* digitizerThreadCallable =
