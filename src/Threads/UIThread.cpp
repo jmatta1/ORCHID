@@ -45,9 +45,10 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
                    InterThread::SlowControlsThreadController* sctCtrl,
                    InterThread::FileOutputThreadController* fileCtrl,
+                   Utility::ToFileMultiQueue* fileDataQueue,
                    SlowControls::MpodController* mpCtrl, int refreshFrequency,
                    int pollingRate):
-    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodMapper(mpodMap), sctControl(sctCtrl),
+    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodMapper(mpodMap), fileMultiQueue(fileDataQueue), sctControl(sctCtrl),
     fileControl(fileCtrl), mpodController(mpCtrl), persistCount(-1), lastFileSize(0), command(""),
     persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
     mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr), lg(OrchidLog::get())
@@ -766,7 +767,7 @@ void UIThread::waitForAllTerminations()
     this->waitForSlowControlsThreadTermination();
     //this->waitForDigitizerThreadTermination();
     //this->waitForEventProcessingThreadsTermination();
-    //this->waitForFileThreadTermination();
+    this->waitForFileThreadTermination();
     BOOST_LOG_SEV(this->lg, Information) << "Done Terminating Threads";
 }
 
@@ -778,12 +779,37 @@ void UIThread::waitForSlowControlsThreadTermination()
     wrefresh(this->textWindow);
     wclear(this->messageWindow);
     wrefresh(this->messageWindow);
-    sctControl->setToTerminate();
+    this->sctControl->setToTerminate();
+    //make certain the slow controls thread is awake
+    this->fileMultiQueue->setForceStayAwake();
+    this->fileMultiQueue->wakeAllProducer<Utility::SlowControlsQueueIndex>();
     //loop until we see the terminate signal from the slow controls thread
-    while(!(sctControl->isDone()))
+    while(!(this->sctControl->isDone()))
     {
         boost::this_thread::sleep_for(this->refreshPeriod);
     }
+    this->fileMultiQueue->clearForceStayAwake();
+}
+
+void UIThread::waitForFileThreadTermination()
+{
+    BOOST_LOG_SEV(this->lg, Information) << "Terminating File Output Thread";
+    wclear(this->textWindow);
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Termination of File Output Thread");
+    wrefresh(this->textWindow);
+    wclear(this->messageWindow);
+    wrefresh(this->messageWindow);
+    this->fileControl->setToTerminate();
+    //make certain the file thread is awake
+    this->fileMultiQueue->setForceStayAwake();
+    this->fileMultiQueue->wakeAllConsumer();
+    //loop until we see the terminate signal from the slow controls thread
+    while(!(this->fileControl->isDone()))
+    {
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    this->fileMultiQueue->clearForceStayAwake();
 }
 
 void UIThread::runGracefulShutdown()

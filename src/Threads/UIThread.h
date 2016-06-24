@@ -36,6 +36,7 @@
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"Utility/OrchidLogger.h"
+#include"Utility/CommonTypeDefs.h"
 
 namespace Threads
 {
@@ -49,6 +50,7 @@ public:
              InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
              InterThread::SlowControlsThreadController* sctCtrl,
              InterThread::FileOutputThreadController* fileCtrl,
+             Utility::ToFileMultiQueue* fileDataQueue,
              SlowControls::MpodController* mpCtrl,
              int refreshFrequency, int pollingRate);
     ~UIThread(){}
@@ -101,6 +103,7 @@ private:
     //** Wait For Other Threads Functions **/
     void waitForAllTerminations();
     void waitForSlowControlsThreadTermination();
+    void waitForFileThreadTermination();
     
     /** Command functions **/
     //shuts down orchid, disconnecting from digitizer and ramping down voltages
@@ -134,6 +137,7 @@ private:
     InterThread::FileOutputThreadController* fileControl;
     SlowControls::MpodController* mpodController;
     Utility::MpodMapper* mpodMapper;
+    Utility::ToFileMultiQueue* fileMultiQueue;
     //multiplier for calculating rate from number of triggers
     float rateMultiplier;
     
