@@ -40,19 +40,14 @@ namespace Threads
 
 static const boost::posix_time::ptime epoch(boost::gregorian::date(1970,1,1), boost::posix_time::time_duration(0,0,0,0));
 
-FileOutputThread::FileOutputThread(SlowControlEventQueue* incomingSlowControlEvents,
-                                   SlowControlEventQueue* returningSlowControlEvents,
-         //                        ProcessedEventQueue* incomingDigitizerEvents,
-         //                        ProcessedEventQueue* returningDigitizerEvents,
+FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
                                    InterThread::FileData* fileDat,
                                    InterThread::FileOutputThreadController* fileThreadCtrl,
                                    InputParser::GeneralBlock* generalBlock):
     outFile(nullptr), evBufSize(2048), eventBuffer(nullptr), 
     outDirectory(generalBlock->baseOutputDirectory), currentFileName(""),
     currentRunTitle(generalBlock->runTitle), runNumber(0), sequenceNumber(0),
-    buffInd(0), bufferNumber(0), eventCount(0),
-    incomingSlowControlsEventQueue(incomingSlowControlEvents),
-    returningSlowControlsEventQueue(returningSlowControlEvents),
+    buffInd(0), bufferNumber(0), eventCount(0), inputQueues(queueInput),
     fileData(fileDat), fileThreadController(fileThreadCtrl), notTerminated(true)
 {
     //make directories and prep file name
@@ -245,19 +240,29 @@ void FileOutputThread::doWriteLoop()
     bool gotData = false;
     while(this->fileThreadController->getCurrentState() == InterThread::FileOutputThreadState::Writing)
     {
-        //TODO: Modify this when we have a event processing thread
         //check for data
-        /*Events::EventInterface* fastEvent;
-        if(this->incomingDigitizerEventQueue->pop(fastEvent))
+        Events::EventInterface* event;
+        if(this->inputQueues->tryConsumerPop<Utility::ProcessingQueueIndex>(event))
         {
             gotData = true;
+            int eventSize = event->getSizeOfBinaryRepresentation();
+            //loop until the intermediate buffer is big enough
+            while(eventSize > this->evBufSize)
+            {
+                this->doubleEventBuffer();
+            }
+            //get the event now that our buffer is big enough
+            event->getBinaryRepresentation(this->eventBuffer);
+            //pass the empty event back to the queue
+            this->inputQueues->consumerPush<Utility::ProcessingQueueIndex>(event);
+            //now write the data into the file buffer
+            this->transferData(eventSize);
             
-        }*/
-        Events::EventInterface* slowEvent;
-        if(this->incomingSlowControlsEventQueue->pop(slowEvent))
+        }
+        if(this->inputQueues->tryConsumerPop<Utility::SlowControlsQueueIndex>(event))
         {
             gotData = true;
-            int eventSize = slowEvent->getSizeOfBinaryRepresentation();
+            int eventSize = event->getSizeOfBinaryRepresentation();
             //loop until we double the event buffer past the size of the event
             while(eventSize > this->evBufSize)
             {
@@ -265,16 +270,15 @@ void FileOutputThread::doWriteLoop()
                 this->doubleEventBuffer();
             }
             //now that we know that we have enough size
-            slowEvent->getBinaryRepresentation(this->eventBuffer);
+            event->getBinaryRepresentation(this->eventBuffer);
             //now that we are done with the event pass it back to the return queue
-            this->returningSlowControlsEventQueue->push(slowEvent);
+            this->inputQueues->consumerPush<Utility::SlowControlsQueueIndex>(event);
             //now that we have the data, write it to our large buffer
             this->transferData(eventSize);
         }
-        if(gotData != true)
+        if(!gotData)
         {
-            //we recieved no data from either queue so wait for data
-            //TODO, add logic for data waits here
+            this->inputQueues->consumerWaitForData();
         }
         gotData = false;
     }
