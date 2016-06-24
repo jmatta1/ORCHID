@@ -25,8 +25,6 @@
 #include<atomic>
 // includes from other libraries
 #include<boost/thread.hpp>
-#include<boost/lockfree/queue.hpp>
-#include<boost/lockfree/spsc_queue.hpp>
 // includes from ORCHID
 #include"Events/EventInterface.h"
 #include"InterThreadQueueSizes.h"
@@ -46,24 +44,24 @@ public:
     //the producer threads pop empty objects from their return queue and push
     //full data objects onto the data queue
     template<int ProducerInd>
-    bool producerPop(QueueContent*& data);
+    bool producerPop(QueueContent& data);
     template<int ProducerInd>
-    bool producerPush(QueueContent* data);
+    bool producerPush(QueueContent data);
     template<int ProducerInd>
-    bool tryProducerPop(QueueContent*& data);
+    bool tryProducerPop(QueueContent& data);
     template<int ProducerInd>
-    bool tryProducerPush(QueueContent* data);
+    bool tryProducerPush(QueueContent data);
     
     //the consumer thread pops full objects from the data queue and pushes empty
     //objects onto the return queue
     template<int ProducerInd>
-    bool consumerPop(QueueContent*& data);
+    bool consumerPop(QueueContent& data);
     template<int ProducerInd>
-    bool consumerPush(QueueContent* data);
+    bool consumerPush(QueueContent data);
     template<int ProducerInd>
-    bool tryConsumerPop(QueueContent*& data);
+    bool tryConsumerPop(QueueContent& data);
     template<int ProducerInd>
-    bool tryConsumerPush(QueueContent* data);
+    bool tryConsumerPush(QueueContent data);
     
     
     //function for the file thread to use to wait for data
@@ -111,7 +109,7 @@ private:
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::producerPop(QueueContent*& data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::producerPop(QueueContent& data)
 {
     bool success = false;
     while(!(success = std::get<ProducerInd>(this->returnQueues).pop(data)) && this->notForcedAwakening.load())
@@ -133,7 +131,7 @@ bool MultiQueuePair<QueueContent, QueueTypes...>::producerPop(QueueContent*& dat
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::producerPush(QueueContent* data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::producerPush(QueueContent data)
 {
     //this function pushes a filled event to the consumer queue. This should *always* succeed.
     //The guarantee of success comes because if we managed to get an empty event to fill
@@ -151,14 +149,14 @@ bool MultiQueuePair<QueueContent, QueueTypes...>::producerPush(QueueContent* dat
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::tryProducerPop(QueueContent*& data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::tryProducerPop(QueueContent& data)
 {
     return std::get<ProducerInd>(this->returnQueues).pop(data);
 }
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::tryProducerPush(QueueContent* data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::tryProducerPush(QueueContent data)
 {
     typedef typename std::tuple_element<ProducerInd, decltype(this->dataQueues)>::type ElementType;
     bool success = PushSelect<ElementType, QueueContent>::push(std::get<ProducerInd>(this->dataQueues), data);
@@ -172,7 +170,7 @@ bool MultiQueuePair<QueueContent, QueueTypes...>::tryProducerPush(QueueContent* 
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::consumerPop(QueueContent*& data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::consumerPop(QueueContent& data)
 {
     bool success = false;
     while(!(success = std::get<ProducerInd>(this->dataQueues).pop(data)) && this->notForcedAwakening.load())
@@ -192,7 +190,7 @@ bool MultiQueuePair<QueueContent, QueueTypes...>::consumerPop(QueueContent*& dat
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::consumerPush(QueueContent* data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::consumerPush(QueueContent data)
 {
     typedef typename std::tuple_element<ProducerInd, decltype(this->returnQueues)>::type ElementType;
     bool success = PushSelect<ElementType, QueueContent>::push(std::get<ProducerInd>(this->returnQueues), data);
@@ -205,14 +203,14 @@ bool MultiQueuePair<QueueContent, QueueTypes...>::consumerPush(QueueContent* dat
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::tryConsumerPop(QueueContent*& data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::tryConsumerPop(QueueContent& data)
 {
     return std::get<ProducerInd>(this->dataQueues).pop(data);
 }
 
 template <typename QueueContent, typename ... QueueTypes>
 template<int ProducerInd>
-bool MultiQueuePair<QueueContent, QueueTypes...>::tryConsumerPush(QueueContent* data)
+bool MultiQueuePair<QueueContent, QueueTypes...>::tryConsumerPush(QueueContent data)
 {
     typedef typename std::tuple_element<ProducerInd, decltype(this->returnQueues)>::type ElementType;
     bool success = PushSelect<ElementType, QueueContent>::push(std::get<ProducerInd>(this->returnQueues), data);
