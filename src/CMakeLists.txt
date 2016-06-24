@@ -32,7 +32,7 @@ find_package(Curses REQUIRED)
 find_package(Threads REQUIRED)
 
 # add our default g++ flags
-add_definitions(-m64 -std=c++11 -D_FILE_OFFSET_BITS=64 -lpthread)
+add_definitions(-m64 -std=c++14 -D_FILE_OFFSET_BITS=64 -lpthread)
 
 # a little hack to make Qt Creator a little happier when it runs cmake to get
 # the project files
