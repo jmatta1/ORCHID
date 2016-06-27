@@ -61,6 +61,10 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
     
     long long int pollPeriod = static_cast<long long int>(1.5*static_cast<float>(1000000000/pollingRate));
     this->slowControlsPollingWaitPeriod = boost::chrono::nanoseconds(pollPeriod);
+    
+    //set up the logger variable too
+    
+    this->lg = OrchidLog::get();
 }
 
 void UIThread::operator() ()
@@ -84,6 +88,7 @@ void UIThread::operator() ()
         //here we sleep a bit
         boost::this_thread::sleep_for(this->refreshPeriod);
     }
+    BOOST_LOG_SEV(this->lg, Information) << "Preparing for shutdown" << std::flush;
     this->waitForAllTerminations();
     delwin(this->textWindow);
     delwin(this->messageWindow);
@@ -92,6 +97,7 @@ void UIThread::operator() ()
 
 void UIThread::initScreen()
 {
+    BOOST_LOG_SEV(this->lg, Information) << "Initializing the UI" << std::flush;
     initscr();
     keypad(stdscr, true);
     nodelay(stdscr, true);
@@ -132,6 +138,7 @@ void UIThread::initScreen()
     init_color(COLOR_WHITE, 1000, 1000, 1000);
     init_pair(errorColor, COLOR_RED, COLOR_BLACK);
     init_pair(goodColor, COLOR_GREEN, COLOR_BLACK);
+    BOOST_LOG_SEV(this->lg, Information) << "Done Initializing UI" << std::flush;
 }
 
 void UIThread::drawScreen()
@@ -354,7 +361,7 @@ void UIThread::handleCommand()
     //normalize the command to lowercase
     boost::to_lower(command);
     // log that we have a command
-    BOOST_LOG_SEV(this->lg, Information) << "Got Command: " << command;
+    BOOST_LOG_SEV(this->lg, Information) << "Got Command: " << command << std::flush;
     //look up the command inside dispatch map
     std::map<std::string, UICommands>::const_iterator cmdFind = UI_COMMAND_DISPATCH.find(command);
     //clear the command and screen
@@ -380,13 +387,13 @@ void UIThread::handleCommand()
         }
         if(!okFlag)
         {
-            BOOST_LOG_SEV(this->lg, Information) << "Command is unavailable in current mode";
+            BOOST_LOG_SEV(this->lg, Information) << "Command is unavailable in current mode" << std::flush;
             cmd = UICommands::Unavailable;
         }
     }
     else
     {
-        BOOST_LOG_SEV(this->lg, Information) << "Command is invalid";
+        BOOST_LOG_SEV(this->lg, Information) << "Command is invalid" << std::flush;
         cmd = UICommands::Invalid;
     }
     
@@ -446,7 +453,7 @@ void UIThread::handleCommand()
         this->persistCount = refreshRate*5;
         break;
     default:
-        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error: Got to command switch default case. This should not be possible";
+        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error: Got to command switch default case. This should not be possible" << std::flush;
         this->persistentMessage = "Critical Error: Got to command switch default case. This should be IMPOSSIBLE!";
         this->persistColor = errorColor;
         this->persistCount = refreshRate*60;
@@ -500,6 +507,7 @@ void UIThread::handleKeyPress(int inChar)
     case '\r':
     case '\n':
     case '\f':
+        BOOST_LOG_SEV(this->lg, Information) << "Got command: " << this->command << std::flush;
         this->handleCommand();
         break;
     case KEY_RESIZE:
@@ -510,7 +518,7 @@ void UIThread::handleKeyPress(int inChar)
         if(lastCharInd >= 0)
         {
             mvwprintw(this->messageWindow, 3, lastCharInd+3, " ");
-            command.erase(lastCharInd, 1);   
+            this->command.erase(lastCharInd, 1);   
         }
         break;
     case 'a'://I know it is probably a bit dumb, but this was my first thought
@@ -589,7 +597,7 @@ void UIThread::handleKeyPress(int inChar)
     case '{':
     case '}':
     case ' ':
-        command.append(1, inChar);
+        this->command.append(1, inChar);
         break;
     default://anything not listed explicitly, ignore
         break;
@@ -763,17 +771,17 @@ void UIThread::handleSetRunTitleKeyPress(int inChar)
 
 void UIThread::waitForAllTerminations()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Terminating Threads";
+    BOOST_LOG_SEV(this->lg, Information) << "Terminating Threads" << std::flush;
     this->waitForSlowControlsThreadTermination();
     //this->waitForDigitizerThreadTermination();
     //this->waitForEventProcessingThreadsTermination();
     this->waitForFileThreadTermination();
-    BOOST_LOG_SEV(this->lg, Information) << "Done Terminating Threads";
+    BOOST_LOG_SEV(this->lg, Information) << "Done Terminating Threads" << std::flush;
 }
 
 void UIThread::waitForSlowControlsThreadTermination()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Terminating Slow Controls Thread";
+    BOOST_LOG_SEV(this->lg, Information) << "Terminating Slow Controls Thread" << std::flush;
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Termination of Slow Controls Thread");
     wrefresh(this->textWindow);
@@ -793,7 +801,7 @@ void UIThread::waitForSlowControlsThreadTermination()
 
 void UIThread::waitForFileThreadTermination()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Terminating File Output Thread";
+    BOOST_LOG_SEV(this->lg, Information) << "Terminating File Output Thread" << std::flush;
     wclear(this->textWindow);
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Termination of File Output Thread");
@@ -814,7 +822,7 @@ void UIThread::waitForFileThreadTermination()
 
 void UIThread::runGracefulShutdown()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Running Graceful Shutdown";
+    BOOST_LOG_SEV(this->lg, Information) << "Running Graceful Shutdown" << std::flush;
     if(mode == UIMode::Idle)
     {
         turnOff();
@@ -825,25 +833,25 @@ void UIThread::runGracefulShutdown()
         turnOff();
     }
     this->runLoop = false;
-    BOOST_LOG_SEV(this->lg, Information) << "Graceful Shutdown Complete";
+    BOOST_LOG_SEV(this->lg, Information) << "Graceful Shutdown Complete" << std::flush;
 }
 
 void UIThread::turnOn()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Turning on the MPOD Crate";
+    BOOST_LOG_SEV(this->lg, Information) << "Turning on the MPOD Crate" << std::flush;
     if(!this->mpodController->turnCrateOn())
     {
-        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error: MPOD either did not turn on or did not initialize";
+        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error: MPOD either did not turn on or did not initialize" << std::flush;
         this->persistentMessage = "Critical Error: MPOD either did not turn on or did not initialize";
         this->persistColor = errorColor;
         this->persistCount = refreshRate*10;
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
-    BOOST_LOG_SEV(this->lg, Information) << "Turning on the HV channels";
+    BOOST_LOG_SEV(this->lg, Information) << "Turning on the HV channels" << std::flush;
     if(!this->mpodController->activateAllChannels())
     {
-        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error:  Error in turning on HV channels";
+        BOOST_LOG_SEV(this->lg, Critical) << "Critical Error:  Error in turning on HV channels" << std::flush;
         this->persistentMessage = "Critical Error:  Error in turning on HV channels";
         this->persistColor = errorColor;
         this->persistCount = refreshRate*10;
@@ -851,7 +859,7 @@ void UIThread::turnOn()
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
-    BOOST_LOG_SEV(this->lg, Information) << "Setting Slow Controls thread to polling";
+    BOOST_LOG_SEV(this->lg, Information) << "Setting Slow Controls thread to polling" << std::flush;
     this->sctControl->setToPolling();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp up");
@@ -875,7 +883,7 @@ void UIThread::turnOn()
             stillRamping = false;
         }
     }
-    BOOST_LOG_SEV(this->lg, Information) << "HV done ramping, connecting to digitizer";
+    BOOST_LOG_SEV(this->lg, Information) << "HV done ramping, connecting to digitizer" << std::flush;
     //TODO write code to connect to digitizer
     mode = UIMode::Idle;
     //this->startLine = 0;
@@ -884,11 +892,11 @@ void UIThread::turnOn()
 
 void UIThread::turnOff()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Disconnecting from digitizer";
+    BOOST_LOG_SEV(this->lg, Information) << "Disconnecting from digitizer" << std::flush;
     //TODO write code to handle disconnecting from the digitizer
-    BOOST_LOG_SEV(this->lg, Information) << "Putting Slow Controls thread into polling mode";
+    BOOST_LOG_SEV(this->lg, Information) << "Putting Slow Controls thread into polling mode" << std::flush;
     this->sctControl->setToPolling();
-    BOOST_LOG_SEV(this->lg, Information) << "Starting channel ramp down";
+    BOOST_LOG_SEV(this->lg, Information) << "Starting channel ramp down" << std::flush;
     this->mpodController->deactivateAllChannels();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp down");
@@ -913,7 +921,7 @@ void UIThread::turnOff()
             stillRamping = false;
         }
     }
-    BOOST_LOG_SEV(this->lg, Information) << "Done Ramping, stopping slow controls thread";
+    BOOST_LOG_SEV(this->lg, Information) << "Done Ramping, stopping slow controls thread" << std::flush;
     this->sctControl->setToStop();
     this->mpodController->turnCrateOff();
     mode = UIMode::Init;
@@ -922,17 +930,17 @@ void UIThread::turnOff()
 
 void UIThread::startDataTaking()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Starting File Writing";
+    BOOST_LOG_SEV(this->lg, Information) << "Starting File Writing" << std::flush;
     this->fileControl->setToWriting();
     //TODO Put in a wait for file thread to be waiting for data
-    BOOST_LOG_SEV(this->lg, Information) << "Starting Event Processing";
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Event Processing" << std::flush;
     //TODO put the event processing threads into running mode
-    BOOST_LOG_SEV(this->lg, Information) << "Starting Slow Controls Event Generation";
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Slow Controls Event Generation" << std::flush;
     this->sctControl->setToWriting();
     //TODO put the digitizer thread into running mode
-    BOOST_LOG_SEV(this->lg, Information) << "Starting Digitizer Thread Acquisition";
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Digitizer Thread Acquisition" << std::flush;
     //TODO put the digitizer into running mode
-    BOOST_LOG_SEV(this->lg, Information) << "Starting Digitizer Run";
+    BOOST_LOG_SEV(this->lg, Information) << "Starting Digitizer Run" << std::flush;
     
     mode = UIMode::Running;
     //this->startLine = 0;
@@ -941,16 +949,16 @@ void UIThread::startDataTaking()
 
 void UIThread::stopDataTaking()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Stopping Digitzer Run";
+    BOOST_LOG_SEV(this->lg, Information) << "Stopping Digitzer Run" << std::flush;
     //TODO put the digitizer into stopped mode
-    BOOST_LOG_SEV(this->lg, Information) << "Digitizer Thread Set To Stop";
+    BOOST_LOG_SEV(this->lg, Information) << "Digitizer Thread Set To Stop" << std::flush;
     //TODO put the digitizer thread into stopped mode
-    BOOST_LOG_SEV(this->lg, Information) << "Event Processing Threads Set To Stop";
+    BOOST_LOG_SEV(this->lg, Information) << "Event Processing Threads Set To Stop" << std::flush;
     //TODO put the event processing threads into finish and stop mode
     //TODO put in wait for processing threads to stop
-    BOOST_LOG_SEV(this->lg, Information) << "Slow Controls Set To Polling Only";
+    BOOST_LOG_SEV(this->lg, Information) << "Slow Controls Set To Polling Only" << std::flush;
     this->sctControl->setToPolling();
-    BOOST_LOG_SEV(this->lg, Information) << "File Thread Set To Stop";
+    BOOST_LOG_SEV(this->lg, Information) << "File Thread Set To Stop" << std::flush;
     this->fileControl->setToWaiting();
     while(!this->fileControl->isWaiting())
     {//until we see the file thread waiting on its wait condition, sleep and spin
@@ -962,7 +970,7 @@ void UIThread::stopDataTaking()
 
 void UIThread::setRunNumber()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Getting Run Number";
+    BOOST_LOG_SEV(this->lg, Information) << "Getting Run Number" << std::flush;
     //run number to that and the sequence number to zero
     int inChar;
     this->runSubLoop = true;
@@ -988,7 +996,7 @@ void UIThread::setRunNumber()
 
 void UIThread::setRunName()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Getting Run Name";
+    BOOST_LOG_SEV(this->lg, Information) << "Getting Run Name" << std::flush;
     //run number to that and the sequence number to zero
     int inChar;
     this->runSubLoop = true;
@@ -1017,13 +1025,13 @@ void UIThread::setRunParams()
 {
     this->setRunName();
     this->setRunNumber();
-    BOOST_LOG_SEV(this->lg, Information) << "Setting All Run Info";
+    BOOST_LOG_SEV(this->lg, Information) << "Setting All Run Info" << std::flush;
     //TODO: call run changing code
     while(!this->fileControl->setNewRunParameters(this->tempRunTitle, this->tempRunNumber))
     {//failed at setting the new parameters, try again in a moment
         boost::this_thread::sleep_for(this->refreshPeriod);
     }
-    BOOST_LOG_SEV(this->lg, Information) << "RunInfoSet";
+    BOOST_LOG_SEV(this->lg, Information) << "Run Info Set" << std::flush;
 }
 
 }
