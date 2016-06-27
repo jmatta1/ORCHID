@@ -90,6 +90,7 @@ FileOutputThread::~FileOutputThread()
 
 void FileOutputThread::prepNewRunFolder()
 {
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Preparing new folder";
     boost::filesystem::path writePath(this->outDirectory);
     boost::system::error_code mkDirErr;
     bool success = boost::filesystem::create_directories(writePath, mkDirErr);
@@ -111,11 +112,13 @@ void FileOutputThread::prepNewRunFolder()
         throw std::runtime_error("No run directory detected despite creation");
     }
     this->writeDirectory = writePath.native();
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Made new folder at: " << this->writeDirectory;
     this->buildFileName();
 }
 
 void FileOutputThread::buildFileName()
 {
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Starting new file";
     std::ostringstream builder;
     builder << this->writeDirectory;
     if(this->writeDirectory.back()!=boost::filesystem::path::preferred_separator)
@@ -126,6 +129,7 @@ void FileOutputThread::buildFileName()
     builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
     builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
     this->currentFileName = builder.str();
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Made new file at: " << this->currentFileName;
 }
 
 void FileOutputThread::operator()()
@@ -146,6 +150,7 @@ void FileOutputThread::operator()()
             break;
         case InterThread::FileOutputThreadState::Writing:
             this->doWriteLoop();
+            this->emptyWriteQueueBeforeChange();
             break;
         }
     }
@@ -284,6 +289,52 @@ void FileOutputThread::doWriteLoop()
     }
 }
 
+void FileOutputThread::emptyWriteQueueBeforeChange()
+{//this function is used to run until the consumer queue is empty, then stop
+    //for a state change
+    bool outOfData = false;
+    while(!outOfData)
+    {
+        outOfData = true;
+        //check for data
+        Events::EventInterface* event;
+        if(this->inputQueues->tryConsumerPop<Utility::ProcessingQueueIndex>(event))
+        {
+            outOfData = false;
+            int eventSize = event->getSizeOfBinaryRepresentation();
+            //loop until the intermediate buffer is big enough
+            while(eventSize > this->evBufSize)
+            {
+                this->doubleEventBuffer();
+            }
+            //get the event now that our buffer is big enough
+            event->getBinaryRepresentation(this->eventBuffer);
+            //pass the empty event back to the queue
+            this->inputQueues->consumerPush<Utility::ProcessingQueueIndex>(event);
+            //now write the data into the file buffer
+            this->transferData(eventSize);
+            
+        }
+        if(this->inputQueues->tryConsumerPop<Utility::SlowControlsQueueIndex>(event))
+        {
+            outOfData = false;
+            int eventSize = event->getSizeOfBinaryRepresentation();
+            //loop until we double the event buffer past the size of the event
+            while(eventSize > this->evBufSize)
+            {
+                //we need to double the size of the event buffer
+                this->doubleEventBuffer();
+            }
+            //now that we know that we have enough size
+            event->getBinaryRepresentation(this->eventBuffer);
+            //now that we are done with the event pass it back to the return queue
+            this->inputQueues->consumerPush<Utility::SlowControlsQueueIndex>(event);
+            //now that we have the data, write it to our large buffer
+            this->transferData(eventSize);
+        }
+    }
+}
+
 void FileOutputThread::doubleEventBuffer()
 {
     delete[] this->eventBuffer;
@@ -302,11 +353,12 @@ void FileOutputThread::transferData(int eventSize)
     }
     else
     {//otherwise, write the buffer to disk and write this event to the next buffer
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "Sending buffer to disk";
         this->finalizeDataBuffer();//this finalizes the event and writes the buffer to disk
         //here we make certain that we are not at capacity
-        if (this->bufferNumber < MaxBuffersPerFile)
+        if (this->bufferNumber >= MaxBuffersPerFile)
         {
-            //increment sequence number and set up the new run
+            //increment sequence number and set up the new file
             ++(this->sequenceNumber);
             this->buildFileName();
             this->outFile->newFile(this->currentFileName);
@@ -314,6 +366,10 @@ void FileOutputThread::transferData(int eventSize)
             this->bufferNumber = 0;
             this->writeFileHeader();
         }
+        //now write the data to the fresh new buffer
+        std::copy(this->eventBuffer, (this->eventBuffer + eventSize), &(this->currentBuffer[this->buffInd]));
+        ++(this->eventCount);
+        this->buffInd += eventSize;
     }
 }
 

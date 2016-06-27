@@ -81,6 +81,7 @@ private:
     void getNextBuffer();
     //this function writes the header of the buffer to the current buffer
     void writeBufferHeader();
+    void emptyWriteQueueBeforeChange();
     
     
     /*
