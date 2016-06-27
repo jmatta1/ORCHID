@@ -91,17 +91,21 @@ FileOutputThread::~FileOutputThread()
 void FileOutputThread::prepNewRunFolder()
 {
     BOOST_LOG_SEV(OrchidLog::get(), Information) << "Preparing new folder";
+    if(this->outDirectory.back() == '/')
+    {
+        this->outDirectory.erase(this->outDirectory.size()-1, 1); 
+    }
     boost::filesystem::path writePath(this->outDirectory);
     boost::system::error_code mkDirErr;
-    bool success = boost::filesystem::create_directories(writePath, mkDirErr);
-    if(!success)
+    boost::filesystem::create_directories(writePath, mkDirErr);
+    if(!boost::filesystem::is_directory(writePath))
     {
         BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create data directory in file thread";
         throw std::runtime_error("Could not create data directory in file thread");
     }
     writePath.append(this->currentRunTitle);
-    success = boost::filesystem::create_directories(writePath, mkDirErr);
-    if(!success)
+    boost::filesystem::create_directories(writePath, mkDirErr);
+    if(!boost::filesystem::is_directory(writePath))
     {
         BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create run directory in file thread";
         throw std::runtime_error("Could not create run directory in file thread");
