@@ -41,7 +41,8 @@ HFIR background monitoring wall.
 // ORCHID threads
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
-#include"Threads/FileOutputThread.h"
+//#include"Threads/FileOutputThread.h"
+#include"Threads/FileOutputShell.h"
 
 //pre declare event interface so we can use pointers to it as a type
 class EventInterface;
@@ -65,6 +66,7 @@ int main(int argc, char* argv[])
                 boost::log::keywords::file_name = "orchid_%N.log",          //file name format
                 boost::log::keywords::rotation_size = (1*1024*1024),        //rotate to a new file every megabyte
                 boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),  //or rotate at midnight
+                boost::log::keywords::auto_flush = true,
                 //boost::log::keywords::format = "[%TimeStamp%]  (%LineID%) <%Severity%>: %Message%");  //give every message a timestamp
                 boost::log::keywords::format = "[%TimeStamp%] <%Severity%>: %Message%");  //give every message a timestamp and severity
     //set up to dump to the console as well
@@ -208,7 +210,8 @@ int main(int argc, char* argv[])
                                   params.powerBlock->pollingRate);
 
     //make the file thread callable
-    //Threads::FileOutputThread* fileThreadCallable = new Threads::FileOutputThread(toFileQueues, fileData, fotController, &params.generalBlock);
+    Threads::FileOutputThread* fileThreadCallable = new Threads::FileOutputThread(toFileQueues, fileData, fotController, params.generalBlock);
+    Threads::FileOutputShell* fileThreadShellCallable = new Threads::FileOutputShell(fileThreadCallable);
     
     //make the slow controls callable
     Threads::SlowControlsThread* scThreadCallable =
@@ -234,18 +237,18 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Debug)  << "Building threads\n" << std::flush;
     // Make the threads
     boost::thread scThread(*scThreadCallable);
-    BOOST_LOG_SEV(lg, Debug)  << "Starting UI Thread, stopping console logging\n" << std::flush;
-    boost::log::core::get()->remove_sink(coutSink);
-    boost::thread uiThread(*uiThreadCallable);
-    //boost::thread fileThread(fileThreadCallable);
-    //boost::thread slowControlsThread(slowControlsThreadCallable);
-    //boost::thread digitizerThread(digitizerThreadCallable);
+    boost::thread fileThread(*fileThreadShellCallable);
+    //boost::thread digitizerThread(*digitizerThreadCallable);
     //boost::thread_group eventProcessingThreads;
     /*for(int i = 0; i < numProcThreads; ++i)
     {
         eventProcessingThreads.create_thread(*(evProcThreadCallable[i]));
     }*/
-    
+    //make the UI thread last
+    BOOST_LOG_SEV(lg, Debug)  << "Starting UI Thread, stopping console logging\n" << std::flush;
+    boost::log::core::get()->remove_sink(coutSink);
+    coutSink->flush();
+    boost::thread uiThread(*uiThreadCallable);
 
     //Wait to join the IO thread
     uiThread.join();
@@ -257,10 +260,27 @@ int main(int argc, char* argv[])
     //delete the thread callable objects
     delete uiThreadCallable;
     delete scThreadCallable;
+    delete fileThreadShellCallable;
+    delete fileThreadCallable;
+    
 
     //delete the data queues
     BOOST_LOG_SEV(lg, Debug)  << "Deleting interthread data queues" << std::flush;
-    
+    //TODO: delete empty events from queue
+    /*for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
+    {
+        Events::EventInterface* temp;
+        //we use producer pop because that pulls empty events from the queue index
+        toFileQueues->producerPop<Utility::ProcessingQueueIndex>(temp);
+    }*/
+    //here we load the queue with empty slow controls events
+    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
+    {
+        Events::EventInterface* temp;
+        //we use producer pop because that pulls empty events from the queue index
+        toFileQueues->producerPop<Utility::SlowControlsQueueIndex>(temp);
+    }
+    delete toFileQueues;
 
     //delete the device control structures
     BOOST_LOG_SEV(lg, Debug)  << "Deleting device controls" << std::flush;
@@ -272,6 +292,7 @@ int main(int argc, char* argv[])
     //delete the thread control structures
     BOOST_LOG_SEV(lg, Debug)  << "Deleting thread controls" << std::flush;
     delete sctController;
+    delete fotController;
     
     BOOST_LOG_SEV(lg, Debug)  << "Deleting statistics accumulators\n" << std::flush;
     //delete shared objects generated for interprocess communication
