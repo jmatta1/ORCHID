@@ -36,7 +36,7 @@ class SlowControlsThreadController
 public:
     //construction and destruction
     SlowControlsThreadController():
-        currentState(SlowControlsThreadState::Stopped),
+        currentState(SlowControlsThreadState::Stopped), threadWaiting(false),
         threadDone(false){}
     ~SlowControlsThreadController(){}
     
@@ -66,6 +66,7 @@ public:
         this->currentState.store(SlowControlsThreadState::Writing);
         this->waitCondition.notify_all();
     }
+    bool isWaiting(){return this->threadWaiting.load();}
     bool isDone(){return this->threadDone.load();}
     
 private:
@@ -74,6 +75,7 @@ private:
     //thread syncronization
     boost::mutex waitMutex;
     boost::condition_variable waitCondition;
+    std::atomic_bool threadWaiting;
     
     //termination checking
     std::atomic_bool threadDone;
