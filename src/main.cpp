@@ -41,8 +41,8 @@ HFIR background monitoring wall.
 // ORCHID threads
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
-//#include"Threads/FileOutputThread.h"
-#include"Threads/FileOutputShell.h"
+#include"Threads/FileOutputThread.h"
+#include"Threads/ThreadWrapper.h"
 
 //pre declare event interface so we can use pointers to it as a type
 class EventInterface;
@@ -210,8 +210,10 @@ int main(int argc, char* argv[])
                                   params.powerBlock->pollingRate);
 
     //make the file thread callable
-    Threads::FileOutputThread* fileThreadCallable = new Threads::FileOutputThread(toFileQueues, fileData, fotController, params.generalBlock);
-    Threads::FileOutputShell* fileThreadShellCallable = new Threads::FileOutputShell(fileThreadCallable);
+    Threads::FileOutputThread* fileThreadCallable =
+            new Threads::FileOutputThread(toFileQueues, fileData, fotController, params.generalBlock);
+    Threads::ThreadWrapper<Threads::FileOutputThread>* fileThreadShellCallable =
+            new Threads::ThreadWrapper<Threads::FileOutputThread>(fileThreadCallable);
     
     //make the slow controls callable
     Threads::SlowControlsThread* scThreadCallable =
