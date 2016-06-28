@@ -30,11 +30,11 @@ namespace Threads
 {
 
 template <typename ThreadCallable>
-class ThreadShell
+class ThreadWrapper
 {
 public:
-    ThreadShell(ThreadCallable* callable):threadCallable(callable){}
-    ~ThreadShell(){}
+    ThreadWrapper(ThreadCallable* callable):threadCallable(callable){}
+    ~ThreadWrapper(){}
     void operator()(){(*threadCallable)();}
     
 private:
