@@ -232,7 +232,7 @@ void UIThread::drawFileInfo()
     {
         builder << std::setw(4) << std::setfill(' ') << rate;
     }
-    builder << "B/s | File: " << this->fileName;
+    builder << "B/s | Size: " << tempFileSize << "B | File: " << this->fileName;
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
 }
 
