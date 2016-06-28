@@ -29,15 +29,16 @@
 namespace Threads
 {
 
-class FileOutputShell
+template <typename ThreadCallable>
+class ThreadShell
 {
 public:
-    FileOutputShell(FileOutputThread* foThread):fileThread(foThread){}
-    ~FileOutputShell(){}
-    void operator()(){(*fileThread)();}
+    ThreadShell(ThreadCallable* callable):threadCallable(callable){}
+    ~ThreadShell(){}
+    void operator()(){(*threadCallable)();}
     
 private:
-    FileOutputThread* fileThread;
+    ThreadCallable* threadCallable;
 };
 
 }
