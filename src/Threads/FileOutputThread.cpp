@@ -74,6 +74,10 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
     this->writeFileHeader();
     //allocate the event buffer to be 2kB
     this->eventBuffer = new char[evBufSize];
+    this->fileData->setFileNameAndRunTitle(this->currentFileName,this->currentRunTitle);
+    this->fileData->setRunNumber(this->runNumber);
+    this->fileData->setSequenceNumber(this->sequenceNumber);
+    this->fileData->setSize(0);
 }
 
 FileOutputThread::~FileOutputThread()
@@ -149,8 +153,6 @@ void FileOutputThread::operator()()
         {
         case InterThread::FileOutputThreadState::Terminate:
             this->notTerminated = false;
-            //force the flush of the last buffer
-            this->finalizeDataBuffer();
             break;
         case InterThread::FileOutputThreadState::Waiting:
             this->fileThreadController->waitForNewState();
@@ -201,6 +203,10 @@ void FileOutputThread::grabNewRunParameters()
         this->outFile->newFile(this->currentFileName);
         this->writeFileHeader();
     }
+    this->fileData->setFileNameAndRunTitle(this->currentFileName,this->currentRunTitle);
+    this->fileData->setRunNumber(this->runNumber);
+    this->fileData->setSequenceNumber(this->sequenceNumber);
+    this->fileData->setSize(0);
 }
 
 void FileOutputThread::writeFileHeader()
@@ -348,6 +354,8 @@ void FileOutputThread::emptyWriteQueueBeforeChange()
             this->transferData(eventSize);
         }
     }
+    //the queues are empty, so now dump the last buffer and be done with it
+    this->finalizeDataBuffer();
 }
 
 void FileOutputThread::doubleEventBuffer()
@@ -375,7 +383,9 @@ void FileOutputThread::transferData(int eventSize)
         {
             //increment sequence number and set up the new file
             ++(this->sequenceNumber);
+            this->fileData->incrementSequenceNumber();
             this->buildFileName();
+            this->fileData->setFileName(this->currentFileName);
             this->outFile->newFile(this->currentFileName);
             //reset the buffer number to 0 now that we have a new file
             this->bufferNumber = 0;
@@ -422,6 +432,7 @@ void FileOutputThread::finalizeDataBuffer()
 void FileOutputThread::writeBufferToDisk(int bufferSize)
 {
     this->outFile->writeBuf(this->currentBuffer, bufferSize);
+    this->fileData->increaseSize(bufferSize);
     //now that we have sent that buffer out
     //get another use in the actual file handling
     this->getNextBuffer();
