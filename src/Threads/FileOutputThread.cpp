@@ -78,13 +78,17 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
 
 FileOutputThread::~FileOutputThread()
 {
+    //delete the file stream
     delete this->outFile;
-    for(int i=0; i<BufferCount ; ++i)
+    //delete the buffer that we have popped from the bufferqueue to write to
+    delete this->currentBuffer;
+    char* allocBuffer;
+    //pop each of the buffers in the queue and delete them
+    while(this->bufferQueue.pop(allocBuffer))
     {
-        char* allocBuffer;
-        this->bufferQueue.pop(allocBuffer);
         delete[] allocBuffer;
     }
+    //delete the temporary buffer
     delete[] this->eventBuffer;
 }
 
@@ -145,6 +149,8 @@ void FileOutputThread::operator()()
         {
         case InterThread::FileOutputThreadState::Terminate:
             this->notTerminated = false;
+            //force the flush of the last buffer
+            this->finalizeDataBuffer();
             break;
         case InterThread::FileOutputThreadState::Waiting:
             this->fileThreadController->waitForNewState();
@@ -215,8 +221,11 @@ void FileOutputThread::writeFileHeader()
     reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_nanoseconds();
     this->buffInd += 8;
     std::string fileTimeString = boost::posix_time::to_iso_extended_string(currFileTime);
-    std::copy(fileTimeString.c_str(), fileTimeString.c_str() + 30, &this->currentBuffer[this->buffInd]);
-    this->buffInd += 30;
+    int fTimeLength = fileTimeString.size();
+    std::copy(fileTimeString.c_str(), fileTimeString.c_str() + fTimeLength, &this->currentBuffer[this->buffInd]);
+    this->buffInd += fTimeLength;
+    std::fill_n(reinterpret_cast<char*>(&(this->currentBuffer[this->buffInd])), 30-fTimeLength, 0);
+    this->buffInd += (30-fTimeLength);
     if(this->currentRunTitle.size() < 100)
     {
         std::copy(this->currentRunTitle.c_str(), this->currentRunTitle.c_str() + this->currentRunTitle.size(), &this->currentBuffer[this->buffInd]);
@@ -242,6 +251,8 @@ void FileOutputThread::writeFileHeader()
     this->buffInd += 8;
     //send this 4kB header to the file
     this->writeBufferToDisk(this->buffInd);
+    //now that we have written the file header we want to write a buffer header
+    this->writeBufferHeader();
 }
 
 void FileOutputThread::doWriteLoop()
@@ -370,6 +381,10 @@ void FileOutputThread::transferData(int eventSize)
             this->bufferNumber = 0;
             this->writeFileHeader();
         }
+        //if we are here then we are either starting a fresh buffer in the same
+        //file or we are starting a new file and have already written the file
+        //header
+        this->writeBufferHeader();
         //now write the data to the fresh new buffer
         std::copy(this->eventBuffer, (this->eventBuffer + eventSize), &(this->currentBuffer[this->buffInd]));
         ++(this->eventCount);
@@ -417,13 +432,12 @@ void FileOutputThread::getNextBuffer()
     this->bufferQueue.pop(this->currentBuffer);
     ++bufferNumber;
     this->buffInd = 0;
-    this->writeBufferHeader();
 }
 
 void FileOutputThread::writeBufferHeader()
 {
     //first we write the buffer separator
-    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0F0F0F0F0ULL;
+    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F00F0F0F0FULL;
     this->buffInd += 8;
     //then we write the buffer ID
     reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000002;
