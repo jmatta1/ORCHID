@@ -13,13 +13,13 @@ BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
 TotalChannelsAvailable = 16 # soon to be deleted
 GlobalCfdFraction = 0.2 # soon to be deleted
 BoardAddressList = [00000000, 00010000] 	# soon to be deleted
-PerChannelParameterFile = "./digitizer_channel_params.csv"
-#PerModuleParameterFile = "./digitizer_module_params.csv" #coming soon
+PerChannelParameterFile = "./orchid_digi_chan_params.csv"
+#PerModuleParameterFile = "./orchid_digi_mod_params.csv" #coming soon
 [EndBlock]
 
 [PowerBlock]
-PerChannelParameterFile = "./mpod_channel_params.csv"
-PerModuleParameterFile = "./mpod_module_params.csv"
+PerChannelParameterFile = "./orchid_mpod_channel_params.csv"
+PerModuleParameterFile = "./orchid_mpod_module_params.csv"
 MpodIPAddress = 192.168.11.11
 WienerMibFileDirectory = "/usr/share/snmp/mibs"
 PollingRate = 1
