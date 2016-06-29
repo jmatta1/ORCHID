@@ -28,16 +28,10 @@ namespace InputParser
 {
 
 
-GeneralBlock::GeneralBlock() : runTitle(""), warnRate(10000),
-    updateFrequency(2), baseOutputDirectory(""){}
+GeneralBlock::GeneralBlock() :warnRate(10000), updateFrequency(2),
+    baseOutputDirectory(""){}
 
 // required parameters
-void GeneralBlock::runTitleSet(std::string input)
-{
-    runTitle = input;
-    runTitleSet_ = true;
-}
-
 void GeneralBlock::warnRateSet(int input)
 {
     warnRate = input;
@@ -58,8 +52,7 @@ void GeneralBlock::baseOutputDirectorySet(std::string input)
 
 bool GeneralBlock::validate()
 {
-    return (runTitleSet_ &&
-            warnRateSet_ &&
+    return (warnRateSet_ &&
             updateFrequencySet_ &&
             baseOutputDirectorySet_);
 }
@@ -67,10 +60,6 @@ bool GeneralBlock::validate()
 void GeneralBlock::printValidationErrors()
 {
     std::cout << "GeneralBlock Validation Errors:\n";
-    if(!runTitleSet_)
-    {
-        std::cout << "    RunTitle was not set\n";
-    }
     if(!warnRateSet_)
     {
         std::cout << "    WarnRate was not set\n";
@@ -89,7 +78,6 @@ void GeneralBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, GeneralBlock const& gb) 
 {
 return os << "[GeneralBlock]\n"
-    << "    RunTitle            = \"" << gb.runTitle            << "\"\n"
     << "    WarnRate            = "   << gb.warnRate            << "\n"
     << "    UpdateFrequency     = "   << gb.updateFrequency     << "\n"
     << "    BaseOutputDirectory = "   << gb.baseOutputDirectory << "\n"

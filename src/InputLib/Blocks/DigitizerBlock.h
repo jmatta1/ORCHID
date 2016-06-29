@@ -37,17 +37,13 @@ struct DigitizerBlock
     DigitizerBlock();
     // configuration parameters
     // required parameters
-	int totalChannelsAvailable;
-	float globalCfdFraction;
 	std::string perChannelParameterFile;
-	std::vector<unsigned int> boardAddressList;
+    std::string perModuleParameterFile;
     
     // parameter setters for binding with boost::spirit::qi
     // required parameters
-    void totalChannelsAvailableSet(int input);
-    void globalCfdFractionSet(float input);
-    void perChannelParameterFileSet(std::string input);
-    void boardAddressListSet(unsigned int input);
+    void perChannelParameterFileSet(std::string& input);
+    void perModuleParameterFileSet(std::string& input);
 	
 	bool validate();
 	void printValidationErrors();
@@ -57,11 +53,8 @@ struct DigitizerBlock
 
 private:
     // parameters to make sure the required parameters were set
-    bool totalChannelsAvailableSet_;
-    bool globalCfdFractionSet_;
     bool perChannelParameterFileSet_;
-    bool boardAddressListSet_;
-    int boardAddressListCount_;
+    bool perModuleParameterFileSet_;
 };
 
 }

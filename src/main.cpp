@@ -136,7 +136,6 @@ int main(int argc, char* argv[])
     InterThread::RateData* rateData = new InterThread::RateData(numDigitizerChannels);
     //Make the data structure for file information
     InterThread::FileData* fileData = new InterThread::FileData();
-    fileData->setRunTitle(params.generalBlock->runTitle);
     
     /*
      * Build the InterThread Control structures

@@ -21,7 +21,6 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<iostream>
-#include<iomanip>
 // includes from other libraries
 // includes from ORCHID
 
@@ -29,81 +28,47 @@ namespace InputParser
 {
 
 
-DigitizerBlock::DigitizerBlock() : totalChannelsAvailable(1),
-    globalCfdFraction(0.2), perChannelParameterFile(""){}
+DigitizerBlock::DigitizerBlock() : perChannelParameterFile(""),
+    perModuleParameterFile(""){}
 
 // required parameters
-void DigitizerBlock::totalChannelsAvailableSet(int input)
-{
-    totalChannelsAvailable = input;
-    totalChannelsAvailableSet_ = true;
-}
-
-void DigitizerBlock::globalCfdFractionSet(float input)
-{
-    globalCfdFraction = input;
-    globalCfdFractionSet_ = true;
-}
-
-void DigitizerBlock::perChannelParameterFileSet(std::string input)
+void DigitizerBlock::perChannelParameterFileSet(std::string& input)
 {
     perChannelParameterFile = input;
     perChannelParameterFileSet_ = true;
 }
 
-void DigitizerBlock::boardAddressListSet(unsigned int input)
+void DigitizerBlock::perModuleParameterFileSet(std::string& input)
 {
-	boardAddressList.push_back(input);
-	boardAddressListSet_ = true;
-	++boardAddressListCount_;
+    perModuleParameterFile = input;
+    perModuleParameterFileSet_ = true;
 }
 
 bool DigitizerBlock::validate()
 {
-    return (totalChannelsAvailableSet_ &&
-            globalCfdFractionSet_ &&
-            perChannelParameterFileSet_ &&
-            boardAddressListSet_);
+    return (perChannelParameterFileSet_ &&
+            perModuleParameterFileSet_);
 }
 
 void DigitizerBlock::printValidationErrors()
 {
     std::cout << "DigitizerBlock Validation Errors:\n";
-    if(!totalChannelsAvailableSet_)
-    {
-        std::cout << "    TotalChannelsAvailable was not set\n";
-    }
-    if(!globalCfdFractionSet_)
-    {
-        std::cout << "    GlobalCfdFraction was not set\n";
-    }
     if(!perChannelParameterFileSet_)
     {
         std::cout << "    PerChannelParameterFile was not set\n";
     }
-    if(!boardAddressListSet_)
+    if(!perModuleParameterFileSet_)
     {
-        std::cout << "    BoardAddressList was not set\n";
+        std::cout << "    PerModuleParameterFile was not set\n";
     }
     std::cout << "End DigitizerBlock Validation Errors\n";
 }
 
 std::ostream& operator<<(std::ostream& os, DigitizerBlock const& db) 
 {
-	using std::hex;
-	using std::dec;
-	using std::setw;
-	using std::setfill;
 	os << "[DigitizerBlock]\n"
-    << "    GlobalCfdFraction        = "   << db.globalCfdFraction       << "\n"
-    << "    BoardAddressList         = 0x"   << hex << setw(8) << setfill('0') << db.boardAddressList[0] << dec << "\n";
-    for(int i=1; i < db.boardAddressListCount_; ++i)
-    {
-    	os << "                               0x"   << hex << setw(8) << setfill('0') << db.boardAddressList[i] << dec << "\n";
-    }
-    os << "    TotalChannelsAvailable   = " << db.totalChannelsAvailable  << "\n"
-       << "    PerChannelParameterFile  = "   << db.perChannelParameterFile << "\n";
-    
+       << "    PerChannelParameterFile  = " << db.perChannelParameterFile << "\n"
+       << "    PerModuleParameterFile   = " << db.perModuleParameterFile  << "\n";
     return os << "[EndBlock]";
 }
 

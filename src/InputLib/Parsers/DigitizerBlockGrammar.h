@@ -46,26 +46,19 @@ struct DigitizerBlockGrammar : qi::grammar<Iterator>
 		using qi::skip;
 		using qi::blank;
 		using qi::lexeme;
-		using qi::float_;
-		using qi::int_;
-		using qi::hex;
 		using Utility::eol_;
 		using Utility::separator;
         
         //define the rules to parse the parameters
-        totalChanAvail = (lexeme["TotalChannelsAvailable"]  >> '=' > int_         [phoenix::bind(&DigitizerBlock::totalChannelsAvailableSet , ptr, qi::_1)] > separator);
-        globCfdFrac    = (lexeme["GlobalCfdFraction"]       >> '=' > float_       [phoenix::bind(&DigitizerBlock::globalCfdFractionSet      , ptr, qi::_1)] > separator);
-        paramFile      = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&DigitizerBlock::perChannelParameterFileSet, ptr, qi::_1)] > separator);
-        addressList    = (lexeme["BoardAddressList"]        >> '=' > '[' >> -lexeme["0x"] >> hex   [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]
-        				>> *(',' >> -lexeme["0x"] >> hex [phoenix::bind(&DigitizerBlock::boardAddressListSet, ptr, qi::_1)]) >> ']' > separator);
+        channelFile = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&DigitizerBlock::perChannelParameterFileSet, ptr, qi::_1)] > separator);
+        moduleFile  = (lexeme["PerModuleParameterFile"]  >> '=' > quotedString [phoenix::bind(&DigitizerBlock::perModuleParameterFileSet, ptr, qi::_1)]  > separator);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		startRule = skip(blank) [digitizerBlockRule];
 		digitizerBlockRule = lexeme["[DigitizerBlock]"] >> *eol_
                                > ( 
-                                   totalChanAvail ^ globCfdFrac ^ paramFile ^
-                                   addressList
+                                   channelFile ^ moduleFile
                                  )
                                > lexeme["[EndBlock]"];
 	}
@@ -79,8 +72,7 @@ private:
 	Utility::QuotedString<Iterator> quotedString;
 	
 	// parameters
-	qi::rule<Iterator, qi::blank_type> totalChanAvail, globCfdFrac, paramFile,
-									   addressList;
+	qi::rule<Iterator, qi::blank_type> channelFile, moduleFile;
 
 	// hold the pointer that we are going to bind to
 	DigitizerBlock* ptr;

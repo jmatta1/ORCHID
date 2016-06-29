@@ -36,14 +36,12 @@ struct GeneralBlock
     GeneralBlock();
     // configuration parameters
     // required parameters
-	std::string runTitle;
 	int         warnRate; //rate in hertz to warn user at
 	int         updateFrequency; //rate in hertz to update display
 	std::string baseOutputDirectory;
     
     // parameter setters for binding with boost::spirit::qi
     // required parameters
-    void runTitleSet(std::string input);
     void warnRateSet(int input);
 	void updateFrequencySet(int input);
 	void baseOutputDirectorySet(std::string input);
@@ -56,7 +54,6 @@ struct GeneralBlock
 
 private:
     // parameters to make sure the required parameters were set
-    bool runTitleSet_;
     bool warnRateSet_;
     bool updateFrequencySet_;
     bool baseOutputDirectorySet_;
