@@ -1,0 +1,2 @@
+#LinkType, link #, Daisy Chain #, board address, num channels, Sample Rate (kHz),
+  Optical,      0,             0,    0x00000000,           16,            500000,

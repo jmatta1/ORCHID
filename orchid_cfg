@@ -3,23 +3,19 @@
 # adding a test comment to the file
 
 [GeneralBlock] # this block of parameters holds the basic values that control the overall running of the DAQ
-RunTitle = "Test_Run"  # we basically ignore this parameter now, it will be deleted from parsing soon
 WarnRate = 20000   # this is the rate at will we issue warning about the digitizer running too fast
-UpdateFrequency = 20 #the rate in hertz that the UI updates itself
+UpdateFrequency = 20              #the rate in hertz that the UI updates itself
 BaseOutputDirectory = "/home/jmatta1/code/ORCHID/data/"
 [EndBlock]
 
 [DigitizerBlock]
-TotalChannelsAvailable = 16 # soon to be deleted
-GlobalCfdFraction = 0.2 # soon to be deleted
-BoardAddressList = [00000000, 00010000] 	# soon to be deleted
 PerChannelParameterFile = "./orchid_digi_chan_params.csv"
-#PerModuleParameterFile = "./orchid_digi_mod_params.csv" #coming soon
+PerModuleParameterFile = "./orchid_digi_mod_params.csv"
 [EndBlock]
 
 [PowerBlock]
-PerChannelParameterFile = "./orchid_mpod_channel_params.csv"
-PerModuleParameterFile = "./orchid_mpod_module_params.csv"
+PerChannelParameterFile = "./orchid_mpod_chan_params.csv"
+PerModuleParameterFile = "./orchid_mpod_mod_params.csv"
 MpodIPAddress = 192.168.11.11
 WienerMibFileDirectory = "/usr/share/snmp/mibs"
 PollingRate = 1
