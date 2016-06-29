@@ -46,9 +46,9 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
                                    InputParser::GeneralBlock* generalBlock):
     outFile(nullptr), evBufSize(2048), eventBuffer(nullptr), 
     outDirectory(generalBlock->baseOutputDirectory), currentFileName(""),
-    currentRunTitle(generalBlock->runTitle), runNumber(0), sequenceNumber(0),
-    buffInd(0), bufferNumber(0), eventCount(0), inputQueues(queueInput),
-    fileData(fileDat), fileThreadController(fileThreadCtrl), notTerminated(true)
+    runNumber(0), sequenceNumber(0), buffInd(0), bufferNumber(0), eventCount(0),
+    inputQueues(queueInput), fileData(fileDat),
+    fileThreadController(fileThreadCtrl), notTerminated(true)
 {
     //make directories and prep file name
     this->prepNewRunFolder();
@@ -68,16 +68,18 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
     }
     //pop a buffer from the queue to serve as what we are filling now
     this->getNextBuffer();
-    //make the asynchronous output file
-    this->outFile = new AsyncIO::AsyncOutFile<BufferQueue>(this->currentFileName, &(this->bufferQueue));
+    //make the asynchronous output file uninitialized
+    this->outFile = new AsyncIO::AsyncOutFile<BufferQueue>(&(this->bufferQueue));
+    //this->outFile = new AsyncIO::AsyncOutFile<BufferQueue>(this->currentFileName, &(this->bufferQueue));
     //write the file header
-    this->writeFileHeader();
+    //this->writeFileHeader();
     //allocate the event buffer to be 2kB
     this->eventBuffer = new char[evBufSize];
-    this->fileData->setFileNameAndRunTitle(this->currentFileName,this->currentRunTitle);
-    this->fileData->setRunNumber(this->runNumber);
-    this->fileData->setSequenceNumber(this->sequenceNumber);
-    this->fileData->setSize(0);
+    //this->fileData->setFileNameAndRunTitle(this->currentFileName,this->currentRunTitle);
+    //this->fileData->setRunNumber(this->runNumber);
+    //this->fileData->setSequenceNumber(this->sequenceNumber);
+    //this->fileData->setSize(0);
+    this->fileData->setInitState('u');
 }
 
 FileOutputThread::~FileOutputThread()
@@ -146,23 +148,27 @@ void FileOutputThread::buildFileName()
 
 void FileOutputThread::operator()()
 {
-    //Prep the event loop
+    //run the event loop
     while(this->notTerminated)
     {
         switch(this->fileThreadController->getCurrentState())
         {
         case InterThread::FileOutputThreadState::Terminate:
             this->notTerminated = false;
+            this->outFile->closeAndTerminate();
             break;
         case InterThread::FileOutputThreadState::Waiting:
             this->fileThreadController->waitForNewState();
             break;
         case InterThread::FileOutputThreadState::NewRunParams:
             this->grabNewRunParameters();
+            this->fileData->setInitState('i');
             break;
         case InterThread::FileOutputThreadState::Writing:
             this->doWriteLoop();
             this->emptyWriteQueueBeforeChange();
+            this->outFile->closeFile();
+            this->fileData->setInitState('n');
             break;
         }
     }

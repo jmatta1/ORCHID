@@ -182,11 +182,15 @@ void UIThread::drawIdleScreen()
     mvwprintw(this->textWindow, 2, 4,  "start");
     mvwprintw(this->textWindow, 2, 16, "- Start taking data");
     mvwprintw(this->textWindow, 3, 4,  "changerun");
-    mvwprintw(this->textWindow, 3, 16, "- Change Run Parameters");
-    mvwprintw(this->textWindow, 4, 4,  "turnoff");
-    mvwprintw(this->textWindow, 4, 16, "- Disconnect from digitizer and shutdown MPOD");
-    mvwprintw(this->textWindow, 5, 4,  "quit/exit");
-    mvwprintw(this->textWindow, 5, 16, "- Exit ORCHID");
+    mvwprintw(this->textWindow, 3, 16, "- Change Run Title and Number");
+    mvwprintw(this->textWindow, 4, 4,  "runnumber");
+    mvwprintw(this->textWindow, 4, 16, "- Change Run Number");
+    mvwprintw(this->textWindow, 5, 4,  "next");
+    mvwprintw(this->textWindow, 5, 16, "- Increment Run Number");
+    mvwprintw(this->textWindow, 6, 4,  "turnoff");
+    mvwprintw(this->textWindow, 6, 16, "- Disconnect from digitizer and shutdown MPOD");
+    mvwprintw(this->textWindow, 7, 4,  "quit/exit");
+    mvwprintw(this->textWindow, 7, 16, "- Exit ORCHID");
     
     this->drawPersistentMessage();
     this->drawCommandInProgress();
@@ -431,7 +435,62 @@ void UIThread::handleCommand()
         wmove(this->messageWindow, 1, 0);
         persistentMessage.clear();
         wclrtoeol(this->messageWindow);
-        this->startDataTaking();
+        switch(this->fileData->getInitState())
+        {
+        case 'i':
+            this->startDataTaking();
+            break;
+        case 'u':
+            this->persistentMessage = "Error:  Must set run title and number";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*5;
+            break;
+        case 'n':
+            this->persistentMessage = "Error:  Must set at least number";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*5;
+            break;
+        }
+        break;
+    case UICommands::Next:
+        this->persistCount = -1; //clear any error, clearly they fixed it
+        wmove(this->messageWindow, 1, 0);
+        persistentMessage.clear();
+        wclrtoeol(this->messageWindow);
+        switch(this->fileData->getInitState())
+        {
+        case 'i':
+        case 'n':
+            ++(this->tempRunNumber);
+            while(!this->fileControl->setNewRunParameters(this->tempRunTitle, this->tempRunNumber))
+            {//failed at setting the new parameters, try again in a moment
+                boost::this_thread::sleep_for(this->refreshPeriod);
+            }
+            break;
+        case 'u':
+            this->persistentMessage = "Error:  Set run title and number before incrementing run number";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*5;
+            break;
+        }
+        break;
+    case UICommands::ChangeNum:
+        switch(this->fileData->getInitState())
+        {
+        case 'i':
+        case 'n':
+            this->setRunNumber();
+            while(!this->fileControl->setNewRunParameters(this->tempRunTitle, this->tempRunNumber))
+            {//failed at setting the new parameters, try again in a moment
+                boost::this_thread::sleep_for(this->refreshPeriod);
+            }
+            break;
+        case 'u':
+            this->persistentMessage = "Error:  Must set run title before trying to modify only the number";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*5;
+            break;
+        }
         break;
     case UICommands::Stop:
         this->persistCount = -1; //clear any error, clearly they fixed it

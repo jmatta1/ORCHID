@@ -83,6 +83,12 @@ public:
         this->currentState.store(FileOutputThreadState::Writing);
         if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
     }
+    void uiGetRunParams(std::string& rTitle, int& rNum)
+    {
+        rTitle=this->runTitle;
+        rNum=this->runNumber;
+    }
+
     bool isDone(){return this->threadDone.load();}
     bool isWaiting(){return this->fileThreadWaiting.load();}
 private:

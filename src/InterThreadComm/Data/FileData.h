@@ -48,6 +48,8 @@ public:
     void increaseRunNumber(int diff){runNumber.fetch_add(diff); runNumberTest.store(true);}
     void increaseSequenceNumber(int diff){sequenceNumber.fetch_add(diff); sequenceNumberTest.store(true);}
     void increaseSize(long long diff){size.fetch_add(diff);}
+    void setInitState(char state){isInitted.store(state);}
+    
     //getters
     int getRunNumber(){return runNumber.load(); runNumberTest.store(false);}
     int getSequenceNumber(){return sequenceNumber.load(); sequenceNumberTest.store(false);}
@@ -55,6 +57,7 @@ public:
     void getFileName(std::string& fName);
     void getRunTitle(std::string& rTitle);
     void getFileNameAndRunTitle(std::string& fName, std::string& rTitle);
+    char getInitState(){return isInitted.load();}
     //tester functions
     //why repeatedly lock and unlock mutexes when we can simply check
     //an atomic boolean and see if it is true or not
@@ -74,6 +77,8 @@ private:
     std::atomic_int runNumber;
     std::atomic_int sequenceNumber;
     std::atomic_llong size;
+    //file initialized or not
+    std::atomic_char isInitted;
     
     //atomic boolean test
     std::atomic_bool fileNameTest;

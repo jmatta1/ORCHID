@@ -69,6 +69,7 @@ template <typename RetQueueType>
 class AsyncOutFile
 {
 public:
+    AsyncOutFile(RetQueueType* cbQueue);
     AsyncOutFile(const std::string& filePath, RetQueueType* cbQueue);
     ~AsyncOutFile();
     
@@ -76,6 +77,12 @@ public:
     void newFile(const std::string& filePath);
     //enqueue a buffer for writing
     void writeBuf(char* outBuffer, int bufferSize);
+    
+    //tells the caller if we have an open file or not
+    bool hasOpenFile(){return this->isInitialized.load();}
+    
+    //closes the current file and sets is Initialized false
+    void closeFile();
     
     //shutdown the write thread and close the file
     void closeAndTerminate();
@@ -90,6 +97,7 @@ private:
     
     //the actual fstream to write the file
     std::ofstream outFile;
+    std::atomic_bool isInitialized;
     
     //synchronization objects to wait for data or wait to add data
     //used to hold back the consumer thread writing data if it needs to wait for more data
@@ -130,6 +138,16 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
     //first lock the write mutex, whenever this thread is not waiting it has this
     //mutex locked to prevent changes to the underlying fstream
     boost::unique_lock<boost::mutex> writeLock(this->aOutFile->writeMutex);
+    //wait for initialization, or termination signal
+    while(!(this->aOutFile->isInitialized.load()) && !(this->aOutFile->terminateWhenEmpty.load()))
+    {
+        //if we are here then we have not been told to terminate, nor have we been told that there is data for reading
+        //so instead we go to sleep, this also unlocks the mutex so the fstream can be pointed at a new file while we sleep
+        this->aOutFile->writerWaiting.store(true);
+        this->aOutFile->writeWaitCondition.wait(writeLock);
+    }
+    //we are done waiting, tell people
+    this->aOutFile->writerWaiting.store(false);
     //the overarching loop. It checks for the termination signal and
     //if it sees one then it exits that loop going to the secondary empty queue
     //loop before terminating
@@ -150,8 +168,6 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
             this->aOutFile->writerWaiting.store(true);
             this->aOutFile->writeWaitCondition.wait(writeLock);
         }
-        //we are done waiting, tell people
-        this->aOutFile->writerWaiting.store(false);
         //if we are here then there is either data available for reading or we were told to terminate
         //if there is data available, grab it and write it
         if(this->aOutFile->writeQueue.pop(temp))
@@ -207,11 +223,27 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
  */
 
 template <typename RetQueueType>
+AsyncOutFile<RetQueueType>::AsyncOutFile(RetQueueType* cbQueue):
+    isInitialized(false), writerWaiting(false), producerWaiting(false),
+    callBackQueue(cbQueue), terminateWhenEmpty(false), writeTerminated(false),
+    writeCallable(nullptr), writeThread(nullptr)
+{
+    //load the return queue with spare BSCTriples
+    for(int i=0; i<QueueCapacity; ++i)
+    {
+        returnQueue.push(new BufferPair);
+    }
+    //now generate the callable and thread for writing
+    writeCallable = new AsyncOutFileWriteThread<RetQueueType>(this);
+    writeThread = new boost::thread(*writeCallable);
+}
+
+template <typename RetQueueType>
 AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueType* cbQueue):
     outFile(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc),
-    writerWaiting(false), producerWaiting(false), callBackQueue(cbQueue),
-    terminateWhenEmpty(false), writeTerminated(false), writeCallable(nullptr),
-    writeThread(nullptr)
+    isInitialized(true), writerWaiting(false), producerWaiting(false),
+    callBackQueue(cbQueue), terminateWhenEmpty(false), writeTerminated(false),
+    writeCallable(nullptr), writeThread(nullptr)
 {
     //load the return queue with spare BSCTriples
     for(int i=0; i<QueueCapacity; ++i)
@@ -260,8 +292,34 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     //therefor we block any addition to the write queue until the mutex is locked by us anyways
     boost::unique_lock<boost::mutex> writeLock(this->writeMutex);
     //once we have the lock, we have control of the fstream
-    outFile.close();
+    if(this->isInitialized.load())
+    {
+        outFile.close();
+    }
+    else
+    {//setting a file essentially initializes the system
+        this->isInitialized.store(true);
+    }
+    
     outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
+    //our changes are done
+    //the lock should release on destruction when the function exits
+}
+
+template <typename RetQueueType>
+void AsyncOutFile<RetQueueType>::closeFile()
+{
+    //first we try to lock the writeMutex.
+    //If we manage that then the write thread is waiting for data.
+    //If we have to wait that is ok because we should be the only write thread
+    //therefor we block any addition to the write queue until the mutex is locked by us anyways
+    boost::unique_lock<boost::mutex> writeLock(this->writeMutex);
+    //once we have the lock, we have control of the fstream
+    if(this->isInitialized.load())
+    {
+        outFile.close();
+        this->isInitialized.store(false);
+    }
     //our changes are done
     //the lock should release on destruction when the function exits
 }

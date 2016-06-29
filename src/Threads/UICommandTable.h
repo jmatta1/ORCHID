@@ -32,8 +32,8 @@ namespace Threads
 
 //The various enumerated commands
 enum class UICommands : char {TurnOn,       TurnOff,    Start,      Stop,
-                              ChangeRun,    Next,       Quit,       Invalid,
-                              Unavailable};
+                              ChangeRun,    ChangeNum,  Next,       Quit,
+                              Invalid,      Unavailable};
 
 //A lookup between string and the command
 static const std::map<std::string, UICommands> UI_COMMAND_DISPATCH =
@@ -45,42 +45,40 @@ static const std::map<std::string, UICommands> UI_COMMAND_DISPATCH =
         ("start",     UICommands::Start)
         ("stop",      UICommands::Stop)
         ("changerun", UICommands::ChangeRun)
+        ("runnumber", UICommands::ChangeNum)
         ("next",      UICommands::Next);
 
 //A lookup for valid commands while in init mode
 static const std::map<UICommands, bool> INIT_MODE_VALID_CMD =
     map_list_of(UICommands::Quit, true)
-        (UICommands::Quit,      true)
-        (UICommands::Quit,      true)
         (UICommands::TurnOn,    true)
         (UICommands::TurnOff,   false)
         (UICommands::Start,     false)
         (UICommands::Stop,      false)
         (UICommands::ChangeRun, false)
-        (UICommands::Next, false);
+        (UICommands::ChangeNum, false)
+        (UICommands::Next,      false);
 
 //A lookup for valid commands while in idle mode
 static const std::map<UICommands, bool> IDLE_MODE_VALID_CMD =
     map_list_of(UICommands::Quit, true)
-        (UICommands::Quit,      true)
-        (UICommands::Quit,      true)
         (UICommands::TurnOn,    false)
         (UICommands::TurnOff,   true)
         (UICommands::Start,     true)
         (UICommands::Stop,      false)
         (UICommands::ChangeRun, true)
+        (UICommands::ChangeNum, true)
         (UICommands::Next,      true);
 
 //A lookup for valid commands while in run mode
 static const std::map<UICommands, bool> RUN_MODE_VALID_CMD =
     map_list_of(UICommands::Quit, true)
-        (UICommands::Quit,      true)
-        (UICommands::Quit,      true)
         (UICommands::TurnOn,    false)
         (UICommands::TurnOff,   false)
         (UICommands::Start,     false)
         (UICommands::Stop,      true)
         (UICommands::ChangeRun, false)
+        (UICommands::ChangeNum, false)
         (UICommands::Next, false);
 }
 

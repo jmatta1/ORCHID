@@ -69,8 +69,6 @@ private:
     void transferData(int eventSize);
     //takes a full buffer, and writes the checksums for its contents into the header then sends it to disk
     void finalizeDataBuffer();
-    //write a fill sized buffer to disk
-    void writeFullSizeBufferToDisk(){this->writeBufferToDisk(BufferSizeInBytes);}
     //write buffers of indeterminate size to disk
     void writeBufferToDisk(int bufferSize);
     //this function generates the file header and writes it to the disk
