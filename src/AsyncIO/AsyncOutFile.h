@@ -31,6 +31,7 @@
 #include<boost/lockfree/spsc_queue.hpp>
 #include<boost/lockfree/queue.hpp>
 // includes from ORCHID
+#include<InterThreadComm/QueueTMP.h>
 
 namespace AsyncIO
 {
@@ -158,7 +159,8 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
             //write the buffer
             this->aOutFile->outFile.write(temp->buffer, temp->size);
             //run the call back to return the buffer to whoever owns it
-            this->aOutFile->callBackQueue->push(temp->buffer);
+            //this->aOutFile->callBackQueue->push(temp->buffer);
+            InterThread::PushSelect<RetQueueType, char*>::push(*(this->aOutFile->callBackQueue), temp->buffer);
             //clear the pair
             temp->clear();
             //return the BSCTriple to the return queue if we took this out of the
