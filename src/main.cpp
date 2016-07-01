@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
     /*
      * Build the callable objects for boost::thread
      */
-    BOOST_LOG_SEV(lg, Debug)  << "Building callable objects" << std::flush;
+    BOOST_LOG_SEV(lg, Debug)  << "Building callable objects and their wrappers" << std::flush;
     //make the UI thread callable
     Threads::UIThread* uiThreadCallable =
             new Threads::UIThread(slowData, rateData, fileData, mpodMapper,
@@ -207,17 +207,21 @@ int main(int argc, char* argv[])
                                   toFileQueues, mpodController,
                                   params.generalBlock->updateFrequency,
                                   params.powerBlock->pollingRate);
+    Threads::ThreadWrapper<Threads::UIThread>* uiThreadWrapper = 
+            new Threads::ThreadWrapper<Threads::UIThread>(uiThreadCallable);
 
     //make the file thread callable
     Threads::FileOutputThread* fileThreadCallable =
             new Threads::FileOutputThread(toFileQueues, fileData, fotController, params.generalBlock);
-    Threads::ThreadWrapper<Threads::FileOutputThread>* fileThreadShellCallable =
+    Threads::ThreadWrapper<Threads::FileOutputThread>* fileThreadWrapper =
             new Threads::ThreadWrapper<Threads::FileOutputThread>(fileThreadCallable);
     
     //make the slow controls callable
     Threads::SlowControlsThread* scThreadCallable =
             new Threads::SlowControlsThread(mpodReader, slowData, sctController,
                                             toFileQueues, params.powerBlock->pollingRate);
+    Threads::ThreadWrapper<Threads::SlowControlsThread>* scThreadWrapper = 
+            new Threads::ThreadWrapper<Threads::SlowControlsThread>(scThreadCallable);
     
     //make the digitizer reader callable
     //Threads::DigitizerThread* digitizerThreadCallable =
@@ -237,8 +241,8 @@ int main(int argc, char* argv[])
      */
     BOOST_LOG_SEV(lg, Debug)  << "Building threads\n" << std::flush;
     // Make the threads
-    boost::thread scThread(*scThreadCallable);
-    boost::thread fileThread(*fileThreadShellCallable);
+    boost::thread scThread(*scThreadWrapper);
+    boost::thread fileThread(*fileThreadWrapper);
     //boost::thread digitizerThread(*digitizerThreadCallable);
     //boost::thread_group eventProcessingThreads;
     /*for(int i = 0; i < numProcThreads; ++i)
@@ -249,7 +253,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Debug)  << "Starting UI Thread, stopping console logging\n" << std::flush;
     boost::log::core::get()->remove_sink(coutSink);
     coutSink->flush();
-    boost::thread uiThread(*uiThreadCallable);
+    boost::thread uiThread(*uiThreadWrapper);
 
     //Wait to join the IO thread
     uiThread.join();
@@ -259,9 +263,11 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Trace)  << "Other threads should have terminated.\n" << std::flush;
     BOOST_LOG_SEV(lg, Debug)  << "Deleting thread callable objects" << std::flush;
     //delete the thread callable objects
+    delete uiThreadWrapper;
     delete uiThreadCallable;
+    delete scThreadWrapper;
     delete scThreadCallable;
-    delete fileThreadShellCallable;
+    delete fileThreadWrapper;
     delete fileThreadCallable;
     
 
