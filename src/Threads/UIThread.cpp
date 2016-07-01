@@ -218,7 +218,7 @@ void UIThread::drawFileInfo()
     //Generate the file info string
     std::ostringstream builder;
     builder << "Run Title: " << this->runTitle << " | Run #: " << this->runNumber;
-    builder << " | File #: " << this->sequenceNumber << " | Rate: ";
+    builder << " | File #: " << this->sequenceNumber << " | Recent Rate: ";
     //get the file size and calculate the current file write rate
     long long tempFileSize = this->fileData->getSize();
     long long rate = (tempFileSize - this->lastFileSize) * this->rateMultiplier;
