@@ -29,7 +29,6 @@
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
 #include<boost/crc.hpp>
-#include<boost/date_time/gregorian/gregorian.hpp>
 // includes from ORCHID
 #include"Utility/OrchidLogger.h"
 #include"Utility/OrchidConfig.h"
@@ -38,7 +37,7 @@
 namespace Threads
 {
 
-static const boost::posix_time::ptime epoch(boost::gregorian::date(1970,1,1), boost::posix_time::time_duration(0,0,0,0));
+static const boost::posix_time::ptime epoch(boost::posix_time::time_from_string("1970-01-01 00:00:00.000"));
 
 FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
                                    InterThread::FileData* fileDat,
@@ -230,9 +229,9 @@ void FileOutputThread::writeFileHeader()
     this->buffInd += 2;
     this->currFileTime = boost::posix_time::microsec_clock::universal_time();
     boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
-    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_nanoseconds();
+    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_microseconds();
     this->buffInd += 8;
-    std::string fileTimeString = boost::posix_time::to_iso_extended_string(currFileTime);
+    std::string fileTimeString = boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time());
     int fTimeLength = fileTimeString.size();
     std::copy(fileTimeString.c_str(), fileTimeString.c_str() + fTimeLength, &this->currentBuffer[this->buffInd]);
     this->buffInd += fTimeLength;
@@ -413,7 +412,11 @@ void FileOutputThread::finalizeDataBuffer()
     //first we load the last of the buffer with zeros
     std::fill_n(&(this->currentBuffer[this->buffInd]), BufferSizeInBytes - this->buffInd, 0);
     //here we go back to the beginning of the buffer and load the number of events into the header
-    reinterpret_cast<unsigned int*>(&(this->currentBuffer[12]))[0] = this->eventCount;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[8]))[0] = this->eventCount;
+    //then we write the time this buffer is started
+    this->currFileTime = boost::posix_time::microsec_clock::universal_time();
+    boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
+    reinterpret_cast<long long*>(&(this->currentBuffer[24]))[0] = epochTime.total_microseconds();
     //now skip past the first 32 bytes of the buffer and start writing the 4 byte 32 bit crcs
     unsigned int writeInd   = 32;
     unsigned int writeSize  = 4;
@@ -454,8 +457,8 @@ void FileOutputThread::getNextBuffer()
 void FileOutputThread::writeBufferHeader()
 {
     //first we write the buffer separator
-    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F00F0F0F0FULL;
-    this->buffInd += 8;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = 0xF0F0F0F0;
+    this->buffInd += 4;
     //then we write the buffer ID
     reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000002;
     this->buffInd += 4;
@@ -465,11 +468,16 @@ void FileOutputThread::writeBufferHeader()
     //then we write which buffer number this is in the file
     reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = this->bufferNumber;
     this->buffInd += 4;
-    //then we write which buffer number this is in the run
-    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = ((this->sequenceNumber * MaxBuffersPerFile) + this->bufferNumber);
-    this->buffInd += 4;
+    //then we write the time this buffer is started
+    this->currFileTime = boost::posix_time::microsec_clock::universal_time();
+    boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
+    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_microseconds();
+    this->buffInd += 8;
+    //now we write a stand in for the time the buffer is finished
+    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0;
+    this->buffInd += 8;
     //then we write zero to the remainder of the 8kb, since we are aligned to an 8byte boundary go in 8 byte chunks
-    std::fill_n(reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd])), ((BufferOverHead - 24)/8), 0ULL);
+    std::fill_n(reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd])), ((BufferOverHead - 32)/8), 0ULL);
     this->buffInd = BufferOverHead;
 }
 
