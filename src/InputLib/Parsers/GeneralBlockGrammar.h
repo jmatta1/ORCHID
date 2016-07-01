@@ -52,17 +52,18 @@ struct GeneralBlockGrammar : qi::grammar<Iterator>
 		using Utility::separator;
         
         //define the rules to parse the parameters
-        warnRate            = (lexeme["WarnRate"]            >> '=' > int_         [phoenix::bind(&GeneralBlock::warnRateSet           , ptr, qi::_1)] > separator);
-        updateFrequency     = (lexeme["UpdateFrequency"]     >> '=' > int_         [phoenix::bind(&GeneralBlock::updateFrequencySet    , ptr, qi::_1)] > separator);
-        baseOutputDirectory = (lexeme["BaseOutputDirectory"] >> '=' > quotedString [phoenix::bind(&GeneralBlock::baseOutputDirectorySet, ptr, qi::_1)] > separator);
+        warnRate            = (lexeme["WarnRate"]              >> '=' > int_         [phoenix::bind(&GeneralBlock::warnRateSet             , ptr, qi::_1)] > separator);
+        updateFrequency     = (lexeme["UpdateFrequency"]       >> '=' > int_         [phoenix::bind(&GeneralBlock::updateFrequencySet      , ptr, qi::_1)] > separator);
+        procThrCount        = (lexeme["ProcessingThreadCount"] >> '=' > int_         [phoenix::bind(&GeneralBlock::processingThreadCountSet, ptr, qi::_1)] > separator);
+        baseOutputDirectory = (lexeme["BaseOutputDirectory"]   >> '=' > quotedString [phoenix::bind(&GeneralBlock::baseOutputDirectorySet  , ptr, qi::_1)] > separator);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
 		startRule = skip(blank) [generalBlockRule];
 		generalBlockRule = lexeme["[GeneralBlock]"] >> *eol_
                                > ( 
-                                   warnRate            ^ updateFrequency ^
-                                   baseOutputDirectory
+                                   warnRate     ^ updateFrequency     ^
+                                   procThrCount ^ baseOutputDirectory
                                  )
                                > lexeme["[EndBlock]"];
 	}
@@ -76,8 +77,8 @@ private:
 	Utility::QuotedString<Iterator> quotedString;
 	
 	// parameters
-	qi::rule<Iterator, qi::blank_type> warnRate,            updateFrequency,
-                                       baseOutputDirectory;
+	qi::rule<Iterator, qi::blank_type> warnRate,     updateFrequency,
+                                       procThrCount, baseOutputDirectory;
 
 	// hold the pointer that we are going to bind to
 	GeneralBlock* ptr;

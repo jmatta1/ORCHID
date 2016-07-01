@@ -44,6 +44,12 @@ void GeneralBlock::updateFrequencySet(int input)
     updateFrequencySet_ = true;
 }
 
+void GeneralBlock::processingThreadCountSet(int input)
+{
+    processingThreadCount = input;
+    processingThreadCountSet_ = true;
+}
+
 void GeneralBlock::baseOutputDirectorySet(std::string input)
 {
     baseOutputDirectory = input;
@@ -54,6 +60,7 @@ bool GeneralBlock::validate()
 {
     return (warnRateSet_ &&
             updateFrequencySet_ &&
+            processingThreadCountSet_ &&
             baseOutputDirectorySet_);
 }
 
@@ -68,6 +75,10 @@ void GeneralBlock::printValidationErrors()
     {
         std::cout << "    UpdateFrequency was not set\n";
     }
+    if(!processingThreadCountSet_)
+    {
+        std::cout << "    ProcessingThreadCount was not set\n";
+    }
     if(!baseOutputDirectorySet_)
     {
         std::cout << "    BaseOutputDirectory was not set\n";
@@ -78,9 +89,10 @@ void GeneralBlock::printValidationErrors()
 std::ostream& operator<<(std::ostream& os, GeneralBlock const& gb) 
 {
 return os << "[GeneralBlock]\n"
-    << "    WarnRate            = "   << gb.warnRate            << "\n"
-    << "    UpdateFrequency     = "   << gb.updateFrequency     << "\n"
-    << "    BaseOutputDirectory = "   << gb.baseOutputDirectory << "\n"
+    << "    WarnRate              = "   << gb.warnRate              << "\n"
+    << "    UpdateFrequency       = "   << gb.updateFrequency       << "\n"
+    << "    ProcessingThreadCount = "   << gb.processingThreadCount << "\n"
+    << "    BaseOutputDirectory   = "   << gb.baseOutputDirectory   << "\n"
     << "[EndBlock]";
 }
 
