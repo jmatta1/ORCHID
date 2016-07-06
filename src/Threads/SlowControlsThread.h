@@ -25,7 +25,7 @@
 // includes from other libraries
 #include<boost/chrono.hpp>
 // includes from ORCHID
-#include"SlowControls/HVLib/MpodReader.h"
+#include"Hardware/HVLib/MpodReader.h"
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"Utility/CommonTypeDefs.h"

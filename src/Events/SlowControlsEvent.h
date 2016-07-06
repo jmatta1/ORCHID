@@ -24,7 +24,7 @@
 // includes from other libraries
 // includes from ORCHID
 #include"EventInterface.h"
-#include"SlowControls/HVLib/VoltageData.h"
+#include"Hardware/HVLib/VoltageData.h"
 
 namespace Events
 {

@@ -29,7 +29,7 @@
 #include<ncurses.h>
 // includes from ORCHID
 #include"Utility/MpodMapper.h"
-#include"SlowControls/HVLib/MpodController.h"
+#include"Hardware/HVLib/MpodController.h"
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Data/RateData.h"
 #include"InterThreadComm/Data/FileData.h"

@@ -23,11 +23,10 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<atomic>
-using std::atomic;
 #include<string>
 // includes from other libraries
 // includes from ORCHID
-#include"SlowControls/HVLib/VoltageData.h"
+#include"Hardware/HVLib/VoltageData.h"
 
 namespace InterThread
 {

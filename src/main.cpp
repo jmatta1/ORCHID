@@ -36,8 +36,8 @@ HFIR background monitoring wall.
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 // ORCHID device objects
-#include"SlowControls/HVLib/MpodController.h"
-#include"SlowControls/HVLib/SnmpUtilCommands.h"
+#include"Hardware//HVLib/MpodController.h"
+#include"Hardware/HVLib/SnmpUtilCommands.h"
 // ORCHID threads
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
