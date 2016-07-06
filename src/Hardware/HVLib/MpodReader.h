@@ -17,8 +17,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_SLOWCONTROLS_HVLIB_MPODREADER_H
-#define ORCHID_SRC_SLOWCONTROLS_HVLIB_MPODREADER_H
+#ifndef ORCHID_SRC_HARDWARE_HVLIB_MPODREADER_H
+#define ORCHID_SRC_HARDWARE_HVLIB_MPODREADER_H
 
 // includes for C system headers
 // includes for C++ system headers

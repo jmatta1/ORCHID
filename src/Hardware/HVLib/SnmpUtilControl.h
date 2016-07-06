@@ -17,8 +17,8 @@
 ********************************************************************************
 *******************************************************************************/
 
-#ifndef ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
-#define ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
+#ifndef ORCHID_SRC_HARDWARE_HVLIB_SNMPUTILCONTROL_H
+#define ORCHID_SRC_HARDWARE_HVLIB_SNMPUTILCONTROL_H
 
 //TODO: convert to asio based direct communication rather than using the snmp
 // utils as intermediates, this will require some work and interfacing with the
@@ -191,4 +191,4 @@ std::string SnmpUtilControl::buildSetGlobalParameter(const std::string& paramNam
 }
 
 }
-#endif //ORCHID_SRC_SLOWCONTROLS_HVLIB_SNMPUTILCONTROL_H
+#endif //ORCHID_SRC_HARDWARE_HVLIB_SNMPUTILCONTROL_H

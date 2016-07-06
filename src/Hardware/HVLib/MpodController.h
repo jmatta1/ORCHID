@@ -17,8 +17,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_SLOWCONTROLS_HVLIB_MPODCONTROLLER_H
-#define ORCHID_SRC_SLOWCONTROLS_HVLIB_MPODCONTROLLER_H
+#ifndef ORCHID_SRC_HARDWARE_HVLIB_MPODCONTROLLER_H
+#define ORCHID_SRC_HARDWARE_HVLIB_MPODCONTROLLER_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -58,5 +58,5 @@ private:
     MpodModuleData* moduleData;
 };
 }
-#endif //ORCHID_SRC_SLOWCONTROLS_HVLIB_MPODCONTROLLER_H
+#endif //ORCHID_SRC_HARDWARE_HVLIB_MPODCONTROLLER_H
 
