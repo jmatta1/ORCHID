@@ -1,0 +1,57 @@
+"#"," 01) Module Number         = the number of the module whose channel these settings belong to",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 02) Channel Number        = the number of the channel within the module whose settings these belong to",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 03) Channel Enable        = T/F",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 04) Record Length         = Number Of Samples/8 ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 05) Large Range           = T for 2Vpp (F for 0.5Vpp)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 06) Aggregate Events      = # events in a channel aggregate (max is 1023)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 07) PreTrigger            = Number Of Samples to keep before trigger / 4 (must be greater than Gate Offset by at least 38ns)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 08) CFD Delay             = CFD delay time in sample units (2ns/sample for 730, 4ns/sample for 725) (ideal delay is (1-cfdFraction)*RiseTime)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 09) CFD Fraction          = CFD zero point fraction (0 for 25%, 1 for 50%, 2 for 75%, 3 for 100%)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 10) Short Gate            = Width of short gate in samples",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 11) Long Gate             = Width of long gate in samples (must be larger than short gate)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 12) Gate Offset           = Number of samples for the shift of the integration gate position wrt trigger",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 13) Trigger Threshold     = Threshold for LED or to arm the CFD (in LSB units(0.12mv in 2Vpp, or 0.03mV for 0.5Vpp))",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 14) Fixed Baseline        = Fixed Baseline value (when not using baseline mean which must be turned off)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 15) Shaped Trigger Width  = num samples for the shaped trigger (8ns steps)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 16) Trigger Hold Off      = time to block channel from triggering again (8ns steps)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 17) PSD Threshold         = When Selecting events online (gamma or neutron), this defines the psd limit for the selection (multiply value by 1024 and convert to int), must also use PSDCut=True",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 18) Charge Sensitivity    = charge per lsb unit (for 2Vpp: 0=5fC, 1=20fC, 2=80fC, 3=320fC, 4=320fC) (for 0.5Vpp: 0=1.25fC, 1=5fC, 2=20fC, 3=80fC, 4=320fC)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 19) Charge Pedestal On    = (T/F) add fixed value of 1024 to charge (useful when en close to 0)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 20) DPP Trigger Counting  = 0->trig-out only reflects accepted self triggers, 1->trg-out reflects all self triggers (even rejected events)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 21) Discrimination Mode   = 0->Leading Edge, 1->Digital CFD",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 22) Pulse Polarity        = 0->positive pulses, 1->negative pulses",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 23) Trigger Mode          = 0->Normal Mode, 1->Coincidence mode (required coincidence with validation signal in shaped trigger window), 3->Anticoincidence",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 24) Baseline Mean         = # samples to avg for baseline. (0->Disable baseline(used fixed value), 1->16 samples, 2->64 samples, 3->256 samples, 4->1024 samples)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 25) Disable Self Trigger  = F->Self Triggering, T->Self Triggering false (use external triggering)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 26) PSD Cut Below Thresh  = T/F (only accept pulses below previously set psd threshold)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 27) PSD Cut Above Thresh  = T/F (only accept pulses above previously set psd threshold)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 28) Over Range Rejection  = T->Reject pulse if ADC value is outside ADC sample range (during long gate) F->do not reject clipped pulses",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 29) Trigger Hysteresis    = T->Inhibit trigger during trailing edge of a pulse F->Do not inhibit trigger in trailing edge",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 30) Use Local Shaped Trig = T->Enable Local Shaped Trigger use between pairs of channels (chan 0 and 1, 2 and 3, etc), F-> Do not use Local Shaped Trigger",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 31) Local Shaped Trig Mode= 0->AND the two channels, 1->Even channel only, 2->Odd Channel only, 3->OR the two channels",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 32) Use Local Trig Val    = T->Enable Local Trigger Validation between pairs of channels, F->Disable Local Trigger Validation",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 33) Local Trig Val mode   = 0->AND the two channels, 1->Trig Validation from mobo, 2->Require coincidence in pair, 3->OR the two channels",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 34) Local Trig Val as Veto= T->Use use lcl trig val from mobo to veto event in couple, F->Do not",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 35) Extras Word Options   = 0->Ext tStamp and baseline*4, 1->Ext tStamp and flags, 2->Ext tstamp, flags, and fine tStamp, 5->Positive and Negative 0 crossings",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 36) Smooth Integration    = T->Use a smoothed signal for charge integration, F->Do not",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 37) Input smoothing       = 0->Do not smooth input for cfd or led, 1-> smooth w/ 2 samples, 2-> smooth w/ 4 samples, 3-> smooth w/ 8 samples",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 38) DC Offset             = DC Offset for the channel in DAC LSB units (which are ADC LSB units/4)",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 39) Veto Duration Ext     = When veto from local trig val is enabled, this can be used to extend its duration",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#"," 40) Trigger Valid Mask    = Set trigger validation logic for channel, see 725-730 DPP-PSD registers manual for more",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"#1",2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40
+0,0," T",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,1," T",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,2," T",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,3,"T",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,4,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,5,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,6,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,7,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,8,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,9,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,10,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,11,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,12,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,13,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,14,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
+0,15,"F",256," T",256,16,26,0,375,376,18,36,0,0,960,128,2,"  F",0,1,1,0,1,"F","F","F","F","T","F",3,"F",3,"F",2,"F",0,44,0,"0x00000000"
