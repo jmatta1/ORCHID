@@ -42,7 +42,7 @@ namespace Threads
 {
 //An enumeration for the modes the display might be in
 enum class UIMode : char {Init, Idle, Running};
-
+//TODO: add calibrate command for UI
 class UIThread
 {
 public:
