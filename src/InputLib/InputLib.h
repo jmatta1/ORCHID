@@ -27,10 +27,13 @@
 #include"Blocks/DigitizerBlock.h"
 #include"Blocks/MpodChannelData.h"
 #include"Blocks/MpodModuleData.h"
+//#include"Blocks/DigitizerChannelData.h"
+#include"Blocks/DigitizerModuleData.h"
 
 //grab the definition of the parsing function
 #include"Parsers/Parser.h"
 #include"Parsers/MpodParser.h"
+#include"Parsers/DigitizerParser.h"
 
 
 #endif  // ORCHID_SRC_INPUTLIB_INPUTLIB_H
