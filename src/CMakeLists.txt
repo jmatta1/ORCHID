@@ -20,6 +20,11 @@ include_directories("${PROJECT_BINARY_DIR}/Utility")
 # utility directory to access the generated file as OrchidConfig.h
 include_directories("${PROJECT_BINARY_DIR}")
 
+# Add the CAEN digitizer library folders to the include stack
+# This include directory may already be there but it never hurts to be certain
+include_directories(/usr/include)
+link_directories(/usr/lib)
+
 # include the file where I define a couple of compiler flags, including the long
 # lists of warning flags for the compiler
 include(./CMakeFlagDefs.txt)
@@ -74,3 +79,5 @@ add_executable(orchid ${SRCS} ${HDRS})
 target_link_libraries( orchid ${Boost_LIBRARIES})
 target_link_libraries( orchid ${CURSES_LIBRARIES})
 target_link_libraries( orchid ${CMAKE_THREAD_LIBS_INIT})
+# now also set linking to the CAEN digitizer library
+target_link_libraries( orchid CAENDigitizer)
