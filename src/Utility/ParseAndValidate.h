@@ -39,5 +39,8 @@ bool parseAndValidateMpodChannel(InputParser::MpodChannelData& mpodChannelData,
 bool parseAndValidateMpodModule(InputParser::MpodModuleData& mpodModuleData,
                                 const std::string& inputFileName);
 
+bool parseAndValidateDigitizerModule(InputParser::DigitizerModuleData& digitizerModuleData,
+                                     const std::string& inputFileName);
+
 }
 #endif //ORCHID_SRC_UTILITY_PARSEANDVALIDATE_H
