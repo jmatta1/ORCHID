@@ -116,8 +116,38 @@ bool parseAndValidateMpodModule(InputParser::MpodModuleData& mpodModuleData,
     return true;
 }
 
+bool parseAndValidateDigitizerChannel(InputParser::DigitizerChannelData& digitizerChannelData,
+                                      const std::string& inputFileName)
+{
+    bool parseSuccess = true;
+    std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    std::cout << "Reading MPOD Module Data from the file: " << inputFileName << "\n";
+    parseSuccess = InputParser::parseDigitizerChannelFile(&digitizerChannelData, inputFileName);
+    std::cout << "MPOD Module Data File Parsing: " << (parseSuccess?"Succeeded":"Failed") << "\n";
+    
+    if(!parseSuccess)
+    {
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    if (!digitizerChannelData.validate())
+    {
+        std::cout << "Digitizer Module Data Validation Failed\n";
+        digitizerChannelData.printValidationErrors();
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+        return false;
+    }
+    else
+    {
+        std::cout << "Digitizer Module Data Validation Succeeded\n";
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
+    }
+    std::cout << "\n";
+    return true;
+}
+
 bool parseAndValidateDigitizerModule(InputParser::DigitizerModuleData& digitizerModuleData,
-                                const std::string& inputFileName)
+                                     const std::string& inputFileName)
 {
     bool parseSuccess = true;
     std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n";
