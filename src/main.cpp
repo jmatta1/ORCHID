@@ -87,13 +87,15 @@ int main(int argc, char* argv[])
     InputParser::MpodChannelData mpodChannelData;
     InputParser::MpodModuleData mpodModuleData;
     InputParser::DigitizerModuleData digitizerModuleData;
+    InputParser::DigitizerChannelData digitizerChannelData;
     
     //TODO: Add reading of digitizer module and channel csv files
     //TODO: Also add the reading of the mapping csv which maps digitizer channel to voltage channel
     if(!Utility::parseAndValidateInput(params, inputFileName) ||
        !Utility::parseAndValidateMpodModule(mpodModuleData, params.powerBlock->perModuleParameterFile) ||
        !Utility::parseAndValidateMpodChannel(mpodChannelData, params.powerBlock->perChannelParameterFile) ||
-       !Utility::parseAndValidateDigitizerModule(digitizerModuleData, params.digitizerBlock->perModuleParameterFile))
+       !Utility::parseAndValidateDigitizerModule(digitizerModuleData, params.digitizerBlock->perModuleParameterFile) ||
+       !Utility::parseAndValidateDigitizerChannel(digitizerChannelData, params.digitizerBlock->perChannelParameterFile) )
     {
         return 1;
     }
@@ -118,7 +120,10 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Information)  << "Digitizer Module Input File";
     BOOST_LOG_SEV(lg, Information)  << digitizerModuleData ;
     BOOST_LOG_SEV(lg, Information)  << "--------------------------------------------------------------------------------";
-    //TODO: output the data from the digitizer csvs and the mapping csv
+    BOOST_LOG_SEV(lg, Information)  << "--------------------------------------------------------------------------------";
+    BOOST_LOG_SEV(lg, Information)  << "Digitizer Module Input File";
+    BOOST_LOG_SEV(lg, Information)  << digitizerChannelData ;
+    BOOST_LOG_SEV(lg, Information)  << "--------------------------------------------------------------------------------";
     BOOST_LOG_SEV(lg, Trace)  << "\nReady to start!" << std::flush;
     BOOST_LOG_SEV(lg, Trace)  << "Press enter to continue\n" <<std::flush;
     std::cin.get();
