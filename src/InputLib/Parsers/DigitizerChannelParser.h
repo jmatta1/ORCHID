@@ -102,13 +102,14 @@ struct DigitizerChannelParser : qi::grammar<Iterator>
                       boolSymbols_ [phoenix::bind(&DigitizerChannelData::addUseLocalShapedTrig,    ptr, qi::_1)] > lexeme[','] >
                       int_         [phoenix::bind(&DigitizerChannelData::addLocalShapedTrigMode,   ptr, qi::_1)] > lexeme[','] >
                       boolSymbols_ [phoenix::bind(&DigitizerChannelData::addUseLocalTrigVal,       ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addLocalTrigValAsVeto,    ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addExtrasWordOptions,     ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addSmoothIntegration,     ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addInputSmoothing,        ptr, qi::_1)] > lexeme[','] >
+                      int_         [phoenix::bind(&DigitizerChannelData::addLocalTrigValMode,      ptr, qi::_1)] > lexeme[','] >
+                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addLocalTrigValAsVeto,    ptr, qi::_1)] > lexeme[','] >
+                      int_         [phoenix::bind(&DigitizerChannelData::addExtrasWordOptions,     ptr, qi::_1)] > lexeme[','] >
+                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addSmoothIntegration,     ptr, qi::_1)] > lexeme[','] >
+                      int_         [phoenix::bind(&DigitizerChannelData::addInputSmoothing,        ptr, qi::_1)] > lexeme[','] >
                       int_         [phoenix::bind(&DigitizerChannelData::addDcOffset,              ptr, qi::_1)] > lexeme[','] >
                       int_         [phoenix::bind(&DigitizerChannelData::addVetoDurationExtension, ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addTriggerValidMas,       ptr, qi::_1)] );
+	   lexeme["0x"] > hex          [phoenix::bind(&DigitizerChannelData::addTriggerValidMask,       ptr, qi::_1)] );
                   
 
         on_error<fail>

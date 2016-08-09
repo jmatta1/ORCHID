@@ -28,7 +28,7 @@
 #define FUSION_MAX_VECTOR_SIZE 50
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
-//#include"DigitizerChannelParser.h"
+#include"DigitizerChannelParser.h"
 #include"DigitizerModuleParser.h"
 #include"InputLib/Blocks/DigitizerModuleData.h"
 
@@ -37,7 +37,7 @@ namespace InputParser
 
 typedef boost::spirit::istream_iterator It;
 
-/*bool parseDigitizerChannelFile(DigitizerChannelData* digiData, const std::string& inputFileName)
+bool parseDigitizerChannelFile(DigitizerChannelData* digiData, const std::string& inputFileName)
 {
     //make the parser, this line will make the compiler *GRIND* as it has to
     //work its way through the huge amount template stuff
@@ -50,7 +50,7 @@ typedef boost::spirit::istream_iterator It;
     It start(input), stop;
     //parse the damn thing
     return boost::spirit::qi::parse(start, stop, digiChannelParser);
-}*/
+}
 
 
 bool parseDigitizerModuleFile(DigitizerModuleData* digiData, const std::string& inputFileName)

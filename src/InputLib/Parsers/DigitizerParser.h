@@ -29,11 +29,11 @@ namespace InputParser
 {
 
 //predeclare the InputParameters class to get a pointer to it
-//class DigitizerChannelData;
+class DigitizerChannelData;
 class DigitizerModuleData;
 
 //function prototype for the parsing function
-//bool parseDigitizerChannelFile(DigitizerChannelData* mpodData, const std::string& inputFileName);
+bool parseDigitizerChannelFile(DigitizerChannelData* mpodData, const std::string& inputFileName);
 
 bool parseDigitizerModuleFile(DigitizerModuleData* mpodData, const std::string& inputFileName);
 
