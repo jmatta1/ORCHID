@@ -555,7 +555,7 @@ std::ostream& operator<<(std::ostream& os, DigitizerChannelData const& dcd)
         os << setw(10) << setfill(' ') << dcd.inputSmoothing[i]                 << ", ";
         os << setw(9)  << setfill(' ') << dcd.dcOffset[i]                       << ", ";
         os << setw(14) << setfill(' ') << dcd.vetoDurationExtension[i]          << ", ";
-        os << "          0x" << setw(8) << setfill('0') << hex << dcd.triggerValidMask[i] << dec << ",\n";
+        os << "          0x" << setw(8) << setfill('0') << hex << dcd.triggerValidMask[i] << dec << "\n";
     }
     return os;
 }
