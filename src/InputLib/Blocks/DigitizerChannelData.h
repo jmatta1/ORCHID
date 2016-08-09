@@ -114,49 +114,6 @@ public:
     void addVetoDurationExtension(int input);//39
     void addTriggerValidMask(unsigned int input);//40
     
-/*
-int moduleNumber; //1
-int channelNumber;//2
-bool channelEnable;//3
-int recordLength;//4
-bool largeRange;//5
-int aggregateEvents;//6
-int preTrigger;//7
-int cfdDelay;//8
-int cfdFraction;//9
-int shortGate;//10
-int longGate;//11
-int gateOffset;//12
-int trigThreshold;//13
-int fixedBaseline;//14
-int shapedTrigWidth;//15
-int trigHoldOff;//16
-int psdThreshold;//17
-int chargeSensitivity;//18
-bool chargePedestalOn;//19
-int dppTriggerCounting;//20
-int discMode;//21
-int pulsePolarity;//22
-int trigMode;//23
-int baselineMean;//24
-bool disableSelfTrigger;//25
-bool psdCutBelowThresh;//26
-bool psdCutAboveThresh;//27
-bool overRangeRejection;//28
-bool triggerHysteresis;//29
-bool useLocalShapedTrig;//30
-int localShapedTrigMode;//31
-bool useLocalTrigVal;//32
-int localTrigValMode;//33
-bool localTrigValAsVeto;//34
-int extrasWordOptions;//35
-bool smoothIntegration;//36
-int inputSmoothing;//37
-int dcOffset;//38
-int vetoDurationExtension;//39
-int triggerValidMask;//40
-*/
-    
     bool validate();
     void printValidationErrors();
     
