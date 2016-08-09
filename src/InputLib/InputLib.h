@@ -27,10 +27,10 @@
 #include"Blocks/DigitizerBlock.h"
 #include"Blocks/MpodChannelData.h"
 #include"Blocks/MpodModuleData.h"
-//#include"Blocks/DigitizerChannelData.h"
+#include"Blocks/DigitizerChannelData.h"
 #include"Blocks/DigitizerModuleData.h"
 
-//grab the definition of the parsing function
+//grab the definitions of the parsing functions
 #include"Parsers/Parser.h"
 #include"Parsers/MpodParser.h"
 #include"Parsers/DigitizerParser.h"
