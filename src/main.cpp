@@ -102,6 +102,8 @@ int main(int argc, char* argv[])
 
     mpodModuleData.sort();
     mpodChannelData.sort();
+    digitizerModuleData.sort();
+    digitizerChannelData.sort();
     BOOST_LOG_SEV(lg, Information)  << "\n\nInput Parameters";
     BOOST_LOG_SEV(lg, Information)  << "================================================================================\n";
     BOOST_LOG_SEV(lg, Information)  << "--------------------------------------------------------------------------------";
