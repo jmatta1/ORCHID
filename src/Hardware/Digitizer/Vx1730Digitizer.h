@@ -22,14 +22,20 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
+#include"InputLib/Blocks/DigitizerModuleData.h"
+#include"InputLib/Blocks/DigitizerChannelData.h"
 
 namespace Digitizer
 {
 
-class Digitizer
+class Vx1730Digitizer
 {
 public:
+    Vx1730Digitizer(int modNum, const InputParser::DigitizerModuleData& modData,
+                    const InputParser::DigitizerChannelData& chanData);
+    ~Vx1730Digitizer();
     
+    void setupDigitizer();
 private:
     
 };
