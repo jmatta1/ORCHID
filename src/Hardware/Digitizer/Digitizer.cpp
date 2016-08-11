@@ -23,7 +23,7 @@
 // includes from ORCHID
 
 
-namespace Data
+namespace Digitizer
 {
 
 }

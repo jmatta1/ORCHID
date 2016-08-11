@@ -23,7 +23,7 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace Data
+namespace Digitizer
 {
 
 class Digitizer

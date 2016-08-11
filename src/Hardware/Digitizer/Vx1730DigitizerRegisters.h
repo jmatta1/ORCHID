@@ -28,7 +28,7 @@
 using boost::assign::map_list_of;
 // includes from ORCHID
 
-namespace Data
+namespace Digitizer
 {
 
 namespace LowLvl
