@@ -8,6 +8,8 @@ HFIR background monitoring wall.
 // includes for C++ system headers
 #include<string>
 #include<algorithm>
+#include<iostream>
+#include<iomanip>
 // includes from other libraries
 #include<boost/thread.hpp>
 #include<boost/lockfree/queue.hpp>
