@@ -80,4 +80,4 @@ target_link_libraries( orchid ${Boost_LIBRARIES})
 target_link_libraries( orchid ${CURSES_LIBRARIES})
 target_link_libraries( orchid ${CMAKE_THREAD_LIBS_INIT})
 # now also set linking to the CAEN digitizer library
-target_link_libraries( orchid CAENDigitizer)
+target_link_libraries( orchid CAENComm)
