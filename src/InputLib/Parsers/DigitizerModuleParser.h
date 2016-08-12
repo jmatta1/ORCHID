@@ -125,7 +125,8 @@ private:
     {
         LinkType_(){
             this->add("Optical", LinkType::Optical)
-                     ("USB",     LinkType::USB    );
+                     ("Direct",  LinkType::DirectOptical)
+                     ("USB",     LinkType::USB);
         }
     } linkType_;
 };

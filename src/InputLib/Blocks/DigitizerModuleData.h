@@ -29,7 +29,7 @@
 namespace InputParser
 {
 
-enum class LinkType: char {USB, Optical};
+enum class LinkType: char {USB, Optical, DirectOptical};
 
 // stream operator to output the ProblemType enum in a pretty way
 std::ostream& operator<<(std::ostream& os, LinkType const& value);
