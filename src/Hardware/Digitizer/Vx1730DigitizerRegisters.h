@@ -62,7 +62,7 @@ enum class Vx1730ReadRegisters : unsigned short
 template<Vx1730ReadRegisters> struct Vx1730CoupleReadRegistersAddr;
 //the offsets are almost always 0x0200 for the group write registers
 template<Vx1730ReadRegisters> struct Vx1730CoupleReadRegistersOffs { static constexpr ushort value = 0x0200;};
-//except in the case of TriggerValMas, so specialize the template for that one case
+//except in the case of TriggerValMask, so specialize the template for that one case
 template<> struct Vx1730CoupleReadRegistersOffs<Vx1730ReadRegisters::TriggerValMask> { static constexpr ushort value = 0x0004;};
 //now define addresses
 template<> struct Vx1730CoupleReadRegistersAddr<Vx1730ReadRegisters::RecordLength> : std::integral_constant<ushort, 0x1020>{};
@@ -246,7 +246,7 @@ template<> struct Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::VetoExten
 template<Vx1730WriteRegisters> struct Vx1730GroupWriteRegistersAddr;
 //the offsets are almost always 0x0200 for the group write registers
 template<Vx1730WriteRegisters> struct Vx1730GroupWriteRegistersOffs { static constexpr ushort value = 0x0200;};
-//except in the case of TriggerValMas, so specialize the template for that one case
+//except in the case of TriggerValMask, so specialize the template for that one case
 template<> struct Vx1730GroupWriteRegistersOffs<Vx1730WriteRegisters::TriggerValMask> { static constexpr ushort value = 0x0004;}; 
 //now define addresses
 template<> struct Vx1730GroupWriteRegistersAddr<Vx1730WriteRegisters::RecordLength>        : std::integral_constant<ushort, 0x1020> {};
