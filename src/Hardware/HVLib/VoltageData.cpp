@@ -269,11 +269,14 @@ void VoltageData::loadChannelStatuses(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Loading Channel Statuses";
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Input is: \n" << input;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "Line is: \n" << input;
         //get the integer representation of the bits line
-        unsigned int final = parseBitsLine(input, 6);
+        unsigned int final = parseBitsLine(line, 6);
         //send the integer representation into the struct for parsing
         channelStatus[i].loadFromValue(final);
         ++i;
