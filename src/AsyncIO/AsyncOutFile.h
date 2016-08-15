@@ -101,7 +101,6 @@ void AsyncOutFileWriteThread<RetQueueType>::operator ()()
 template <typename RetQueueType>
 void AsyncOutFileWriteThread<RetQueueType>::waitForInitialization()
 {
-    BOOST_LOG_SEV(lg, Information) << "FW Thread: Waiting for initialization";
     //first lock the write mutex, whenever this thread is not waiting it has this
     //mutex locked to prevent changes to the underlying fstream
     boost::unique_lock<boost::mutex> writeLock(this->aOutFile->writeMutex);
@@ -114,7 +113,7 @@ void AsyncOutFileWriteThread<RetQueueType>::waitForInitialization()
     //wait for initialization, or termination signal
     while(!(this->aOutFile->isInitialized.load()) && !(this->aOutFile->terminateWhenEmpty.load()))
     {
-        BOOST_LOG_SEV(lg, Information) << "FW Thread: Within Initialization Wait";
+        BOOST_LOG_SEV(lg, Information) << "FW Thread: Waiting for initialization";
         if(this->aOutFile->producerWaiting.load())
         {
             this->aOutFile->producerWaitCondition.notify_all();
@@ -144,7 +143,7 @@ void AsyncOutFileWriteThread<RetQueueType>::runMainLoop()
         //(and terminate signals)
         while(!(this->aOutFile->writeQueue.read_available()) && !(this->aOutFile->emptyQueue.load()))
         {
-            BOOST_LOG_SEV(lg, Information) << "FW Thread: Waiting For Data In Main Loop";
+            BOOST_LOG_SEV(lg, Information) << "FW Thread: Waiting For Data";
             //first make certain the writer thread is not waiting for some reason
             if(this->aOutFile->producerWaiting.load())
             {
@@ -159,7 +158,7 @@ void AsyncOutFileWriteThread<RetQueueType>::runMainLoop()
         //if there is data available, grab it and write it
         if(this->aOutFile->writeQueue.pop(temp))
         {
-            BOOST_LOG_SEV(lg, Information) << "FW Thread: Grabbing Data To Write In Main Loop";
+            BOOST_LOG_SEV(lg, Information) << "FW Thread: Grabbing Data";
             //write the buffer
             this->aOutFile->outFile.write(temp->buffer, temp->size);
             //run the call back to return the buffer to whoever owns it
@@ -186,12 +185,13 @@ void AsyncOutFileWriteThread<RetQueueType>::runMainLoop()
 template <typename RetQueueType>
 void AsyncOutFileWriteThread<RetQueueType>::clearBuffer()
 {
-    BOOST_LOG_SEV(lg, Information) << "FW Thread: Queue Clearing Loop";
+    BOOST_LOG_SEV(lg, Information) << "FW Thread: Queue Emptying Loop";
     boost::unique_lock<boost::mutex> writeLock(this->aOutFile->writeMutex);
     //if we are here we have a terminate signal, so empty the write buffer first
     BufferPair* temp = nullptr;
     while(this->aOutFile->writeQueue.pop(temp))
     {
+        BOOST_LOG_SEV(lg, Information) << "FW Thread: Grabbing Data";
         //if we are in here then there is data in the buffer to empty before
         //termination
         //write the buffer
@@ -208,6 +208,7 @@ void AsyncOutFileWriteThread<RetQueueType>::clearBuffer()
         //then we are being destroyed and the producer thread is not waiting on
         //a wait condition, merely for this thread to terminate
     }
+    this->aOutFile->emptyQueue.store(false);
     this->aOutFile->readyToInitialize.store(true);
 }
 
@@ -337,7 +338,7 @@ AsyncOutFile<RetQueueType>::~AsyncOutFile()
 template <typename RetQueueType>
 void AsyncOutFile<RetQueueType>::closeAndTerminate()
 {
-    BOOST_LOG_SEV(lg, Information) << "AF Thread: Giving Queue Emptying and Terminate Flags";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Giving Queue Emptying and Terminate Flags";
     this->emptyQueue.store(true);
     //terminate the write thread if it is not already terminated
     this->terminateWhenEmpty.store(true);
@@ -348,13 +349,13 @@ void AsyncOutFile<RetQueueType>::closeAndTerminate()
     }
     //wait for the termination
     if(!(this->writeTerminated.load())) writeThread->join();
-    BOOST_LOG_SEV(lg, Information) << "AF Thread: File Writing Thread Has Terminated";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): File Writing Thread Has Terminated";
 }
 
 template <typename RetQueueType>
 void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
 {
-    BOOST_LOG_SEV(lg, Information) << "AF Thread: Prepping new file";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Prepping new file";
     
     //first we try to lock the writeMutex.
     //If we manage that then the write thread is waiting for data.
@@ -374,14 +375,15 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
     //our changes are done
     //the lock should release on destruction when the function exits
-    BOOST_LOG_SEV(lg, Information) << "AF Thread: Done prepping new file";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Done prepping new file";
 }
 
 template <typename RetQueueType>
 void AsyncOutFile<RetQueueType>::closeFile()
 {
-    BOOST_LOG_SEV(lg, Information) << "AF Thread: Closing current file";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Closing current file";
     this->emptyQueue.store(true);
+    this->isInitialized.store(false);
     if(this->writerWaiting.load())
     {
         this->writeWaitCondition.notify_one();
@@ -393,7 +395,7 @@ void AsyncOutFile<RetQueueType>::closeFile()
         this->producerWaiting.store(true);
         this->producerWaitCondition.wait(producerLock);
     }
-    
+    this->emptyQueue.store(false);
     //now we try to lock the writeMutex.
     //If we manage that then the write thread is waiting for data.
     //If we have to wait that is ok because we should be the only write thread
