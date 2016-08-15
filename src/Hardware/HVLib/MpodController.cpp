@@ -62,6 +62,7 @@ bool MpodController::activateAllChannels()
                                                      board, channel, 1);
             }
         }
+        channelIndexOffset += numChannels;
     }
     return true;
 }
@@ -88,6 +89,7 @@ bool MpodController::deactivateAllChannels()
                                                      board, channel, 0);
             }
         }
+        channelIndexOffset += numChannels;
     }
     return true;
 }
@@ -100,6 +102,8 @@ bool MpodController::setupChannels()
     {
         int numChannels = this->moduleData->numChannels[i];
         int maxChan = channelIndexOffset + numChannels;
+        //BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting up board: " << i << " With "<< numChannels <<" channels";
+        //BOOST_LOG_SEV(OrchidLog::get(), Information) << "Channels Offset is:" << channelIndexOffset;
         if(this->moduleData->online[i])
         {
             int board = this->moduleData->board[i];
@@ -113,7 +117,7 @@ bool MpodController::setupChannels()
                 if(!(this->channelData->online[j])) continue;
                 
                 int setCurrentTripTime = this->channelData->currentTripTime[j];
-                float setMaxCurrent = this->channelData->maxCurrent[j];
+                float setMaxCurrent = (this->channelData->maxCurrent[j]/1000000.0);
                 float setVoltage = this->channelData->voltage[j];
                 float setRampDownSpeed = this->channelData->rampDownRate[j];
                 float setRampUpSpeed = this->channelData->rampUpRate[j];
@@ -149,6 +153,7 @@ bool MpodController::setupChannels()
                 this->snmpController->snmpChannelSet(MpodChannelSetParam::SetVoltage,           board, channel, setVoltage);
             }
         }
+        channelIndexOffset += numChannels;
     }
     return true;
 }
