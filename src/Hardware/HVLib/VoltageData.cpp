@@ -23,6 +23,7 @@
 #include<sstream>
 #include<string>
 #include<algorithm>
+#include<iomanip>
 #include<cctype>
 #include<iomanip>
 // includes from other libraries
@@ -174,24 +175,43 @@ std::string ChannelStatus::getStatusString()
 
 void ChannelStatus::loadFromValue(unsigned int value)
 {
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Value To Convert To Bits: " << value;
     this->outputOn                        = ((value & ChannelMasks::MaskOutputOn)                        != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputOn: " << this->outputOn;
     this->outputInhibit                   = ((value & ChannelMasks::MaskOutputInhibit)                   != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputInhibit: " << this->outputInhibit;
     this->outputFailureMinSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMinSenseVoltage)    != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMinSenseVoltage: " << this->outputFailureMinSenseVoltage;
     this->outputFailureMaxSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMaxSenseVoltage)    != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxSenseVoltage: " << this->outputFailureMaxSenseVoltage;
     this->outputFailureMaxTerminalVoltage = ((value & ChannelMasks::MaskOutputFailureMaxTerminalVoltage) != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxTerminalVoltage: " << this->outputFailureMaxTerminalVoltage;
     this->outputFailureMaxCurrent         = ((value & ChannelMasks::MaskOutputFailureMaxCurrent)         != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxCurrent: " << this->outputFailureMaxCurrent;
     this->outputFailureMaxTemperature     = ((value & ChannelMasks::MaskOutputFailureMaxTemperature)     != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxTemperature: " << this->outputFailureMaxTemperature;
     this->outputFailureMaxPower           = ((value & ChannelMasks::MaskOutputFailureMaxPower)           != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxPower: " << this->outputFailureMaxPower;
     this->outputFailureTimeout            = ((value & ChannelMasks::MaskOutputFailureTimeout)            != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureTimeout: " << this->outputFailureTimeout;
     this->outputCurrentLimited            = ((value & ChannelMasks::MaskOutputCurrentLimited)            != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputCurrentLimited: " << this->outputCurrentLimited;
     this->outputRampUp                    = ((value & ChannelMasks::MaskOutputRampUp)                    != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputRampUp: " << this->outputRampUp;
     this->outputRampDown                  = ((value & ChannelMasks::MaskOutputRampDown)                  != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputRampDown: " << this->outputRampDown;
     this->outputEnableKill                = ((value & ChannelMasks::MaskOutputEnableKill)                != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputEnableKill: " << this->outputEnableKill;
     this->outputEmergencyOff              = ((value & ChannelMasks::MaskOutputEmergencyOff)              != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputEmergencyOff: " << this->outputEmergencyOff;
     this->outputAdjusting                 = ((value & ChannelMasks::MaskOutputAdjusting)                 != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputAdjusting: " << this->outputAdjusting;
     this->outputConstantVoltage           = ((value & ChannelMasks::MaskOutputConstantVoltage)           != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputConstantVoltage: " << this->outputConstantVoltage;
     this->outputCurrentBoundsExceeded     = ((value & ChannelMasks::MaskOutputCurrentBoundsExceeded)     != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputCurrentBoundsExceeded: " << this->outputCurrentBoundsExceeded;
     this->outputFailureCurrentLimit       = ((value & ChannelMasks::MaskOutputFailureCurrentLimit)       != 0);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureCurrentLimit: " << this->outputFailureCurrentLimit;
 }
 
 ChannelStatus& ChannelStatus::operator=(const ChannelStatus& rhs)
@@ -269,12 +289,9 @@ void VoltageData::loadChannelStatuses(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Loading Channel Statuses";
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Input is: \n" << input;
     
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "Line is: \n" << line;
         //get the integer representation of the bits line
         unsigned int final = parseBitsLine(line, 6);
         //send the integer representation into the struct for parsing
@@ -346,16 +363,12 @@ float VoltageData::parseFloatLine(const std::string& line)
 unsigned int VoltageData::parseBitsLine(const std::string& line, int nibbleCount)
 {
     using namespace boost::spirit::qi;
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Preparing to parse bits line, nibbles is: " << nibbleCount;
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Line: " << line;
     std::string input(line + '\n');
     std::string intermediate;
     //parse the interesting part of the input line
     parse(input.begin(), input.end(), lexeme["BITS: "] >> string_ >> lexeme["["] >> +char_('.') >> lexeme["]"] >> +eol, intermediate);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Intermediate: " << intermediate;
     //remove the spaces
     intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(), [](char x){return std::isspace(x);}), intermediate.end());
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Intermediate: " << intermediate;
     //since mpod does not return a trailing byte if its value is zero (ie no bits set)
     //calculate how many bits we need to push to result up to have a '4*nibbleCount-bit' integer
     int push = (4 * (nibbleCount -  intermediate.find_first_of('[')));
