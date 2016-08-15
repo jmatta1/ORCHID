@@ -28,6 +28,7 @@
 // includes from other libraries
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
+#include"Utility/OrchidLogger.h"
 
 namespace SlowControls
 {
@@ -342,18 +343,23 @@ float VoltageData::parseFloatLine(const std::string& line)
 unsigned int VoltageData::parseBitsLine(const std::string& line, int nibbleCount)
 {
     using namespace boost::spirit::qi;
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Preparing to parse bits line, nibbles is: " << nibbleCount;
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Line: " << line;
     std::string input(line + '\n');
     std::string intermediate;
     //parse the interesting part of the input line
     parse(input.begin(), input.end(), lexeme["BITS: "] >> string_ >> lexeme["["] >> +char_('.') >> lexeme["]"] >> +eol, intermediate);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Intermediate: " << intermediate;
     //remove the spaces
     intermediate.erase(std::remove_if(intermediate.begin(), intermediate.end(), [](char x){return std::isspace(x);}), intermediate.end());
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Intermediate: " << intermediate;
     //since mpod does not return a trailing byte if its value is zero (ie no bits set)
     //calculate how many bits we need to push to result up to have a '4*nibbleCount-bit' integer
     int push = (4 * (nibbleCount -  intermediate.find_first_of('[')));
     //parse into an integer from hex format
     unsigned int final;
     parse(intermediate.begin(), intermediate.end(), hex, final);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Value To Convert To Bits: " << finale;
     final <<= push;
     return final;    
 }

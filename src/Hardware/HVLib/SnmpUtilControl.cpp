@@ -270,7 +270,6 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     //lock the command running mutex
     boost::lock_guard<boost::mutex> lock(this->commandMutex);
     //open a pipe that takes the output of the snmp command to be run
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Running: " << command;
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe)
     {
@@ -284,7 +283,6 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
             result.append(buffer);
         }
     }
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Result Was: " << result;
     return result;
     //lock guard is destructed when this function returns, therefore the mutex
     // is unlocked when the function exits
