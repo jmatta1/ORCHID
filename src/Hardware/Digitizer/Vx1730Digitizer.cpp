@@ -37,11 +37,10 @@ Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* m
                                  InputParser::DigitizerChannelData* chanData) :
     moduleNumber(modNum), channelStartInd(0), numChannel(1), digitizerHandle(0),
     acqRunning(false), digitizerOpen(false), moduleData(modData),
-    channelData(chanData), addrArray(NULL), dataArray(NULL),
+    channelData(chanData), addrArray(NULL), dataArray(NULL), rdbkArray(NULL),
     cycleErrsArray(NULL), arraySize(MultiRWArraySize), acquisitionCtrlRegBase(0),
     lg(OrchidLog::get())
 {
-    BOOST_LOG_SEV(lg, Debug)  << moduleData << ", " <<  channelData;
     //find the channel start index
     while(chanData->moduleNumber[channelStartInd] != modNum)
     {
@@ -57,11 +56,13 @@ Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* m
     //allocate the multiread and multiwrite arrays
     addrArray = new unsigned int[arraySize];
     dataArray = new unsigned int[arraySize];
+    rdbkArray = new unsigned int[arraySize];
     cycleErrsArray = new CAENComm_ErrorCode[arraySize];
     for(int i=0; i<arraySize; ++i)
     {
         addrArray[i] = 0;
         dataArray[i] = 0;
+        rdbkArray[i] = 0;
         cycleErrsArray[i] = CAENComm_Success;
     }
 }
@@ -84,6 +85,8 @@ Vx1730Digitizer::~Vx1730Digitizer()
     //delete the arrays we allocated
     delete[] addrArray;
     delete[] dataArray;
+    delete[] rdbkArray;
+    delete[] cycleErrsArray;
 }
 
 void Vx1730Digitizer::setupDigitizer()
@@ -255,89 +258,62 @@ void Vx1730Digitizer::writeCommonRegisterData()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     int regCount=0;
     //set the components of the address and data arrays
-    BOOST_LOG_SEV(lg, Information) << "Writing settings to digitizer # " << moduleNumber << "\n";
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::BoardConfig>::value;
     dataArray[regCount] = calculateBoardConfigRegVal();
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AggregateOrg>::value;
     dataArray[regCount] = (this->moduleData->chanBuffPerAgg[moduleNumber] & 0x0000000F);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value;
     calculateAcqCtrlRegBase();
     dataArray[regCount] = (acquisitionCtrlRegBase);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::GlobalTrgMask>::value;
     dataArray[regCount] = calculateGlblTrigMaskRegVal();
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::TrgOutEnMask>::value;
     dataArray[regCount] = calculateTrigOutEnableMaskRegVal();
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontIoCtrl>::value;
     dataArray[regCount] = 0x00000002;//set everything to zero except the bit that makes the lvds high impedance
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChanEnMask>::value;
     dataArray[regCount] = calculateChanEnMaskRegVal();
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SetMonitorDac>::value;
     dataArray[regCount] = 0x00UL;
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MonitorDacMode>::value;
     dataArray[regCount] = 0x00000003UL;
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MemBuffAlmtFullLvl>::value;
     dataArray[regCount] = (this->moduleData->memBuffAlmostFullLevel[moduleNumber] & 0x000003FF);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::RunStrtStpDelay>::value;
     dataArray[regCount] = (this->moduleData->runStartStopDelay[moduleNumber] & 0xFFFFFFFF);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::DisableExtTrig>::value;
     dataArray[regCount] = ( (this->moduleData->useExtTrigger[moduleNumber]) ? 0x00000000 : 0x00000001);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::DisableExtTrig>::value;
     dataArray[regCount] = ( (this->moduleData->useExtTrigger[moduleNumber]) ? 0x00000000 : 0x00000001);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontLvdsIoNew>::value;
     dataArray[regCount] = 0x00000000;
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ReadoutCtrl>::value;
     dataArray[regCount] = 0x00000088;
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::InterruptStatID>::value;
     dataArray[regCount] = (0xFFFFFFFF & moduleNumber);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::InterruptEventNum>::value;
     dataArray[regCount] = (0x000003FF & this->moduleData->interruptEventCount[moduleNumber]);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AggregateNumPerBlt>::value;
     dataArray[regCount] = (0x000000FF & this->moduleData->aggregatesPerBlockTransfer[moduleNumber]);
-    BOOST_LOG_SEV(lg, Information) << std::hex << addrArray[regCount] << " | " << dataArray[regCount] << std::dec << " | " << regCount << "\n";
     ++regCount;
-    
-    //TODO: Remove this test/debug code
-    BOOST_LOG_SEV(lg, Information) << "Attempting to write to digitizer #" << moduleNumber <<"\n";
-    BOOST_LOG_SEV(lg, Information) << "    Addr   |     Data  \n";
-    for(int i=0; i<regCount; ++i)
-    {
-        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i]<< " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << "\n";
-    }
-    //END TODO
+
     //call the write
     CAENComm_ErrorCode overallErr = CAENComm_MultiWrite32(this->digitizerHandle,
                                                           addrArray, regCount,
@@ -358,36 +334,40 @@ void Vx1730Digitizer::writeCommonRegisterData()
         BOOST_LOG_SEV(lg, Error) << "Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
-    //TODO: Remove this test/debug code
+
+
+    //perform a readback to be certain
     for(int i=0; i<regCount; ++i)
     {
-        dataArray[i] = 0x12345678UL;
+        rdbkArray[i] = 0x12345678UL;
     }
     overallErr = CAENComm_MultiRead32(this->digitizerHandle,
                                       addrArray, regCount,
-                                      dataArray, cycleErrsArray);
-    BOOST_LOG_SEV(lg, Information) << "Read from digitizer #" << moduleNumber <<"\n";
-    BOOST_LOG_SEV(lg, Information) << "    Addr   |     Data  \n";
-    for(int i=0; i<regCount; ++i)
-    {
-        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i]<< " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << "\n";
-    }
+                                      rdbkArray, cycleErrsArray);
     //test for errors in the individual cycles
     for(int i=0; i<regCount; ++i)
     {
         if(cycleErrsArray[i] < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            BOOST_LOG_SEV(lg, Error) << "Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
             this->writeErrorAndThrow(cycleErrsArray[i]);
         }
     }
+    
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "Overall Error In Readback Of Common Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
-    //END TODO
+    
+    //give the readback results
+    BOOST_LOG_SEV(lg, Information) << "Results of readback of common registers";
+    BOOST_LOG_SEV(lg, Information) << "    Addr   |  Written |   Read   ";
+    for(int i=0; i<regCount; ++i)
+    {
+        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
+    }
 }
 
 void Vx1730Digitizer::writeGroupRegisterData()

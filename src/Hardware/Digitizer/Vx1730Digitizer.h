@@ -83,6 +83,7 @@ private:
     //arrays to handle multireads and multi writes
     unsigned int* addrArray;
     unsigned int* dataArray;
+    unsigned int* rdbkArray;
     CAENComm_ErrorCode* cycleErrsArray;
     int arraySize;
     //variables to hold sizes of parts of the readout
