@@ -899,6 +899,10 @@ void UIThread::runGracefulShutdown()
 void UIThread::turnOn()
 {
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the MPOD Crate";
+    //if we do not have a wait we hit the crate too hard and fast and tell it to do things before it is fully booted
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Pause for crate bootup.");
+    wrefresh(this->textWindow);
     if(!this->mpodController->turnCrateOn())
     {
         BOOST_LOG_SEV(this->lg, Critical) << "UI Thread: Critical Error: MPOD either did not turn on or did not initialize";
@@ -908,10 +912,6 @@ void UIThread::turnOn()
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
-    //if we do not have a wait we hit the crate too hard and fast and tell it to do things before it is fully booted
-    wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Pause for crate bootup.");
-    wrefresh(this->textWindow);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the HV channels";
     if(!this->mpodController->activateAllChannels())
     {
