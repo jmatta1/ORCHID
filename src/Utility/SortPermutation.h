@@ -20,6 +20,7 @@
 // includes for C++ system headers
 #include<vector>
 #include<algorithm>
+#include<numeric>
 // includes from other libraries
 // includes from ORCHID
 namespace Utility
