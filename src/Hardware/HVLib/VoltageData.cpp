@@ -258,7 +258,7 @@ void VoltageData::loadOutputSwitches(const std::string& input)
     {
         BOOST_LOG_SEV(OrchidLog::get(), Information) << "Load Out Switches line: " << line;
         //get the integer representation of the bits line
-        int final = parseIntegerLine(input);
+        int final = parseIntegerLine(line);
         BOOST_LOG_SEV(OrchidLog::get(), Information) << "Load Out Switches number: " << final;
         //send the integer representation into the struct for parsing
         outputSwitch[i] = ((final==0)?false:true);
