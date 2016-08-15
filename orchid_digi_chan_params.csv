@@ -20,7 +20,7 @@
 #, 20) DPP Trigger Counting  = 0->trig-out only reflects accepted self triggers, 1->trg-out reflects all self triggers (even rejected events),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 21) Discrimination Mode   = 0->Leading Edge, 1->Digital CFD,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 22) Pulse Polarity        = 0->positive pulses, 1->negative pulses,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-#, 23) Trigger Mode          = 0->Normal Mode, 1->Coincidence mode (required coincidence with validation signal in shaped trigger window), 3->Anticoincidence,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+#, 23) Trigger Mode          = 0->Normal Mode (indep self trig), 1->Coincidence mode (required coincidence with validation signal in shaped trigger window), 3->Anticoincidence,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 24) Baseline Mean         = # samples to avg for baseline. (0->Disable baseline(used fixed value), 1->16 samples, 2->64 samples, 3->256 samples, 4->1024 samples),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 25) Disable Self Trigger  = F->Self Triggering, T->Self Triggering false (use external triggering),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 26) PSD Cut Below Thresh  = T/F (only accept pulses below previously set psd threshold),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
