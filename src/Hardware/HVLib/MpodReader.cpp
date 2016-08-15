@@ -44,4 +44,14 @@ void MpodReader::readAll()
     this->getCrateStatus();
 }
 
+void MpodReader::readActive()
+{
+    this->walkTerminalVoltages();
+    this->walkSenseVoltages();
+    this->walkCurrents();
+    this->walkTemperatures();
+    this->walkChannelStatuses();
+    this->getCrateStatus();
+}
+
 }

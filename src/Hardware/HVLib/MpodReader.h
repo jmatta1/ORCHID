@@ -42,6 +42,7 @@ public:
     VoltageData voltageData;
     
     void readAll();
+    void readActive();
     
     void walkTerminalVoltages(){
         this->voltageData.loadTerminalVoltages(
