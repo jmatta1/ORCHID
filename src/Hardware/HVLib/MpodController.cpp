@@ -67,6 +67,9 @@ bool MpodController::activateAllChannels()
         }
         channelIndexOffset += numChannels;
     }
+    //another pause so that channels can start coming up and normalizing and realizing they are rising
+    //before things start hammering them
+    boost::this_thread::sleep_for(boost::chrono::seconds(10));
     return true;
 }
 
@@ -94,6 +97,9 @@ bool MpodController::deactivateAllChannels()
         }
         channelIndexOffset += numChannels;
     }
+    //another pause so that channels can start coming up and normalizing and realizing they are rising
+    //before things start hammering them
+    boost::this_thread::sleep_for(boost::chrono::seconds(10));
     return true;
 }
 

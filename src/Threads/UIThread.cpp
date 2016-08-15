@@ -961,10 +961,10 @@ void UIThread::turnOff()
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Putting Slow Controls thread into polling mode";
     this->sctControl->setToPolling();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting channel ramp down";
-    this->mpodController->deactivateAllChannels();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp down");
     wrefresh(this->textWindow);
+    this->mpodController->deactivateAllChannels();
     //sleep for 1.5 * poll period to give the slow controls thread a chance to
     //read when the ramp down is running
     boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
