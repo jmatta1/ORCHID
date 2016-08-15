@@ -28,7 +28,7 @@
 namespace InputParser
 {
 
-//stream operator to output the ProblemType in a pretty way
+//stream operator to output the LinkType in a pretty way
 std::ostream& operator<<(std::ostream& os, LinkType const& value)
 {
     switch(value)
@@ -37,6 +37,8 @@ std::ostream& operator<<(std::ostream& os, LinkType const& value)
         return os << "USB";
     case LinkType::Optical:
         return os << "Optical";
+    case LinkType::DirectOptical:
+        return os << "DOptical";
     }
 }
 
