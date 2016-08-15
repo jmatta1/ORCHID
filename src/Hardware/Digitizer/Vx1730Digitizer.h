@@ -21,9 +21,11 @@
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
+#include<CAENComm.h>
 // includes from ORCHID
 #include"InputLib/Blocks/DigitizerModuleData.h"
 #include"InputLib/Blocks/DigitizerChannelData.h"
+#include"Utility/OrchidLogger.h"
 
 namespace Digitizer
 {
@@ -61,6 +63,15 @@ private:
     void writeGroupRegisterData();
     void writeIndividualRegisterData();
     
+    //function to calculate register values for common registers
+    unsigned int calculateBoardConfigRegVal();
+    void calculateAcqCtrlRegBase();
+    unsigned int calculateGlblTrigMaskRegVal();
+    unsigned int calculateTrigOutEnableMaskRegVal();
+    unsigned int calculateChanEnMaskRegVal();
+    unsigned int calculateLocalTrgManagementRegVal(int ind);
+    unsigned int calculateTriggerValidationMask(int ind);
+    
     int moduleNumber;
     int channelStartInd;
     int numChannel;
@@ -69,6 +80,19 @@ private:
     bool digitizerOpen;
     InputParser::DigitizerModuleData* moduleData;
     InputParser::DigitizerChannelData* channelData;
+    //arrays to handle multireads and multi writes
+    unsigned int* addrArray;
+    unsigned int* dataArray;
+    CAENComm_ErrorCode* cycleErrsArray;
+    int arraySize;
+    //variables to hold sizes of parts of the readout
+    int sizePerEvent[16];
+    int sizePerChanAggregate[16];
+    int maxSizeOfBoardAggregate;
+    //variables to hold persistent values for use later
+    unsigned int acquisitionCtrlRegBase;
+    
+    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
     
 };
 
