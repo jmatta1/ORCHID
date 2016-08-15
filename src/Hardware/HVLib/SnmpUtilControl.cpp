@@ -292,7 +292,8 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
 std::string SnmpUtilControl::convertToUniversalChannel(int board,
                                                        int channel) const
 {
-    if( (board < 0) || (board > 9) ) throw std::runtime_error("Invalid board number (not in the range [1, 10]");
+    //TODO, support for multiple chained crates?
+    if( (board < 0) || (board > 9) ) throw std::runtime_error("Invalid board number (not in the range [0, 9]");
     std::ostringstream channelNamer;
     channelNamer << ".u";
     if((board!=0))
