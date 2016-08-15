@@ -467,10 +467,10 @@ unsigned int Vx1730Digitizer::calculateChanEnMaskRegVal()
 {
     int stopInd = this->channelStartInd + this->numChannel;
     unsigned int output = 0x00000000;
-    BOOST_LOG_SEV(lg, Information) << std::dec << stopInd << " | " << this->channelStartInd << " | " << this->numChannel;
+    BOOST_LOG_SEV(lg, Information) << std::dec << stopInd << " | " << channelStartInd << " | " << numChannel << " | " << channelData->channelEnable.size()<< " | " << channelData->channelNumber.size();
     for(int i=channelStartInd; i<stopInd; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << std::dec << i << " | " << channelData->channelEnable[i];
+        BOOST_LOG_SEV(lg, Information) << std::dec << i << " | " << channelData->channelEnable[i] << " | " << channelData->channelNumber[i];
         if(channelData->channelEnable[i])
         {
             output |= (0x01UL << channelData->channelNumber[i]);
