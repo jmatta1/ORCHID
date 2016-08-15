@@ -327,9 +327,11 @@ int VoltageData::parseIntegerLine(const std::string& line)
 {
     using namespace boost::spirit::qi;
     std::string input(line + '\n');
-    int output;
+    int output=0;
     //parse the interesting part of the input line
-    parse(line.begin(), line.end(), lexeme["INTEGER: "] >> int_ >> +eol, output);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Parser input line: " << line;
+    parse(line.begin(), line.end(), lexeme["INTEGER:"] >> int_ >> +eol, output);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Parser output value: " << output;
     return output;
 }
 
