@@ -161,18 +161,19 @@ enum class Vx1730WriteRegisters : unsigned short
     GateOffset,         TrgThreshold,       FixedBaseline,      ShapedTrgWidth,
     TrgHoldOff,         PsdCutThreshold,    DppAlgorithmCtrl,   LocalTrgManage,
     DcOffset,           IndivSoftwTrig,     VetoExtension,      BoardConfig,
-    AggregateOrg,       AcquisitionCtrl,    SoftwareTrg,        GlobalTrgMask,
-    TrgOutEnMask,       LvdsData,           FrontIoCtrl,        ChanEnMask,
-    SetMonitorDac,      SoftwClckSync,      MonitorDacMode,     FanSpeedCtrl,
-    MemBuffAlmtFullLvl, RunStrtStpDelay,    DisableExtTrig,     TriggerValMask,
-    FrontLvdsIoNew,     ChannelShutdown,    ReadoutCtrl,        BoardId,
-    McstBaseAddrCtrl,   RelocationAddr,     InterruptStatID,    InterruptEventNum,
-    AggregateNumPerBlt, Scratch,            SoftwReset,         SoftwClear,
-    ConfigReload};
+    AggregateOrg,       ChannelCal,         AcquisitionCtrl,    SoftwareTrg,
+    GlobalTrgMask,      TrgOutEnMask,       LvdsData,           FrontIoCtrl,
+    ChanEnMask,         SetMonitorDac,      SoftwClckSync,      MonitorDacMode,
+    FanSpeedCtrl,       MemBuffAlmtFullLvl, RunStrtStpDelay,    DisableExtTrig,
+    TriggerValMask,     FrontLvdsIoNew,     ChannelShutdown,    ReadoutCtrl,
+    BoardId,            McstBaseAddrCtrl,   RelocationAddr,     InterruptStatID,
+    InterruptEventNum,  AggregateNumPerBlt, Scratch,            SoftwReset,
+    SoftwClear,         ConfigReload};
 
 template<Vx1730WriteRegisters> struct Vx1730CommonWriteRegistersAddr;
 template<> struct Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::BoardConfig>         : std::integral_constant<ushort, 0x8000> {};
-template<> struct Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AggregateOrg>        : std::integral_constant<ushort, 0x809C> {};
+template<> struct Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AggregateOrg>        : std::integral_constant<ushort, 0x800C> {};
+template<> struct Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelCal>          : std::integral_constant<ushort, 0x809C> {};
 template<> struct Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>     : std::integral_constant<ushort, 0x8100> {};
 template<> struct Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwareTrg>         : std::integral_constant<ushort, 0x8108> {};
 template<> struct Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::GlobalTrgMask>       : std::integral_constant<ushort, 0x810C> {};
