@@ -185,7 +185,6 @@ int main(int argc, char* argv[])
     Digitizer::Vx1730Digitizer** digitizerList = new Digitizer::Vx1730Digitizer*[numDigitizers];
     for(int i=0; i<numDigitizers; ++i)
     {
-        BOOST_LOG_SEV(lg, Debug)  << &digitizerModuleData << ", " <<  &digitizerChannelData;
         digitizerList[i] = new Digitizer::Vx1730Digitizer(i, &digitizerModuleData, &digitizerChannelData);
         digitizerList[i]->setupDigitizer();
     }
