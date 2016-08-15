@@ -299,9 +299,12 @@ std::string SnmpUtilControl::convertToUniversalChannel(int board,
     channelNamer << ".u";
     if((board!=0))
     {
-        channelNamer << board;
+        channelNamer << board << std::setw(2) << std::setfill('0') << channel;
     }
-    channelNamer << std::setw(2) << std::setfill('0') << channel;
+    else
+    {
+        channelNamer << channel;;
+    }
     return channelNamer.str();
 }
 }
