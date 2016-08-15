@@ -29,6 +29,7 @@
 #include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"Utility/CommonTypeDefs.h"
+#include"Utility/OrchidLogger.h"
 
 namespace Threads
 {
@@ -52,6 +53,9 @@ private:
     boost::chrono::nanoseconds refreshPeriod;
     
     bool notTerminated;
+    
+    //logger
+    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
 };
 
 }

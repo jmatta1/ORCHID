@@ -33,7 +33,7 @@ SlowControlsThread::SlowControlsThread(SlowControls::MpodReader* mRead,
                                        Utility::ToFileMultiQueue* toFileQueue,
                                        int refreshRate):
     mpodReader(mRead), slowData(slDat), sctControl(sctCtrl),
-    toFileOutputQueue(toFileQueue), notTerminated(true)
+    toFileOutputQueue(toFileQueue), notTerminated(true), lg(OrchidLog::get())
 {
     long long int refreshNanoseconds = (1000000000/refreshRate);
     this->refreshPeriod = boost::chrono::nanoseconds(refreshNanoseconds);
@@ -42,28 +42,52 @@ SlowControlsThread::SlowControlsThread(SlowControls::MpodReader* mRead,
 
 void SlowControlsThread::operator ()()
 {
+    long long int loopCount = 0;
+    InterThread::SlowControlsThreadState lastState = InterThread::SlowControlsThreadState::Stopped;
+    InterThread::SlowControlsThreadState currState;
     while(notTerminated)
     {
         //TODO: add actual querying of the temperature controller
         boost::this_thread::sleep_for(this->refreshPeriod);
-        switch(this->sctControl->getState())
+        currState = this->sctControl->getState();
+        switch(currState)
         {
         case InterThread::SlowControlsThreadState::Terminate:
+            BOOST_LOG_SEV(lg, Information) << "SC Thread: Terminating";
             //stop looping
             this->notTerminated = false;
             break;
         case InterThread::SlowControlsThreadState::Stopped:
             //if we are stopped, then wait to not be stopped
+            BOOST_LOG_SEV(lg, Information) << "SC Thread: Stopped";
             this->sctControl->waitForNewState();
             break;
         case InterThread::SlowControlsThreadState::Polling:
             //here we poll the mpod but do not send any voltage events
+            if(lastState != currState)
+            {
+                loopCount = 0;
+                BOOST_LOG_SEV(lg, Information) << "SC Thread: Started Polling";
+            }
+            else if((loopCount % 30)==0)
+            {
+                BOOST_LOG_SEV(lg, Information) << "SC Thread: Still Polling (# Loops: "<<loopCount<<")";
+            }
             //poll the mpod
             this->mpodReader->readAll();
             //publish the data for the UI thread but do not bother with writing it
             slowData->readVoltageData(this->mpodReader->voltageData);
             break;
         case InterThread::SlowControlsThreadState::Writing:
+            if(lastState != currState)
+            {
+                loopCount = 0;
+                BOOST_LOG_SEV(lg, Information) << "SC Thread: Started Writing";
+            }
+            else if((loopCount % 120)==0)
+            {
+                BOOST_LOG_SEV(lg, Information) << "SC Thread: Still Writing (# Loops: "<<loopCount<<")";
+            }
             //poll the mpod
             this->mpodReader->readAll();
             //publish the data for the UI Thread
@@ -77,6 +101,8 @@ void SlowControlsThread::operator ()()
             this->toFileOutputQueue->producerPush<Utility::SlowControlsQueueIndex>(static_cast<Events::EventInterface*>(scEvent));
             break;
         }
+        lastState = currState;
+        ++loopCount;
     }
     //just before we exit, tell the controller that we have exited
     this->sctControl->setDone();
