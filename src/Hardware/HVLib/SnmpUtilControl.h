@@ -35,7 +35,7 @@
 namespace SlowControls
 {
 
-#define SPOOF
+//#define SPOOF
 
 //TODO: Remove spoofing of MPOD connection from this class
 class SnmpUtilControl
