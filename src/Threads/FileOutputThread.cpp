@@ -30,7 +30,6 @@
 #include<boost/filesystem.hpp>
 #include<boost/crc.hpp>
 // includes from ORCHID
-#include"Utility/OrchidLogger.h"
 #include"Utility/OrchidConfig.h"
 #include"Events/EventInterface.h"
 
@@ -47,7 +46,7 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
     outDirectory(generalBlock->baseOutputDirectory), currentFileName(""),
     runNumber(0), sequenceNumber(0), buffInd(0), bufferNumber(0), eventCount(0),
     inputQueues(queueInput), fileData(fileDat),
-    fileThreadController(fileThreadCtrl), notTerminated(true)
+    fileThreadController(fileThreadCtrl), notTerminated(true), lg(OrchidLog::get())
 {
     //make directories and prep file name
     this->prepNewRunFolder();
@@ -57,7 +56,7 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
         char* allocBuffer = new (std::nothrow) char[BufferSizeInBytes];
         if(allocBuffer == nullptr)
         {
-            BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Error In File Write Buffer Allocation";
+            BOOST_LOG_SEV(lg, Critical) << "File Thread: Error In File Write Buffer Allocation";
             throw std::runtime_error("Error In File Write Buffer Allocation");
         }
         //technically this thread should not push, only pop, but I think that it
@@ -99,7 +98,7 @@ FileOutputThread::~FileOutputThread()
 
 void FileOutputThread::prepNewRunFolder()
 {
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Preparing new folder";
+    BOOST_LOG_SEV(lg, Information) << "File Thread: Preparing new folder";
     if(this->outDirectory.back() == '/')
     {
         this->outDirectory.erase(this->outDirectory.size()-1, 1); 
@@ -109,29 +108,29 @@ void FileOutputThread::prepNewRunFolder()
     boost::filesystem::create_directories(writePath, mkDirErr);
     if(!boost::filesystem::is_directory(writePath))
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create data directory in file thread";
+        BOOST_LOG_SEV(lg, Critical) << "File Thread: Could not create data directory in file thread";
         throw std::runtime_error("Could not create data directory in file thread");
     }
     writePath.append(this->currentRunTitle);
     boost::filesystem::create_directories(writePath, mkDirErr);
     if(!boost::filesystem::is_directory(writePath))
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create run directory in file thread";
+        BOOST_LOG_SEV(lg, Critical) << "File Thread: Could not create run directory in file thread";
         throw std::runtime_error("Could not create run directory in file thread");
     }
     if(!boost::filesystem::is_directory(writePath, mkDirErr))
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "No run directory detected despite creation";
+        BOOST_LOG_SEV(lg, Critical) << "File Thread: No run directory detected despite creation";
         throw std::runtime_error("No run directory detected despite creation");
     }
     this->writeDirectory = writePath.native();
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Made new folder at: " << this->writeDirectory;
+    BOOST_LOG_SEV(lg, Information) << "File Thread: Made new folder at: " << this->writeDirectory;
     this->buildFileName();
 }
 
 void FileOutputThread::buildFileName()
 {
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Starting new file";
+    BOOST_LOG_SEV(lg, Information) << "File Thread: Starting new file";
     std::ostringstream builder;
     builder << this->writeDirectory;
     if(this->writeDirectory.back()!=boost::filesystem::path::preferred_separator)
@@ -142,7 +141,7 @@ void FileOutputThread::buildFileName()
     builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
     builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
     this->currentFileName = builder.str();
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Made new file at: " << this->currentFileName;
+    BOOST_LOG_SEV(lg, Information) << "File Thread: Made new file at: " << this->currentFileName;
 }
 
 void FileOutputThread::operator()()
@@ -153,17 +152,21 @@ void FileOutputThread::operator()()
         switch(this->fileThreadController->getCurrentState())
         {
         case InterThread::FileOutputThreadState::Terminate:
+            BOOST_LOG_SEV(lg, Information) << "File Thread: Terminating";
             this->notTerminated = false;
             this->outFile->closeAndTerminate();
             break;
         case InterThread::FileOutputThreadState::Waiting:
+            BOOST_LOG_SEV(lg, Information) << "File Thread: Waiting";
             this->fileThreadController->waitForNewState();
             break;
         case InterThread::FileOutputThreadState::NewRunParams:
+            BOOST_LOG_SEV(lg, Information) << "File Thread: New Parameters";
             this->grabNewRunParameters();
             this->fileData->setInitState('i');
             break;
         case InterThread::FileOutputThreadState::Writing:
+            BOOST_LOG_SEV(lg, Information) << "File Thread: Writing";
             this->doWriteLoop();
             this->emptyWriteQueueBeforeChange();
             this->outFile->closeFile();
@@ -276,6 +279,7 @@ void FileOutputThread::doWriteLoop()
         if(this->inputQueues->tryConsumerPop<Utility::ProcessingQueueIndex>(event))
         {
             gotData = true;
+            BOOST_LOG_SEV(lg, Information) << "File Thread: Got a data event";
             int eventSize = event->getSizeOfBinaryRepresentation();
             //loop until the intermediate buffer is big enough
             while(eventSize > this->evBufSize)
@@ -293,6 +297,7 @@ void FileOutputThread::doWriteLoop()
         if(this->inputQueues->tryConsumerPop<Utility::SlowControlsQueueIndex>(event))
         {
             gotData = true;
+            BOOST_LOG_SEV(lg, Information) << "File Thread: Got a slow controls event";
             int eventSize = event->getSizeOfBinaryRepresentation();
             //loop until we double the event buffer past the size of the event
             while(eventSize > this->evBufSize)
@@ -381,7 +386,6 @@ void FileOutputThread::transferData(int eventSize)
     }
     else
     {//otherwise, write the buffer to disk and write this event to the next buffer
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "Sending buffer to disk";
         this->finalizeDataBuffer();//this finalizes the event and writes the buffer to disk
         //here we make certain that we are not at capacity
         if (this->bufferNumber >= MaxBuffersPerFile)
@@ -440,6 +444,7 @@ void FileOutputThread::finalizeDataBuffer()
 
 void FileOutputThread::writeBufferToDisk(int bufferSize)
 {
+    BOOST_LOG_SEV(lg, Information) << "File Thread: Sending buffer to disk";
     this->outFile->writeBuf(this->currentBuffer, bufferSize);
     this->fileData->increaseSize(bufferSize);
     //now that we have sent that buffer out

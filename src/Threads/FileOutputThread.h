@@ -28,6 +28,7 @@
 #include<boost/thread.hpp>
 #include "boost/date_time/posix_time/posix_time.hpp"
 // includes from ORCHID
+#include"Utility/OrchidLogger.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"AsyncIO/AsyncOutFile.h"
 #include"InterThreadComm/InterThreadQueueSizes.h"
@@ -134,6 +135,9 @@ private:
      * Loop Control
      */
     bool notTerminated;
+    
+    //logger
+    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
 };
 }
 #endif //ORCHID_SRC_THREADS_FILEOUTPUTTHREAD_H
