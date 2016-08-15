@@ -330,7 +330,7 @@ int VoltageData::parseIntegerLine(const std::string& line)
     int output=0;
     //parse the interesting part of the input line
     BOOST_LOG_SEV(OrchidLog::get(), Information) << "Parser input line: " << line;
-    parse(line.begin(), line.end(), lexeme["INTEGER:"] >> int_ >> +eol, output);
+    parse(line.begin(), line.end(), lexeme["INTEGER: "] >> int_ >> +eol, output);
     BOOST_LOG_SEV(OrchidLog::get(), Information) << "Parser output value: " << output;
     return output;
 }
