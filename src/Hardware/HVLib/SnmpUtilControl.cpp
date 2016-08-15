@@ -254,7 +254,8 @@ std::string SnmpUtilControl::buildCommand(const std::string& command,
     std::ostringstream cmdBuilder;
     cmdBuilder << command << " -OTeUv -v 2c -M " << this->mibLocation;
     cmdBuilder << " -m +WIENER-CRATE-MIB  -c "<< user << " " << this->ipAddress;
-    cmdBuilder << " " << parameter;
+    //cmdBuilder << " " << parameter;
+    cmdBuilder << " " << parameter << " 2>&1";
     return cmdBuilder.str();
 }
 
@@ -268,6 +269,7 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     //lock the command running mutex
     boost::lock_guard<boost::mutex> lock(this->commandMutex);
     //open a pipe that takes the output of the snmp command to be run
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Running: " << command;
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe)
     {
@@ -281,6 +283,7 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
             result.append(buffer);
         }
     }
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Result Was: " << result;
     return result;
     //lock guard is destructed when this function returns, therefore the mutex
     // is unlocked when the function exits

@@ -87,11 +87,11 @@ static const std::map<MpodGlobalSetParam, std::string> GLOBAL_SET_USERS =
 static const std::map<MpodChannelSetParam, std::string> CHANNEL_SET_USERS =
     map_list_of (MpodChannelSetParam::OutputSwitch      , "guru")
                 (MpodChannelSetParam::SetVoltage        , "guru")
-                (MpodChannelSetParam::RampUp            , "admin")
-                (MpodChannelSetParam::RampDown          , "admin")
-                (MpodChannelSetParam::MaxTerminalVoltage, "admin")
-                (MpodChannelSetParam::MaxCurrent        , "admin")
-                (MpodChannelSetParam::MaxCurrentTripTime, "admin");
+                (MpodChannelSetParam::RampUp            , "guru")
+                (MpodChannelSetParam::RampDown          , "guru")
+                (MpodChannelSetParam::MaxTerminalVoltage, "guru")
+                (MpodChannelSetParam::MaxCurrent        , "guru")
+                (MpodChannelSetParam::MaxCurrentTripTime, "guru");
 
 static const std::map<MpodGlobalSetParam, char> GLOBAL_SET_TYPES =
     map_list_of (MpodGlobalSetParam::SysMainSwitch, 'i');
