@@ -41,7 +41,7 @@ Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* m
     cycleErrsArray(NULL), arraySize(MultiRWArraySize), acquisitionCtrlRegBase(0),
     lg(OrchidLog::get())
 {
-    BOOST_LOG_SEV(lg, Debug)  << digitizerModuleData << ", " <<  digitizerChannelData;
+    BOOST_LOG_SEV(lg, Debug)  << moduleData << ", " <<  channelData;
     //find the channel start index
     while(chanData->moduleNumber[channelStartInd] != modNum)
     {
