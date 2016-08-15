@@ -35,6 +35,8 @@
 namespace SlowControls
 {
 
+#define SPOOF
+
 //TODO: Remove spoofing of MPOD connection from this class
 class SnmpUtilControl
 {
@@ -83,6 +85,7 @@ template<class Number>
 std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command,
                                            Number value)
 {
+#ifdef SPOOF
     //TODO: Remove this spoof here
     std::ostringstream outBuilder;
     switch(command)
@@ -92,6 +95,7 @@ std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command,
         return outBuilder.str();
         break;
     }
+#endif
     if(CmdLookup::GLOBAL_SET_TYPES.at(command) == 'i')
     {
         return this->runCommand(this->buildCommand("snmpset",
@@ -115,6 +119,7 @@ std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command,
                                             int board, int channel,
                                             Number value)
 {
+#ifdef SPOOF
     //TODO: Remove this spoof here
     std::ostringstream outBuilder;
     switch(command)
@@ -148,6 +153,7 @@ std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command,
         return outBuilder.str();
         break;
     }
+#endif
     if(CmdLookup::CHANNEL_SET_TYPES.at(command) == 'i')
     {
         return this->runCommand(this->buildCommand("snmpset",

@@ -290,8 +290,8 @@ void UIThread::drawSlowControlsGrid()
         //build the voltage data string
         std::ostringstream builder;
         //first add the channel in the usual format
-        builder << "| u" << (this->mpodMapper->moduleNum[chanInd] - 1);
-        builder << std::setw(2) << std::setfill('0') << (this->mpodMapper->channelNum[chanInd] - 1) << " | " << std::setfill(' ');
+        builder << "| u" << (this->mpodMapper->moduleNum[chanInd]);
+        builder << std::setw(2) << std::setfill('0') << (this->mpodMapper->channelNum[chanInd]) << " | " << std::setfill(' ');
         //add the voltage
         float termVol =  this->slowData->terminalVoltage[chanInd];
         if(termVol >= 1000.0)

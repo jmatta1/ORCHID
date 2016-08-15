@@ -36,6 +36,7 @@ namespace SlowControls
 //TODO: Remove spoofing of MPOD connection from this class
 std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command)
 {
+#ifdef SPOOF
     //TODO: Remove this spoof here
     switch(command)
     {
@@ -46,7 +47,7 @@ std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command)
         return "BITS: 80 [.]0";
         break;
     }
-
+#endif
     return this->runCommand(this->buildCommand("snmpget", "guru",
                                                CmdLookup::GLOBAL_GET_COMMANDS.at(command)));
 }
@@ -54,6 +55,7 @@ std::string SnmpUtilControl::snmpGlobalGet(MpodGlobalGetParam command)
 std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command,
                                             int board, int channel)
 {
+#ifdef SPOOF
     //TODO: Remove this spoof here
     switch(command)
     {
@@ -139,7 +141,7 @@ std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command,
         return "INTEGER: 500";
         break;
     }
-            
+#endif
     std::ostringstream parameterBuilder;
     parameterBuilder << CmdLookup::CHANNEL_GET_COMMANDS.at(command);
     parameterBuilder << this->convertToUniversalChannel(board, channel);
@@ -150,6 +152,7 @@ std::string SnmpUtilControl::snmpChannelGet(MpodChannelGetParam command,
 
 std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command)
 {
+#ifdef SPOOF
     //TODO: Remove this spoof here
     std::string output;
     switch(command)
@@ -239,6 +242,7 @@ std::string SnmpUtilControl::snmpChannelWalk(MpodChannelGetParam command)
         return output;
         break;
     }
+#endif
     return this->runCommand(this->buildCommand("snmpwalk", "guru",
                                                CmdLookup::CHANNEL_GET_COMMANDS.at(command)));
 }
@@ -267,7 +271,7 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe)
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Could not create run directory. Check admin permissions";
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "popen() failed in SnmpUtilControl!";
         throw std::runtime_error("popen() failed in SnmpUtilControl!");
     }
     while (!feof(pipe.get()))
@@ -285,14 +289,14 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
 std::string SnmpUtilControl::convertToUniversalChannel(int board,
                                                        int channel) const
 {
-    if( (board < 1) || (board > 10) ) throw std::runtime_error("Invalid board number (not in the range [1, 10]");
+    if( (board < 0) || (board > 9) ) throw std::runtime_error("Invalid board number (not in the range [1, 10]");
     std::ostringstream channelNamer;
     channelNamer << ".u";
-    if((board>=2))
+    if((board!=0))
     {
-        channelNamer << (board-1);
+        channelNamer << board;
     }
-    channelNamer << (channel-1);
+    channelNamer << channel;
     return channelNamer.str();
 }
 }
