@@ -338,7 +338,7 @@ AsyncOutFile<RetQueueType>::~AsyncOutFile()
 template <typename RetQueueType>
 void AsyncOutFile<RetQueueType>::closeAndTerminate()
 {
-    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Giving Queue Emptying and Terminate Flags";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Giving Queue Emptying and Terminate Flags";
     this->emptyQueue.store(true);
     //terminate the write thread if it is not already terminated
     this->terminateWhenEmpty.store(true);
@@ -349,13 +349,13 @@ void AsyncOutFile<RetQueueType>::closeAndTerminate()
     }
     //wait for the termination
     if(!(this->writeTerminated.load())) writeThread->join();
-    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): File Writing Thread Has Terminated";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: File Writing Thread Has Terminated";
 }
 
 template <typename RetQueueType>
 void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
 {
-    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Prepping new file";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Prepping new file";
     
     //first we try to lock the writeMutex.
     //If we manage that then the write thread is waiting for data.
@@ -375,13 +375,13 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
     //our changes are done
     //the lock should release on destruction when the function exits
-    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Done prepping new file";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Done prepping new file";
 }
 
 template <typename RetQueueType>
 void AsyncOutFile<RetQueueType>::closeFile()
 {
-    BOOST_LOG_SEV(lg, Information) << "FO Thread (w/in FW Thread): Closing current file";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Closing current file";
     this->emptyQueue.store(true);
     this->isInitialized.store(false);
     if(this->writerWaiting.load())
