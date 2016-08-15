@@ -56,7 +56,7 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
         char* allocBuffer = new (std::nothrow) char[BufferSizeInBytes];
         if(allocBuffer == nullptr)
         {
-            BOOST_LOG_SEV(lg, Critical) << "File Thread: Error In File Write Buffer Allocation";
+            BOOST_LOG_SEV(lg, Critical) << "FO Thread: Error In File Write Buffer Allocation";
             throw std::runtime_error("Error In File Write Buffer Allocation");
         }
         //technically this thread should not push, only pop, but I think that it
@@ -98,7 +98,7 @@ FileOutputThread::~FileOutputThread()
 
 void FileOutputThread::prepNewRunFolder()
 {
-    BOOST_LOG_SEV(lg, Information) << "File Thread: Preparing new folder";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: Preparing new folder";
     if(this->outDirectory.back() == '/')
     {
         this->outDirectory.erase(this->outDirectory.size()-1, 1); 
@@ -108,29 +108,29 @@ void FileOutputThread::prepNewRunFolder()
     boost::filesystem::create_directories(writePath, mkDirErr);
     if(!boost::filesystem::is_directory(writePath))
     {
-        BOOST_LOG_SEV(lg, Critical) << "File Thread: Could not create data directory in file thread";
+        BOOST_LOG_SEV(lg, Critical) << "FO Thread: Could not create data directory in file thread";
         throw std::runtime_error("Could not create data directory in file thread");
     }
     writePath.append(this->currentRunTitle);
     boost::filesystem::create_directories(writePath, mkDirErr);
     if(!boost::filesystem::is_directory(writePath))
     {
-        BOOST_LOG_SEV(lg, Critical) << "File Thread: Could not create run directory in file thread";
+        BOOST_LOG_SEV(lg, Critical) << "FO Thread: Could not create run directory in file thread";
         throw std::runtime_error("Could not create run directory in file thread");
     }
     if(!boost::filesystem::is_directory(writePath, mkDirErr))
     {
-        BOOST_LOG_SEV(lg, Critical) << "File Thread: No run directory detected despite creation";
+        BOOST_LOG_SEV(lg, Critical) << "FO Thread: No run directory detected despite creation";
         throw std::runtime_error("No run directory detected despite creation");
     }
     this->writeDirectory = writePath.native();
-    BOOST_LOG_SEV(lg, Information) << "File Thread: Made new folder at: " << this->writeDirectory;
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: Made new folder at: " << this->writeDirectory;
     this->buildFileName();
 }
 
 void FileOutputThread::buildFileName()
 {
-    BOOST_LOG_SEV(lg, Information) << "File Thread: Starting new file";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: Starting new file";
     std::ostringstream builder;
     builder << this->writeDirectory;
     if(this->writeDirectory.back()!=boost::filesystem::path::preferred_separator)
@@ -141,7 +141,7 @@ void FileOutputThread::buildFileName()
     builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
     builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
     this->currentFileName = builder.str();
-    BOOST_LOG_SEV(lg, Information) << "File Thread: Made new file at: " << this->currentFileName;
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: Made new file at: " << this->currentFileName;
 }
 
 void FileOutputThread::operator()()
@@ -152,21 +152,21 @@ void FileOutputThread::operator()()
         switch(this->fileThreadController->getCurrentState())
         {
         case InterThread::FileOutputThreadState::Terminate:
-            BOOST_LOG_SEV(lg, Information) << "File Thread: Terminating";
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Terminating";
             this->notTerminated = false;
             this->outFile->closeAndTerminate();
             break;
         case InterThread::FileOutputThreadState::Waiting:
-            BOOST_LOG_SEV(lg, Information) << "File Thread: Waiting";
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Waiting";
             this->fileThreadController->waitForNewState();
             break;
         case InterThread::FileOutputThreadState::NewRunParams:
-            BOOST_LOG_SEV(lg, Information) << "File Thread: New Parameters";
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: New Parameters";
             this->grabNewRunParameters();
             this->fileData->setInitState('i');
             break;
         case InterThread::FileOutputThreadState::Writing:
-            BOOST_LOG_SEV(lg, Information) << "File Thread: Writing";
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Writing";
             this->doWriteLoop();
             this->emptyWriteQueueBeforeChange();
             this->outFile->closeFile();
@@ -279,7 +279,7 @@ void FileOutputThread::doWriteLoop()
         if(this->inputQueues->tryConsumerPop<Utility::ProcessingQueueIndex>(event))
         {
             gotData = true;
-            BOOST_LOG_SEV(lg, Information) << "File Thread: Got a data event";
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Got a data event";
             int eventSize = event->getSizeOfBinaryRepresentation();
             //loop until the intermediate buffer is big enough
             while(eventSize > this->evBufSize)
@@ -297,7 +297,7 @@ void FileOutputThread::doWriteLoop()
         if(this->inputQueues->tryConsumerPop<Utility::SlowControlsQueueIndex>(event))
         {
             gotData = true;
-            BOOST_LOG_SEV(lg, Information) << "File Thread: Got a slow controls event";
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Got a slow controls event";
             int eventSize = event->getSizeOfBinaryRepresentation();
             //loop until we double the event buffer past the size of the event
             while(eventSize > this->evBufSize)
@@ -444,7 +444,7 @@ void FileOutputThread::finalizeDataBuffer()
 
 void FileOutputThread::writeBufferToDisk(int bufferSize)
 {
-    BOOST_LOG_SEV(lg, Information) << "File Thread: Sending buffer to disk";
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: Sending buffer to disk";
     this->outFile->writeBuf(this->currentBuffer, bufferSize);
     this->fileData->increaseSize(bufferSize);
     //now that we have sent that buffer out
