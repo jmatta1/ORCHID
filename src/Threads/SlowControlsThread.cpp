@@ -68,23 +68,31 @@ void SlowControlsThread::operator ()()
             {
                 loopCount = 0;
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Started Polling";
+                //first time we enter into a mode, read *everything*
+                //poll the mpod
+                this->mpodReader->readAll();
+                //publish the data for the UI thread but do not bother with writing it
+                BOOST_LOG_SEV(lg, Information) << "SC Thread: Calling Read Voltage Data";
+                slowData->readVoltageData(this->mpodReader->voltageData);
             }
             else if((loopCount % 30)==0)
             {
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Still Polling (# Loops: "<<loopCount<<")";
-            }
-            if(lastState != currState)
-            {//first time we enter into a mode, read *everything*
+                //after that only read the things that actually change
                 //poll the mpod
-                this->mpodReader->readAll();
+                this->mpodReader->readActive();
+                //publish the data for the UI thread but do not bother with writing it
+                BOOST_LOG_SEV(lg, Information) << "SC Thread: Calling Read Voltage Data";
+                slowData->readVoltageData(this->mpodReader->voltageData);
             }
             else
             {//after that only read the things that actually change
                 //poll the mpod
                 this->mpodReader->readActive();
+                //publish the data for the UI thread but do not bother with writing it
+                BOOST_LOG_SEV(lg, Information) << "SC Thread: Calling Read Voltage Data";
+                slowData->readVoltageData(this->mpodReader->voltageData);
             }
-            //publish the data for the UI thread but do not bother with writing it
-            slowData->readVoltageData(this->mpodReader->voltageData);
             break;
         case InterThread::SlowControlsThreadState::Writing:
             if(lastState != currState)
