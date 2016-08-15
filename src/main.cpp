@@ -40,6 +40,7 @@ HFIR background monitoring wall.
 // ORCHID device objects
 #include"Hardware//HVLib/MpodController.h"
 #include"Hardware/HVLib/SnmpUtilCommands.h"
+#include"Hardware/Digitizer/Vx1730Digitizer.h"
 // ORCHID threads
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
@@ -210,6 +211,15 @@ int main(int argc, char* argv[])
         toFileQueues->consumerPush<Utility::SlowControlsQueueIndex>(new Events::SlowControlsEvent(numVoltageChannels, numTemperatureChannels));
     }
     
+    int numDigitizers = digitizerModuleData.linkType.size();
+    Digitizer::Vx1730Digitizer** digitizerList = new Digitizer::Vx1730Digitizer*[numDigitizers];
+    for(int i=0; i<numDigitizers; ++i)
+    {
+        digitizerList[i] = new Digitizer::Vx1730Digitizer(i,&digitizerModuleData, &digitizerChannelData);
+        digitizerList[i]->setupDigitizer();
+    }
+    
+    
     /*
      * Build the callable objects for boost::thread
      */
@@ -251,7 +261,7 @@ int main(int argc, char* argv[])
     //  evProcThreadCallable[i] = new EventProcessingThread(i, ...);
     //}
     
-
+#if 0
     /*
      * Handle the threads
      */
@@ -274,6 +284,7 @@ int main(int argc, char* argv[])
     //Wait to join the IO thread
     uiThread.join();
     boost::log::core::get()->add_sink(coutSink);
+#endif
     //the IO thread has joined proceed with shutdown
     BOOST_LOG_SEV(lg, Trace)  << "UI thread has rejoined main the thread. Resuming console logging." << std::flush;
     BOOST_LOG_SEV(lg, Trace)  << "Other threads should have terminated.\n" << std::flush;
@@ -286,7 +297,6 @@ int main(int argc, char* argv[])
     delete fileThreadWrapper;
     delete fileThreadCallable;
     
-
     //delete the data queues
     BOOST_LOG_SEV(lg, Debug)  << "Deleting interthread data queues" << std::flush;
     //TODO: delete empty events from queue
@@ -311,6 +321,12 @@ int main(int argc, char* argv[])
     delete mpodController;
     delete mpodReader;
     delete mpodSnmpController;
+    
+    for(int i=0; i<numDigitizers; ++i)
+    {
+        delete digitizerList[i];
+    }
+    delete[] digitizerList;
     
     //delete the thread control structures
     BOOST_LOG_SEV(lg, Debug)  << "Deleting thread controls" << std::flush;
