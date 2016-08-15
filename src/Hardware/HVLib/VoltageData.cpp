@@ -359,7 +359,7 @@ unsigned int VoltageData::parseBitsLine(const std::string& line, int nibbleCount
     //parse into an integer from hex format
     unsigned int final;
     parse(intermediate.begin(), intermediate.end(), hex, final);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Value To Convert To Bits: " << finale;
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Value To Convert To Bits: " << final;
     final <<= push;
     return final;    
 }
