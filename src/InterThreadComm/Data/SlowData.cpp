@@ -152,9 +152,12 @@ void SlowData::readVoltageData(const SlowControls::VoltageData& data)
     //set up the loop for transfering per channel information
     std::size_t i=0, j=0;
     std::size_t dataSize = data.terminalVoltage.size();
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Data Size is: " << dataSize;
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Num Vol Channels is: " << numVoltageChannels;
     //loop and transfer per channel information
     while((i < dataSize) && (j < numVoltageChannels))
     {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "i: " << i << " j: " << j;
         if(data.outputSwitch[i])
         {
             this->terminalVoltage[j].store( data.terminalVoltage[i]);
