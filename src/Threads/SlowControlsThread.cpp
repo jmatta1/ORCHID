@@ -71,9 +71,6 @@ void SlowControlsThread::operator ()()
                 //first time we enter into a mode, read *everything*
                 //poll the mpod
                 this->mpodReader->readAll();
-                //publish the data for the UI thread but do not bother with writing it
-                BOOST_LOG_SEV(lg, Information) << "SC Thread: Calling Read Voltage Data";
-                slowData->readVoltageData(this->mpodReader->voltageData);
             }
             else if((loopCount % 30)==0)
             {
@@ -81,18 +78,14 @@ void SlowControlsThread::operator ()()
                 //after that only read the things that actually change
                 //poll the mpod
                 this->mpodReader->readActive();
-                //publish the data for the UI thread but do not bother with writing it
-                BOOST_LOG_SEV(lg, Information) << "SC Thread: Calling Read Voltage Data";
-                slowData->readVoltageData(this->mpodReader->voltageData);
             }
             else
             {//after that only read the things that actually change
                 //poll the mpod
                 this->mpodReader->readActive();
-                //publish the data for the UI thread but do not bother with writing it
-                BOOST_LOG_SEV(lg, Information) << "SC Thread: Calling Read Voltage Data";
-                slowData->readVoltageData(this->mpodReader->voltageData);
             }
+            //publish the data for the UI thread but do not bother with writing it
+            slowData->readVoltageData(this->mpodReader->voltageData);
             break;
         case InterThread::SlowControlsThreadState::Writing:
             if(lastState != currState)
@@ -116,7 +109,6 @@ void SlowControlsThread::operator ()()
             }
             
             //publish the data for the UI Thread
-            BOOST_LOG_SEV(lg, Information) << "SC Thread: Calling Read Voltage Data";
             slowData->readVoltageData(this->mpodReader->voltageData);
             //first pop an empty event to hold the event
             Events::EventInterface* scEvent;

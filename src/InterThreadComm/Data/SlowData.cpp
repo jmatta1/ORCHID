@@ -24,7 +24,6 @@
 // includes from other libraries
 // includes from ORCHID
 #include"Hardware/HVLib/VoltageData.h"
-#include"Utility/OrchidLogger.h"
 
 namespace InterThread
 {
@@ -152,12 +151,9 @@ void SlowData::readVoltageData(const SlowControls::VoltageData& data)
     //set up the loop for transfering per channel information
     std::size_t i=0, j=0;
     std::size_t dataSize = data.terminalVoltage.size();
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Data Size is: " << dataSize;
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Num Vol Channels is: " << numVoltageChannels;
     //loop and transfer per channel information
     while((i < dataSize) && (j < numVoltageChannels))
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "i: " << i << " j: " << j;
         if(data.outputSwitch[i])
         {
             this->terminalVoltage[j].store( data.terminalVoltage[i]);
@@ -174,41 +170,23 @@ void SlowData::readVoltageData(const SlowControls::VoltageData& data)
             this->outputSwitch[j].store(    data.outputSwitch[i]);
 
             this->outputOn[j].store(                        data.channelStatus[i].outputOn);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputOn<< " | "<<this->outputOn[j].load();
             this->outputInhibit[j].store(                   data.channelStatus[i].outputInhibit);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputInhibit<< " | "<<this->outputInhibit[j].load();
             this->outputFailureMinSenseVoltage[j].store(    data.channelStatus[i].outputFailureMinSenseVoltage);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureMinSenseVoltage<< " | "<<this->outputFailureMinSenseVoltage[j].load();
             this->outputFailureMaxSenseVoltage[j].store(    data.channelStatus[i].outputFailureMaxSenseVoltage);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureMaxSenseVoltage<< " | "<<this->outputFailureMaxSenseVoltage[j].load();
             this->outputFailureMaxTerminalVoltage[j].store( data.channelStatus[i].outputFailureMaxTerminalVoltage);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureMaxTerminalVoltage<< " | "<<this->outputFailureMaxTerminalVoltage[j].load();
             this->outputFailureMaxCurrent[j].store(         data.channelStatus[i].outputFailureMaxCurrent);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureMaxCurrent<< " | "<<this->outputFailureMaxCurrent[j].load();
             this->outputFailureMaxTemperature[j].store(     data.channelStatus[i].outputFailureMaxTemperature);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureMaxTemperature<< " | "<<this->outputFailureMaxTemperature[j].load();
             this->outputFailureMaxPower[j].store(           data.channelStatus[i].outputFailureMaxPower);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureMaxPower<< " | "<<this->outputFailureMaxPower[j].load();
             this->outputFailureTimeout[j].store(            data.channelStatus[i].outputFailureTimeout);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureTimeout<< " | "<<this->outputFailureTimeout[j].load();
             this->outputCurrentLimited[j].store(            data.channelStatus[i].outputCurrentLimited);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputCurrentLimited<< " | "<<this->outputCurrentLimited[j].load();
             this->outputRampUp[j].store(                    data.channelStatus[i].outputRampUp);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputRampUp<< " | "<<this->outputRampUp[j].load();
             this->outputRampDown[j].store(                  data.channelStatus[i].outputRampDown);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputRampDown<< " | "<<this->outputRampDown[j].load();
             this->outputEnableKill[j].store(                data.channelStatus[i].outputEnableKill);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputEnableKill<< " | "<<this->outputEnableKill[j].load();
             this->outputEmergencyOff[j].store(              data.channelStatus[i].outputEmergencyOff);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputEmergencyOff<< " | "<<this->outputEmergencyOff[j].load();
             this->outputAdjusting[j].store(                 data.channelStatus[i].outputAdjusting);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputAdjusting<< " | "<<this->outputAdjusting[j].load();
             this->outputConstantVoltage[j].store(           data.channelStatus[i].outputConstantVoltage);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputConstantVoltage<< " | "<<this->outputConstantVoltage[j].load();
             this->outputCurrentBoundsExceeded[j].store(     data.channelStatus[i].outputCurrentBoundsExceeded);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputCurrentBoundsExceeded<< " | "<<this->outputCurrentBoundsExceeded[j].load();
             this->outputFailureCurrentLimit[j].store(       data.channelStatus[i].outputFailureCurrentLimit);
-            BOOST_LOG_SEV(OrchidLog::get(), Information) << data.channelStatus[i].outputFailureCurrentLimit<< " | "<<this->outputFailureCurrentLimit[j].load();
             ++j;
         }
         ++i;

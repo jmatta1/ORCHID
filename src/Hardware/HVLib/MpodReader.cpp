@@ -24,13 +24,11 @@
 // includes from other libraries
 // includes from ORCHID
 #include"InputLib/Blocks/MpodChannelData.h"
-#include"Utility/OrchidLogger.h"
 namespace SlowControls
 {
 
 void MpodReader::readAll()
 {
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Starting to read all data";
     this->walkTerminalVoltages();
     this->walkSenseVoltages();
     this->walkSetVoltages();
@@ -44,19 +42,16 @@ void MpodReader::readAll()
     this->walkOutputSwitches();
     this->walkChannelStatuses();
     this->getCrateStatus();
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Done reading all data";
 }
 
 void MpodReader::readActive()
 {
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Starting to read active data";
     this->walkTerminalVoltages();
     this->walkSenseVoltages();
     this->walkCurrents();
     this->walkTemperatures();
     this->walkChannelStatuses();
     this->getCrateStatus();
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Done reading active data";
 }
 
 }

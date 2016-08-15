@@ -28,7 +28,6 @@
 // includes from other libraries
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
-#include"Utility/OrchidLogger.h"
 
 namespace SlowControls
 {
@@ -253,16 +252,12 @@ void VoltageData::loadOutputSwitches(const std::string& input)
     int i = 0;
     std::stringstream inStream(input + '\n');
     std::string line;
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Load Out Switches Input: " << input;
     while(std::getline(inStream, line, '\n') && (i < numChannels))
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "Load Out Switches line: " << line;
         //get the integer representation of the bits line
         int final = parseIntegerLine(line);
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "Load Out Switches number: " << final;
         //send the integer representation into the struct for parsing
         outputSwitch[i] = ((final==0)?false:true);
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "Load Out Switches value: " << (outputSwitch[i]?"T":"F");
         ++i;
     }
 }
@@ -329,9 +324,7 @@ int VoltageData::parseIntegerLine(const std::string& line)
     std::string input(line + '\n');
     int output=0;
     //parse the interesting part of the input line
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Parser input line: " << line;
     parse(line.begin(), line.end(), lexeme["INTEGER: "] >> int_ >> +eol, output);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Parser output value: " << output;
     return output;
 }
 
