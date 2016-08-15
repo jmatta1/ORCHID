@@ -59,7 +59,7 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
     this->rateMultiplier = static_cast<float>(refreshFrequency);
     this->refreshPeriod = boost::chrono::nanoseconds(refPeriod);
     
-    long long int pollPeriod = static_cast<long long int>(1.5*static_cast<float>(1000000000/pollingRate));
+    long long int pollPeriod = static_cast<long long int>(2*static_cast<float>(1000000000/pollingRate));
     this->slowControlsPollingWaitPeriod = boost::chrono::nanoseconds(pollPeriod);
     
     //set up the logger variable too
@@ -908,6 +908,11 @@ void UIThread::turnOn()
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
+    //if we do not have a wait we hit the crate too hard and fast and tell it to do things before it is fully booted
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Pause for crate bootup.");
+    wrefresh(this->textWindow);
+    boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the HV channels";
     if(!this->mpodController->activateAllChannels())
     {
@@ -1005,7 +1010,7 @@ void UIThread::startDataTaking()
     mvwprintw(this->textWindow, 0, 0, "Pause to ensure first event is slow controls");
     wrefresh(this->textWindow);
     //TODO use wait based on actual config slow controls timing
-    boost::this_thread::sleep_for(boost::chrono::seconds(3));
+    boost::this_thread::sleep_for(slowControlsPollingWaitPeriod);
     //TODO put the digitizer threads into running mode
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Digitizer Thread Acquisition";
     
