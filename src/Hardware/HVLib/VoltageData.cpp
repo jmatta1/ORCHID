@@ -23,13 +23,11 @@
 #include<sstream>
 #include<string>
 #include<algorithm>
-#include<iomanip>
 #include<cctype>
 #include<iomanip>
 // includes from other libraries
 #include <boost/spirit/include/qi.hpp>
 // includes from ORCHID
-#include"Utility/OrchidLogger.h"
 
 namespace SlowControls
 {
@@ -175,43 +173,24 @@ std::string ChannelStatus::getStatusString()
 
 void ChannelStatus::loadFromValue(unsigned int value)
 {
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Value To Convert To Bits: " << value;
     this->outputOn                        = ((value & ChannelMasks::MaskOutputOn)                        != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputOn: " << this->outputOn;
     this->outputInhibit                   = ((value & ChannelMasks::MaskOutputInhibit)                   != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputInhibit: " << this->outputInhibit;
     this->outputFailureMinSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMinSenseVoltage)    != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMinSenseVoltage: " << this->outputFailureMinSenseVoltage;
     this->outputFailureMaxSenseVoltage    = ((value & ChannelMasks::MaskOutputFailureMaxSenseVoltage)    != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxSenseVoltage: " << this->outputFailureMaxSenseVoltage;
     this->outputFailureMaxTerminalVoltage = ((value & ChannelMasks::MaskOutputFailureMaxTerminalVoltage) != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxTerminalVoltage: " << this->outputFailureMaxTerminalVoltage;
     this->outputFailureMaxCurrent         = ((value & ChannelMasks::MaskOutputFailureMaxCurrent)         != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxCurrent: " << this->outputFailureMaxCurrent;
     this->outputFailureMaxTemperature     = ((value & ChannelMasks::MaskOutputFailureMaxTemperature)     != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxTemperature: " << this->outputFailureMaxTemperature;
     this->outputFailureMaxPower           = ((value & ChannelMasks::MaskOutputFailureMaxPower)           != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureMaxPower: " << this->outputFailureMaxPower;
     this->outputFailureTimeout            = ((value & ChannelMasks::MaskOutputFailureTimeout)            != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureTimeout: " << this->outputFailureTimeout;
     this->outputCurrentLimited            = ((value & ChannelMasks::MaskOutputCurrentLimited)            != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputCurrentLimited: " << this->outputCurrentLimited;
     this->outputRampUp                    = ((value & ChannelMasks::MaskOutputRampUp)                    != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputRampUp: " << this->outputRampUp;
     this->outputRampDown                  = ((value & ChannelMasks::MaskOutputRampDown)                  != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputRampDown: " << this->outputRampDown;
     this->outputEnableKill                = ((value & ChannelMasks::MaskOutputEnableKill)                != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputEnableKill: " << this->outputEnableKill;
     this->outputEmergencyOff              = ((value & ChannelMasks::MaskOutputEmergencyOff)              != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputEmergencyOff: " << this->outputEmergencyOff;
     this->outputAdjusting                 = ((value & ChannelMasks::MaskOutputAdjusting)                 != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputAdjusting: " << this->outputAdjusting;
     this->outputConstantVoltage           = ((value & ChannelMasks::MaskOutputConstantVoltage)           != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputConstantVoltage: " << this->outputConstantVoltage;
     this->outputCurrentBoundsExceeded     = ((value & ChannelMasks::MaskOutputCurrentBoundsExceeded)     != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputCurrentBoundsExceeded: " << this->outputCurrentBoundsExceeded;
     this->outputFailureCurrentLimit       = ((value & ChannelMasks::MaskOutputFailureCurrentLimit)       != 0);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "outputFailureCurrentLimit: " << this->outputFailureCurrentLimit;
 }
 
 ChannelStatus& ChannelStatus::operator=(const ChannelStatus& rhs)
@@ -375,7 +354,6 @@ unsigned int VoltageData::parseBitsLine(const std::string& line, int nibbleCount
     //parse into an integer from hex format
     unsigned int final;
     parse(intermediate.begin(), intermediate.end(), hex, final);
-    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Value To Convert To Bits: " << final;
     final <<= push;
     return final;    
 }
