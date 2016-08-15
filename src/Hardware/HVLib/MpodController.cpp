@@ -104,7 +104,7 @@ bool MpodController::setupChannels()
         {
             int board = this->moduleData->board[i];
             int boardMaxSetMaxCurrentTripTime   = this->moduleData->maxCurrentTripTime[i];
-            float boardMaxSetMaxCurrent         = this->moduleData->maxSetCurrent[i];
+            float boardMaxSetMaxCurrent         = (this->moduleData->maxSetCurrent[i]/1000000.0);
             float boardMaxSetVoltage            = this->moduleData->maxSetVoltage[i];
             float boardMaxSetRampDownSpeed      = this->moduleData->maxRampDownSpeed[i];
             float boardMaxSetRampUpSpeed        = this->moduleData->maxRampUpSpeed[i];
