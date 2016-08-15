@@ -439,6 +439,78 @@ void Vx1730Digitizer::writeGroupRegisterData()
     }
 }
 
+void Vx1730Digitizer::writeIndividualRegisterData()
+{
+    using LowLvl::Vx1730WriteRegisters;
+    using LowLvl::Vx1730IndivWriteRegistersAddr;
+    using LowLvl::Vx1730IndivWriteRegistersOffs;
+    int regCount=0;
+    int stopInd = this->channelStartInd + this->numChannel;
+    for(int i=channelStartInd; i<stopInd; ++i)
+    {
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::InputDynamicRange>::value));
+        dataArray[regCount] = (0x0000FFFF & this->channelData->recordLength[i]);
+        ++regCount;
+        
+        
+    }
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>   : std::integral_constant<ushort, 0x1028> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PreTrg>              : std::integral_constant<ushort, 0x1038> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::CfdSettings>         : std::integral_constant<ushort, 0x103C> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>     : std::integral_constant<ushort, 0x1040> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShortGate>           : std::integral_constant<ushort, 0x1054> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::LongGate>            : std::integral_constant<ushort, 0x1058> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::GateOffset>          : std::integral_constant<ushort, 0x105C> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgThreshold>        : std::integral_constant<ushort, 0x1060> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::FixedBaseline>       : std::integral_constant<ushort, 0x1064> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShapedTrgWidth>      : std::integral_constant<ushort, 0x1070> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgHoldOff>          : std::integral_constant<ushort, 0x1074> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PsdCutThreshold>     : std::integral_constant<ushort, 0x1078> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DppAlgorithmCtrl>    : std::integral_constant<ushort, 0x1080> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DcOffset>            : std::integral_constant<ushort, 0x1098> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::IndivSoftwTrig>      : std::integral_constant<ushort, 0x10C0> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::VetoExtension>       : std::integral_constant<ushort, 0x10D4> {};
+    
+    //call the write
+    CAENComm_ErrorCode overallErr = CAENComm_MultiWrite32(this->digitizerHandle,
+                                                          addrArray, regCount,
+                                                          dataArray, cycleErrsArray);
+    
+    //perform a readback to be certain of integrity
+    for(int i=0; i<regCount; ++i)
+    {
+        rdbkArray[i] = 0x12345678UL;
+    }
+    overallErr = CAENComm_MultiRead32(this->digitizerHandle,
+                                      addrArray, regCount,
+                                      rdbkArray, cycleErrsArray);
+    //test for errors in the individual cycles
+    for(int i=0; i<regCount; ++i)
+    {
+        if(cycleErrsArray[i] < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            this->writeErrorAndThrow(cycleErrsArray[i]);
+        }
+    }
+    
+    //test for an overall error
+    if(overallErr < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Overall Error In Readback Of Group Addresses for Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(overallErr);
+    }
+    
+    //give the readback results
+    BOOST_LOG_SEV(lg, Information) << "Results of readback of group registers";
+    BOOST_LOG_SEV(lg, Information) << "    Addr   |  Written |   Read   ";
+    for(int i=0; i<regCount; ++i)
+    {
+        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
+    }
+}
+
 unsigned int Vx1730Digitizer::calculateTriggerValidationMask(int ind)
 {
     unsigned int output = 0x00000000;
@@ -486,10 +558,8 @@ unsigned int Vx1730Digitizer::calculateChanEnMaskRegVal()
 {
     int stopInd = this->channelStartInd + this->numChannel;
     unsigned int output = 0x00000000;
-    BOOST_LOG_SEV(lg, Information) << std::dec << stopInd << " | " << channelStartInd << " | " << numChannel << " | " << channelData->channelEnable.size()<< " | " << channelData->channelNumber.size();
     for(int i=channelStartInd; i<stopInd; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << std::dec << i << " | " << channelData->channelEnable[i] << " | " << channelData->channelNumber[i];
         if(channelData->channelEnable[i])
         {
             output |= (0x01UL << channelData->channelNumber[i]);
@@ -584,11 +654,6 @@ unsigned int Vx1730Digitizer::calculateBoardConfigRegVal()
         output |= (temp << 26);
     }
     return output;
-}
-
-void Vx1730Digitizer::writeIndividualRegisterData()
-{
-    
 }
 
 }
