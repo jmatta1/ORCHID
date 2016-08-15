@@ -912,7 +912,6 @@ void UIThread::turnOn()
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Pause for crate bootup.");
     wrefresh(this->textWindow);
-    boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the HV channels";
     if(!this->mpodController->activateAllChannels())
     {
