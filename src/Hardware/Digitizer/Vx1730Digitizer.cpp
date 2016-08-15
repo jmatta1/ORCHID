@@ -273,7 +273,7 @@ void Vx1730Digitizer::writeCommonRegisterData()
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontIoCtrl>::value;
     dataArray[regCount] = 0x00000002;//set everything to zero except the bit that makes the lvds high impedance
-    BOOST_LOG_SEV(lg, Information) << addrArray[regCount << " | " << dataArray[regCount] << "\n";
+    BOOST_LOG_SEV(lg, Information) << addrArray[regCount] << " | " << dataArray[regCount] << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChanEnMask>::value;
     dataArray[regCount] = calculateChanEnMaskRegVal();
@@ -284,7 +284,7 @@ void Vx1730Digitizer::writeCommonRegisterData()
     BOOST_LOG_SEV(lg, Information) << "Generating addreses for Digitizer # " << moduleNumber << "\n";
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MonitorDacMode>::value;
     dataArray[regCount] = 0x00000003UL;
-    BOOST_LOG_SEV(lg, Information) << addrArray[regCount << " | " << dataArray[regCount] << "\n";
+    BOOST_LOG_SEV(lg, Information) << addrArray[regCount] << " | " << dataArray[regCount] << "\n";
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MemBuffAlmtFullLvl>::value;
     dataArray[regCount] = (this->moduleData->memBuffAlmostFullLevel[moduleNumber] & 0x000003FF);
