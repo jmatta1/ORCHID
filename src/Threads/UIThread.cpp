@@ -1000,10 +1000,14 @@ void UIThread::startDataTaking()
     //boost::this_thread::sleep_for(this->refreshPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Slow Controls Event Generation";
     this->sctControl->setToWriting();
-    //TODO put the digitizer thread into running mode
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Pausing to Ensure First Event Is Slow Controls";
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Pause to ensure first event is slow controls");
+    wrefresh(this->textWindow);
+    //TODO use wait based on actual config slow controls timing
+    boost::this_thread::sleep_for(boost::chrono::seconds(3));
+    //TODO put the digitizer threads into running mode
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Digitizer Thread Acquisition";
-    //TODO put the digitizer into running mode
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Digitizer Run";
     
     mode = UIMode::Running;
     //this->startLine = 0;
@@ -1012,8 +1016,6 @@ void UIThread::startDataTaking()
 
 void UIThread::stopDataTaking()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Stopping Digitzer Run";
-    //TODO put the digitizer into stopped mode
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Digitizer Thread Set To Stop";
     //TODO put the digitizer thread into stopped mode
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Event Processing Threads Set To Stop";
