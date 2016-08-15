@@ -1,7 +1,7 @@
 [Start]
 
 [GeneralBlock] # this block of parameters holds the basic values that control the overall running of the DAQ
-WarnRate = 20000   # this is the rate at will we issue warning about the digitizer running too fast
+WarnRate = 200000   # this is the rate at will we issue warning about the digitizer running too fast currently not implemented
 UpdateFrequency = 20              #the rate in hertz that the UI updates itself
 ProcessingThreadCount = 2
 BaseOutputDirectory = "./data/"
