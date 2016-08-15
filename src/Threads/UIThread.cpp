@@ -901,7 +901,7 @@ void UIThread::turnOn()
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the MPOD Crate";
     //if we do not have a wait we hit the crate too hard and fast and tell it to do things before it is fully booted
     wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Pause for crate bootup.");
+    mvwprintw(this->textWindow, 0, 0, "Pause for MPOD crate bootup.");
     wrefresh(this->textWindow);
     if(!this->mpodController->turnCrateOn())
     {
