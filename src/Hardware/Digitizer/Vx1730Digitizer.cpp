@@ -404,6 +404,21 @@ void Vx1730Digitizer::writeGroupRegisterData()
     CAENComm_ErrorCode overallErr = CAENComm_MultiWrite32(this->digitizerHandle,
                                                           addrArray, regCount,
                                                           dataArray, cycleErrsArray);
+    //test for errors in the individual cycles
+    for(int i=0; i<regCount; ++i)
+    {
+        if(cycleErrsArray[i] < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            this->writeErrorAndThrow(cycleErrsArray[i]);
+        }
+    }
+    //test for an overall error
+    if(overallErr < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(overallErr);
+    }
     
     //perform a readback to be certain of integrity
     for(int i=0; i<regCount; ++i)
@@ -450,32 +465,81 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     {
         addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>::value +
                                ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::InputDynamicRange>::value));
-        dataArray[regCount] = (0x0000FFFF & this->channelData->recordLength[i]);
+        dataArray[regCount] = (this->channelData->largeRange[i] ? 0x00UL : 0x00UL);
         ++regCount;
-        
-        
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PreTrg>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::PreTrg>::value));
+        dataArray[regCount] = (this->channelData->preTrigger[i] & 0x01FFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::CfdSettings>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::CfdSettings>::value));
+        dataArray[regCount] = calculateCfdRegSettings(i);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShortGate>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ShortGate>::value));
+        dataArray[regCount] = (this->channelData->shortGate[i] & 0x0FFFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::LongGate>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::LongGate>::value));
+        dataArray[regCount] = (this->channelData->longGate[i] & 0x0FFFFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::GateOffset>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::GateOffset>::value));
+        dataArray[regCount] = (this->channelData->gateOffset[i] & 0x0FFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgThreshold>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::TrgThreshold>::value));
+        dataArray[regCount] = (this->channelData->trigThreshold[i] & 0x3FFFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::FixedBaseline>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::FixedBaseline>::value));
+        dataArray[regCount] = (this->channelData->fixedBaseline[i] & 0x3FFFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShapedTrgWidth>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ShapedTrgWidth>::value));
+        dataArray[regCount] = (this->channelData->shapedTrigWidth[i] & 0x3FFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgHoldOff>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::TrgHoldOff>::value));
+        dataArray[regCount] = (this->channelData->trigHoldOff[i] & 0xFFFFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PsdCutThreshold>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::PsdCutThreshold>::value));
+        dataArray[regCount] = (this->channelData->psdThreshold[i] & 0x3FFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DppAlgorithmCtrl>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::DppAlgorithmCtrl>::value));
+        dataArray[regCount] = calculateDppAlgCtrlRegVal(i);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DcOffset>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::DcOffset>::value));
+        dataArray[regCount] = (this->channelData->dcOffset[i] & 0xFFFFUL);
+        ++regCount;
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::VetoExtension>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::VetoExtension>::value));
+        dataArray[regCount] = (this->channelData->vetoDurationExtension[i] & 0xFFFFUL);
+        ++regCount;
     }
-/*    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>   : std::integral_constant<ushort, 0x1028> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PreTrg>              : std::integral_constant<ushort, 0x1038> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::CfdSettings>         : std::integral_constant<ushort, 0x103C> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>     : std::integral_constant<ushort, 0x1040> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShortGate>           : std::integral_constant<ushort, 0x1054> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::LongGate>            : std::integral_constant<ushort, 0x1058> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::GateOffset>          : std::integral_constant<ushort, 0x105C> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgThreshold>        : std::integral_constant<ushort, 0x1060> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::FixedBaseline>       : std::integral_constant<ushort, 0x1064> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShapedTrgWidth>      : std::integral_constant<ushort, 0x1070> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgHoldOff>          : std::integral_constant<ushort, 0x1074> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PsdCutThreshold>     : std::integral_constant<ushort, 0x1078> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DppAlgorithmCtrl>    : std::integral_constant<ushort, 0x1080> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DcOffset>            : std::integral_constant<ushort, 0x1098> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::IndivSoftwTrig>      : std::integral_constant<ushort, 0x10C0> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::VetoExtension>       : std::integral_constant<ushort, 0x10D4> {};*/
     
     //call the write
     CAENComm_ErrorCode overallErr = CAENComm_MultiWrite32(this->digitizerHandle,
                                                           addrArray, regCount,
                                                           dataArray, cycleErrsArray);
+    //test for errors in the individual cycles
+    for(int i=0; i<regCount; ++i)
+    {
+        if(cycleErrsArray[i] < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            this->writeErrorAndThrow(cycleErrsArray[i]);
+        }
+    }
+    //test for an overall error
+    if(overallErr < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(overallErr);
+    }
     
     //perform a readback to be certain of integrity
     for(int i=0; i<regCount; ++i)
@@ -509,6 +573,52 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     {
         BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
     }
+}
+
+unsigned int Vx1730Digitizer::calculateDppAlgCtrlRegVal(int i)
+{
+    unsigned int output = 0x00000000;
+    output |= (channelData->chargeSensitivity[i] & 0x07UL);
+    if(channelData->chargePedestalOn[i])
+    {
+        output |= 0x00000010;
+    }
+    output |= ((channelData->dppTriggerCounting[i] & 0x01UL) << 5);
+    output |= ((channelData->discMode[i] & 0x01UL) << 6);
+    //skip the internal test pulse stuff
+    output |= ((channelData->pulsePolarity[i] & 0x01UL) << 16);
+    output |= ((channelData->trigMode[i] & 0x03UL) << 18);
+    output |= ((channelData->baselineMean[i] & 0x07UL) << 20);
+    if(channelData->disableSelfTrigger[i])
+    {
+        output |= 0x01000000;
+    }
+    //pile up rejection goes here
+    if(channelData->psdCutBelowThresh[i])
+    {
+        output |= 0x08000000;
+    }
+    if(channelData->psdCutAboveThresh[i])
+    {
+        output |= 0x10000000;
+    }
+    if(channelData->overRangeRejection[i])
+    {
+        output |= 0x20000000;
+    }
+    if(channelData->triggerHysteresis[i])
+    {
+        output |= 0x40000000;
+    }
+    return output;
+}
+
+unsigned int Vx1730Digitizer::calculateCfdRegSettings(int i)
+{
+    unsigned int output = 0x00000000;
+    output |= (channelData->cfdDelay[i] & 0x000000FF);
+    output |= ((channelData->cfdFraction[i] & 0x03UL) << 8);
+    return output;
 }
 
 unsigned int Vx1730Digitizer::calculateTriggerValidationMask(int ind)

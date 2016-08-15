@@ -63,7 +63,7 @@ private:
     void writeGroupRegisterData();
     void writeIndividualRegisterData();
     
-    //function to calculate register values for common registers
+    //functions to calculate register values for common registers
     unsigned int calculateBoardConfigRegVal();
     void calculateAcqCtrlRegBase();
     unsigned int calculateGlblTrigMaskRegVal();
@@ -71,6 +71,10 @@ private:
     unsigned int calculateChanEnMaskRegVal();
     unsigned int calculateLocalTrgManagementRegVal(int ind);
     unsigned int calculateTriggerValidationMask(int ind);
+    
+    //functions to calculate register values for individual registers
+    unsigned int calculateCfdRegSettings(int i);
+    unsigned int calculateDppAlgCtrlRegVal(int i);
     
     int moduleNumber;
     int channelStartInd;
