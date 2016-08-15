@@ -455,7 +455,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
         
         
     }
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>   : std::integral_constant<ushort, 0x1028> {};
+/*    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>   : std::integral_constant<ushort, 0x1028> {};
     template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PreTrg>              : std::integral_constant<ushort, 0x1038> {};
     template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::CfdSettings>         : std::integral_constant<ushort, 0x103C> {};
     template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>     : std::integral_constant<ushort, 0x1040> {};
@@ -470,7 +470,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DppAlgorithmCtrl>    : std::integral_constant<ushort, 0x1080> {};
     template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DcOffset>            : std::integral_constant<ushort, 0x1098> {};
     template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::IndivSoftwTrig>      : std::integral_constant<ushort, 0x10C0> {};
-    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::VetoExtension>       : std::integral_constant<ushort, 0x10D4> {};
+    template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::VetoExtension>       : std::integral_constant<ushort, 0x10D4> {};*/
     
     //call the write
     CAENComm_ErrorCode overallErr = CAENComm_MultiWrite32(this->digitizerHandle,
