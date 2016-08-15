@@ -373,12 +373,12 @@ std::ostream& operator<<(std::ostream& os, DigitizerModuleData const& dmd)
     int rows = dmd.linkType.size();
     //output the first 7 columns
     os << "__________________________________________________________________________________________________________\n";
-    os << "Link Type, Link Number, DC Num, VME Base Address, Enable Auto Flush, Propogate Triggers, Record Waveforms,\n";
+    os << "Link Number, DC Num, Link Type, VME Base Address, Enable Auto Flush, Propogate Triggers, Record Waveforms,\n";
     for(int i=0; i<rows; ++i)
     {
-        os << setw(9)  << setfill(' ') << dmd.linkType[i]                    << ", ";
         os << setw(11) << setfill(' ') << dmd.linkNumber[i]                  << ", ";
         os << setw(6)  << setfill(' ') << dmd.daisyChainNumber[i]            << ", ";
+        os << setw(9)  << setfill(' ') << dmd.linkType[i]                    << ", ";
         os << "      0x" << setw(8) << setfill('0') << hex << dmd.vmeBaseAddr[i] << dec << ", ";
         os << setw(17) << setfill(' ') << (dmd.enableAutoFlush[i] ? "T":"F") << ", ";
         os << setw(18) << setfill(' ') << (dmd.propogateTrigs[i]  ? "T":"F") << ", ";
