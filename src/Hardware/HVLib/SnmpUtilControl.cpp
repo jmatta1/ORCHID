@@ -22,6 +22,7 @@
 // includes for C++ system headers
 #include<sstream>
 #include<string>
+#include<iomanip>
 #include<cstdio>
 #include<memory>
 #include<stdexcept>
@@ -300,7 +301,7 @@ std::string SnmpUtilControl::convertToUniversalChannel(int board,
     {
         channelNamer << board;
     }
-    channelNamer << channel;
+    channelNamer << std::setw(2) << std::setfill('0') << channel;
     return channelNamer.str();
 }
 }
