@@ -47,6 +47,8 @@ HFIR background monitoring wall.
 #include"Threads/FileOutputThread.h"
 #include"Threads/ThreadWrapper.h"
 
+#include<fstream>
+
 //pre declare event interface so we can use pointers to it as a type
 class EventInterface;
 
@@ -180,7 +182,7 @@ int main(int argc, char* argv[])
     Utility::MpodMapper* mpodMapper = new Utility::MpodMapper();
     mpodMapper->loadFromData(&mpodChannelData);
     
-    
+    // For Controlling the digitizer
     int numDigitizers = digitizerModuleData.linkType.size();
     Digitizer::Vx1730Digitizer** digitizerList = new Digitizer::Vx1730Digitizer*[numDigitizers];
     for(int i=0; i<numDigitizers; ++i)
@@ -188,8 +190,21 @@ int main(int argc, char* argv[])
         digitizerList[i] = new Digitizer::Vx1730Digitizer(i, &digitizerModuleData, &digitizerChannelData);
         digitizerList[i]->setupDigitizer();
     }
-
-    // For Controlling the digitizer
+    //for debugging, start acqusition of the first digitizer and wait for a single interrupt, read the data and dump to a simple file
+    std::fstream outData;
+    outData.open("./tempdata.dat", std::ios_base::binary);
+    int bufferSize = digitizerList[0]->getSizeOfReadBufferIn32BitInts();
+    unsigned int* tempBuffer = new unsigned int[bufferSize];
+    digitizerList[0]->startAcquisition();
+    unsigned int dataRead = digitizerList[0]->waitForInterruptToReadData(tempBuffer);
+    digitizerList[0]->stopAcquisition();
+    outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
+    dataRead = digitizerList[0]->performFinalReadout(tempBuffer);
+    if(dataRead != 0)
+    {
+        outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
+    }
+    outData.close();
     
     /*
      * Build the InterThread Buffer/Data queues
