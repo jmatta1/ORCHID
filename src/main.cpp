@@ -197,15 +197,21 @@ int main(int argc, char* argv[])
     unsigned int* tempBuffer = new unsigned int[bufferSize];
     digitizerList[0]->startAcquisition();
     unsigned int dataRead = digitizerList[0]->waitForInterruptToReadData(tempBuffer);
+    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Interrupt" << std::flush;
     digitizerList[0]->stopAcquisition();
-    outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
+    if(dataRead != 0)
+    {
+        outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
+    }
     dataRead = digitizerList[0]->performFinalReadout(tempBuffer);
+    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Final Readout" << std::flush;
     if(dataRead != 0)
     {
         outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
     }
     outData.close();
-    
+
+#if 0    
     /*
      * Build the InterThread Buffer/Data queues
      */
@@ -235,7 +241,7 @@ int main(int argc, char* argv[])
         toFileQueues->consumerPush<Utility::SlowControlsQueueIndex>(new Events::SlowControlsEvent(numVoltageChannels, numTemperatureChannels));
     }
     
-    
+
     /*
      * Build the callable objects for boost::thread
      */
@@ -277,7 +283,6 @@ int main(int argc, char* argv[])
     //  evProcThreadCallable[i] = new EventProcessingThread(i, ...);
     //}
     
-#if 0
     /*
      * Handle the threads
      */
@@ -300,7 +305,7 @@ int main(int argc, char* argv[])
     //Wait to join the IO thread
     uiThread.join();
     boost::log::core::get()->add_sink(coutSink);
-#endif
+
     //the IO thread has joined proceed with shutdown
     BOOST_LOG_SEV(lg, Trace)  << "UI thread has rejoined main the thread. Resuming console logging." << std::flush;
     BOOST_LOG_SEV(lg, Trace)  << "Other threads should have terminated.\n" << std::flush;
@@ -330,7 +335,7 @@ int main(int argc, char* argv[])
         toFileQueues->producerPop<Utility::SlowControlsQueueIndex>(temp);
     }
     delete toFileQueues;
-
+#endif
     //delete the device control structures
     BOOST_LOG_SEV(lg, Debug)  << "Deleting device controls" << std::flush;
     delete mpodMapper;
