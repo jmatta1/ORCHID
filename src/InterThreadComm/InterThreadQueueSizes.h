@@ -30,10 +30,13 @@ namespace InterThread
 
 enum class QueueSizes : int 
 {
-    SlowControlToFile       = 50,
-    DigitizerToProcessing   = 5000,
+    SlowControlToFile       = 50, //if we fall 60 polling periods behind we are in real trouble
+    DigitizerToProcessing   = 80,
     ProcessingToFile        = 20000
 };
+//Digitizer to processing can be *REALLY* big, for 0 trace samples
+//  (6 bytes per event) and the values governing events per channel aggregate
+//  and board aggregates per blt maxed, it comes to a little under 12MB per buffer
 
 //here is a quick template meta program to cast the strongly typed enums to ints
 //for purposes of accessing the actual values
