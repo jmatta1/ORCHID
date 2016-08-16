@@ -30,7 +30,7 @@ namespace InterThread
 
 enum class QueueSizes : int 
 {
-    SlowControlToFile       = 50, //if we fall 60 polling periods behind we are in real trouble
+    SlowControlToFile       = 50, //if we fall 50 polling periods behind we are in real trouble
     DigitizerToProcessing   = 80,
     ProcessingToFile        = 20000
 };
