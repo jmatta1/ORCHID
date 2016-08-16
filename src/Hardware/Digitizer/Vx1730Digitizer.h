@@ -53,15 +53,19 @@ public:
     //the given buffer
     void waitForInterruptToReadData(char* buffer);
     
+    //is used after a forcible data flush at the end of acquisition
+    void performFinalReadout(char* buffer);
+    
     //give the max possible size of a buffer in bytes so that they can be pre-
     //allocated for the queueing system
-    int getSizeOfReadBufferInBytes();
+    int getSizeOfReadBufferInBytes(){return maxSizeOfBoardAggregateBlock;}
 private:
     void writeErrorAndThrow(CAENComm_ErrorCode errVal);
     
     void writeCommonRegisterData();
     void writeGroupRegisterData();
     void writeIndividualRegisterData();
+    void calculateMaximumSizes();
     
     //functions to calculate register values for common registers
     unsigned int calculateBoardConfigRegVal();
@@ -91,9 +95,10 @@ private:
     CAENComm_ErrorCode* cycleErrsArray;
     int arraySize;
     //variables to hold sizes of parts of the readout
-    int sizePerEvent[16];
-    int sizePerChanAggregate[16];
+    int sizePerEvent[8];
+    int sizePerChanPairAggregate[8];
     int maxSizeOfBoardAggregate;
+    int maxSizeOfBoardAggregateBlock;
     //variables to hold persistent values for use later
     unsigned int acquisitionCtrlRegBase;
     

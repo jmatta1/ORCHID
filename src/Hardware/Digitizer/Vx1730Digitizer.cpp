@@ -153,21 +153,33 @@ void Vx1730Digitizer::setupDigitizer()
     this->writeCommonRegisterData();
     this->writeGroupRegisterData();
     this->writeIndividualRegisterData();
+    this->calculateMaximumSizes();
 }
 
 //puts the digitizer in running mode
 void Vx1730Digitizer::startAcquisition()
 {
-    BOOST_LOG_SEV(lg, Information) << "Starting Acqusition On Digitizer #" << moduleNumber << "\n";
-    
+    using LowLvl::Vx1730WriteRegisters;
+    using LowLvl::Vx1730CommonWriteRegistersAddr;
+    BOOST_LOG_SEV(lg, Information) << "Starting/Arming Acqusition On Digitizer #" << moduleNumber << "\n";
+    //now hit the software clear to blank the data
+    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
+    //now take the acquisition control register base, add bit 2 and write it
+    unsigned int acqusitionRegister = (acquisitionCtrlRegBase | 0x4UL);
+    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acqusitionRegister);
+    BOOST_LOG_SEV(lg, Information) << "Digitizer #" << moduleNumber << "Acquisition Started/Armed\n";
     acqRunning = true;
 }
 
 //takes the digitizer out of running mode
 void Vx1730Digitizer::stopAcquisition()
 {
-    BOOST_LOG_SEV(lg, Information) << "Stopping Acqusition On Digitizer #" << moduleNumber << "\n";
-    //TODO: Clear the board of any data remaining on it after stopping acquisition
+    using LowLvl::Vx1730WriteRegisters;
+    using LowLvl::Vx1730CommonWriteRegistersAddr;
+    BOOST_LOG_SEV(lg, Information) << "Stopping/Disarming Acqusition On Digitizer #" << moduleNumber << "\n";
+    //now take the acquisition control register base and write it, it should already have bit[2] == 0
+    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acquisitionCtrlRegBase);
+    BOOST_LOG_SEV(lg, Information) << "Digitizer #" << moduleNumber << "Acquisition Stopped/Disarmed\n";
     acqRunning = false;
 }
 
@@ -177,14 +189,56 @@ void Vx1730Digitizer::stopAcquisition()
 //the given buffer
 void Vx1730Digitizer::waitForInterruptToReadData(char* buffer)
 {
+    //presume acqusition has been started, now wait on an interrupt
+    
+}
+
+//is used after a forcible data flush at the end of acquisition
+void Vx1730Digitizer::performFinalReadout(char* buffer)
+{
     
 }
 
 //give the max possible size of a buffer in bytes so that they can be pre-
 //allocated for the queueing system
-int Vx1730Digitizer::getSizeOfReadBufferInBytes()
+void Vx1730Digitizer::calculateMaximumSizes()
 {
-    
+    //first calculate the size of a single event, this is calculated by channel pair
+    int stopInd = this->channelStartInd + this->numChannel;
+    for(int i=channelStartInd; i<stopInd; i+=2)
+    {
+        int chanPairInd = ((i-channelStartInd)/2);
+        //each event has record length * 8 samples
+        //each sample takes two bytes
+        sizePerEvent[chanPairInd] = (this->channelData->recordLength[i] * 8 * 2);
+        //each event has a time trigger tag with two bytes and the two integrals
+        //which also take 2 bytes (including the pile up rejection flag in the
+        //16th bit of Qshort)
+        sizePerEvent[chanPairInd] += 4;
+        //determine if the extras word is being written, if it is, add 2 bytes
+        if(this->moduleData->recExtrasWord[i])
+        {
+            sizePerEvent[chanPairInd] += 2;
+        }
+    }
+    //now calculate the max size of a channel pair data aggregate
+    for(int i=channelStartInd; i<stopInd; i+=2)
+    {
+        int chanPairInd = ((i-channelStartInd)/2);
+        //each channel pair aggregate has a 4 byte header
+        sizePerChanPairAggregate[chanPairInd] = 4;
+        //each channel pair aggregate has up to Number of Events per Aggregate
+        sizePerChanPairAggregate[chanPairInd] += (sizePerEvent[chanPairInd] * this->channelData->aggregateEvents[i]);
+    }
+    //each board aggregate has 4 lwords in the header
+    maxSizeOfBoardAggregate = 4*4;
+    //each board aggregate has 0 - 1 channel pair aggregates in it
+    for(int i=channelStartInd; i<stopInd; i+=2)
+    {
+        int chanPairInd = ((i-channelStartInd)/2);
+        maxSizeOfBoardAggregate += sizePerChanPairAggregate[chanPairInd];
+    }
+    maxSizeOfBoardAggregateBlock = (maxSizeOfBoardAggregate * this->moduleData->aggregatesPerBlockTransfer[moduleNumber]);
 }
 
 //log an error and throw an exception to close things
