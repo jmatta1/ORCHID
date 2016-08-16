@@ -32,7 +32,7 @@ namespace Digitizer
 //TODO: Make names associated with the bits we set in registers
 //TODO: Maybe remove some of the error handling from CAENComm calls, it might be overkill
 
-enum {MultiRWArraySize = 320, IrqTimeoutMs = 100};
+enum {MultiRWArraySize = 320, IrqTimeoutMs = 5000};
 
 Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* modData,
                                  InputParser::DigitizerChannelData* chanData) :
