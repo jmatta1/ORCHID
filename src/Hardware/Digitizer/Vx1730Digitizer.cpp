@@ -362,11 +362,11 @@ void Vx1730Digitizer::writeCommonRegisterData()
     }
     
     //give the readback results
-    BOOST_LOG_SEV(lg, Information) << "Results of readback of common registers";
-    BOOST_LOG_SEV(lg, Information) << "    Addr   |  Written |   Read   ";
+    BOOST_LOG_SEV(lg, Information) << "Common Register Readback for Digitizer #" << moduleNumber;
+    BOOST_LOG_SEV(lg, Information) << "  Addr |  Written |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
+        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
     }
 }
 
@@ -446,11 +446,11 @@ void Vx1730Digitizer::writeGroupRegisterData()
     }
     
     //give the readback results
-    BOOST_LOG_SEV(lg, Information) << "Results of readback of group registers";
-    BOOST_LOG_SEV(lg, Information) << "    Addr   |  Written |   Read   ";
+    BOOST_LOG_SEV(lg, Information) << "Group Register Readback for Digitizer #" << moduleNumber;
+    BOOST_LOG_SEV(lg, Information) << "  Addr |  Written |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
+        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
     }
 }
 
@@ -567,7 +567,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     }
     
     //give the readback results
-    BOOST_LOG_SEV(lg, Information) << "Results of readback of group registers";
+    BOOST_LOG_SEV(lg, Information) << "Individual Register Readback for Digitizer #" << moduleNumber;
     BOOST_LOG_SEV(lg, Information) << "    Addr   |  Written |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
