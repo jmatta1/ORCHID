@@ -10,7 +10,7 @@
 #, 10) Record Extras Word    = T/F,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 11) Dig Virt Probe 1      = 0,1,2,3,4,5,7 (see 725-7230 DPP-PSD Registers manual for details about selections),,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 12) Dig Virt Probe 2      = 0,1,2,3,4,5,7 (see 725-7230 DPP-PSD Registers manual for details about selections),,,,,,,,,,,,,,,,,,,,,,,,,,,
-#, 13) Num of chan buff/agg  = log2(# of channel buffers per aggregate) valid choices are 2,3,4,5,6,7,8,9,10 (for 4, 8, 16, 32, ...  buffers),,,,,,,,,,,,,,,,,,,,,,,,,,,
+#, 13) Num of chan buff/agg  = log2(# of channel/pair aggregates per memory) valid choices are 2,3,4,5,6,7,8,9,10 (for 4, 8, 16, 32, ...  buffers) see dpp psd for more info,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 14) Acq Trig Counting     = 0->Only count accepted triggers, 1-> count all triggers,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 15) Mem Full Mode         = 0->Wait till all buffs are full, 1->wait till all but 1 buff are full,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 16) PLL Ref Clock         = 0->Internal Oscillator, 1-> external clock from front panel,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -22,10 +22,10 @@
 #, 22) Trig Out Gen Logic    = 0->OR, 1->AND, 2->Majority Trigger,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 23) Majority Level        = trg-out fires when at least m+1 of the enabled trigger requests are set,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 24) Ext Trig in TrigOut   = External trigger participates in logical OR with trig out generation,,,,,,,,,,,,,,,,,,,,,,,,,,,
-#, 25) Mem Buffer Almst Full = Level of mem buffer usage required to trigger an interrupt request, 0= completely full refer to V1730 user manual for more info,,,,,,,,,,,,,,,,,,,,,,,,,,,
+#, 25) Mem Buffer Almst Full = Level of mem buffer usage required to trigger mem almost full output, 0= completely full refer to V1730 user manual for more info,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 26) Run Strt/Stop Delay   = Time in trigger clock cycles to delay starting and stopping of run from recieving signal,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 27) Use Ext Trigger       = T/F (enable or disable usage of external trigger),,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 28) Interrupt Event Count = Number of Events to trigger an interrupt request,,,,,,,,,,,,,,,,,,,,,,,,,,,
-#, 29) # Aggre per BLT       = max number of complete aggregates to transfer for each block transfer, big number for high rate small number for low rate [1,255]
-#    1,2,3,         4,5,6,7,8,9,10,11,12,13,14,15,16,  17,18,19,20,  21,22,23,24,25,26,27, 28, 29
-Direct,0,0,0x00000000,F,F,F,0,0, T, 0, 0, 6, 0, 0, 0,0x00, 0, 0, F,0x00, 0, 0, 0, 0, 0, F,511,255
+#, 29) # Aggre per BLT       = max number of complete aggregates to transfer for each block transfer, big number for high rate small number for low rate [1,255] (however, there is no point making it much larger than the number of aggregates per channel)
+#    1,2,3,         4,5,6,7,8,9,10,11,12,13,14,15,16,  17,18,19,20,  21,22,23,24,25,26,27, 28,29
+Direct,0,0,0x00000000,F,F,F,0,0, T, 0, 0, 5, 0, 0, 0,0x00, 0, 0, F,0x00, 0, 0, 0, 0, 0, F,1023,48
