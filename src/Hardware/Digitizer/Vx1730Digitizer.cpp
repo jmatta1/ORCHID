@@ -281,7 +281,7 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
             this->writeErrorAndThrow(readError);
         }
     }
-    return true;
+    return dataRead;
 }
 
 //is used after a forcible data flush at the end of acquisition
