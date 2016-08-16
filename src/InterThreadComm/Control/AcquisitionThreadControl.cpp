@@ -16,7 +16,7 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#include"DigitizerThreadControl.h"
+#include"AcquisitionThreadControl.h"
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -24,5 +24,22 @@
 
 namespace InterThread
 {
+
+void AcquisitionThreadControl::waitForStart()
+{
+    //creation of the mutexes happen rarely, so we can suck it up
+    //since we can have multiple threads waiting here simultaneously, if they all
+    //used the same mutex they would serlialize getting out of the function,
+    //so instead we create the threads on the fly
+    boost::mutex waitMutex;
+    boost::unique_lock waitLock(waitMutex);
+    while(this->acqState.load() == AcquisitionThreadState::Stopped)
+    {
+        ++waitCount;
+        acqThreadWaitCondition.wait(waitLock);
+        --waitCount;
+    }
+    //the lock will release on deconstruction
+}
 
 }
