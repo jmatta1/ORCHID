@@ -322,7 +322,7 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
     return dataRead;
 }
 
-//calculate the max possible size of a buffer in bytes so that they can be pre-
+//calculate the max possible size of a buffer in lwords so that they can be pre-
 //allocated for the queueing system
 void Vx1730Digitizer::calculateMaximumSizes()
 {
@@ -332,29 +332,29 @@ void Vx1730Digitizer::calculateMaximumSizes()
     {
         int chanPairInd = ((i-channelStartInd)/2);
         //each event has record length * 8 samples
-        //each sample takes two bytes
-        sizePerEvent[chanPairInd] = (this->channelData->recordLength[i] * 8 * 2);
-        //each event has a time trigger tag with two bytes and the two integrals
-        //which also take 2 bytes (including the pile up rejection flag in the
+        //2 samples take 1 lword so 8/2 = 4
+        sizePerEvent[chanPairInd] = (this->channelData->recordLength[i] * 4);
+        //each event has a time trigger tag with 1 lword and the two integrals
+        //which also take 1 lword (including the pile up rejection flag in the
         //16th bit of Qshort)
-        sizePerEvent[chanPairInd] += 4;
+        sizePerEvent[chanPairInd] += 2;
         //determine if the extras word is being written, if it is, add 2 bytes
         if(this->moduleData->recExtrasWord[i])
         {
-            sizePerEvent[chanPairInd] += 2;
+            sizePerEvent[chanPairInd] += 1;
         }
     }
     //now calculate the max size of a channel pair data aggregate
     for(int i=channelStartInd; i<stopInd; i+=2)
     {
         int chanPairInd = ((i-channelStartInd)/2);
-        //each channel pair aggregate has a 4 byte header
-        sizePerChanPairAggregate[chanPairInd] = 4;
+        //each channel pair aggregate has a 2 lword header
+        sizePerChanPairAggregate[chanPairInd] = 2;
         //each channel pair aggregate has up to Number of Events per Aggregate
         sizePerChanPairAggregate[chanPairInd] += (sizePerEvent[chanPairInd] * this->channelData->aggregateEvents[i]);
     }
     //each board aggregate has 4 lwords in the header
-    maxSizeOfBoardAggregate = 4*4;
+    maxSizeOfBoardAggregate = 4;
     //each board aggregate has 0 - 1 channel pair aggregates in it
     for(int i=channelStartInd; i<stopInd; i+=2)
     {

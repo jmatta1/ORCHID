@@ -58,7 +58,7 @@ public:
     
     //give the max possible size of a buffer in bytes so that they can be pre-
     //allocated for the queueing system
-    int getSizeOfReadBufferInBytes(){return maxSizeOfBoardAggregateBlock;}
+    int getSizeOfReadBufferIn32BitInts(){return maxSizeOfBoardAggregateBlock;}
 private:
     void writeErrorAndThrow(CAENComm_ErrorCode errVal);
     
@@ -94,7 +94,7 @@ private:
     unsigned int* rdbkArray;
     CAENComm_ErrorCode* cycleErrsArray;
     int arraySize;
-    //variables to hold sizes of parts of the readout
+    //variables to hold sizes of parts of the readout (in 32 bit ints
     int sizePerEvent[8];
     int sizePerChanPairAggregate[8];
     int maxSizeOfBoardAggregate;
