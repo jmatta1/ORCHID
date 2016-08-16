@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
         digitizerList[i]->setupDigitizer();
     }
     //for debugging, start acqusition of the first digitizer and wait for a single interrupt, read the data and dump to a simple file
-    std::fstream outData;
+    std::ofstream outData;
     outData.open("./tempdata.dat", std::ios_base::binary);
     int bufferSize = digitizerList[0]->getSizeOfReadBufferIn32BitInts();
     unsigned int* tempBuffer = new unsigned int[bufferSize];

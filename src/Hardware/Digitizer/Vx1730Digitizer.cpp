@@ -98,7 +98,7 @@ void Vx1730Digitizer::setupDigitizer()
     //check to make sure we have 8 or 16 channels
     if ((numChannel != 8) && (numChannel != 16))
     {
-        BOOST_LOG_SEV(lg, Information) << "Error Digitizer #" << moduleNumber << " does not have 8 or 16 channels\n";
+        BOOST_LOG_SEV(lg, Information) << "Error Digitizer #" << moduleNumber << " does not have 8 or 16 channels";
         throw std::runtime_error("Vx1730 Error - Wrong Channel Count");
     }
     
@@ -107,7 +107,7 @@ void Vx1730Digitizer::setupDigitizer()
     InputParser::LinkType lType = moduleData->linkType[moduleNumber];
     if(lType == InputParser::LinkType::Optical)
     {
-        BOOST_LOG_SEV(lg, Information) << "Opening VME Card Via Optical Link, Digitizer #" << moduleNumber << "\n";
+        BOOST_LOG_SEV(lg, Information) << "Opening VME Card Via Optical Link, Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
@@ -116,7 +116,7 @@ void Vx1730Digitizer::setupDigitizer()
     }
     else if(lType == InputParser::LinkType::USB)
     {
-        BOOST_LOG_SEV(lg, Information) << "Opening VME Card Via USB: Digitizer #" << moduleNumber << "\n";
+        BOOST_LOG_SEV(lg, Information) << "Opening VME Card Via USB: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_USB,
                                      moduleData->linkNumber[moduleNumber],
                                      0, moduleData->vmeBaseAddr[moduleNumber],
@@ -124,7 +124,7 @@ void Vx1730Digitizer::setupDigitizer()
     }
     else
     {
-        BOOST_LOG_SEV(lg, Information) << "Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber << "\n";
+        BOOST_LOG_SEV(lg, Information) << "Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
@@ -136,7 +136,7 @@ void Vx1730Digitizer::setupDigitizer()
     }
     else
     {
-        BOOST_LOG_SEV(lg, Information) << "Successfully Opened Digitizer #" << moduleNumber << "\n";
+        BOOST_LOG_SEV(lg, Information) << "Successfully Opened Digitizer #" << moduleNumber;
         digitizerOpen = true;
     }
     
@@ -177,7 +177,7 @@ void Vx1730Digitizer::startAcquisition()
 {
     using LowLvl::Vx1730WriteRegisters;
     using LowLvl::Vx1730CommonWriteRegistersAddr;
-    BOOST_LOG_SEV(lg, Information) << "Starting/Arming Acqusition On Digitizer #" << moduleNumber << "\n";
+    BOOST_LOG_SEV(lg, Information) << "Starting/Arming Acqusition On Digitizer #" << moduleNumber ;
     CAENComm_ErrorCode errVal;
     //now hit the software clear to blank the data
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
@@ -201,7 +201,7 @@ void Vx1730Digitizer::startAcquisition()
         BOOST_LOG_SEV(lg, Error) << "Error Enabling Interrupts For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
-    BOOST_LOG_SEV(lg, Information) << "Digitizer #" << moduleNumber << "Acquisition Started/Armed\n";
+    BOOST_LOG_SEV(lg, Information) << "Digitizer #" << moduleNumber << "Acquisition Started/Armed";
     acqRunning = true;
 }
 
@@ -210,10 +210,10 @@ void Vx1730Digitizer::stopAcquisition()
 {
     using LowLvl::Vx1730WriteRegisters;
     using LowLvl::Vx1730CommonWriteRegistersAddr;
-    BOOST_LOG_SEV(lg, Information) << "Stopping/Disarming Acqusition On Digitizer #" << moduleNumber << "\n";
+    BOOST_LOG_SEV(lg, Information) << "Stopping/Disarming Acqusition On Digitizer #" << moduleNumber;
     //now take the acquisition control register base and write it, it should already have bit[2] == 0
     CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acquisitionCtrlRegBase);
-    BOOST_LOG_SEV(lg, Information) << "Digitizer #" << moduleNumber << "Acquisition Stopped/Disarmed\n";
+    BOOST_LOG_SEV(lg, Information) << "Digitizer #" << moduleNumber << "Acquisition Stopped/Disarmed";
     acqRunning = false;
 }
 
