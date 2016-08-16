@@ -57,7 +57,7 @@ enum class Vx1730ReadRegisters : unsigned short
     ConfigRomManuId2,   ConfigRomManuId1,   ConfigRomManuId0,   ConfigRomBrdVer,
     ConfigRomBrdFf,     ConfigRomBrdNum1,   ConfigRomBrdNum0,   ConfigRomRevis3,
     ConfigRomRevis2,    ConfigRomRevis1,    ConfigRomPcbRev,    ConfigRomFlshTp,
-    ConfigRomBrdSn1,    ConfigRomBrdSn0,    ConfigRomVxcoTp};
+    ConfigRomBrdSn1,    ConfigRomBrdSn0,    ConfigRomVxcoTp,    EventReadout};
 
 template<Vx1730ReadRegisters> struct Vx1730CoupleReadRegistersAddr;
 //the offsets are almost always 0x0200 for the group write registers
@@ -128,6 +128,7 @@ template<> struct Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ConfigRomFl
 template<> struct Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ConfigRomBrdSn1>       : std::integral_constant<ushort, 0xF080> {};
 template<> struct Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ConfigRomBrdSn0>       : std::integral_constant<ushort, 0xF084> {};
 template<> struct Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ConfigRomVxcoTp>       : std::integral_constant<ushort, 0xF088> {};
+template<> struct Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>          : std::integral_constant<ushort, 0x0000> {};
 
 
 template<Vx1730ReadRegisters> struct Vx1730IndivReadRegistersAddr;
