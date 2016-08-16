@@ -30,8 +30,9 @@
 namespace Digitizer
 {
 //TODO: Make names associated with the bits we set in registers
+//TODO: Maybe remove some of the error handling from CAENComm calls, it might be overkill
 
-enum {MultiRWArraySize = 320};
+enum {MultiRWArraySize = 320, IrqTimeoutMs = 100};
 
 Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* modData,
                                  InputParser::DigitizerChannelData* chanData) :
@@ -140,11 +141,26 @@ void Vx1730Digitizer::setupDigitizer()
     }
     
     //now that we have the digitizer opened, hit the software reset.
-    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwReset>::value, 0x00000001);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwReset>::value, 0x00000001);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Resetting Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
     //now hit the software clear to blank the data
-    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Clearing Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
     //now hit the calibration and wait
-    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelCal>::value, 0x00000001);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelCal>::value, 0x00000001);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Triggering Calibration For Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
     BOOST_LOG_SEV(lg, Information) << "Pausing for digitizer " << moduleNumber << " self calibration stabilization.";
     boost::this_thread::sleep_for(boost::chrono::seconds(5));
     
@@ -162,11 +178,29 @@ void Vx1730Digitizer::startAcquisition()
     using LowLvl::Vx1730WriteRegisters;
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     BOOST_LOG_SEV(lg, Information) << "Starting/Arming Acqusition On Digitizer #" << moduleNumber << "\n";
+    CAENComm_ErrorCode errVal;
     //now hit the software clear to blank the data
-    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error In Clearing Digitizer For Acquisition Start in Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
     //now take the acquisition control register base, add bit 2 and write it
     unsigned int acqusitionRegister = (acquisitionCtrlRegBase | 0x4UL);
-    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acqusitionRegister);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acqusitionRegister);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Starting Acqusition In Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
+    //now enable interrupt requests in CAENComm
+    errVal = CAENComm_IRQEnable(digitizerHandle);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Enabling Interrupts For Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
     BOOST_LOG_SEV(lg, Information) << "Digitizer #" << moduleNumber << "Acquisition Started/Armed\n";
     acqRunning = true;
 }
@@ -186,20 +220,109 @@ void Vx1730Digitizer::stopAcquisition()
 //waits for the digitizer to raise and interrupt about data full.
 //once an interrupt is raised, it reads the event size value to find out
 //how much it needs to read, then it iteratively reads data that data into
-//the given buffer
-void Vx1730Digitizer::waitForInterruptToReadData(char* buffer)
+//the given buffer, returns bytes read, which is 0 if we timed out instead of getting a buffer
+unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
 {
+    using LowLvl::Vx1730ReadRegisters;
+    using LowLvl::Vx1730CommonReadRegistersAddr;
     //presume acqusition has been started, now wait on an interrupt
+    CAENComm_ErrorCode readError;
+    readError = CAENComm_IRQWait(digitizerHandle, IrqTimeoutMs);
+    if(readError == CAENComm_CommTimeout)
+    {//timing out is not an error
+        return 0;
+    }
+    else if(readError < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Non Timeout Error Waiting for Interrupt Request For Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(readError);
+    }
+    unsigned int eventSize = 0;
+    //first read the size of the data to be read
+    readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
+    if(readError < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(readError);
+    }
     
+    //now read the bottom 4kb until everything is read
+    int sizeRead;
+    unsigned int* bufferEdge = buffer;
+    int dataRead = 0;
+    while(eventSize > 0)
+    {
+        unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
+        readError = CAENComm_MBLTRead(digitizerHandle,
+                                      Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                      bufferEdge, readSize, &sizeRead);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+            BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+            this->writeErrorAndThrow(readError);
+        }
+        eventSize -= sizeRead;
+        dataRead += sizeRead;
+        bufferEdge += sizeRead;
+    }
+    return true;
 }
 
 //is used after a forcible data flush at the end of acquisition
-void Vx1730Digitizer::performFinalReadout(char* buffer)
+//returns bytes read
+unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
 {
+    using LowLvl::Vx1730ReadRegisters;
+    using LowLvl::Vx1730CommonReadRegistersAddr;
+    using LowLvl::Vx1730WriteRegisters;
+    using LowLvl::Vx1730IbcastWriteRegistersAddr;
+    //hit the software trigger for a data flush
+    CAENComm_ErrorCode readError;
+    readError = CAENComm_Write32(digitizerHandle, Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>::value, 0x00000001);
+    if(readError < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Resetting Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(readError);
+    }
+    unsigned int eventSize = 0;
+    //first read the size of the data to be read
+    readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
+    if(readError < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(readError);
+    }
     
+    if(eventSize == 0)
+    {
+        return 0;
+    }
+    
+    //now read the bottom 4kb until everything is read
+    int sizeRead;
+    unsigned int* bufferEdge = buffer;
+    int dataRead = 0;
+    while(eventSize > 0)
+    {
+        unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
+        readError = CAENComm_MBLTRead(digitizerHandle,
+                                      Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                      bufferEdge, readSize, &sizeRead);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+            BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+            this->writeErrorAndThrow(readError);
+        }
+        eventSize -= sizeRead;
+        dataRead += sizeRead;
+        bufferEdge += sizeRead;
+    }
+    return dataRead;
 }
 
-//give the max possible size of a buffer in bytes so that they can be pre-
+//calculate the max possible size of a buffer in bytes so that they can be pre-
 //allocated for the queueing system
 void Vx1730Digitizer::calculateMaximumSizes()
 {

@@ -51,10 +51,10 @@ public:
     //once an interrupt is raised, it reads the event size value to find out
     //how much it needs to read, then it iteratively reads data that data into
     //the given buffer
-    void waitForInterruptToReadData(char* buffer);
+    unsigned int waitForInterruptToReadData(unsigned int* buffer);
     
     //is used after a forcible data flush at the end of acquisition
-    void performFinalReadout(char* buffer);
+    unsigned int performFinalReadout(unsigned int* buffer);
     
     //give the max possible size of a buffer in bytes so that they can be pre-
     //allocated for the queueing system
