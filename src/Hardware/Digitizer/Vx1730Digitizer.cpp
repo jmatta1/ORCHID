@@ -250,16 +250,17 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     int sizeRead;
     unsigned int* bufferEdge = buffer;
     int dataRead = 0;
+    BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << "Event Size " << eventSize;
     while(eventSize > 0)
     {
         unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
         readError = CAENComm_MBLTRead(digitizerHandle,
                                       Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
                                       bufferEdge, readSize, &sizeRead);
+        BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
         if(readError < 0)
         {
             BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
-            BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
             this->writeErrorAndThrow(readError);
         }
         eventSize -= sizeRead;
@@ -303,16 +304,17 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
     int sizeRead;
     unsigned int* bufferEdge = buffer;
     int dataRead = 0;
+    BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << "Event Size " << eventSize;
     while(eventSize > 0)
     {
         unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
         readError = CAENComm_MBLTRead(digitizerHandle,
                                       Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
                                       bufferEdge, readSize, &sizeRead);
+        BOOST_LOG_SEV(lg, Error) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
         if(readError < 0)
         {
             BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
-            BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
             this->writeErrorAndThrow(readError);
         }
         eventSize -= sizeRead;
@@ -543,7 +545,7 @@ void Vx1730Digitizer::writeCommonRegisterData()
     BOOST_LOG_SEV(lg, Information) << "  Addr |  Written |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
+        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
     }
 }
 
@@ -627,7 +629,7 @@ void Vx1730Digitizer::writeGroupRegisterData()
     BOOST_LOG_SEV(lg, Information) << "  Addr |  Written |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
+        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
     }
 }
 
@@ -748,7 +750,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     BOOST_LOG_SEV(lg, Information) << "    Addr   |  Written |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i];
+        BOOST_LOG_SEV(lg, Information) << "0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
     }
 }
 
