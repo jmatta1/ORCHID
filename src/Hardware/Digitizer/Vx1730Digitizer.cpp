@@ -250,7 +250,7 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     int sizeRead=0;
     unsigned int* bufferEdge = buffer;
     unsigned int dataRead = 0;
-    BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << "Event Size " << eventSize;
+    BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
     BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
     while(eventSize > 0)
     {
