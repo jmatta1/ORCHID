@@ -195,17 +195,18 @@ int main(int argc, char* argv[])
     std::ofstream outData;
     outData.open("./tempdata.dat", std::ios_base::binary);
     int bufferSize = digitizerList[0]->getSizeOfReadBufferIn32BitInts();
+    BOOST_LOG_SEV(lg, Debug)  << "Buffer Size is: " << bufferSize;
     unsigned int* tempBuffer = new unsigned int[bufferSize];
     digitizerList[0]->startAcquisition();
     unsigned int dataRead = digitizerList[0]->waitForInterruptToReadData(tempBuffer);
-    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Interrupt" << std::flush;
+    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Interrupt";
     digitizerList[0]->stopAcquisition();
     if(dataRead != 0)
     {
         outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
     }
     dataRead = digitizerList[0]->performFinalReadout(tempBuffer);
-    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Final Readout" << std::flush;
+    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Final Readout";
     if(dataRead != 0)
     {
         outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);

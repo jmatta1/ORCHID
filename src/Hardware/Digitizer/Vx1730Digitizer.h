@@ -47,6 +47,10 @@ public:
     //takes the digitizer out of running mode
     void stopAcquisition();
     
+    //checks if there is an event ready, if yes it grabs the event, if false
+    //it waits on an interrupt from the digitizer
+    unsigned int getData(unsigned int* buffer);
+    
     //waits for the digitizer to raise and interrupt about data full.
     //once an interrupt is raised, it reads the event size value to find out
     //how much it needs to read, then it iteratively reads data that data into
