@@ -35,9 +35,6 @@
 namespace SlowControls
 {
 
-//#define SPOOF
-
-//TODO: Remove spoofing of MPOD connection from this class
 class SnmpUtilControl
 {
 public:
@@ -85,17 +82,6 @@ template<class Number>
 std::string SnmpUtilControl::snmpGlobalSet(MpodGlobalSetParam command,
                                            Number value)
 {
-#ifdef SPOOF
-    //TODO: Remove this spoof here
-    std::ostringstream outBuilder;
-    switch(command)
-    {
-    case MpodGlobalSetParam::SysMainSwitch:
-        outBuilder << "INTEGER: " << value;
-        return outBuilder.str();
-        break;
-    }
-#endif
     if(CmdLookup::GLOBAL_SET_TYPES.at(command) == 'i')
     {
         return this->runCommand(this->buildCommand("snmpset",
@@ -119,41 +105,6 @@ std::string SnmpUtilControl::snmpChannelSet(MpodChannelSetParam command,
                                             int board, int channel,
                                             Number value)
 {
-#ifdef SPOOF
-    //TODO: Remove this spoof here
-    std::ostringstream outBuilder;
-    switch(command)
-    {
-    case MpodChannelSetParam::OutputSwitch:
-        outBuilder << "INTEGER: " << value;
-        return outBuilder.str();
-        break;
-    case MpodChannelSetParam::SetVoltage:
-        outBuilder << "Opaque: Float: " << value;
-        return outBuilder.str();
-        break;
-    case MpodChannelSetParam::RampUp:
-        outBuilder << "Opaque: Float: " << value;
-        return outBuilder.str();
-        break;
-    case MpodChannelSetParam::RampDown:
-        outBuilder << "Opaque: Float: " << value;
-        return outBuilder.str();
-        break;
-    case MpodChannelSetParam::MaxTerminalVoltage:
-        outBuilder << "Opaque: Float: " << value;
-        return outBuilder.str();
-        break;
-    case MpodChannelSetParam::MaxCurrent:
-        outBuilder << "Opaque: Float: " << value;
-        return outBuilder.str();
-        break;
-    case MpodChannelSetParam::MaxCurrentTripTime:
-        outBuilder << "INTEGER: " << value;
-        return outBuilder.str();
-        break;
-    }
-#endif
     if(CmdLookup::CHANNEL_SET_TYPES.at(command) == 'i')
     {
         return this->runCommand(this->buildCommand("snmpset",
