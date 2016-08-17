@@ -228,7 +228,6 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     //presume acqusition has been started, now wait on an interrupt
     CAENComm_ErrorCode readError;
     readError = CAENComm_IRQWait(digitizerHandle, IrqTimeoutMs);
-    int sizeRead=0;
     if(readError == CAENComm_CommTimeout)
     {//timing out is not an error
         return 0;
@@ -243,6 +242,7 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     unsigned int dataRead = 0;
     while(eventReady)
     {
+        int sizeRead=0;
         BOOST_LOG_SEV(lg, Information) << "Reading Event In Digitizer #" << moduleNumber;
         unsigned int eventSize = 0;
         //first read the size of the data to be read
@@ -321,57 +321,75 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
     readError = CAENComm_Write32(digitizerHandle, Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>::value, 0x00000001);
     if(readError < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Resetting Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(readError);
-    }
-    unsigned int eventSize = 0;
-    //first read the size of the data to be read
-    readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
-    if(readError < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "Error Forcing data flush for digitizer #" << moduleNumber;
         this->writeErrorAndThrow(readError);
     }
     
-    if(eventSize == 0)
-    {
-        return 0;
-    }
-    
-    //now read the bottom 4kb until everything is read
-    int sizeRead=0;
+    bool eventReady = true;
     unsigned int* bufferEdge = buffer;
     unsigned int dataRead = 0;
-    BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << "Event Size " << eventSize;
-    BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
-    while(eventSize > 0)
+    while(eventReady)
     {
-        unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
-        sizeRead = 0;
-        readError = CAENComm_MBLTRead(digitizerHandle,
-                                      Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                      bufferEdge, readSize, &sizeRead);
-        if(readError == CAENComm_Terminated)
+        int sizeRead=0;
+        BOOST_LOG_SEV(lg, Information) << "Reading Event In Digitizer #" << moduleNumber;
+        unsigned int eventSize = 0;
+        //first read the size of the data to be read
+        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
+        if(readError < 0)
         {
-            BOOST_LOG_SEV(lg, Information) << "Got Readout Termination";
-            BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
-            eventSize -= readSize;
-            dataRead += readSize;
-            bufferEdge += readSize;
-        }
-        else if(readError == CAENComm_Success)
-        {
-            BOOST_LOG_SEV(lg, Information) << "Got Readout Success";
-            BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
-            eventSize -= sizeRead;
-            dataRead += sizeRead;
-            bufferEdge += sizeRead;
-        }
-        else
-        {
-            BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
             this->writeErrorAndThrow(readError);
         }
+        
+        //now read the bottom 4kb until everything is read
+        BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
+        BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
+        while(eventSize > 0)
+        {
+            unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
+            sizeRead = 0;
+            if(readSize % 2)//I think the super strange error happens when I make it transfer something other than a multiple of 2 long words
+            {
+                readError = CAENComm_BLTRead(digitizerHandle,
+                                             Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                             bufferEdge, readSize, &sizeRead);
+            }
+            else
+            {
+                readError = CAENComm_MBLTRead(digitizerHandle,
+                                              Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                              bufferEdge, readSize, &sizeRead);
+            }
+            if(readError == CAENComm_Terminated)
+            {
+                BOOST_LOG_SEV(lg, Information) << "Got Readout Termination";
+                BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+                eventSize -= readSize;
+                dataRead += readSize;
+                bufferEdge += readSize;
+            }
+            else if(readError == CAENComm_Success)
+            {
+                BOOST_LOG_SEV(lg, Information) << "Got Readout Success";
+                BOOST_LOG_SEV(lg, Information) << "Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+                eventSize -= sizeRead;
+                dataRead += sizeRead;
+                bufferEdge += sizeRead;
+            }
+            else
+            {
+                BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+                this->writeErrorAndThrow(readError);
+            }
+        }
+        unsigned int readValue = 0;
+        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readError);
+        }
+        eventReady = (readValue & 0x00000001);
     }
     return dataRead;
 }
