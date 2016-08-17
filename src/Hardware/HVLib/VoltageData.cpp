@@ -240,12 +240,20 @@ unsigned int ChannelStatus::giveIntRepresentation()
     return output;
 }
 
-VoltageData::VoltageData(int channels):                terminalVoltage(channels),
+VoltageData::VoltageData(int channels, InputParser::MpodChannelData* channelData):
+    boardNumber(channels),  channelNumber(channels),   terminalVoltage(channels),
     senseVoltage(channels), setVoltage(channels),      temperature(channels),
     current(channels),      outputSwitch(channels),    rampUpRate(channels),
     rampDownRate(channels), currentTripTime(channels), maxTemperature(channels),
     maxCurrent(channels),   maxVoltage(channels),      channelStatus(channels),
-    numChannels(channels) {}
+    numChannels(channels)
+{
+    for(int i=0; i<channels; ++i)
+    {
+        boardNumber[i]   = channelData->board[i];
+        channelNumber[i] = channelData->channel[i];
+    }
+}
 
 void VoltageData::loadOutputSwitches(const std::string& input)
 {

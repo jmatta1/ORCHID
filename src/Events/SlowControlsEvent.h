@@ -47,6 +47,8 @@ private:
     
     //MPOD Information
     //Per Channel information
+    int*    boardNumber;
+    int*    channelNumber;
     float*  terminalVoltage;
     float*  senseVoltage;
     float*  setVoltage;

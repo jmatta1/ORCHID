@@ -26,6 +26,7 @@
 // includes from other libraries
 // includes from ORCHID
 #include "InputLib/Parsers/Utility.h"
+#include "InputLib/Blocks/MpodChannelData.h"
 namespace SlowControls
 {
 namespace CrateMasks 
@@ -106,9 +107,11 @@ public:
 class VoltageData
 {
 public:
-    VoltageData(int channels);
+    VoltageData(int channels, InputParser::MpodChannelData* channelData);
     ~VoltageData(){}
     
+    std::vector<int>           boardNumber;
+    std::vector<int>           channelNumber;
     std::vector<float>         terminalVoltage;
     std::vector<float>         senseVoltage;
     std::vector<float>         setVoltage;

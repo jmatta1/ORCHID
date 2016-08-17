@@ -33,6 +33,8 @@ namespace Events
 SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
     numVoltageChannels(numVolChannels), numTemperatureChannels(numTempChannels)
 {
+    this->boardNumber     = new int[numVolChannels];
+    this->channelNumber   = new int[numVolChannels];
     this->terminalVoltage = new float[numVolChannels];
     this->senseVoltage    = new float[numVolChannels];
     this->setVoltage      = new float[numVolChannels];
@@ -69,15 +71,16 @@ SlowControlsEvent::~SlowControlsEvent()
 int SlowControlsEvent::getSizeOfBinaryRepresentation()
 {
     //size of the event, event ident, num voltage channels, num temp channels
-    int overhead = sizeof(int) + 2*sizeof(int) + sizeof(int);
-    //8 floats + 3 ints + 1 bool per vol channel
-    int sizeOfSingleVoltageChannel = 8*sizeof(float) + 3*sizeof(int) + sizeof(bool);
-    //1 channel data per vol channel, it has 20 bits, so it fits into an int
-    sizeOfSingleVoltageChannel += 8*sizeof(int);
+    int overhead = 4*sizeof(int);
+    //2 ints + 8 floats + 3 ints + 1 bool + 1 unsigned int per vol channel
+    int sizeOfSingleVoltageChannel = 2*sizeof(int) + 8*sizeof(float) +
+                                     3*sizeof(int) + sizeof(bool) +
+                                     sizeof(unsigned int);
     //there are numVoltageChannels worth of this to store, plus the crate status
-    //which also fits into an int
-    int sizeOfVoltage = this->numVoltageChannels*sizeOfSingleVoltageChannel + sizeof(int);
-    //nada at the moment
+    //which fits into an int
+    int sizeOfVoltage = sizeof(unsigned int) +
+                        (this->numVoltageChannels*sizeOfSingleVoltageChannel);
+    //no temperature data at the moment
     int sizeOfSingleTemperatureChannel = 0;
     int sizeOfTemperature = this->numTemperatureChannels*sizeOfSingleTemperatureChannel;
     
@@ -105,6 +108,10 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
     //now write the rest of the power information channel by channel
     for(int i =0; i<numVoltageChannels; ++i)
     {
+        *(reinterpret_cast<int*>(&(buff[index])))   = this->boardNumber[i];
+        index += sizeof(int);
+        *(reinterpret_cast<int*>(&(buff[index])))   = this->channelNumber[i];
+        index += sizeof(int);
         *(reinterpret_cast<float*>(&(buff[index]))) = this->terminalVoltage[i];
         index += sizeof(float);
         *(reinterpret_cast<float*>(&(buff[index]))) = this->senseVoltage[i];
@@ -121,13 +128,13 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
         index += sizeof(float);
         *(reinterpret_cast<float*>(&(buff[index]))) = this->maxVoltage[i];
         index += sizeof(float);
-        *(reinterpret_cast<int*>(&(buff[index]))) = this->currentTripTime[i];
+        *(reinterpret_cast<int*>(&(buff[index])))   = this->currentTripTime[i];
         index += sizeof(int);
-        *(reinterpret_cast<int*>(&(buff[index]))) = this->temperature[i];
+        *(reinterpret_cast<int*>(&(buff[index])))   = this->temperature[i];
         index += sizeof(int);
-        *(reinterpret_cast<int*>(&(buff[index]))) = this->maxTemperature[i];
+        *(reinterpret_cast<int*>(&(buff[index])))   = this->maxTemperature[i];
         index += sizeof(int);
-        *(reinterpret_cast<bool*>(&(buff[index]))) = this->outputSwitch[i];
+        *(reinterpret_cast<bool*>(&(buff[index])))  = this->outputSwitch[i];
         index += sizeof(bool);
         *(reinterpret_cast<unsigned int*>(&(buff[index]))) = this->channelStatus[i].giveIntRepresentation();
         index += sizeof(unsigned int);
@@ -146,19 +153,21 @@ void SlowControlsEvent::ReadVoltageData(const SlowControls::VoltageData& data)
     {
         if(data.outputSwitch[i])
         {
-            this->terminalVoltage[j] = data.terminalVoltage[i];
-            this->senseVoltage[j] = data.senseVoltage[i];
-            this->setVoltage[j] = data.setVoltage[i];
-            this->current[j] = data.current[i];
-            this->rampUpRate[j] = data.rampUpRate[i];
-            this->rampDownRate[j] = data.rampDownRate[i];
-            this->maxCurrent[j] = data.maxCurrent[i];
-            this->maxVoltage[j] = data.maxVoltage[i];
-            this->currentTripTime[j] = data.currentTripTime[i];
-            this->temperature[j] = data.temperature[i];
-            this->maxTemperature[j] = data.maxTemperature[i];
-            this->outputSwitch[j] = data.outputSwitch[i];
-            this->channelStatus[j] = data.channelStatus[i];
+            this->boardNumber[j]        = data.boardNumber[i];
+            this->channelNumber[j]      = data.channelNumber[i];
+            this->terminalVoltage[j]    = data.terminalVoltage[i];
+            this->senseVoltage[j]       = data.senseVoltage[i];
+            this->setVoltage[j]         = data.setVoltage[i];
+            this->current[j]            = data.current[i];
+            this->rampUpRate[j]         = data.rampUpRate[i];
+            this->rampDownRate[j]       = data.rampDownRate[i];
+            this->maxCurrent[j]         = data.maxCurrent[i];
+            this->maxVoltage[j]         = data.maxVoltage[i];
+            this->currentTripTime[j]    = data.currentTripTime[i];
+            this->temperature[j]        = data.temperature[i];
+            this->maxTemperature[j]     = data.maxTemperature[i];
+            this->outputSwitch[j]       = data.outputSwitch[i];
+            this->channelStatus[j]      = data.channelStatus[i];
             ++j;
         }
         ++i;
