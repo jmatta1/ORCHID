@@ -260,9 +260,19 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
         {
             unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
             sizeRead = 0;
-            readError = CAENComm_BLTRead(digitizerHandle,
-                                          Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                          bufferEdge, readSize, &sizeRead);
+            if(readSize % 2)//I think the super strange error happens when I make it transfer something other than a multiple of 2 long words
+            {
+                readError = CAENComm_BLTRead(digitizerHandle,
+                                             Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                             bufferEdge, readSize, &sizeRead);
+            }
+            else
+            {
+                readError = CAENComm_MBLTRead(digitizerHandle,
+                                              Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                              bufferEdge, readSize, &sizeRead);
+            }
+            
             if(readError == CAENComm_Terminated)
             {
                 BOOST_LOG_SEV(lg, Information) << "Got Readout Termination";
