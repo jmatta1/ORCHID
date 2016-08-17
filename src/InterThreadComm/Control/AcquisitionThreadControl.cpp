@@ -32,7 +32,7 @@ void AcquisitionThreadControl::waitForStart()
     //used the same mutex they would serlialize getting out of the function,
     //so instead we create the threads on the fly
     boost::mutex waitMutex;
-    boost::unique_lock waitLock(waitMutex);
+    boost::unique_lock<boost::mutex> waitLock(waitMutex);
     while(this->acqState.load() == AcquisitionThreadState::Stopped)
     {
         ++waitCount;
