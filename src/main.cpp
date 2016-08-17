@@ -190,6 +190,7 @@ int main(int argc, char* argv[])
         digitizerList[i] = new Digitizer::Vx1730Digitizer(i, &digitizerModuleData, &digitizerChannelData);
         digitizerList[i]->setupDigitizer();
     }
+    
     //for debugging, start acqusition of the first digitizer and wait for a single interrupt, read the data and dump to a simple file
     std::ofstream outData;
     outData.open("./tempdata.dat", std::ios_base::binary);
@@ -228,7 +229,7 @@ int main(int argc, char* argv[])
     // thread, also transfers empty data events from the file output thread to
     // the processing threads
     Utility::ToFileMultiQueue* toFileQueues = new Utility::ToFileMultiQueue;
-    //TODO: Load to file queue with empty trigger events
+    //TODO: Load to file queue with empty dpp psd events
     /*for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
         //we use comsumer push since consumers push to the empty object return
@@ -237,7 +238,7 @@ int main(int argc, char* argv[])
     //here we load the queue with empty slow controls events
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
-        //we use comsumer push since consumers push to the empty object return
+        //we use consumer push since consumers push to the empty object return
         toFileQueues->consumerPush<Utility::SlowControlsQueueIndex>(new Events::SlowControlsEvent(numVoltageChannels, numTemperatureChannels));
     }
     
@@ -333,6 +334,7 @@ int main(int argc, char* argv[])
         Events::EventInterface* temp;
         //we use producer pop because that pulls empty events from the queue index
         toFileQueues->producerPop<Utility::SlowControlsQueueIndex>(temp);
+        delete temp;
     }
     delete toFileQueues;
 #endif
