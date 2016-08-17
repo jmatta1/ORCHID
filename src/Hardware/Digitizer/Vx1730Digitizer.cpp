@@ -285,12 +285,6 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
             }
         }
         
-        CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
-        if(readError < 0)
-        {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
-            this->writeErrorAndThrow(readError);
-        }
         unsigned int readValue = 0;
         readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
         if(readError < 0)
