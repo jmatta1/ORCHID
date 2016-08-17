@@ -17,7 +17,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"DigitizerThread.h"
+#include"AcquisitionThread.h"
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries

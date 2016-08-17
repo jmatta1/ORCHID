@@ -26,7 +26,7 @@
 namespace Threads
 {
 
-class DigitizerThread
+class AcquisitionThread
 {
 public:
     
