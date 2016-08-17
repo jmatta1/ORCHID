@@ -32,9 +32,7 @@
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"AsyncIO/AsyncOutFile.h"
 #include"InterThreadComm/InterThreadQueueSizes.h"
-#include"Events/SlowControlsEvent.h"
 #include"InterThreadComm/Data/FileData.h"
-#include"Events/TriggerEvent.h"
 #include"InputLib/Blocks/GeneralBlock.h"
 #include"Utility/CommonTypeDefs.h"
 
