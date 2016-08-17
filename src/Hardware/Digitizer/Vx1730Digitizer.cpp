@@ -259,7 +259,7 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
         {
             unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
             sizeRead = 0;
-            readError = CAENComm_MBLTRead(digitizerHandle,
+            readError = CAENComm_BLTRead(digitizerHandle,
                                           Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
                                           bufferEdge, readSize, &sizeRead);
             if(readError == CAENComm_Terminated)
