@@ -12,7 +12,7 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Definition file for the DigitizerThread callable
+** @details Definition file for the AcquisitionThread callable
 **
 ********************************************************************************
 *******************************************************************************/
@@ -22,6 +22,10 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
+#include"Hardware/Digitizer/Vx1730Digitizer.h"
+#include"InterThreadComm/Control/AcquisitionThreadControl.h"
+#include"Utility/CommonTypeDefs.h"
+#include"Utility/OrchidLogger.h"
 
 namespace Threads
 {
@@ -29,9 +33,23 @@ namespace Threads
 class AcquisitionThread
 {
 public:
+    AcquisitionThread(Digitizer::Vx1730Digitizer* digi, InterThread::AcquisitionThreadControl* acCtrl,
+                      Utility::ToProcessingQueuePair* procQueue):digitizer(digi),
+        controller(), dataOutputQueue(procQueue), notTerminated(true),
+        lg(OrchidLog::get()) {}
+    ~AcquisitionThread(){}//delete nothing since we own nothing
+    
+    void operator()();
     
 private:
+    Digitizer::Vx1730Digitizer* digitizer;
+    InterThread::AcquisitionThreadControl* controller;
+    Utility::ToProcessingQueuePair* dataOutputQueue;
     
+    bool notTerminated;
+    
+    //logger
+    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
 };
 
 }

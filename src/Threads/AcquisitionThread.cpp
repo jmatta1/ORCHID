@@ -26,4 +26,13 @@
 namespace Threads
 {
 
+void AcquisitionThread::operator ()()
+{
+    //poll the state of the controller and loop if it is not terminate
+    while(this->controller->getCurrentState() != InterThread::AcquisitionThreadState::Terminate)
+    {
+        
+    }
+}
+
 }
