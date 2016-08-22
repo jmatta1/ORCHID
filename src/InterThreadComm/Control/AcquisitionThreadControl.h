@@ -46,6 +46,9 @@ public:
     void setToStopped(){acqState.store(AcquisitionThreadState::Stopped);}
     void setToTerminate(){acqState.store(AcquisitionThreadState::Terminate); acqThreadWaitCondition.notify_all();}
     
+    int getThreadsWaiting(){return waitCount.load();}
+    int getThreadsTerminated(){return termAckCount.load();}
+    
 private:
     std::atomic<AcquisitionThreadState> acqState;
     std::atomic<int> termAckCount;
