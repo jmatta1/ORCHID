@@ -146,7 +146,7 @@ bool QueuePair<QueueContent, QueueType>::producerPop(QueueContent& data)
         //some silly reason
         if(this->consumerWaiting.load())
         {
-            this->consumerWaitCondition->notify_all();
+            this->consumerWaitCondition.notify_all();
         }
         //now wait for some empty events
         ++(this->producerWaiting);
