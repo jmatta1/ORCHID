@@ -31,7 +31,7 @@
 #include"Utility/MpodMapper.h"
 #include"Hardware/HVLib/MpodController.h"
 #include"InterThreadComm/Data/SlowData.h"
-#include"InterThreadComm/Data/RateData.h"
+#include"InterThreadComm/Data/AcquisitionData.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
