@@ -38,13 +38,13 @@ public:
     
     //functions to be accessed by the acquisition threads
     AcquisitionThreadState getCurrentState(){return acqState.load();}
-    void waitForStart();
+    void waitForChange();
     void acknowledgeTerminate(){++termAckCount;}
 
     //functions to be accessed by the UI thread
     void setToAcquiring(){acqState.store(AcquisitionThreadState::Acquiring); acqThreadWaitCondition.notify_all();}
     void setToStopped(){acqState.store(AcquisitionThreadState::Stopped);}
-    void setToTerminate(){acqState.store(AcquisitionThreadState::Terminate);}
+    void setToTerminate(){acqState.store(AcquisitionThreadState::Terminate); acqThreadWaitCondition.notify_all();}
     
 private:
     std::atomic<AcquisitionThreadState> acqState;

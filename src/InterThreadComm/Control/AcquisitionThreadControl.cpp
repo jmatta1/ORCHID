@@ -25,7 +25,7 @@
 namespace InterThread
 {
 
-void AcquisitionThreadControl::waitForStart()
+void AcquisitionThreadControl::waitForChange()
 {
     //creation of the mutexes happen rarely, so we can suck it up
     //since we can have multiple threads waiting here simultaneously, if they all
