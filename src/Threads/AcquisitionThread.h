@@ -36,15 +36,23 @@ public:
     AcquisitionThread(Digitizer::Vx1730Digitizer* digi, InterThread::AcquisitionThreadControl* acCtrl,
                       Utility::ToProcessingQueuePair* procQueue):digitizer(digi),
         controller(), dataOutputQueue(procQueue), notTerminated(true),
-        lg(OrchidLog::get()) {}
+        lg(OrchidLog::get()) { firstChannel = digi->getModuleStartChannel();}
     ~AcquisitionThread(){}//delete nothing since we own nothing
     
     void operator()();
     
 private:
+    void doAcquisitionLoop();
+    void startAcquisition();
+    void endAcquisition();
+    void doFinalRead();
+    
     Digitizer::Vx1730Digitizer* digitizer;
     InterThread::AcquisitionThreadControl* controller;
     Utility::ToProcessingQueuePair* dataOutputQueue;
+    
+    Utility::ToProcessingBuffer* currentBuffer;
+    int firstChannel;
     
     bool notTerminated;
     
