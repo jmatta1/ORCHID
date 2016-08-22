@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
     InterThread::SlowData* slowData = new InterThread::SlowData(numVoltageChannels,
                                                                  numTemperatureChannels);
     //count the number of digitizer channels
-    int numDigitizerChannels = 4;
+    int numDigitizerChannels = digitizerChannelData.channelNumber.size();
     //Make the rate data structure
     InterThread::RateData* rateData = new InterThread::RateData(numDigitizerChannels);
     //Make the data structure for file information
@@ -246,12 +246,11 @@ int main(int argc, char* argv[])
     //make the UI thread callable
     Threads::UIThread* uiThreadCallable =
             new Threads::UIThread(slowData, rateData, fileData, mpodMapper,
-                      //Future:   digitizerControl,
-                                  sctController, fotController,
-                      //Future:   eventProcThreadControl, digitizerThreadControl,
-                                  toFileQueues, mpodController,
+                                  acqController, sctController, fotController,
+                      //Future:   eventProcThreadControl,
+                                  toProcessingQueue, toFileQueues, mpodController,
                                   params.generalBlock->updateFrequency,
-                                  params.powerBlock->pollingRate);
+                                  params.powerBlock->pollingRate, numDigitizers);
     Threads::ThreadWrapper<Threads::UIThread>* uiThreadWrapper = 
             new Threads::ThreadWrapper<Threads::UIThread>(uiThreadCallable);
 
