@@ -27,16 +27,16 @@
 
 namespace Utility
 {
+typedef InterThread::RawBufferTriple<int> ToProcessingBuffer;
+
 //queue types
 typedef boost::lockfree::queue<Events::EventInterface*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile)> > ProcessedEventQueue;
 typedef boost::lockfree::spsc_queue<Events::EventInterface*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > SlowControlEventQueue;
-typedef boost::lockfree::queue<char*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::DigitizerToProcessing)> > ToProcessingQueue;
+typedef boost::lockfree::queue<ToProcessingBuffer*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::DigitizerToProcessing)> > ToProcessingQueue;
 
 //Queues for sending things to file type
 typedef InterThread::MultiQueuePair<Events::EventInterface*, ProcessedEventQueue, SlowControlEventQueue> ToFileMultiQueue;
 enum{ProcessingQueueIndex = 0, SlowControlsQueueIndex = 1};
-
-typedef InterThread::RawBufferTriple<int> ToProcessingBuffer;
 
 //queues for sending things from digitizer to processing
 typedef InterThread::QueuePair<ToProcessingBuffer*, ToProcessingQueue> ToProcessingQueuePair;
