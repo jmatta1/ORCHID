@@ -137,7 +137,7 @@ template <typename QueueContent, typename QueueType>
 bool QueuePair<QueueContent, QueueType>::producerPop(QueueContent& data)
 {
     //this function tries to pop from the producer queue, if it is empty (ie all the buffers are currently in
-    //the producer queue) then we wait for the consumer to make some more empties for us to use
+    //the consumer queue) then we wait for the consumer to make some more empties for us to use
     bool success = false;
     while (!(success = this->producerQueue.pop(data)) && this->notForceWake.load())
     {
