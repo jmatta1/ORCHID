@@ -28,7 +28,7 @@ HFIR background monitoring wall.
 #include"Utility/CommonTypeDefs.h"
 // ORCHID interprocess communication data objects
 #include"InterThreadComm/Data/SlowData.h"
-#include"InterThreadComm/Data/RateData.h"
+#include"InterThreadComm/Data/AcquisitionData.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/InterThreadQueueSizes.h"
 #include"InterThreadComm/MultiQueuePair.h"
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
     boost::log::register_simple_formatter_factory< LogSeverity, char >("Severity");
     boost::log::add_file_log(
                 boost::log::keywords::file_name = "orchid_%N.log",          //file name format
-                boost::log::keywords::rotation_size = (1*1024*1024),        //rotate to a new file every megabyte
+                boost::log::keywords::rotation_size = (8*1024*1024),        //rotate to a new file every megabyte
                 boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),  //or rotate at midnight
                 boost::log::keywords::auto_flush = true,
                 //boost::log::keywords::format = "[%TimeStamp%]  (%LineID%) <%Severity%>: %Message%");  //give every message a timestamp
