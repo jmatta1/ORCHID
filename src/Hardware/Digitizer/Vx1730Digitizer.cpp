@@ -99,7 +99,7 @@ void Vx1730Digitizer::setupDigitizer()
     //check to make sure we have 8 or 16 channels
     if ((numChannel != 8) && (numChannel != 16))
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Error Digitizer #" << moduleNumber << " does not have 8 or 16 channels";
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Error Digitizer #" << moduleNumber << " does not have 8 or 16 channels";
         throw std::runtime_error("Vx1730 Error - Wrong Channel Count");
     }
     
@@ -108,7 +108,7 @@ void Vx1730Digitizer::setupDigitizer()
     InputParser::LinkType lType = moduleData->linkType[moduleNumber];
     if(lType == InputParser::LinkType::Optical)
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Opening VME Card Via Optical Link, Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via Optical Link, Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
@@ -117,7 +117,7 @@ void Vx1730Digitizer::setupDigitizer()
     }
     else if(lType == InputParser::LinkType::USB)
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Opening VME Card Via USB: Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via USB: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_USB,
                                      moduleData->linkNumber[moduleNumber],
                                      0, moduleData->vmeBaseAddr[moduleNumber],
@@ -137,7 +137,7 @@ void Vx1730Digitizer::setupDigitizer()
     }
     else
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Successfully Opened Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Successfully Opened Digitizer #" << moduleNumber;
         digitizerOpen = true;
     }
     
@@ -145,21 +145,21 @@ void Vx1730Digitizer::setupDigitizer()
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwReset>::value, 0x00000001);
     if(errVal < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Resetting Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Resetting Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
     //now hit the software clear to blank the data
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
     if(errVal < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Clearing Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Clearing Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
     //now hit the calibration and wait
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelCal>::value, 0x00000001);
     if(errVal < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Triggering Calibration For Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Triggering Calibration For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Pausing for digitizer " << moduleNumber << " self calibration stabilization.";
@@ -184,7 +184,7 @@ void Vx1730Digitizer::startAcquisition()
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
     if(errVal < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error In Clearing Digitizer For Acquisition Start in Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Clearing Digitizer For Acquisition Start in Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
     //now take the acquisition control register base, add bit 2 and write it
@@ -192,14 +192,14 @@ void Vx1730Digitizer::startAcquisition()
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acqusitionRegister);
     if(errVal < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Starting Acqusition In Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Starting Acqusition In Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
     //now enable interrupt requests in CAENComm
     errVal = CAENComm_IRQEnable(digitizerHandle);
     if(errVal < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Enabling Interrupts For Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #" << moduleNumber << " Acquisition Started/Armed";
@@ -228,7 +228,7 @@ unsigned int Vx1730Digitizer::getData(unsigned int* buffer)
     readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
     if(readError < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(readError);
     }
     eventReady = (readValue & 0x00000001);
@@ -259,12 +259,9 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     }
     else if(readError < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Non Timeout Error Waiting for Interrupt Request For Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Non Timeout Error Waiting for Interrupt Request For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(readError);
     }
-    bool eventReady = true;
-    unsigned int* bufferEdge = buffer;
-    unsigned int dataRead = 0;
     
     return readInterruptDataAvailable(buffer);
 }
@@ -292,19 +289,16 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
     while(eventReady)
     {
         int sizeRead=0;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Reading Event In Digitizer #" << moduleNumber;
         unsigned int eventSize = 0;
         //first read the size of the data to be read
         readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
         if(readError < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
+            //BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
             this->writeErrorAndThrow(readError);
         }
         
         //now read the bottom 4kb until everything is read
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
         while(eventSize > 0)
         {
             unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
@@ -321,25 +315,16 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
                                               Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
                                               bufferEdge, readSize, &sizeRead);
             }
-            if(readError == CAENComm_Terminated)
+            
+            if(readError == CAENComm_Terminated || readError == CAENComm_Success)
             {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Termination";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
                 eventSize -= readSize;
                 dataRead += readSize;
                 bufferEdge += readSize;
             }
-            else if(readError == CAENComm_Success)
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Success";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
-                eventSize -= sizeRead;
-                dataRead += sizeRead;
-                bufferEdge += sizeRead;
-            }
             else
             {
-                BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+                BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
                 this->writeErrorAndThrow(readError);
             }
         }
@@ -347,7 +332,7 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
         readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
         if(readError < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
             this->writeErrorAndThrow(readError);
         }
         eventReady = (readValue & 0x00000001);
@@ -366,19 +351,16 @@ unsigned int Vx1730Digitizer::readImpromptuDataAvailable(unsigned int* buffer)
     while(eventReady && (dataRead < maxBufferFillForAnotherRead))
     {
         int sizeRead=0;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Reading Impromptu Event In Digitizer #" << moduleNumber;
         unsigned int eventSize = 0;
         //first read the size of the data to be read
         readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
         if(readError < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
+            //BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
             this->writeErrorAndThrow(readError);
         }
         
         //now read the bottom 4kb until everything is read
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
         while(eventSize > 0)
         {
             unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
@@ -396,25 +378,15 @@ unsigned int Vx1730Digitizer::readImpromptuDataAvailable(unsigned int* buffer)
                                               bufferEdge, readSize, &sizeRead);
             }
             
-            if(readError == CAENComm_Terminated)
+            if(readError == CAENComm_Terminated || readError == CAENComm_Success)
             {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Termination";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
-                eventSize -= sizeRead;
-                dataRead += sizeRead;
-                bufferEdge += sizeRead;
-            }
-            else if(readError == CAENComm_Success)
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Success";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
                 eventSize -= sizeRead;
                 dataRead += sizeRead;
                 bufferEdge += sizeRead;
             }
             else
             {
-                BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+                BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
                 this->writeErrorAndThrow(readError);
             }
         }
@@ -423,7 +395,7 @@ unsigned int Vx1730Digitizer::readImpromptuDataAvailable(unsigned int* buffer)
         readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
         if(readError < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
             this->writeErrorAndThrow(readError);
         }
         eventReady = (readValue & 0x00000001);
@@ -442,19 +414,16 @@ unsigned int Vx1730Digitizer::readInterruptDataAvailable(unsigned int* buffer)
     while(readCount < eventsPerInterrupt)
     {
         int sizeRead=0;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Reading Interrupt Event In Digitizer #" << moduleNumber;
         unsigned int eventSize = 0;
         //first read the size of the data to be read
         readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
         if(readError < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber << "After Event # "<<readCount;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber << "After Event # "<<readCount;
             this->writeErrorAndThrow(readError);
         }
         
         //now read the bottom 4kb until everything is read
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
         while(eventSize > 0)
         {
             unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
@@ -472,25 +441,15 @@ unsigned int Vx1730Digitizer::readInterruptDataAvailable(unsigned int* buffer)
                                               bufferEdge, readSize, &sizeRead);
             }
             
-            if(readError == CAENComm_Terminated)
+            if(readError == CAENComm_Terminated || readError == CAENComm_Success)
             {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Termination";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
-                eventSize -= sizeRead;
-                dataRead += sizeRead;
-                bufferEdge += sizeRead;
-            }
-            else if(readError == CAENComm_Success)
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Success";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
                 eventSize -= sizeRead;
                 dataRead += sizeRead;
                 bufferEdge += sizeRead;
             }
             else
             {
-                BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+                BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
                 this->writeErrorAndThrow(readError);
             }
         }
@@ -548,59 +507,59 @@ void Vx1730Digitizer::writeErrorAndThrow(CAENComm_ErrorCode errVal)
     switch(errVal)
     {
     case CAENComm_Success:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Success\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Success\n";
         throw std::runtime_error("Vx1730 Error - Success");
         break;
     case CAENComm_VMEBusError:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: VME Bus Error During Cycle\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: VME Bus Error During Cycle\n";
         throw std::runtime_error("Vx1730 Error - VME Bus Error During Cycle");
         break;
     case CAENComm_CommError:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Communication Error\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Communication Error\n";
         throw std::runtime_error("Vx1730 Error - Communication Error");
         break;
     case CAENComm_GenericError:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Unspecified Error\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Unspecified Error\n";
         throw std::runtime_error("Vx1730 Error - Unspecified Error");
         break;
     case CAENComm_InvalidParam:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Invalid Parameter\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Invalid Parameter\n";
         throw std::runtime_error("Vx1730 Error - Invalid Parameter");
         break;
     case CAENComm_InvalidLinkType:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Invalid Link Type\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Invalid Link Type\n";
         throw std::runtime_error("Vx1730 Error - Invalid Link Type");
         break;
     case CAENComm_InvalidHandler:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Invalid Device Handler\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Invalid Device Handler\n";
         throw std::runtime_error("Vx1730 Error - Invalid Device Handler");
         break;
     case CAENComm_CommTimeout:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Communication Timeout\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Communication Timeout\n";
         throw std::runtime_error("Vx1730 Error - Communication Timeout");
         break;
     case CAENComm_DeviceNotFound:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Unable To Open Requested Device\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Unable To Open Requested Device\n";
         throw std::runtime_error("Vx1730 Error - Unable To Open Requested Device");
         break;
     case CAENComm_MaxDevicesError:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Maximum Number of Devices Exceeded\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Maximum Number of Devices Exceeded\n";
         throw std::runtime_error("Vx1730 Error - Maximum Number of Devices Exceeded");
         break;
     case CAENComm_DeviceAlreadyOpen:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Device Already Open\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Device Already Open\n";
         throw std::runtime_error("Vx1730 Error - Device Already Open");
         break;
     case CAENComm_NotSupported:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Not Supported Function\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Not Supported Function\n";
         throw std::runtime_error("Vx1730 Error - Not Supported Function");
         break;
     case CAENComm_UnusedBridge:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: There Are No Boards Controlled By That Bridge\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: There Are No Boards Controlled By That Bridge\n";
         throw std::runtime_error("Vx1730 Error - There Are No Boards Controlled By That Bridge");
         break;
     case CAENComm_Terminated:
-        BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Communication Terminated By Device\n";
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Communication Terminated By Device\n";
         throw std::runtime_error("Vx1730 Error - Communication Terminated By Device");
         break;
     }
@@ -630,7 +589,8 @@ void Vx1730Digitizer::writeCommonRegisterData()
     dataArray[regCount] = calculateTrigOutEnableMaskRegVal();
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontIoCtrl>::value;
-    dataArray[regCount] = 0x00000002;//set everything to zero except the bit that makes the lvds high impedance
+    dataArray[regCount] = 0x00000003;//set everything to zero except the bit that makes the lvds high impedance and the bit that
+                                       //makes the front lemo connectors TTL logic instead of NIM logic
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChanEnMask>::value;
     dataArray[regCount] = calculateChanEnMaskRegVal();
@@ -718,7 +678,7 @@ void Vx1730Digitizer::writeCommonRegisterData()
     
     //give the readback results
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Common Register Readback for Digitizer #" << moduleNumber;
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:  Addr |  Written |   Read   ";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:  Addr |   Written  |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
         BOOST_LOG_SEV(lg, Information) << "ACQ Thread:0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
@@ -802,7 +762,7 @@ void Vx1730Digitizer::writeGroupRegisterData()
     
     //give the readback results
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Group Register Readback for Digitizer #" << moduleNumber;
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:  Addr |  Written |   Read   ";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:  Addr |   Written  |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
         BOOST_LOG_SEV(lg, Information) << "ACQ Thread:0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
@@ -923,7 +883,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     
     //give the readback results
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Individual Register Readback for Digitizer #" << moduleNumber;
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:    Addr   |  Written |   Read   ";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:    Addr   |   Written  |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
         BOOST_LOG_SEV(lg, Information) << "ACQ Thread:0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
