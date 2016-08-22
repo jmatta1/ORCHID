@@ -37,11 +37,12 @@ enum {MultiRWArraySize = 320, IrqTimeoutMs = 5000};
 Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* modData,
                                  InputParser::DigitizerChannelData* chanData) :
     moduleNumber(modNum), channelStartInd(0), numChannel(1), digitizerHandle(0),
-    acqRunning(false), digitizerOpen(false), moduleData(modData),
+    eventsPerInterrupt(0), acqRunning(false), digitizerOpen(false), moduleData(modData),
     channelData(chanData), addrArray(NULL), dataArray(NULL), rdbkArray(NULL),
     cycleErrsArray(NULL), arraySize(MultiRWArraySize), acquisitionCtrlRegBase(0),
     lg(OrchidLog::get())
 {
+    eventsPerInterrupt = moduleData->interruptEventCount[moduleNumber];
     //find the channel start index
     while(chanData->moduleNumber[channelStartInd] != modNum)
     {
@@ -217,6 +218,30 @@ void Vx1730Digitizer::stopAcquisition()
     acqRunning = false;
 }
 
+unsigned int Vx1730Digitizer::getData(unsigned int* buffer)
+{
+    using LowLvl::Vx1730ReadRegisters;
+    using LowLvl::Vx1730CommonReadRegistersAddr;
+    unsigned int readValue = 0;
+    bool eventReady = false;
+    CAENComm_ErrorCode readError;
+    readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
+    if(readError < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(readError);
+    }
+    eventReady = (readValue & 0x00000001);
+    if(eventReady)
+    {
+        return readImpromptuDataAvailable(buffer);
+    }
+    else
+    {
+        return waitForInterruptToReadData(buffer);
+    }
+}
+
 //waits for the digitizer to raise and interrupt about data full.
 //once an interrupt is raised, it reads the event size value to find out
 //how much it needs to read, then it iteratively reads data that data into
@@ -240,72 +265,8 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     bool eventReady = true;
     unsigned int* bufferEdge = buffer;
     unsigned int dataRead = 0;
-    while(eventReady)
-    {
-        int sizeRead=0;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Reading Event In Digitizer #" << moduleNumber;
-        unsigned int eventSize = 0;
-        //first read the size of the data to be read
-        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
-        if(readError < 0)
-        {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
-            this->writeErrorAndThrow(readError);
-        }
-        
-        //now read the bottom 4kb until everything is read
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
-        while(eventSize > 0)
-        {
-            unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
-            sizeRead = 0;
-            if(readSize % 2)//I think the super strange error happens when I make it transfer something other than a multiple of 2 long words
-            {
-                readError = CAENComm_BLTRead(digitizerHandle,
-                                             Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                             bufferEdge, readSize, &sizeRead);
-            }
-            else
-            {
-                readError = CAENComm_MBLTRead(digitizerHandle,
-                                              Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                              bufferEdge, readSize, &sizeRead);
-            }
-            
-            if(readError == CAENComm_Terminated)
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Termination";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
-                eventSize -= readSize;
-                dataRead += readSize;
-                bufferEdge += readSize;
-            }
-            else if(readError == CAENComm_Success)
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Success";
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
-                eventSize -= sizeRead;
-                dataRead += sizeRead;
-                bufferEdge += sizeRead;
-            }
-            else
-            {
-                BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
-                this->writeErrorAndThrow(readError);
-            }
-        }
-        
-        unsigned int readValue = 0;
-        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
-        if(readError < 0)
-        {
-            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
-            this->writeErrorAndThrow(readError);
-        }
-        eventReady = (readValue & 0x00000001);
-    }
-    return dataRead;
+    
+    return readInterruptDataAvailable(buffer);
 }
 
 //is used after a forcible data flush at the end of acquisition
@@ -394,6 +355,150 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
     return dataRead;
 }
 
+unsigned int Vx1730Digitizer::readImpromptuDataAvailable(unsigned int* buffer)
+{
+    using LowLvl::Vx1730ReadRegisters;
+    using LowLvl::Vx1730CommonReadRegistersAddr;
+    CAENComm_ErrorCode readError;
+    bool eventReady = true;
+    unsigned int* bufferEdge = buffer;
+    unsigned int dataRead = 0;
+    while(eventReady && (dataRead < maxBufferFillForAnotherRead))
+    {
+        int sizeRead=0;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Reading Impromptu Event In Digitizer #" << moduleNumber;
+        unsigned int eventSize = 0;
+        //first read the size of the data to be read
+        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readError);
+        }
+        
+        //now read the bottom 4kb until everything is read
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
+        while(eventSize > 0)
+        {
+            unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
+            sizeRead = 0;
+            if((readSize % 2) == 1)//I think the super strange error happens when I make MBLT transfer something other than a multiple of 2 long words
+            {
+                readError = CAENComm_BLTRead(digitizerHandle,
+                                             Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                             bufferEdge, readSize, &sizeRead);
+            }
+            else
+            {
+                readError = CAENComm_MBLTRead(digitizerHandle,
+                                              Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                              bufferEdge, readSize, &sizeRead);
+            }
+            
+            if(readError == CAENComm_Terminated)
+            {
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Termination";
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+                eventSize -= sizeRead;
+                dataRead += sizeRead;
+                bufferEdge += sizeRead;
+            }
+            else if(readError == CAENComm_Success)
+            {
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Success";
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+                eventSize -= sizeRead;
+                dataRead += sizeRead;
+                bufferEdge += sizeRead;
+            }
+            else
+            {
+                BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+                this->writeErrorAndThrow(readError);
+            }
+        }
+        
+        unsigned int readValue = 0;
+        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readError);
+        }
+        eventReady = (readValue & 0x00000001);
+    }
+    return dataRead;
+}
+
+unsigned int Vx1730Digitizer::readInterruptDataAvailable(unsigned int* buffer)
+{
+    using LowLvl::Vx1730ReadRegisters;
+    using LowLvl::Vx1730CommonReadRegistersAddr;
+    CAENComm_ErrorCode readError;
+    unsigned int* bufferEdge = buffer;
+    unsigned int dataRead = 0;
+    int readCount = 0;
+    while(readCount < eventsPerInterrupt)
+    {
+        int sizeRead=0;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Reading Interrupt Event In Digitizer #" << moduleNumber;
+        unsigned int eventSize = 0;
+        //first read the size of the data to be read
+        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "Error Reading Event Size After Interrupt For Digitizer #" << moduleNumber << "After Event # "<<readCount;
+            this->writeErrorAndThrow(readError);
+        }
+        
+        //now read the bottom 4kb until everything is read
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " Event Size " << eventSize;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << dataRead;
+        while(eventSize > 0)
+        {
+            unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
+            sizeRead = 0;
+            if((readSize % 2) == 1)//I think the super strange error happens when I make MBLT transfer something other than a multiple of 2 long words
+            {
+                readError = CAENComm_BLTRead(digitizerHandle,
+                                             Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                             bufferEdge, readSize, &sizeRead);
+            }
+            else
+            {
+                readError = CAENComm_MBLTRead(digitizerHandle,
+                                              Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                              bufferEdge, readSize, &sizeRead);
+            }
+            
+            if(readError == CAENComm_Terminated)
+            {
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Termination";
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+                eventSize -= sizeRead;
+                dataRead += sizeRead;
+                bufferEdge += sizeRead;
+            }
+            else if(readError == CAENComm_Success)
+            {
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Got Readout Success";
+                BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #"  << std::dec << moduleNumber << " " << eventSize << " " << sizeRead << " " << readSize << " " << dataRead;
+                eventSize -= sizeRead;
+                dataRead += sizeRead;
+                bufferEdge += sizeRead;
+            }
+            else
+            {
+                BOOST_LOG_SEV(lg, Error) << "Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+                this->writeErrorAndThrow(readError);
+            }
+        }
+        ++readCount;
+    }
+    return dataRead;
+}
+
 //calculate the max possible size of a buffer in lwords so that they can be pre-
 //allocated for the queueing system
 void Vx1730Digitizer::calculateMaximumSizes()
@@ -434,6 +539,7 @@ void Vx1730Digitizer::calculateMaximumSizes()
         maxSizeOfBoardAggregate += sizePerChanPairAggregate[chanPairInd];
     }
     maxSizeOfBoardAggregateBlock = (maxSizeOfBoardAggregate * this->moduleData->aggregatesPerBlockTransfer[moduleNumber]);
+    maxBufferFillForAnotherRead = (maxSizeOfBoardAggregateBlock - maxSizeOfBoardAggregate);
 }
 
 //log an error and throw an exception to close things
@@ -495,7 +601,7 @@ void Vx1730Digitizer::writeErrorAndThrow(CAENComm_ErrorCode errVal)
         break;
     case CAENComm_Terminated:
         BOOST_LOG_SEV(lg, Error) << "Digitizer #" << moduleNumber << " - Code: Communication Terminated By Device\n";
-        throw std::runtime_error("Vx1730 Error - nication Terminated By Device");
+        throw std::runtime_error("Vx1730 Error - Communication Terminated By Device");
         break;
     }
 }

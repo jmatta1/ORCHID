@@ -29,7 +29,9 @@
 
 namespace Digitizer
 {
-
+//Todo: add some mechanism to reduce the number of individual channel reads
+//  while acquiring data, maybe use the number of aggregates to trigger an IRQ
+//  as a bare minimum to wait for?
 class Vx1730Digitizer
 {
 public:
@@ -51,20 +53,25 @@ public:
     //it waits on an interrupt from the digitizer
     unsigned int getData(unsigned int* buffer);
     
-    //waits for the digitizer to raise and interrupt about data full.
-    //once an interrupt is raised, it reads the event size value to find out
-    //how much it needs to read, then it iteratively reads data that data into
-    //the given buffer
-    unsigned int waitForInterruptToReadData(unsigned int* buffer);
-    
     //is used after a forcible data flush at the end of acquisition
     unsigned int performFinalReadout(unsigned int* buffer);
     
     //give the max possible size of a buffer in bytes so that they can be pre-
     //allocated for the queueing system
     int getSizeOfReadBufferIn32BitInts(){return maxSizeOfBoardAggregateBlock;}
+    
+    //return the channel 0 index
+    int getModuleStartChannel(){return channelStartInd;}
 private:
     void writeErrorAndThrow(CAENComm_ErrorCode errVal);
+
+    //waits for the digitizer to raise and interrupt about data full.
+    //once an interrupt is raised, it reads the event size value to find out
+    //how much it needs to read, then it iteratively reads data that data into
+    //the given buffer
+    unsigned int waitForInterruptToReadData(unsigned int* buffer);
+    unsigned int readImpromptuDataAvailable(unsigned int* buffer);
+    unsigned int readInterruptDataAvailable(unsigned int* buffer);
     
     void writeCommonRegisterData();
     void writeGroupRegisterData();
@@ -88,6 +95,7 @@ private:
     int channelStartInd;
     int numChannel;
     int digitizerHandle;
+    int eventsPerInterrupt;
     bool acqRunning;
     bool digitizerOpen;
     InputParser::DigitizerModuleData* moduleData;
@@ -103,6 +111,7 @@ private:
     int sizePerChanPairAggregate[8];
     int maxSizeOfBoardAggregate;
     int maxSizeOfBoardAggregateBlock;
+    int maxBufferFillForAnotherRead;
     //variables to hold persistent values for use later
     unsigned int acquisitionCtrlRegBase;
     
