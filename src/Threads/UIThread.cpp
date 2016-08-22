@@ -43,15 +43,19 @@ static const int volStartCol = 40;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
+                   InterThread::AcquisitionThreadControl* acqCtrl,
                    InterThread::SlowControlsThreadController* sctCtrl,
                    InterThread::FileOutputThreadController* fileCtrl,
+                   Utility::ToProcessingQueuePair* procDataQueue,
                    Utility::ToFileMultiQueue* fileDataQueue,
                    SlowControls::MpodController* mpCtrl, int refreshFrequency,
-                   int pollingRate):
-    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodMapper(mpodMap), fileMultiQueue(fileDataQueue), sctControl(sctCtrl),
-    fileControl(fileCtrl), mpodController(mpCtrl), persistCount(-1), lastFileSize(0), command(""),
-    persistentMessage(""), runLoop(true), refreshRate(refreshFrequency),
-    mode(UIMode::Init), textWindow(nullptr), messageWindow(nullptr), lg(OrchidLog::get())
+                   int pollingRate, int numAcqThr):
+    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodMapper(mpodMap), procQueuePair(procDataQueue),
+    fileMultiQueue(fileDataQueue), numAcqThreads(numAcqThr),
+    acqControl(acqCtrl), sctControl(sctCtrl), fileControl(fileCtrl), mpodController(mpCtrl),
+    persistCount(-1), lastFileSize(0), command(""),  persistentMessage(""), runLoop(true),
+    refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
+    messageWindow(nullptr), lg(OrchidLog::get())
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
@@ -166,7 +170,7 @@ void UIThread::drawInitScreen()
     mvwprintw(this->textWindow, 0, 0,  "Status: Not Ready");
     mvwprintw(this->textWindow, 1, 0,  "Commands Available");
     mvwprintw(this->textWindow, 2, 4,  "turnon");
-    mvwprintw(this->textWindow, 2, 16, "- Connects to digitizer and activates MPOD");
+    mvwprintw(this->textWindow, 2, 16, "- Activates MPOD and Preps Acquisition");
     mvwprintw(this->textWindow, 3, 4,  "quit/exit");
     mvwprintw(this->textWindow, 3, 16, "- Exit ORCHID");
     
@@ -188,7 +192,7 @@ void UIThread::drawIdleScreen()
     mvwprintw(this->textWindow, 5, 4,  "next");
     mvwprintw(this->textWindow, 5, 16, "- Increment Run Number");
     mvwprintw(this->textWindow, 6, 4,  "turnoff");
-    mvwprintw(this->textWindow, 6, 16, "- Disconnect from digitizer and shutdown MPOD");
+    mvwprintw(this->textWindow, 6, 16, "- Shutdown MPOD and Demobilize Acquisition");
     mvwprintw(this->textWindow, 7, 4,  "quit/exit");
     mvwprintw(this->textWindow, 7, 16, "- Exit ORCHID");
     
@@ -321,7 +325,7 @@ void UIThread::drawRunningScreen()
 {
     //draw the file information line
     this->drawFileInfo();
-    //draw the digitizer info line
+    //TODO: draw the acquisition info line
     
     //draw the slow controls global info line
     this->drawGlobalSlowControlsInformation();
@@ -833,10 +837,29 @@ void UIThread::waitForAllTerminations()
 {
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Terminating Threads";
     this->waitForSlowControlsThreadTermination();
-    //this->waitForDigitizerThreadTermination();
+    this->waitForAcquisitionThreadsTermination();
     //this->waitForEventProcessingThreadsTermination();
     this->waitForFileThreadTermination();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Done Terminating Threads";
+}
+
+void UIThread::waitForAcquisitionThreadsTermination()
+{
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Terminating Acquisition Threads";
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Termination of Acquisition Threads");
+    wrefresh(this->textWindow);
+    wclear(this->messageWindow);
+    wrefresh(this->messageWindow);
+    this->acqControl->setToTerminate();
+    //make certain the slow controls thread is awake
+    this->procQueuePair->forceWakeAll();
+    //loop until we see the terminate signals from the slow controls thread
+    while(!(this->acqControl->getThreadsTerminated() == this->numAcqThreads))
+    {
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    this->procQueuePair->clearForce();
 }
 
 void UIThread::waitForSlowControlsThreadTermination()
@@ -947,8 +970,7 @@ void UIThread::turnOn()
             stillRamping = false;
         }
     }
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: HV done ramping, connecting to digitizer";
-    //TODO write code to connect to digitizer
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: HV done ramping";
     mode = UIMode::Idle;
     //this->startLine = 0;
     wclear(this->textWindow);
@@ -956,8 +978,6 @@ void UIThread::turnOn()
 
 void UIThread::turnOff()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Disconnecting from digitizer";
-    //TODO write code to handle disconnecting from the digitizer
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Putting Slow Controls thread into polling mode";
     this->sctControl->setToPolling();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting channel ramp down";
@@ -998,21 +1018,30 @@ void UIThread::startDataTaking()
     this->fileControl->setToWriting();
     //wait to be certain the file thread is up and running before we start anything else
     boost::this_thread::sleep_for(this->refreshPeriod);
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Event Processing";
-    //TODO put the event processing threads into running mode
-    //wait to be certain the processing threads are up and running before we start anything else
-    //boost::this_thread::sleep_for(this->refreshPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Slow Controls Event Generation";
     this->sctControl->setToWriting();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Pausing to Ensure First Event Is Slow Controls";
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Pause to ensure first event is slow controls");
     wrefresh(this->textWindow);
-    //TODO use wait based on actual config slow controls timing
     boost::this_thread::sleep_for(slowControlsPollingWaitPeriod);
-    //TODO put the digitizer threads into running mode
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Digitizer Thread Acquisition";
-    
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Event Processing";
+    //TODO put the event processing threads into running mode
+    //wait to be certain the processing threads are up and running before we start anything else
+    boost::this_thread::sleep_for(this->refreshPeriod);
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Online Processing Thread Set To Stop";
+    //TODO put the online processing thread into stop mode
+    //TODO wait for online processing to stop
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Acquisition Thread";
+    this->acqControl->setToAcquiring();
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Acquisition Starts");
+    wrefresh(this->textWindow);
+    while(this->acqControl->getThreadsWaiting() > 0)
+    {//until we see the acquisition threads are done waiting on their wait condition, sleep and spin
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    //TODO: Add code for sending acquisition start signal from USB device for the S-In front panel LEMO
     mode = UIMode::Running;
     //this->startLine = 0;
     wclear(this->textWindow);
@@ -1020,11 +1049,23 @@ void UIThread::startDataTaking()
 
 void UIThread::stopDataTaking()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Digitizer Thread Set To Stop";
-    //TODO put the digitizer thread into stopped mode
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Acquistion Threads Set To Stop";
+    this->acqControl->setToStopped();
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Acquisition Stopping");
+    wrefresh(this->textWindow);
+    while(this->numAcqThreads > this->acqControl->getThreadsWaiting())
+    {//until we see the acquisition threads waiting on their wait condition, sleep and spin
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Event Processing Threads Set To Stop";
     //TODO put the event processing threads into finish and stop mode
     //TODO put in wait for processing threads to stop
+    
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Online Processing Thread Set To Stop";
+    //TODO put the online processing thread into stop mode
+    //TODO wait for online processing to stop
     
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Slow Controls Set To Polling Only";
     this->sctControl->setToPolling();
@@ -1039,6 +1080,9 @@ void UIThread::stopDataTaking()
     //make certain the file thread is not waiting in the multi queue
     this->fileMultiQueue->setForceStayAwake();
     this->fileMultiQueue->wakeAllConsumer();
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For File Thread Stopping");
+    wrefresh(this->textWindow);
     while(!this->fileControl->isWaiting())
     {//until we see the file thread waiting on its wait condition, sleep and spin
         boost::this_thread::sleep_for(this->refreshPeriod);

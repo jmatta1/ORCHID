@@ -35,6 +35,7 @@
 #include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
+#include"InterThreadComm/Control/AcquisitionThreadControl.h"
 #include"Utility/OrchidLogger.h"
 #include"Utility/CommonTypeDefs.h"
 
@@ -48,11 +49,13 @@ class UIThread
 public:
     UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
              InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
+             InterThread::AcquisitionThreadControl* acqCtrl,
              InterThread::SlowControlsThreadController* sctCtrl,
              InterThread::FileOutputThreadController* fileCtrl,
+             Utility::ToProcessingQueuePair* procDataQueue,
              Utility::ToFileMultiQueue* fileDataQueue,
              SlowControls::MpodController* mpCtrl,
-             int refreshFrequency, int pollingRate);
+             int refreshFrequency, int pollingRate, int numAcqThr);
     ~UIThread(){}
 
     //this is the function that is called by boost::thread when making a thread
@@ -104,6 +107,7 @@ private:
     void waitForAllTerminations();
     void waitForSlowControlsThreadTermination();
     void waitForFileThreadTermination();
+    void waitForAcquisitionThreadsTermination();
     
     /** Command functions **/
     //shuts down orchid, disconnecting from digitizer and ramping down voltages
@@ -133,13 +137,17 @@ private:
     InterThread::SlowData* slowData;
     InterThread::RateData* rateData;
     InterThread::FileData* fileData;
+    InterThread::AcquisitionThreadControl* acqControl;
     InterThread::SlowControlsThreadController* sctControl;
     InterThread::FileOutputThreadController* fileControl;
     SlowControls::MpodController* mpodController;
     Utility::MpodMapper* mpodMapper;
+    Utility::ToProcessingQueuePair* procQueuePair;
     Utility::ToFileMultiQueue* fileMultiQueue;
     //multiplier for calculating rate from number of triggers
     float rateMultiplier;
+    //number of acquisition threads running to wait for
+    int numAcqThreads;
     
     /**  Variables for managing the display output**/
     //the actual refresh rate in Hz good for calculations of persist count
