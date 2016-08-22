@@ -198,7 +198,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Debug)  << "Buffer Size is: " << bufferSize;
     unsigned int* tempBuffer = new unsigned int[bufferSize];
     digitizerList[0]->startAcquisition();
-    unsigned int dataRead = digitizerList[0]->waitForInterruptToReadData(tempBuffer);
+    unsigned int dataRead = digitizerList[0]->getData(tempBuffer);
     BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Interrupt";
     digitizerList[0]->stopAcquisition();
     if(dataRead != 0)
