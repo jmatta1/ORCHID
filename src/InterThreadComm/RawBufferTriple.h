@@ -26,7 +26,7 @@ template<class BufferInfo>
 struct RawBufferTriple
 {
     int sizeOfData;
-    int* dataBuffer;
+    unsigned int* dataBuffer;
     BufferInfo info;
 };
 
