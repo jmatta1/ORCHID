@@ -37,6 +37,7 @@ HFIR background monitoring wall.
 // ORCHID interprocess communication control objects
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
+#include"InterThreadComm/Control/AcquisitionThreadControl.h"
 // ORCHID device objects
 #include"Hardware//HVLib/MpodController.h"
 #include"Hardware/HVLib/SnmpUtilCommands.h"
@@ -45,6 +46,7 @@ HFIR background monitoring wall.
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
 #include"Threads/FileOutputThread.h"
+#include"Threads/AcquisitionThread.h"
 #include"Threads/ThreadWrapper.h"
 
 #include<fstream>
@@ -160,7 +162,8 @@ int main(int argc, char* argv[])
      * Build the InterThread Control structures
      */
     BOOST_LOG_SEV(lg, Debug)  << "Building thread control data structures" << std::flush;
-    // For controlling DigitizerThread
+    // For controlling AcquisitionThread
+    InterThread::AcquisitionThreadControl* acqController = new InterThread::AcquisitionThreadControl();
     
     // For controlling SlowControlsThread
     InterThread::SlowControlsThreadController* sctController = new InterThread::SlowControlsThreadController();
@@ -191,45 +194,37 @@ int main(int argc, char* argv[])
         digitizerList[i]->setupDigitizer();
     }
     
-    //for debugging, start acqusition of the first digitizer and wait for a single interrupt, read the data and dump to a simple file
-    std::ofstream outData;
-    outData.open("./tempdata.dat", std::ios_base::binary);
-    int bufferSize = digitizerList[0]->getSizeOfReadBufferIn32BitInts();
-    BOOST_LOG_SEV(lg, Debug)  << "Buffer Size is: " << bufferSize;
-    unsigned int* tempBuffer = new unsigned int[bufferSize];
-    digitizerList[0]->startAcquisition();
-    unsigned int dataRead = digitizerList[0]->getData(tempBuffer);
-    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Interrupt";
-    digitizerList[0]->stopAcquisition();
-    if(dataRead != 0)
+    //find the largest buffer size for the digitizers
+    unsigned int biggestBuffer = 0;
+    for(int i=0; i<numDigitizers; ++i)
     {
-        outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
+        unsigned int bufferSize = digitizerList[i]->getSizeOfReadBufferIn32BitInts();
+        if( bufferSize > biggestBuffer)
+        {
+            biggestBuffer =  bufferSize;
+        }
     }
-    dataRead = digitizerList[0]->performFinalReadout(tempBuffer);
-    BOOST_LOG_SEV(lg, Debug)  << "Read " << dataRead << " From Final Readout";
-    if(dataRead != 0)
-    {
-        outData.write(reinterpret_cast<char*>(tempBuffer), 4*dataRead);
-    }
-    outData.close();
-
-#if 0    
+    
     /*
      * Build the InterThread Buffer/Data queues
      */
     BOOST_LOG_SEV(lg, Debug)  << "Building interthread data queues" << std::flush;
-    // For transferring full data buffers from the digitizer
-    // reader to the event processing threads
-    
-    // For transferring empty data buffers from the event
-    // processing threads to the digitizer reader
+    // For transferring data buffers to and from the acquisition
+    // threads to the event processing threads
+    Utility::ToProcessingQueuePair* toProcessingQueue = new Utility::ToProcessingQueuePair();
+    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::DigitizerToProcessing); ++i)
+    {
+        Utility::ToProcessingBuffer* temp = new Utility::ToProcessingBuffer();
+        temp->dataBuffer = new unsigned int[biggestBuffer];
+        toProcessingQueue->consumerPush(temp);
+    }
     
     // transfers full slow controls events from the slow controls thread to the
     // file output thread. Also transfers empty sc events back to sc thread. Also
     // transfers full data events from the processing threads to the file output
     // thread, also transfers empty data events from the file output thread to
     // the processing threads
-    Utility::ToFileMultiQueue* toFileQueues = new Utility::ToFileMultiQueue;
+    Utility::ToFileMultiQueue* toFileQueues = new Utility::ToFileMultiQueue();
     //TODO: Load to file queue with empty dpp psd events
     /*for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
@@ -274,8 +269,16 @@ int main(int argc, char* argv[])
             new Threads::ThreadWrapper<Threads::SlowControlsThread>(scThreadCallable);
     
     //make the digitizer reader callable
-    //Threads::DigitizerThread* digitizerThreadCallable =
-    //          new DigitizerThread(...);
+    Threads::AcquisitionThread** acqThreadCallables = new Threads::AcquisitionThread*[numDigitizers];
+    for(int i=0; i<numDigitizers; ++i)
+    {
+        acqThreadCallables[i] = new Threads::AcquisitionThread(digitizerList[i], acqController, toProcessingQueue);
+    }
+    Threads::ThreadWrapper<Threads::AcquisitionThread>** acqThreadWrappers = new Threads::ThreadWrapper<Threads::AcquisitionThread>*[numDigitizers];
+    for(int i=0; i<numDigitizers; ++i)
+    {
+        acqThreadWrappers[i] = new Threads::ThreadWrapper<Threads::AcquisitionThread>(acqThreadCallables[i]);
+    }
     
     //make the event processing callables
     //Threads::EventProcessingThread** evProcThreadCallable =
@@ -292,7 +295,11 @@ int main(int argc, char* argv[])
     // Make the threads
     boost::thread scThread(*scThreadWrapper);
     boost::thread fileThread(*fileThreadWrapper);
-    //boost::thread digitizerThread(*digitizerThreadCallable);
+    boost::thread_group acquisitionThreads;
+    for(int i = 0; i<numDigitizers; ++i)
+    {
+        acquisitionThreads.create_thread(*(acqThreadWrappers[i]));
+    }
     //boost::thread_group eventProcessingThreads;
     /*for(int i = 0; i < numProcThreads; ++i)
     {
@@ -319,9 +326,27 @@ int main(int argc, char* argv[])
     delete scThreadCallable;
     delete fileThreadWrapper;
     delete fileThreadCallable;
+    for(int i = 0; i<numDigitizers; ++i)
+    {
+        delete acqThreadWrappers[i];
+    }
+    delete[] acqThreadWrappers;
+    for(int i = 0; i<numDigitizers; ++i)
+    {
+        delete acqThreadCallables[i];
+    }
+    delete[] acqThreadCallables;
     
     //delete the data queues
     BOOST_LOG_SEV(lg, Debug)  << "Deleting interthread data queues" << std::flush;
+    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::DigitizerToProcessing); ++i)
+    {
+        Utility::ToProcessingBuffer* temp;
+        toProcessingQueue->producerPop(temp);
+        delete[] temp->dataBuffer;
+        delete temp;
+    }
+    delete toProcessingQueue;
     //TODO: delete empty events from queue
     /*for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
@@ -338,7 +363,8 @@ int main(int argc, char* argv[])
         delete temp;
     }
     delete toFileQueues;
-#endif
+
+    
     //delete the device control structures
     BOOST_LOG_SEV(lg, Debug)  << "Deleting device controls" << std::flush;
     delete mpodMapper;
@@ -356,6 +382,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Debug)  << "Deleting thread controls" << std::flush;
     delete sctController;
     delete fotController;
+    delete acqController;
     
     BOOST_LOG_SEV(lg, Debug)  << "Deleting statistics accumulators\n" << std::flush;
     //delete shared objects generated for interprocess communication
