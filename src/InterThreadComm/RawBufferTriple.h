@@ -22,6 +22,12 @@
 namespace InterThread
 {
 
+struct BoardInfo
+{
+    unsigned short boardNumber;
+    unsigned short startChannel;
+};
+
 template<class BufferInfo>
 struct RawBufferTriple
 {

@@ -27,7 +27,7 @@
 
 namespace Utility
 {
-typedef InterThread::RawBufferTriple<int> ToProcessingBuffer;
+typedef InterThread::RawBufferTriple<InterThread::BoardInfo> ToProcessingBuffer;
 
 //queue types
 typedef boost::lockfree::queue<Events::EventInterface*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile)> > ProcessedEventQueue;
