@@ -73,7 +73,7 @@ void ProcessingThread::doProcessingLoop()
 void ProcessingThread::emptyProcessingBuffer()
 {//essentially loop until we cannot pull more buffers
     Utility::ToProcessingBuffer* dataBuffer;
-    while(dataInputQueue->consumerPop(dataBuffer))
+    while(dataInputQueue->tryConsumerPop(dataBuffer))
     {
         BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Clearing buffer queue, got a buffer";
         //asked to terminate
