@@ -41,7 +41,7 @@ static const int gridStartLine = 5;
 static const int tempStartCol = 21;
 static const int volStartCol = 40;
 
-UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
+UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
                    InterThread::AcquisitionThreadControl* acqCtrl,
                    InterThread::SlowControlsThreadController* sctCtrl,
@@ -50,7 +50,7 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
                    Utility::ToFileMultiQueue* fileDataQueue,
                    SlowControls::MpodController* mpCtrl, int refreshFrequency,
                    int pollingRate, int numAcqThr):
-    slowData(slDat), rateData(rtDat), fileData(fiDat), mpodMapper(mpodMap), procQueuePair(procDataQueue),
+    slowData(slDat), acqData(rtDat), fileData(fiDat), mpodMapper(mpodMap), procQueuePair(procDataQueue),
     fileMultiQueue(fileDataQueue), numAcqThreads(numAcqThr),
     acqControl(acqCtrl), sctControl(sctCtrl), fileControl(fileCtrl), mpodController(mpCtrl),
     persistCount(-1), lastFileSize(0), command(""),  persistentMessage(""), runLoop(true),

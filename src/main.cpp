@@ -153,8 +153,10 @@ int main(int argc, char* argv[])
                                                                  numTemperatureChannels);
     //count the number of digitizer channels
     int numDigitizerChannels = digitizerChannelData.channelNumber.size();
+    //count the number of digitizer modules
+    int numDigitizerModules = digitizerModuleData.linkNumber.size();
     //Make the rate data structure
-    InterThread::RateData* rateData = new InterThread::RateData(numDigitizerChannels);
+    InterThread::AcquisitionData* acqData = new InterThread::AcquisitionData(numDigitizerChannels, numDigitizerModules);
     //Make the data structure for file information
     InterThread::FileData* fileData = new InterThread::FileData();
     
@@ -245,7 +247,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Debug)  << "Building callable objects and their wrappers" << std::flush;
     //make the UI thread callable
     Threads::UIThread* uiThreadCallable =
-            new Threads::UIThread(slowData, rateData, fileData, mpodMapper,
+            new Threads::UIThread(slowData, acqData, fileData, mpodMapper,
                                   acqController, sctController, fotController,
                       //Future:   eventProcThreadControl,
                                   toProcessingQueue, toFileQueues, mpodController,
@@ -386,7 +388,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Debug)  << "Deleting statistics accumulators\n" << std::flush;
     //delete shared objects generated for interprocess communication
     delete slowData;
-    delete rateData;
+    delete acqData;
     delete fileData;
 
     BOOST_LOG_SEV(lg, Debug)  << "ORCHID has successfully shut down, have a nice day! :-)\n\n" << std::flush;

@@ -47,7 +47,7 @@ enum class UIMode : char {Init, Idle, Running};
 class UIThread
 {
 public:
-    UIThread(InterThread::SlowData* slDat, InterThread::RateData* rtDat,
+    UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
              InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
              InterThread::AcquisitionThreadControl* acqCtrl,
              InterThread::SlowControlsThreadController* sctCtrl,
@@ -135,7 +135,7 @@ private:
     //we may have a pointer to these data but we do not own it so: No deletions!
     // *vader says shaking his finger at Boba Fett*
     InterThread::SlowData* slowData;
-    InterThread::RateData* rateData;
+    InterThread::AcquisitionData* acqData;
     InterThread::FileData* fileData;
     InterThread::AcquisitionThreadControl* acqControl;
     InterThread::SlowControlsThreadController* sctControl;
