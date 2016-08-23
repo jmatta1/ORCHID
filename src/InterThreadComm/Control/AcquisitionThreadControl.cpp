@@ -35,9 +35,9 @@ void AcquisitionThreadControl::waitForChange()
     boost::unique_lock<boost::mutex> waitLock(waitMutex);
     while(this->acqState.load() == AcquisitionThreadState::Stopped)
     {
-        ++waitCount;
+        waitCount.fetch_add(1);
         acqThreadWaitCondition.wait(waitLock);
-        --waitCount;
+        waitCount.fetch_add(-1);
     }
     //the lock will release on deconstruction
 }

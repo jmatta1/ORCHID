@@ -51,9 +51,9 @@ public:
     
 private:
     std::atomic<ProcessingThreadState> procState;
-    std::atomic<int> termAckCount;
+    std::atomic_uint termAckCount;
     
-    std::atomic<int> waitCount;
+    std::atomic_uint waitCount;
     boost::condition_variable procThreadWaitCondition;//we create the mutex for this on the fly so everyone can wake up simultaneously
 };
 
