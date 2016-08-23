@@ -45,7 +45,8 @@ void ProcessingThread::operator()()
         case InterThread::ProcessingThreadState::Running:
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Starting Processing";
             this->doProcessingLoop();
-            //this->emptyProcessingBuffer();
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Clearing buffer queue";
+            this->emptyProcessingBuffer();
             break;
         }
     }
