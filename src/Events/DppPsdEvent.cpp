@@ -21,6 +21,7 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
+#include"EventCodes.h"
 
 namespace Events
 {
@@ -28,7 +29,7 @@ namespace Events
 
 int DppPsdEvent::getSizeOfBinaryRepresentation()
 {
-    return (sizeof(unsigned long long) + 7*sizeof(unsigned short));
+    return binarySize;
 }
 
 unsigned short boardNumber;
@@ -44,6 +45,10 @@ unsigned short flags;//bit[0] = PUR flag, bit[1] = over-range, bit[2] = trigger 
 void DppPsdEvent::getBinaryRepresentation(char* buff)
 {
     int index = 0;
+    *(reinterpret_cast<int*>(&(buff[index]))) = this->binarySize;
+    index += sizeof(int);
+    *(reinterpret_cast<int*>(&(buff[index]))) = Codes::DigitizerPsdEventCode;
+    index += sizeof(int);
     *(reinterpret_cast<unsigned short*>(&(buff[index]))) = boardNumber;
     index += sizeof(unsigned short);
     *(reinterpret_cast<unsigned short*>(&(buff[index]))) = channelNumber;

@@ -30,7 +30,9 @@ namespace Events
 class DppPsdEvent : public EventInterface
 {
 public:
-    DppPsdEvent():boardNumber(0), channelNumber(0), longIntegral(0),
+    DppPsdEvent():
+        binarySize(2*sizeof(int) + sizeof(unsigned long long) + 7*sizeof(unsigned short)),
+        boardNumber(0), channelNumber(0), longIntegral(0),
         shortIntegral(0), extendedTimestamp(0), fineTimeStamp(0),
         baseline(0), flags(0) {}
     virtual ~DppPsdEvent(){}
@@ -52,6 +54,7 @@ public:
     void setFlags(unsigned short flg){flags = flg;}
     
 private:
+    int binarySize;
     unsigned short boardNumber;
     unsigned short channelNumber;
     unsigned long long extendedTimestamp;
