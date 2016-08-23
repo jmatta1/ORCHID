@@ -75,6 +75,7 @@ void ProcessingThread::emptyProcessingBuffer()
     Utility::ToProcessingBuffer* dataBuffer;
     while(dataInputQueue->consumerPop(dataBuffer))
     {
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Clearing buffer queue, got a buffer";
         //asked to terminate
         processDataBuffer(dataBuffer); //when this finishes the data buffer
         //is completely handled and can be put back on the return queue
@@ -241,18 +242,18 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         //first pull an event from the queue
         Events::EventInterface* prEvent=nullptr;
         bool temp = this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": "<<offset<<" "<<scaledStopOffset<<" "<<temp;
+        //BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": "<<offset<<" "<<scaledStopOffset<<" "<<temp;
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
         {
             event->setChannel(baseChan + 1);
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with channel: " << (baseChan + 1);
+            //BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with channel: " << (baseChan + 1);
         }
         else
         {
             event->setChannel(baseChan);
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with channel: " << baseChan;
+            //BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with channel: " << baseChan;
         }
         int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
         ++offset;
@@ -274,8 +275,8 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         ++offset;
         //now push the event back onto the queue
         this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with timestamp: " << timeStamp;
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with longGate: " << (rawBuffer[offset] & 0xFFFF0000);
+        //BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with timestamp: " << timeStamp;
+        //BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with longGate: " << (rawBuffer[offset] & 0xFFFF0000);
     }
     return (offset - startOffset);
 }

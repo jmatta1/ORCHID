@@ -1089,6 +1089,7 @@ void UIThread::stopDataTaking()
     wrefresh(this->textWindow);
     while(this->numProcThreads > this->procControl->getThreadsWaiting())
     {//until we see the acquisition threads waiting on their wait condition, sleep and spin
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: "<<this->numProcThreads<<"  "<<this->procControl->getThreadsWaiting();
         boost::this_thread::sleep_for(this->refreshPeriod);
     }
     this->fileMultiQueue->clearForceStayAwake();
