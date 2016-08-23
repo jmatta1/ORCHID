@@ -252,9 +252,8 @@ int main(int argc, char* argv[])
     Threads::UIThread* uiThreadCallable =
             new Threads::UIThread(slowData, acqData, fileData, mpodMapper,
                                   acqController, sctController, fotController,
-                      //Future:   eventProcThreadControl,
-                                  toProcessingQueue, toFileQueues, mpodController,
-                                  params.generalBlock->updateFrequency,
+                                  prController, toProcessingQueue, toFileQueues,
+                                  mpodController, params.generalBlock->updateFrequency,
                                   params.powerBlock->pollingRate, numDigitizers);
     Threads::ThreadWrapper<Threads::UIThread>* uiThreadWrapper = 
             new Threads::ThreadWrapper<Threads::UIThread>(uiThreadCallable);
