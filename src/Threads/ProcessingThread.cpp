@@ -129,7 +129,7 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
         }
         //offset now points at the last channel aggregate event, increment it by
         //1 to point it at the start of the next channel aggregate
-        ++offset;
+        //++offset;
         ++loopCount;
     }
     return (offset - startOffset);
