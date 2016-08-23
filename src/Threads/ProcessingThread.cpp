@@ -106,6 +106,7 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
         //if we have the right header, process the board aggregate
         offset += processBoardAggregate(buffer, offset);
     }
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Done Processing Buffer";
 }
 
 int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer, int startOffset)
@@ -194,7 +195,7 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
-        Events::EventInterface* prEvent;
+        Events::EventInterface* prEvent=nullptr;
         this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
@@ -202,13 +203,11 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
         {
             event->setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with channel: " << (baseChan + 1);
         }
         else
         {
             event->setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with channel: " << baseChan;
         }
         int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
         ++offset;
@@ -225,8 +224,6 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
         event->setFlags(((rawBuffer[offset] & 0x00008000) >> 15));
         event->setShortGate((rawBuffer[offset] & 0x00007FFF));
         event->setLongGate(((rawBuffer[offset] & 0xFFFF0000) >> 16));
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with timestamp: " << timeStamp;
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with longGate: " << (rawBuffer[offset] & 0xFFFF0000);
         ++offset;
         //now push the event back onto the queue
         this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
@@ -242,17 +239,20 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
-        Events::EventInterface* prEvent;
-        this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
+        Events::EventInterface* prEvent=nullptr;
+        bool temp = this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": "<<offset<<" "<<scaledStopOffset<<" "<<temp;
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
         {
             event->setChannel(baseChan + 1);
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with channel: " << (baseChan + 1);
         }
         else
         {
             event->setChannel(baseChan);
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with channel: " << baseChan;
         }
         int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
         ++offset;
@@ -274,6 +274,8 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         ++offset;
         //now push the event back onto the queue
         this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with timestamp: " << timeStamp;
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with longGate: " << (rawBuffer[offset] & 0xFFFF0000);
     }
     return (offset - startOffset);
 }
@@ -286,7 +288,7 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
-        Events::EventInterface* prEvent;
+        Events::EventInterface* prEvent=nullptr;
         this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
@@ -330,7 +332,7 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
-        Events::EventInterface* prEvent;
+        Events::EventInterface* prEvent=nullptr;
         this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
