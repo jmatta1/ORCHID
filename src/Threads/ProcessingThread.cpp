@@ -156,17 +156,17 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
         switch(extraFormat)
         {
         case 0x0:
-            offset += processEventsWithExtras1(rawBuffer, startOffset, stopOffset, baseChan, board, skip);
+            offset += processEventsWithExtras1(rawBuffer, offset, stopOffset, baseChan, board, skip);
             break;
         case 0x1:
-            offset += processEventsWithExtras2(rawBuffer, startOffset, stopOffset, baseChan, board, skip);
+            offset += processEventsWithExtras2(rawBuffer, offset, stopOffset, baseChan, board, skip);
             break;
         case 0x2:
-            offset += processEventsWithExtras3(rawBuffer, startOffset, stopOffset, baseChan, board, skip);
+            offset += processEventsWithExtras3(rawBuffer, offset, stopOffset, baseChan, board, skip);
             break;
             //ignore case 0x5, useless
         default:
-            offset += processEventsWithoutExtras(rawBuffer, startOffset, stopOffset, baseChan, board, skip+1);
+            offset += processEventsWithoutExtras(rawBuffer, offset, stopOffset, baseChan, board, skip+1);
             break;
         }
     }
@@ -177,7 +177,7 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
         {
             skip = (sampleSlotsPerEvent/2);
         }
-        offset += processEventsWithoutExtras(rawBuffer, startOffset, stopOffset, baseChan, board, skip);
+        offset += processEventsWithoutExtras(rawBuffer, offset, stopOffset, baseChan, board, skip);
     }
     return (offset-startOffset);
 }
