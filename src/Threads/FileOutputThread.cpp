@@ -434,6 +434,7 @@ void FileOutputThread::finalizeDataBuffer()
     {
         crcComputer.process_block(&(this->currentBuffer[readInd]),&(this->currentBuffer[readInd+readSize]));
         reinterpret_cast<unsigned int*>(&(this->currentBuffer[writeInd]))[0] = crcComputer.checksum();
+        crcComputer.reset();
         writeInd += writeSize;
         readInd += readSize;
     }
