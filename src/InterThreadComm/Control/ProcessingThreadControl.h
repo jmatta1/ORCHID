@@ -32,7 +32,29 @@ enum class ProcessingThreadState : char {Running, Stopped, Terminate};
 
 class ProcessingThreadControl
 {
+public:
+    ProcessingThreadControl():procState(ProcessingThreadState::Stopped),
+        termAckCount(0), waitCount(0) {}
     
+    //functions to be accessed by the processing threads
+    ProcessingThreadState getCurrentState(){return procState.load();}
+    void waitForChange();
+    void acknowledgeTerminate(){++termAckCount;}
+
+    //functions to be accessed by the UI thread
+    void setToRunning(){procState.store(ProcessingThreadState::Running); procThreadWaitCondition.notify_all();}
+    void setToStopped(){procState.store(ProcessingThreadState::Stopped);}
+    void setToTerminate(){procState.store(ProcessingThreadState::Terminate); procThreadWaitCondition.notify_all();}
+    
+    int getThreadsWaiting(){return waitCount.load();}
+    int getThreadsTerminated(){return termAckCount.load();}
+    
+private:
+    std::atomic<ProcessingThreadState> procState;
+    std::atomic<int> termAckCount;
+    
+    std::atomic<int> waitCount;
+    boost::condition_variable procThreadWaitCondition;//we create the mutex for this on the fly so everyone can wake up simultaneously
 };
 
 }
