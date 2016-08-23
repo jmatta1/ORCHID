@@ -1050,7 +1050,7 @@ void UIThread::startDataTaking()
     this->procControl->setToRunning();
     //wait to be certain the processing threads are up and running before we start anything else
     boost::this_thread::sleep_for(this->refreshPeriod);
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Online Processing Thread Set To Stop";
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Online Processing Thread Set To Start";
     //TODO put the online processing thread into stop mode
     //TODO wait for online processing to stop
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Acquisition Thread";

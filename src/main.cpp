@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
     /*
      * Handle the threads
      */
-    BOOST_LOG_SEV(lg, Debug)  << "Building threads\n" << std::flush;
+    BOOST_LOG_SEV(lg, Debug)  << "Building threads" << std::flush;
     // Make the threads
     boost::thread scThread(*scThreadWrapper);
     boost::thread fileThread(*fileThreadWrapper);
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
         processingThreads.create_thread(*(prThreadWrappers[i]));
     }
     //make the UI thread last
-    BOOST_LOG_SEV(lg, Debug)  << "Starting UI Thread, stopping console logging\n" << std::flush;
+    BOOST_LOG_SEV(lg, Debug)  << "Starting UI Thread, stopping console logging" << std::flush;
     boost::log::core::get()->remove_sink(coutSink);
     coutSink->flush();
     boost::thread uiThread(*uiThreadWrapper);

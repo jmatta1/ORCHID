@@ -45,7 +45,7 @@ void ProcessingThread::operator()()
         case InterThread::ProcessingThreadState::Running:
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Starting Processing";
             this->doProcessingLoop();
-            this->emptyProcessingBuffer();
+            //this->emptyProcessingBuffer();
             break;
         }
     }
@@ -92,11 +92,12 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
     //now loop through the board aggregates
     while(offset < dataSize)
     {
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
         //first makes sure the board aggregate leads with the right info
         if(((rawBuffer[offset] && 0xF0000000UL)!=0xA0000000UL) && ((rawBuffer[offset] && 0x0FFFFFFFUL) <= (dataSize - offset)))
         {
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Found corrupted board aggregate";
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Brd #: " << std::dec << board << " Size: " << dataSize << " Offset: " << offset;
             //now skip the rest of the buffer
             break;
@@ -109,6 +110,7 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
 int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer, int startOffset)
 {
     //grab a couple useful things in the buffer
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing board aggregate with offset: " << startOffset;
     unsigned int* rawBuffer = buffer->dataBuffer;
     int startChan = buffer->info.startChannel;
     int offset = startOffset;
@@ -131,6 +133,7 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
 int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffer, int startOffset, int baseChan)
 {
     //grab a couple useful things in the buffer
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing channel aggregate with offset: " << startOffset << " and baseChan: "<<baseChan;
     unsigned int* rawBuffer = buffer->dataBuffer;
     int board = buffer->info.boardNumber;
     int offset = startOffset;
@@ -179,6 +182,7 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
 
 int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip)
 {
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 3);
     while(offset < scaledStopOffset)
@@ -222,6 +226,7 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
 
 int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip)
 {
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 3);
     while(offset < scaledStopOffset)
@@ -265,6 +270,7 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
 
 int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip)
 {
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events3 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 3);
     while(offset < scaledStopOffset)
@@ -308,6 +314,7 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
 
 int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip)
 {
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events0 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 2);
     while(offset < scaledStopOffset)
