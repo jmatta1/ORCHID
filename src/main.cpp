@@ -244,6 +244,7 @@ int main(int argc, char* argv[])
     }
     
 
+    int numProcThreads = params.generalBlock->processingThreadCount;
     /*
      * Build the callable objects for boost::thread
      */
@@ -254,7 +255,7 @@ int main(int argc, char* argv[])
                                   acqController, sctController, fotController,
                                   prController, toProcessingQueue, toFileQueues,
                                   mpodController, params.generalBlock->updateFrequency,
-                                  params.powerBlock->pollingRate, numDigitizers);
+                                  params.powerBlock->pollingRate, numDigitizers, numProcThreads);
     Threads::ThreadWrapper<Threads::UIThread>* uiThreadWrapper = 
             new Threads::ThreadWrapper<Threads::UIThread>(uiThreadCallable);
 
@@ -284,7 +285,6 @@ int main(int argc, char* argv[])
     }
     
     //make the event processing callables
-    int numProcThreads = params.generalBlock->processingThreadCount;
     Threads::ProcessingThread** processingThreadCallables = new Threads::ProcessingThread*[numProcThreads];
     for(int i=0; i < numProcThreads; ++i)
     {
