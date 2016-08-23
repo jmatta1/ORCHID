@@ -5,9 +5,6 @@
 This is a Data Acquisiton and Control program for handling the CAEN digitizer via optical link and handling the MPOD HV system.
 
 ####Programming ToDo List
- - TODO: Implement Digitizer Reader and Controller
- - TODO: Implement the Digitizer Thread
- - TODO: Implement the Event Processing Thread(s)
  - TODO: Update UI Thread as more things are implemented
  - TODO: Implement Compressing buffer
  - TODO: Clean up the format and structure of the ui thread
