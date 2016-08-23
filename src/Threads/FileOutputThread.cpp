@@ -279,7 +279,6 @@ void FileOutputThread::doWriteLoop()
         if(this->inputQueues->tryConsumerPop<Utility::ProcessingQueueIndex>(event))
         {
             gotData = true;
-            BOOST_LOG_SEV(lg, Information) << "FO Thread: Got a data event";
             int eventSize = event->getSizeOfBinaryRepresentation();
             //loop until the intermediate buffer is big enough
             while(eventSize > this->evBufSize)
@@ -297,7 +296,6 @@ void FileOutputThread::doWriteLoop()
         if(this->inputQueues->tryConsumerPop<Utility::SlowControlsQueueIndex>(event))
         {
             gotData = true;
-            BOOST_LOG_SEV(lg, Information) << "FO Thread: Got a slow controls event";
             int eventSize = event->getSizeOfBinaryRepresentation();
             //loop until we double the event buffer past the size of the event
             while(eventSize > this->evBufSize)
