@@ -117,7 +117,7 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
     int stopOffset = startOffset + (rawBuffer[offset] & 0x0FFFFFFFUL);
     ++offset;
     short chanMask = (rawBuffer[offset] & 0x000000FFUL);
-    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing board aggregate with chanMask: " << std::hex << "0x"<<chanMask<std::dec;
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing board aggregate with chanMask: " << std::hex << "0x"<<chanMask<<std::dec;
     offset += 3;
     //now loop through the board aggregates
     int loopCount = 0;
