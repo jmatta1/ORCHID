@@ -26,31 +26,32 @@
 namespace InterThread
 {
 
-RateData::RateData(int numDigiChan): numDigitizerChannels(numDigiChan)
+AcquisitionData::AcquisitionData(int numDigiChan, int numMods):
+    numChannels(numDigiChan), numModules(numMods)
 {
-    this->triggers = new std::atomic_uint[this->numDigitizerChannels];
-    for(int i=0; i<this->numDigitizerChannels; ++i)
+    this->triggers = new std::atomic_uint[this->numChannels];
+    for(int i=0; i<this->numChannels; ++i)
     {
         triggers[i].store(0);
     }
-}
-
-RateData::~RateData()
-{
-    delete[] this->triggers;
-}
-
-void RateData::clearTrigs()
-{
-    for(int i=0; i<this->numDigitizerChannels; ++i)
+    this->dataSizes = new std::atomic_uint[this->numModules];
+    for(int i=0; i<this->numModules; ++i)
     {
-        triggers[i].store(0, std::memory_order_relaxed);
+        dataSizes[i].store(0);
     }
 }
 
-void RateData::addTrigs(int chan, unsigned count)
+
+void AcquisitionData::clearData()
 {
-    triggers[chan].fetch_add(count, std::memory_order_relaxed);
+    for(int i=0; i<this->numChannels; ++i)
+    {
+        triggers[i].store(0, std::memory_order_relaxed);
+    }
+    for(int i=0; i<this->numModules; ++i)
+    {
+        dataSizes[i].store(0, std::memory_order_relaxed);
+    }
 }
 
 }

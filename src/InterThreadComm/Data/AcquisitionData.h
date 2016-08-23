@@ -29,16 +29,20 @@
 namespace InterThread
 {
 
-struct RateData
+struct AcquisitionData
 {
-    RateData(int numDigiChan);
-    ~RateData();
-    void clearTrigs();
-    void addTrigs(int chan, unsigned count);
+    AcquisitionData(int numDigiChan, int numMods);
+    ~AcquisitionData(){delete[] this->dataSizes; delete[] this->triggers;}
+    void clearData();
+    void addData(int digi, unsigned amount){dataSizes[digi].fetch_add(amount, std::memory_order_relaxed);}
+    void addTrigs(int chan, unsigned count){triggers[chan].fetch_add(count, std::memory_order_relaxed);}
+    void incrTrigs(int chan){triggers[chan].fetch_add(1, std::memory_order_relaxed);}
 
+    std::atomic_uint* dataSizes;
     std::atomic_uint* triggers;
 
-    int numDigitizerChannels;
+    int numChannels;
+    int numModules;
 };
 
 }
