@@ -58,7 +58,8 @@ void AcquisitionThread::doAcquisitionLoop()
     while(this->controller->getCurrentState() == InterThread::AcquisitionThreadState::Acquiring)
     {
         //we have the buffer prepped and ready for the first read, so go about things
-        currentBuffer->info = this->firstChannel;
+        currentBuffer->info.startChannel = this->firstChannel;
+        currentBuffer->info.boardNumber = this->modNumber;
         currentBuffer->sizeOfData = this->digitizer->getData(currentBuffer->dataBuffer);
         if(currentBuffer->sizeOfData != 0)
         {
@@ -101,7 +102,8 @@ void AcquisitionThread::endAcquisition()
 
 void AcquisitionThread::doFinalRead()
 {
-    currentBuffer->info = this->firstChannel;
+    currentBuffer->info.startChannel = this->firstChannel;
+    currentBuffer->info.boardNumber = this->modNumber;
     currentBuffer->sizeOfData = this->digitizer->performFinalReadout(currentBuffer->dataBuffer);
     if(currentBuffer->sizeOfData != 0)
     {
