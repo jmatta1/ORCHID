@@ -62,6 +62,8 @@ public:
     
     //return the channel 0 index
     int getModuleStartChannel(){return channelStartInd;}
+    //return the channel 0 index
+    int getModuleNumber(){return moduleNumber;}
 private:
     void writeErrorAndThrow(CAENComm_ErrorCode errVal);
 
