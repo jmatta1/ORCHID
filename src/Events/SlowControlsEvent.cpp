@@ -31,7 +31,8 @@ namespace Events
 {
 
 SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
-    numVoltageChannels(numVolChannels), numTemperatureChannels(numTempChannels)
+    numVoltageChannels(numVolChannels), numTemperatureChannels(numTempChannels),
+    binarySize(0)
 {
     this->boardNumber     = new int[numVolChannels];
     this->channelNumber   = new int[numVolChannels];
@@ -48,6 +49,21 @@ SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
     this->maxTemperature  = new int[numVolChannels];
     this->outputSwitch    = new bool[numVolChannels];
     this->channelStatus   = new SlowControls::ChannelStatus[numVolChannels];
+    //calculate the size of an event
+    //size of the event, event ident, num voltage channels, num temp channels
+    int overhead = 4*sizeof(int);
+    //2 ints + 8 floats + 3 ints + 1 bool + 1 unsigned int per vol channel
+    int sizeOfSingleVoltageChannel = 2*sizeof(int) + 8*sizeof(float) +
+                                     3*sizeof(int) + sizeof(bool) +
+                                     sizeof(unsigned int);
+    //there are numVoltageChannels worth of this to store, plus the crate status
+    //which fits into an int
+    int sizeOfVoltage = sizeof(unsigned int) +
+                        (this->numVoltageChannels*sizeOfSingleVoltageChannel);
+    //no temperature data at the moment
+    int sizeOfSingleTemperatureChannel = 0;
+    int sizeOfTemperature = this->numTemperatureChannels*sizeOfSingleTemperatureChannel;
+    binarySize = (overhead + sizeOfVoltage + sizeOfTemperature);
 }
 
 SlowControlsEvent::~SlowControlsEvent()
@@ -70,21 +86,7 @@ SlowControlsEvent::~SlowControlsEvent()
 
 int SlowControlsEvent::getSizeOfBinaryRepresentation()
 {
-    //size of the event, event ident, num voltage channels, num temp channels
-    int overhead = 4*sizeof(int);
-    //2 ints + 8 floats + 3 ints + 1 bool + 1 unsigned int per vol channel
-    int sizeOfSingleVoltageChannel = 2*sizeof(int) + 8*sizeof(float) +
-                                     3*sizeof(int) + sizeof(bool) +
-                                     sizeof(unsigned int);
-    //there are numVoltageChannels worth of this to store, plus the crate status
-    //which fits into an int
-    int sizeOfVoltage = sizeof(unsigned int) +
-                        (this->numVoltageChannels*sizeOfSingleVoltageChannel);
-    //no temperature data at the moment
-    int sizeOfSingleTemperatureChannel = 0;
-    int sizeOfTemperature = this->numTemperatureChannels*sizeOfSingleTemperatureChannel;
-    
-    return (overhead + sizeOfVoltage + sizeOfTemperature);
+    return binarySize;
     
 }
 
@@ -94,7 +96,7 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
     //lots of pointer tricks to come
     size_t index = 0;
     //first write the size of the event
-    *(reinterpret_cast<int*>(&(buff[index]))) = this->getSizeOfBinaryRepresentation();
+    *(reinterpret_cast<int*>(&(buff[index]))) = this->binarySize;
     index += sizeof(int);
     *(reinterpret_cast<int*>(&(buff[index]))) = Codes::SlowControlsEventCode;
     index += sizeof(int);

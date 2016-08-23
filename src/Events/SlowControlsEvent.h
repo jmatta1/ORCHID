@@ -70,6 +70,7 @@ private:
     //once at object creation and never again
     int numVoltageChannels;
     int numTemperatureChannels;
+    int binarySize;
 };
 
 }
