@@ -94,7 +94,7 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
     {
         BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
         //first makes sure the board aggregate leads with the right info
-        if(((rawBuffer[offset] && 0xF0000000UL)!=0xA0000000UL) && ((rawBuffer[offset] && 0x0FFFFFFFUL) <= (dataSize - offset)))
+        if(((rawBuffer[offset] & 0xF0000000UL)!=0xA0000000UL) && ((rawBuffer[offset] & 0x0FFFFFFFUL) <= (dataSize - offset)))
         {
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Found corrupted board aggregate";
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
@@ -114,9 +114,9 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
     unsigned int* rawBuffer = buffer->dataBuffer;
     int startChan = buffer->info.startChannel;
     int offset = startOffset;
-    int stopOffset = startOffset + (rawBuffer[offset] && 0x0FFFFFFFUL);
+    int stopOffset = startOffset + (rawBuffer[offset] & 0x0FFFFFFFUL);
     ++offset;
-    short chanMask = (rawBuffer[offset] && 0x000000FFUL);
+    short chanMask = (rawBuffer[offset] & 0x000000FFUL);
     offset += 3;
     //now loop through the board aggregates
     int loopCount = 0;
@@ -137,12 +137,12 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
     unsigned int* rawBuffer = buffer->dataBuffer;
     int board = buffer->info.boardNumber;
     int offset = startOffset;
-    int stopOffset = startOffset + (rawBuffer[offset] && 0x00007FFFUL);
+    int stopOffset = startOffset + (rawBuffer[offset] & 0x00007FFFUL);
     ++offset;
-    short sampleSlotsPerEvent = 8*(rawBuffer[offset] && 0x00000FFFUL);
-    bool extraEnabled = ((rawBuffer[offset] && 0x10000000UL) != 0);
-    bool waveformEnabled = ((rawBuffer[offset] && 0x08000000UL) != 0);
-    short extraFormat = ((rawBuffer[offset] && 0x07000000UL) >> 24);
+    short sampleSlotsPerEvent = 8*(rawBuffer[offset] & 0x00000FFFUL);
+    bool extraEnabled = ((rawBuffer[offset] & 0x10000000UL) != 0);
+    bool waveformEnabled = ((rawBuffer[offset] & 0x08000000UL) != 0);
+    short extraFormat = ((rawBuffer[offset] & 0x07000000UL) >> 24);
     ++offset;
     if(extraEnabled)
     {
