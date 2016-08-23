@@ -57,7 +57,7 @@ public:
              Utility::ToProcessingQueuePair* procDataQueue,
              Utility::ToFileMultiQueue* fileDataQueue,
              SlowControls::MpodController* mpCtrl,
-             int refreshFrequency, int pollingRate, int numAcqThr);
+             int refreshFrequency, int pollingRate, int numAcqThr, int numPrThr);
     ~UIThread(){}
 
     //this is the function that is called by boost::thread when making a thread
@@ -110,6 +110,7 @@ private:
     void waitForSlowControlsThreadTermination();
     void waitForFileThreadTermination();
     void waitForAcquisitionThreadsTermination();
+    void waitForProcessingThreadsTermination();
     
     /** Command functions **/
     //shuts down orchid, disconnecting from digitizer and ramping down voltages
@@ -151,6 +152,8 @@ private:
     float rateMultiplier;
     //number of acquisition threads running to wait for
     int numAcqThreads;
+    //number of processing threads running to wait for
+    int numProcThreads;
     
     /**  Variables for managing the display output**/
     //the actual refresh rate in Hz good for calculations of persist count

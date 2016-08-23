@@ -49,9 +49,9 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* r
                    Utility::ToProcessingQueuePair* procDataQueue,
                    Utility::ToFileMultiQueue* fileDataQueue,
                    SlowControls::MpodController* mpCtrl, int refreshFrequency,
-                   int pollingRate, int numAcqThr):
+                   int pollingRate, int numAcqThr, int numPrThr):
     slowData(slDat), acqData(rtDat), fileData(fiDat), mpodMapper(mpodMap), procQueuePair(procDataQueue),
-    fileMultiQueue(fileDataQueue), numAcqThreads(numAcqThr),
+    fileMultiQueue(fileDataQueue), numAcqThreads(numAcqThr), numProcThreads(numPrThr),
     acqControl(acqCtrl), sctControl(sctCtrl), fileControl(fileCtrl), procControl(procCtrl), mpodController(mpCtrl),
     persistCount(-1), lastFileSize(0), command(""),  persistentMessage(""), runLoop(true),
     refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
@@ -838,9 +838,30 @@ void UIThread::waitForAllTerminations()
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Terminating Threads";
     this->waitForSlowControlsThreadTermination();
     this->waitForAcquisitionThreadsTermination();
-    //this->waitForEventProcessingThreadsTermination();
+    this->waitForProcessingThreadsTermination();
+    //this->waitForOnlineProcThreadTermination();
     this->waitForFileThreadTermination();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Done Terminating Threads";
+}
+
+void UIThread::waitForProcessingThreadsTermination()
+{
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Terminating Processing Threads";
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Termination of Processing Threads");
+    wrefresh(this->textWindow);
+    wclear(this->messageWindow);
+    wrefresh(this->messageWindow);
+    this->procControl->setToTerminate();
+    //make certain the slow controls thread is awake
+    this->fileMultiQueue->setForceStayAwake();
+    this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
+    //loop until we see the terminate signals from the slow controls thread
+    while(this->numProcThreads > this->procControl->getThreadsTerminated())
+    {//until we see the acquisition threads waiting on their wait condition, sleep and spin
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    this->fileMultiQueue->clearForceStayAwake();
 }
 
 void UIThread::waitForAcquisitionThreadsTermination()
@@ -1026,7 +1047,7 @@ void UIThread::startDataTaking()
     wrefresh(this->textWindow);
     boost::this_thread::sleep_for(slowControlsPollingWaitPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Event Processing";
-    //TODO put the event processing threads into running mode
+    this->procControl->setToRunning();
     //wait to be certain the processing threads are up and running before we start anything else
     boost::this_thread::sleep_for(this->refreshPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Online Processing Thread Set To Stop";
@@ -1052,7 +1073,7 @@ void UIThread::stopDataTaking()
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Acquistion Threads Set To Stop";
     this->acqControl->setToStopped();
     wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Waiting For Acquisition Stopping");
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Acquisition Stop");
     wrefresh(this->textWindow);
     while(this->numAcqThreads > this->acqControl->getThreadsWaiting())
     {//until we see the acquisition threads waiting on their wait condition, sleep and spin
@@ -1060,7 +1081,17 @@ void UIThread::stopDataTaking()
     }
     
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Event Processing Threads Set To Stop";
-    //TODO put the event processing threads into finish and stop mode
+    this->procControl->setToStopped();
+    this->fileMultiQueue->setForceStayAwake();
+    this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Waiting For Processing Stop");
+    wrefresh(this->textWindow);
+    while(this->numProcThreads > this->procControl->getThreadsWaiting())
+    {//until we see the acquisition threads waiting on their wait condition, sleep and spin
+        boost::this_thread::sleep_for(this->refreshPeriod);
+    }
+    this->fileMultiQueue->clearForceStayAwake();
     //TODO put in wait for processing threads to stop
     
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Online Processing Thread Set To Stop";
