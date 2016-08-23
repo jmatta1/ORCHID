@@ -201,11 +201,13 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
         {
             event->setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with channel: " << (baseChan + 1);
         }
         else
         {
             event->setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with channel: " << baseChan;
         }
         int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
         ++offset;
@@ -222,6 +224,8 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
         event->setFlags(((rawBuffer[offset] & 0x00008000) >> 15));
         event->setShortGate((rawBuffer[offset] & 0x00007FFF));
         event->setLongGate(((rawBuffer[offset] & 0xFFFF0000) >> 16));
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with timestamp: " << timeStamp;
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with longGate: " << (rawBuffer[offset] & 0xFFFF0000);
         ++offset;
         //now push the event back onto the queue
         this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
