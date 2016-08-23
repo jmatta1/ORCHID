@@ -32,16 +32,6 @@ int DppPsdEvent::getSizeOfBinaryRepresentation()
     return binarySize;
 }
 
-unsigned short boardNumber;
-unsigned short channelNumber;
-unsigned long long extendedTimestamp;
-unsigned short longIntegral;
-unsigned short shortIntegral;
-//could be zero based on extras word options
-unsigned short fineTimeStamp;
-unsigned short baseline;
-unsigned short flags;//bit[0] = PUR flag, bit[1] = over-range, bit[2] = trigger lost
-
 void DppPsdEvent::getBinaryRepresentation(char* buff)
 {
     int index = 0;
