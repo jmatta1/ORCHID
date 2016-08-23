@@ -68,9 +68,9 @@ void AcquisitionThread::doAcquisitionLoop()
             //now pop a buffer
             if(!(this->dataOutputQueue->producerPop(currentBuffer)))
             {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Failure in waiting for a buffer";
-                this->digitizer->stopAcquisition();
-                throw std::runtime_error("ACQ Thread Error: Failure in waiting for a buffer");
+                //if this failed we are being asked to exit the loop while we were waiting for a buffer
+                break;
+                currentBuffer = nullptr;
             }
         }
         
@@ -102,6 +102,11 @@ void AcquisitionThread::endAcquisition()
 
 void AcquisitionThread::doFinalRead()
 {
+    bool haveBuffer = (currentBuffer == nullptr);
+    while(!haveBuffer)
+    {
+        haveBuffer = this->dataOutputQueue->producerPop(currentBuffer);
+    }
     currentBuffer->info.startChannel = this->firstChannel;
     currentBuffer->info.boardNumber = this->modNumber;
     currentBuffer->sizeOfData = this->digitizer->performFinalReadout(currentBuffer->dataBuffer);
