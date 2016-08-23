@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_THREADS_DIGITIZERTHREAD_H
-#define ORCHID_SRC_THREADS_DIGITIZERTHREAD_H
+#ifndef ORCHID_SRC_THREADS_ACQUISITIONTHREAD_H
+#define ORCHID_SRC_THREADS_ACQUISITIONTHREAD_H
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -64,4 +64,4 @@ private:
 
 }
 
-#endif //ORCHID_SRC_THREADS_DIGITIZERTHREAD_H
+#endif //ORCHID_SRC_THREADS_ACQUISITIONTHREAD_H
