@@ -46,6 +46,7 @@ public:
     
 private:
     void doProcessingLoop();
+    void emptyProcessingBuffer();
     void processDataBuffer(Utility::ToProcessingBuffer* buffer);
     int processBoardAggregate(Utility::ToProcessingBuffer* buffer, int startOffset);
     int processChannelAggregate(Utility::ToProcessingBuffer* buffer, int startOffset, int baseChan);

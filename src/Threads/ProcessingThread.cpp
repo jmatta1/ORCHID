@@ -45,6 +45,7 @@ void ProcessingThread::operator()()
         case InterThread::ProcessingThreadState::Running:
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Starting Processing";
             this->doProcessingLoop();
+            this->emptyProcessingBuffer();
             break;
         }
     }
@@ -65,6 +66,18 @@ void ProcessingThread::doProcessingLoop()
             //is completely handled and can be put back on the return queue
             this->dataInputQueue->consumerPush(dataBuffer);
         }
+    }
+}
+
+void ProcessingThread::emptyProcessingBuffer()
+{//essentially loop until we cannot pull more buffers
+    Utility::ToProcessingBuffer* dataBuffer;
+    while(dataInputQueue->consumerPop(dataBuffer))
+    {
+        //asked to terminate
+        processDataBuffer(dataBuffer); //when this finishes the data buffer
+        //is completely handled and can be put back on the return queue
+        this->dataInputQueue->consumerPush(dataBuffer);
     }
 }
 
