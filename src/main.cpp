@@ -34,10 +34,12 @@ HFIR background monitoring wall.
 #include"InterThreadComm/MultiQueuePair.h"
 #include"InterThreadComm/QueuePair.h"
 #include"Events/SlowControlsEvent.h"
+#include"Events/DppPsdEvent.h"
 // ORCHID interprocess communication control objects
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"InterThreadComm/Control/AcquisitionThreadControl.h"
+#include"InterThreadComm/Control/ProcessingThreadControl.h"
 // ORCHID device objects
 #include"Hardware//HVLib/MpodController.h"
 #include"Hardware/HVLib/SnmpUtilCommands.h"
@@ -47,6 +49,7 @@ HFIR background monitoring wall.
 #include"Threads/SlowControlsThread.h"
 #include"Threads/FileOutputThread.h"
 #include"Threads/AcquisitionThread.h"
+#include"Threads/ProcessingThread.h"
 #include"Threads/ThreadWrapper.h"
 
 #include<fstream>
@@ -174,6 +177,7 @@ int main(int argc, char* argv[])
     InterThread::FileOutputThreadController* fotController = new InterThread::FileOutputThreadController();
     
     // For controlling EventProcThread(s)
+    InterThread::ProcessingThreadControl* prController = new  InterThread::ProcessingThreadControl();
     
     /*
      * Build the Device Control structures
@@ -227,12 +231,11 @@ int main(int argc, char* argv[])
     // thread, also transfers empty data events from the file output thread to
     // the processing threads
     Utility::ToFileMultiQueue* toFileQueues = new Utility::ToFileMultiQueue();
-    //TODO: Load to file queue with empty dpp psd events
-    /*for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
+    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile); ++i)
     {
         //we use comsumer push since consumers push to the empty object return
-        toFileQueues->consumerPush<Utility::ProcessingQueueIndex>(new Events::TriggerEvent());
-    }*/
+        toFileQueues->consumerPush<Utility::ProcessingQueueIndex>(new Events::DppPsdEvent());
+    }
     //here we load the queue with empty slow controls events
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
@@ -282,12 +285,17 @@ int main(int argc, char* argv[])
     }
     
     //make the event processing callables
-    //Threads::EventProcessingThread** evProcThreadCallable =
-    //          new EventProcessingThread*[numProcThreads];
-    //for(int i=0; i < numProcThreads; ++i)
-    //{
-    //  evProcThreadCallable[i] = new EventProcessingThread(i, ...);
-    //}
+    int numProcThreads = params.generalBlock->processingThreadCount;
+    Threads::ProcessingThread** processingThreadCallables = new Threads::ProcessingThread*[numProcThreads];
+    for(int i=0; i < numProcThreads; ++i)
+    {
+        processingThreadCallables[i] = new Threads::ProcessingThread(prController, toProcessingQueue, toFileQueues, acqData, i);
+    }
+    Threads::ThreadWrapper<Threads::ProcessingThread>** prThreadWrappers = new Threads::ThreadWrapper<Threads::ProcessingThread>*[numProcThreads];
+    for(int i=0; i<numProcThreads; ++i)
+    {
+        prThreadWrappers[i] = new Threads::ThreadWrapper<Threads::ProcessingThread>(processingThreadCallables[i]);
+    }
     
     /*
      * Handle the threads
@@ -301,11 +309,11 @@ int main(int argc, char* argv[])
     {
         acquisitionThreads.create_thread(*(acqThreadWrappers[i]));
     }
-    //boost::thread_group eventProcessingThreads;
-    /*for(int i = 0; i < numProcThreads; ++i)
+    boost::thread_group processingThreads;
+    for(int i = 0; i < numProcThreads; ++i)
     {
-        eventProcessingThreads.create_thread(*(evProcThreadCallable[i]));
-    }*/
+        processingThreads.create_thread(*(prThreadWrappers[i]));
+    }
     //make the UI thread last
     BOOST_LOG_SEV(lg, Debug)  << "Starting UI Thread, stopping console logging\n" << std::flush;
     boost::log::core::get()->remove_sink(coutSink);
@@ -337,6 +345,16 @@ int main(int argc, char* argv[])
         delete acqThreadCallables[i];
     }
     delete[] acqThreadCallables;
+    for(int i = 0; i<numProcThreads; ++i)
+    {
+        delete prThreadWrappers[i];
+    }
+    delete[] prThreadWrappers;
+    for(int i = 0; i<numProcThreads; ++i)
+    {
+        delete processingThreadCallables[i];
+    }
+    delete[] processingThreadCallables;
     
     //delete the data queues
     BOOST_LOG_SEV(lg, Debug)  << "Deleting interthread data queues" << std::flush;
@@ -348,13 +366,13 @@ int main(int argc, char* argv[])
         delete temp;
     }
     delete toProcessingQueue;
-    //TODO: delete empty events from queue
-    /*for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
+    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
         Events::EventInterface* temp;
         //we use producer pop because that pulls empty events from the queue index
         toFileQueues->producerPop<Utility::ProcessingQueueIndex>(temp);
-    }*/
+        delete temp;
+    }
     //here we load the queue with empty slow controls events
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
@@ -384,6 +402,7 @@ int main(int argc, char* argv[])
     delete sctController;
     delete fotController;
     delete acqController;
+    delete prController;
     
     BOOST_LOG_SEV(lg, Debug)  << "Deleting statistics accumulators\n" << std::flush;
     //delete shared objects generated for interprocess communication
