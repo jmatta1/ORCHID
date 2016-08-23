@@ -45,14 +45,14 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* r
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
                    InterThread::AcquisitionThreadControl* acqCtrl,
                    InterThread::SlowControlsThreadController* sctCtrl,
-                   InterThread::FileOutputThreadController* fileCtrl,
+                   InterThread::FileOutputThreadController* fileCtrl, InterThread::ProcessingThreadControl* procCtrl,
                    Utility::ToProcessingQueuePair* procDataQueue,
                    Utility::ToFileMultiQueue* fileDataQueue,
                    SlowControls::MpodController* mpCtrl, int refreshFrequency,
                    int pollingRate, int numAcqThr):
     slowData(slDat), acqData(rtDat), fileData(fiDat), mpodMapper(mpodMap), procQueuePair(procDataQueue),
     fileMultiQueue(fileDataQueue), numAcqThreads(numAcqThr),
-    acqControl(acqCtrl), sctControl(sctCtrl), fileControl(fileCtrl), mpodController(mpCtrl),
+    acqControl(acqCtrl), sctControl(sctCtrl), fileControl(fileCtrl), procControl(procCtrl), mpodController(mpCtrl),
     persistCount(-1), lastFileSize(0), command(""),  persistentMessage(""), runLoop(true),
     refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
     messageWindow(nullptr), lg(OrchidLog::get())

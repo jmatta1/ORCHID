@@ -36,6 +36,7 @@
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"InterThreadComm/Control/AcquisitionThreadControl.h"
+#include"InterThreadComm/Control/ProcessingThreadControl.h"
 #include"Utility/OrchidLogger.h"
 #include"Utility/CommonTypeDefs.h"
 
@@ -52,6 +53,7 @@ public:
              InterThread::AcquisitionThreadControl* acqCtrl,
              InterThread::SlowControlsThreadController* sctCtrl,
              InterThread::FileOutputThreadController* fileCtrl,
+             InterThread::ProcessingThreadControl* procCtrl,
              Utility::ToProcessingQueuePair* procDataQueue,
              Utility::ToFileMultiQueue* fileDataQueue,
              SlowControls::MpodController* mpCtrl,
@@ -140,6 +142,7 @@ private:
     InterThread::AcquisitionThreadControl* acqControl;
     InterThread::SlowControlsThreadController* sctControl;
     InterThread::FileOutputThreadController* fileControl;
+    InterThread::ProcessingThreadControl* procControl;
     SlowControls::MpodController* mpodController;
     Utility::MpodMapper* mpodMapper;
     Utility::ToProcessingQueuePair* procQueuePair;
