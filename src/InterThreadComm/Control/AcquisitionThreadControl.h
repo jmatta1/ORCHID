@@ -12,7 +12,7 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Definition file for the DigitizerThreadControl class
+** @details Definition file for the AcquisitionThreadControl class
 **
 ********************************************************************************
 *******************************************************************************/
