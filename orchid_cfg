@@ -17,7 +17,7 @@ PerChannelParameterFile = "./orchid_mpod_chan_params.csv"
 PerModuleParameterFile = "./orchid_mpod_mod_params.csv"
 MpodIPAddress = 192.168.11.11
 WienerMibFileDirectory = "/usr/share/snmp/mibs"
-PollingRate = 1
+PollingRate = 1 # the rate in hertz that the mpod polling runs at
 [EndBlock]
 
 [End]
