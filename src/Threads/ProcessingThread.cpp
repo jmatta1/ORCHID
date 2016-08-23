@@ -189,7 +189,7 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
 {
     BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events1 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
-    int scaledStopOffset = stopOffset - (skip + 3);
+    int scaledStopOffset = stopOffset - (skip + 2);
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
@@ -237,7 +237,7 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
 {
     BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events2 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
-    int scaledStopOffset = stopOffset - (skip + 3);
+    int scaledStopOffset = stopOffset - (skip + 2);
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
@@ -281,7 +281,7 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
 {
     BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events3 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
-    int scaledStopOffset = stopOffset - (skip + 3);
+    int scaledStopOffset = stopOffset - (skip + 2);
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
@@ -325,7 +325,7 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
 {
     BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing events0 with offset: " << startOffset << " and baseChan: "<<baseChan<<" and stopOffset: "<<stopOffset<<" and boardNumber "<<boardNum<<" and skip: "<<skip;
     int offset = startOffset;
-    int scaledStopOffset = stopOffset - (skip + 2);
+    int scaledStopOffset = stopOffset - (skip + 1);
     while(offset < scaledStopOffset)
     {
         //first pull an event from the queue
