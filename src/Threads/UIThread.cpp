@@ -258,6 +258,23 @@ void UIThread::drawGlobalSlowControlsInformation()
     mvwprintw(this->textWindow, 3, 0, builder.str().c_str());
 }
 
+void UIThread::drawAcquisitionGlobalInformation()
+{
+    std::ostringstream builder;
+    static int updateLoops = 1;
+    for(int i=0; i < numAcqThreads; ++i)
+    {
+        builder << " Module "<<i<<": "<<(rateMultiplier/updateLoops)*(acqData->dataSizes[i]);
+    }
+    mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
+    ++updateLoops;
+    if((updateLoops%20)==0)
+    {
+        updateLoops = 0;
+        acqData->clearData();
+    }
+}
+
 void UIThread::drawSlowControlsGrid()
 {
     //TODO: Add highligting of params outside range
@@ -326,7 +343,7 @@ void UIThread::drawRunningScreen()
     //draw the file information line
     this->drawFileInfo();
     //TODO: draw the acquisition info line
-    
+    this->drawAcquisitionGlobalInformation();
     //draw the slow controls global info line
     this->drawGlobalSlowControlsInformation();
     //draw the slow controls info grid();

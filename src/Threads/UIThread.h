@@ -93,6 +93,8 @@ private:
     void drawGlobalSlowControlsInformation();
     //this function draws the slow controls information tables
     void drawSlowControlsGrid();
+    //this function draws the digitizer line
+    void drawAcquisitionGlobalInformation();
     //This function handles drawing the command in progress in the message window
     void drawCommandInProgress();
     //This function handles drawing any persistent message that may need to
