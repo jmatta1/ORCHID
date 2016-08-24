@@ -161,6 +161,7 @@ void AsyncOutFileWriteThread<RetQueueType>::runMainLoop()
             BOOST_LOG_SEV(lg, Information) << "FW Thread: Grabbing Data";
             //write the buffer
             this->aOutFile->outFile.write(temp->buffer, temp->size);
+            BOOST_LOG_SEV(lg, Information) << "FW Thread: Out file is: "<< aOutFile->outFile.good()<< ", "<<aOutFile->outFile.eof()<<", "<<aOutFile->outFile.fail()<<", "<<aOutFile->outFile.bad();
             //run the call back to return the buffer to whoever owns it
             //this->aOutFile->callBackQueue->push(temp->buffer);
             InterThread::PushSelect<RetQueueType, char*>::push(*(this->aOutFile->callBackQueue), temp->buffer);
@@ -373,6 +374,7 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     }
     outFile.clear();
     outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
+    outFile.clear();
     if(outFile.is_open())
     {
         BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Opened New File at: " << filePath;
@@ -413,6 +415,7 @@ void AsyncOutFile<RetQueueType>::closeFile()
     if(this->isInitialized.load())
     {
         outFile.close();
+        outFile.clear();
         this->isInitialized.store(false);
     }
     //our changes are done

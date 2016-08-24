@@ -141,7 +141,7 @@ void FileOutputThread::buildFileName()
     builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
     builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
     this->currentFileName = builder.str();
-    BOOST_LOG_SEV(lg, Information) << "FO Thread: Made new file at: " << this->currentFileName;
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: New file name is: " << this->currentFileName;
 }
 
 void FileOutputThread::operator()()

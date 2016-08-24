@@ -958,6 +958,9 @@ void UIThread::turnOn()
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
+    wclear(this->textWindow);
+    mvwprintw(this->textWindow, 0, 0, "Pause for MPOD channel starts.");
+    wrefresh(this->textWindow);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the HV channels";
     if(!this->mpodController->activateAllChannels())
     {
