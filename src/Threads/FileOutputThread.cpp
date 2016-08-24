@@ -152,9 +152,10 @@ void FileOutputThread::operator()()
         switch(this->fileThreadController->getCurrentState())
         {
         case InterThread::FileOutputThreadState::Terminate:
-            BOOST_LOG_SEV(lg, Information) << "FO Thread: Terminating";
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Preparing To Terminate";
             this->notTerminated = false;
             this->outFile->closeAndTerminate();
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Terminating";
             break;
         case InterThread::FileOutputThreadState::Waiting:
             BOOST_LOG_SEV(lg, Information) << "FO Thread: Waiting";
