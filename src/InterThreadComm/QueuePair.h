@@ -260,11 +260,11 @@ bool QueuePair<QueueContent, QueueType>::tryProducerPop(QueueContent& data)
     bool success = this->producerQueue.pop(data);
     if(success)
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPush Good";
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryProducerPop Good";
     }
     else
     {
-        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPush Bad";
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryProducerPop Bad";
     }
     return success;
 }
