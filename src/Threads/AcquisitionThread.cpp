@@ -65,6 +65,7 @@ void AcquisitionThread::doAcquisitionLoop()
         {
             //if we have a filled buffer, there must be space for it to be pushed
             this->dataOutputQueue->producerPush(currentBuffer);
+            currentBuffer = nullptr;
             //now pop a buffer
             if(!(this->dataOutputQueue->producerPop(currentBuffer)))
             {
@@ -114,11 +115,13 @@ void AcquisitionThread::doFinalRead()
     {
         //if we have a buffer, there must be space for it to be pushed
         this->dataOutputQueue->producerPush(currentBuffer);
+        currentBuffer = nullptr;
     }
     else
     {
          //since the buffer is empty, dump it back on to the end of the consumer queue
         this->dataOutputQueue->consumerPush(currentBuffer);
+        currentBuffer = nullptr;
     }
 }
 
