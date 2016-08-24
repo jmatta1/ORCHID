@@ -1074,7 +1074,7 @@ void UIThread::stopDataTaking()
 {
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Acquistion Threads Set To Stop";
     this->acqControl->setToStopped();
-    this->procQueuePair->setForceWake();
+    this->procQueuePair->setProducerForceWake();
     this->procQueuePair->wakeAllProducer();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Acquisition Stop");
@@ -1090,7 +1090,7 @@ void UIThread::stopDataTaking()
     this->procControl->setToStopped();
     this->fileMultiQueue->setForceStayAwake();
     this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
-    this->procQueuePair->setForceWake();
+    this->procQueuePair->setConsumerForceWake();
     this->procQueuePair->wakeAllConsumer();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Processing Stop");
