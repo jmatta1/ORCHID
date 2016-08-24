@@ -325,7 +325,7 @@ int main(int argc, char* argv[])
 
     //the IO thread has joined proceed with shutdown
     BOOST_LOG_SEV(lg, Trace)  << "UI thread has rejoined main the thread. Resuming console logging." << std::flush;
-    BOOST_LOG_SEV(lg, Trace)  << "Other threads should have terminated.\n" << std::flush;
+    BOOST_LOG_SEV(lg, Trace)  << "Other threads should have terminated." << std::flush;
     BOOST_LOG_SEV(lg, Debug)  << "Deleting thread callable objects" << std::flush;
     //delete the thread callable objects
     delete uiThreadWrapper;
@@ -360,25 +360,48 @@ int main(int argc, char* argv[])
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::DigitizerToProcessing); ++i)
     {
         Utility::ToProcessingBuffer* temp;
-        toProcessingQueue->producerPop(temp);
-        delete[] temp->dataBuffer;
-        delete temp;
+        if(toProcessingQueue->tryProducerPop(temp))
+        {
+            BOOST_LOG_SEV(lg, Debug)  << "To Processing Pop Succeeded: " << i << std::flush;
+            delete[] temp->dataBuffer;
+            delete temp;
+        }
+        else
+        {
+            BOOST_LOG_SEV(lg, Debug)  << "To Processing Pop Failed: " << i << std::flush;
+        }
     }
     delete toProcessingQueue;
-    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
+    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile); ++i)
     {
         Events::EventInterface* temp;
         //we use producer pop because that pulls empty events from the queue index
-        toFileQueues->producerPop<Utility::ProcessingQueueIndex>(temp);
-        delete temp;
+        if(toFileQueues->tryProducerPop<Utility::ProcessingQueueIndex>(temp))
+        {
+            BOOST_LOG_SEV(lg, Debug)  << "Proc To File Pop Succeeded: " << i << std::flush;
+            delete[] temp->dataBuffer;
+            delete temp;
+        }
+        else
+        {
+            BOOST_LOG_SEV(lg, Debug)  << "Proc To File Pop Failed: " << i << std::flush;
+        }
     }
     //here we load the queue with empty slow controls events
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
     {
         Events::EventInterface* temp;
         //we use producer pop because that pulls empty events from the queue index
-        toFileQueues->producerPop<Utility::SlowControlsQueueIndex>(temp);
-        delete temp;
+        if(toFileQueues->producerPop<Utility::SlowControlsQueueIndex>(temp))
+        {
+            BOOST_LOG_SEV(lg, Debug)  << "SC To File Pop Succeeded: " << i << std::flush;
+            delete[] temp->dataBuffer;
+            delete temp;
+        }
+        else
+        {
+            BOOST_LOG_SEV(lg, Debug)  << "SC To File Pop Failed: " << i << std::flush;
+        }
     }
     delete toFileQueues;
 
