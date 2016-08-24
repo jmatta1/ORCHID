@@ -160,8 +160,8 @@ void AsyncOutFileWriteThread<RetQueueType>::runMainLoop()
         {
             BOOST_LOG_SEV(lg, Information) << "FW Thread: Grabbing Data";
             //write the buffer
-            this->aOutFile->outFile.write(temp->buffer, temp->size);
-            BOOST_LOG_SEV(lg, Information) << "FW Thread: Out file is: "<< aOutFile->outFile.good()<< ", "<<aOutFile->outFile.eof()<<", "<<aOutFile->outFile.fail()<<", "<<aOutFile->outFile.bad();
+            this->aOutFile->outFile->write(temp->buffer, temp->size);
+            BOOST_LOG_SEV(lg, Information) << "FW Thread: Out file is: "<< aOutFile->outFile->good()<< ", "<<aOutFile->outFile->eof()<<", "<<aOutFile->outFile->fail()<<", "<<aOutFile->outFile->bad();
             //run the call back to return the buffer to whoever owns it
             //this->aOutFile->callBackQueue->push(temp->buffer);
             InterThread::PushSelect<RetQueueType, char*>::push(*(this->aOutFile->callBackQueue), temp->buffer);
@@ -196,7 +196,7 @@ void AsyncOutFileWriteThread<RetQueueType>::clearBuffer()
         //if we are in here then there is data in the buffer to empty before
         //termination
         //write the buffer
-        this->aOutFile->outFile.write(temp->buffer, temp->size);
+        this->aOutFile->outFile->write(temp->buffer, temp->size);
         //run the call back to return the buffer to whoever owns it
         this->aOutFile->callBackQueue->push(temp->buffer);
         //clear the pair
@@ -245,7 +245,7 @@ public:
 private:
     
     //the actual fstream to write the file
-    std::ofstream outFile;
+    std::ofstream* outFile;
     std::atomic_bool isInitialized;
     
     //synchronization objects to wait for data or wait to add data
@@ -286,7 +286,7 @@ private:
  */
 
 template <typename RetQueueType>
-AsyncOutFile<RetQueueType>::AsyncOutFile(RetQueueType* cbQueue):
+AsyncOutFile<RetQueueType>::AsyncOutFile(RetQueueType* cbQueue): outFile(nullptr),
     isInitialized(false), writerWaiting(false), producerWaiting(false),
     callBackQueue(cbQueue), terminateWhenEmpty(false), emptyQueue(false),
     readyToInitialize(true), writeTerminated(false), writeCallable(nullptr),
@@ -304,7 +304,7 @@ AsyncOutFile<RetQueueType>::AsyncOutFile(RetQueueType* cbQueue):
 
 template <typename RetQueueType>
 AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueType* cbQueue):
-    outFile(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc),
+    outFile(new std::ofstream(filePath, std::ios_base::binary | std::ios_base::trunc)),
     isInitialized(false), writerWaiting(false), producerWaiting(false),
     callBackQueue(cbQueue), terminateWhenEmpty(false), emptyQueue(false),
     readyToInitialize(true), writeTerminated(false), writeCallable(nullptr),
@@ -326,6 +326,7 @@ template <typename RetQueueType>
 AsyncOutFile<RetQueueType>::~AsyncOutFile()
 {
     this->closeAndTerminate();
+    this->closeFile();
     //delete all the BSCTriples we allocated initially
     BufferPair* temp;
     while(returnQueue.pop(temp))
@@ -363,19 +364,14 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     //If we have to wait that is ok because we should be the only write thread
     //therefor we block any addition to the write queue until the mutex is locked by us anyways
     boost::unique_lock<boost::mutex> writeLock(this->writeMutex);
-    //once we have the lock, we have control of the fstream
     if(this->isInitialized.load())
     {
-        outFile.close();
+        this->closeFile();
     }
-    else
-    {//setting a file essentially initializes the system
-        this->isInitialized.store(true);
-    }
-    outFile.clear();
-    outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
-    outFile.clear();
-    if(outFile.is_open())
+    //once we have the lock, we have control of the fstream
+    outFile = new std::ofstream(filePath, std::ios_base::binary | std::ios_base::trunc);
+    this->isInitialized.store(true);
+    if(outFile->is_open())
     {
         BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Opened New File at: " << filePath;
     }
@@ -414,8 +410,8 @@ void AsyncOutFile<RetQueueType>::closeFile()
     //once we have the lock, we have control of the fstream
     if(this->isInitialized.load())
     {
-        outFile.close();
-        outFile.clear();
+        outFile->close();
+        delete outFile;
         this->isInitialized.store(false);
     }
     //our changes are done
