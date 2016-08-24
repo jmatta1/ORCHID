@@ -125,7 +125,7 @@ void Vx1730Digitizer::setupDigitizer()
     }
     else
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
@@ -162,7 +162,7 @@ void Vx1730Digitizer::setupDigitizer()
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Triggering Calibration For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Pausing for digitizer " << moduleNumber << " self calibration stabilization.";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Pausing for digitizer " << moduleNumber << " self calibration stabilization.";
     boost::this_thread::sleep_for(boost::chrono::seconds(5));
     
     
@@ -178,7 +178,7 @@ void Vx1730Digitizer::startAcquisition()
 {
     using LowLvl::Vx1730WriteRegisters;
     using LowLvl::Vx1730CommonWriteRegistersAddr;
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Starting/Arming Acqusition On Digitizer #" << moduleNumber ;
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Starting/Arming Acqusition On Digitizer #" << moduleNumber ;
     CAENComm_ErrorCode errVal;
     //now hit the software clear to blank the data
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
@@ -202,7 +202,7 @@ void Vx1730Digitizer::startAcquisition()
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #" << moduleNumber << " Acquisition Started/Armed";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Started/Armed";
     acqRunning = true;
 }
 
@@ -211,10 +211,10 @@ void Vx1730Digitizer::stopAcquisition()
 {
     using LowLvl::Vx1730WriteRegisters;
     using LowLvl::Vx1730CommonWriteRegistersAddr;
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Stopping/Disarming Acqusition On Digitizer #" << moduleNumber;
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Stopping/Disarming Acqusition On Digitizer #" << moduleNumber;
     //now take the acquisition control register base and write it, it should already have bit[2] == 0
     CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acquisitionCtrlRegBase);
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Digitizer #" << moduleNumber << " Acquisition Stopped/Disarmed";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Stopped/Disarmed";
     acqRunning = false;
 }
 
@@ -279,7 +279,7 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
     readError = CAENComm_Write32(digitizerHandle, Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>::value, 0x00000001);
     if(readError < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Error Forcing data flush for digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Forcing data flush for digitizer #" << moduleNumber;
         this->writeErrorAndThrow(readError);
     }
     
@@ -639,14 +639,14 @@ void Vx1730Digitizer::writeCommonRegisterData()
     {
         if(cycleErrsArray[i] < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
             this->writeErrorAndThrow(cycleErrsArray[i]);
         }
     }
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
 
@@ -664,7 +664,7 @@ void Vx1730Digitizer::writeCommonRegisterData()
     {
         if(cycleErrsArray[i] < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
             this->writeErrorAndThrow(cycleErrsArray[i]);
         }
     }
@@ -672,7 +672,7 @@ void Vx1730Digitizer::writeCommonRegisterData()
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Overall Error In Readback Of Common Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Readback Of Common Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
     
@@ -724,14 +724,14 @@ void Vx1730Digitizer::writeGroupRegisterData()
     {
         if(cycleErrsArray[i] < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
             this->writeErrorAndThrow(cycleErrsArray[i]);
         }
     }
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
     
@@ -748,7 +748,7 @@ void Vx1730Digitizer::writeGroupRegisterData()
     {
         if(cycleErrsArray[i] < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
             this->writeErrorAndThrow(cycleErrsArray[i]);
         }
     }
@@ -756,7 +756,7 @@ void Vx1730Digitizer::writeGroupRegisterData()
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Overall Error In Readback Of Group Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Readback Of Group Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
     
@@ -845,14 +845,14 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     {
         if(cycleErrsArray[i] < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Writing To Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
             this->writeErrorAndThrow(cycleErrsArray[i]);
         }
     }
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
     
@@ -869,7 +869,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     {
         if(cycleErrsArray[i] < 0)
         {
-            BOOST_LOG_SEV(lg, Error) << "Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Read Back From Address: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << std::dec;
             this->writeErrorAndThrow(cycleErrsArray[i]);
         }
     }
@@ -877,7 +877,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "Overall Error In Readback Of Group Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Readback Of Group Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
     
