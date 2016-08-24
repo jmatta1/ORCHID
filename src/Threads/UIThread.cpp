@@ -969,7 +969,7 @@ void UIThread::turnOn()
         this->mpodController->turnCrateOff();//Undo anything that may have happened
         return; //then return without changing mode
     }
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Setting Slow Controls thread to polling";
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Setting Slow Controls thread to polling" << std::flush;
     this->sctControl->setToPolling();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp up");
@@ -993,7 +993,7 @@ void UIThread::turnOn()
             stillRamping = false;
         }
     }
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: HV done ramping";
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: HV done ramping" << std::flush;
     mode = UIMode::Idle;
     //this->startLine = 0;
     wclear(this->textWindow);
