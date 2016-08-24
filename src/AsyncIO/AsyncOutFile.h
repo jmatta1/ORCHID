@@ -371,8 +371,16 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     {//setting a file essentially initializes the system
         this->isInitialized.store(true);
     }
-    
+    outFile.clear();
     outFile.open(filePath.c_str(), std::ios_base::binary | std::ios_base::trunc);
+    if(outFile.is_open())
+    {
+        BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Opened New File at: " << filePath;
+    }
+    else
+    {
+        BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Could not open new file at: " << filePath;
+    }
     //our changes are done
     //the lock should release on destruction when the function exits
     BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Done prepping new file";

@@ -362,7 +362,6 @@ int main(int argc, char* argv[])
         Utility::ToProcessingBuffer* temp;
         if(toProcessingQueue->tryProducerPop(temp))
         {
-            BOOST_LOG_SEV(lg, Debug)  << "To Processing Pop Succeeded: " << i << std::flush;
             delete[] temp->dataBuffer;
             delete temp;
         }
@@ -378,7 +377,6 @@ int main(int argc, char* argv[])
         //we use producer pop because that pulls empty events from the queue index
         if(toFileQueues->tryProducerPop<Utility::ProcessingQueueIndex>(temp))
         {
-            BOOST_LOG_SEV(lg, Debug)  << "Proc To File Pop Succeeded: " << i << std::flush;
             delete temp;
         }
         else
@@ -393,7 +391,6 @@ int main(int argc, char* argv[])
         //we use producer pop because that pulls empty events from the queue index
         if(toFileQueues->tryProducerPop<Utility::SlowControlsQueueIndex>(temp))
         {
-            BOOST_LOG_SEV(lg, Debug)  << "SC To File Pop Succeeded: " << i << std::flush;
             delete temp;
         }
         else

@@ -56,28 +56,44 @@ void ProcessingThread::operator()()
 
 void ProcessingThread::doProcessingLoop()
 {
-    Utility::ToProcessingBuffer* dataBuffer;
+    Utility::ToProcessingBuffer* dataBuffer = nullptr;
     while(this->controller->getCurrentState() == InterThread::ProcessingThreadState::Running)
     {
         //first pull a buffer from the file thread queue, this may cause a wait
         if(dataInputQueue->consumerPop(dataBuffer))
         {//if we got the buffer, proceed, if not make sure we are not being
             //asked to terminate
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Do Popped buffer";
             processDataBuffer(dataBuffer); //when this finishes the data buffer
             //is completely handled and can be put back on the return queue
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Do Pushed buffer";
             this->dataInputQueue->consumerPush(dataBuffer);
+            dataBuffer = nullptr;
         }
+    }
+    if(dataBuffer != nullptr)
+    {
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Do Extra Pushed buffer";
+        this->dataInputQueue->consumerPush(dataBuffer);
     }
 }
 
 void ProcessingThread::emptyProcessingBuffer()
 {//essentially loop until we cannot pull more buffers
-    Utility::ToProcessingBuffer* dataBuffer;
+    Utility::ToProcessingBuffer* dataBuffer = nullptr;
     while(dataInputQueue->tryConsumerPop(dataBuffer))
     {
         //asked to terminate
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Empty Popped buffer";
         processDataBuffer(dataBuffer); //when this finishes the data buffer
         //is completely handled and can be put back on the return queue
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Empty Pushed buffer";
+        this->dataInputQueue->consumerPush(dataBuffer);
+        dataBuffer = nullptr;
+    }
+    if(dataBuffer != nullptr)
+    {
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Empty Extra Pushed buffer";
         this->dataInputQueue->consumerPush(dataBuffer);
     }
 }
@@ -233,7 +249,7 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
     {
         //first pull an event from the queue
         Events::EventInterface* prEvent=nullptr;
-        bool temp = this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
+        this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
