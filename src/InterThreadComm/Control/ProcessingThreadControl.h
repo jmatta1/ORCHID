@@ -44,7 +44,7 @@ public:
 
     //functions to be accessed by the UI thread
     void setToRunning(){procState.store(ProcessingThreadState::Running); BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting to running " << (procState.load() == ProcessingThreadState::Running)?"True":"False"; procThreadWaitCondition.notify_all();}
-    void setToStopped(){procState.store(ProcessingThreadState::Stopped); BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting to running " << (procState.load() == ProcessingThreadState::Stopped)?"True":"False"; }
+    void setToStopped(){procState.store(ProcessingThreadState::Stopped); BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting to stopped " << (procState.load() == ProcessingThreadState::Stopped)?"True":"False"; }
     void setToTerminate(){procState.store(ProcessingThreadState::Terminate); BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting to terminate " << (procState.load() == ProcessingThreadState::Terminate)?"True":"False"; procThreadWaitCondition.notify_all();}
     
     int getThreadsWaiting(){return waitCount.load();}
