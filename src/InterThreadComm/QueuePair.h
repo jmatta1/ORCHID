@@ -257,7 +257,7 @@ template <typename QueueContent, typename QueueType>
 bool QueuePair<QueueContent, QueueType>::tryProducerPop(QueueContent& data)
 {
     //try to pop from the producer queue
-    bool success = this->producerQueue.pop(data)
+    bool success = this->producerQueue.pop(data);
     if(success)
     {
         BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPush Good";
