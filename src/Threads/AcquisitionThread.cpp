@@ -26,6 +26,8 @@
 namespace Threads
 {
 
+enum {MaxInteruptChecks = 50};
+
 void AcquisitionThread::operator ()()
 {
     //run the event loop
@@ -55,42 +57,44 @@ void AcquisitionThread::operator ()()
 void AcquisitionThread::doAcquisitionLoop()
 {
     this->startAcquisition();
+    Utility::ToProcessingBuffer* currentBuffer;
     while(this->controller->getCurrentState() == InterThread::AcquisitionThreadState::Acquiring)
     {
+        if(!(this->dataOutputQueue->producerPop(currentBuffer)))
+        {
+            //we were unable to obtain a buffer this probably happened because were told to keep awake while waiting
+            //make certain this is the case by jumping to the next loop
+            continue;
+        }
         //we have the buffer prepped and ready for the first read, so go about things
         currentBuffer->info.startChannel = this->firstChannel;
         currentBuffer->info.boardNumber = this->modNumber;
+        int loopCount = 0;
         currentBuffer->sizeOfData = this->digitizer->getData(currentBuffer->dataBuffer);
+        while((loopCount < MaxInteruptChecks) && (currentBuffer->sizeOfData == 0))
+        {
+            ++loopCount;
+            currentBuffer->sizeOfData = this->digitizer->getData(currentBuffer->dataBuffer);
+        }
+        
         if(currentBuffer->sizeOfData != 0)
         {
             //if we have a filled buffer, there must be space for it to be pushed
             this->dataOutputQueue->producerPush(currentBuffer);
             currentBuffer = nullptr;
-            //now pop a buffer
-            if(!(this->dataOutputQueue->producerPop(currentBuffer)))
-            {
-                //if this failed we are being asked to exit the loop while we were waiting for a buffer
-                currentBuffer = nullptr;
-                break;
-            }
         }
-        
+        else
+        {
+            //the buffer is still empty, maybe something is wrong
+            this->dataOutputQueue->consumerPush(currentBuffer);
+            BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Did not get data after 50 loops";
+        }
     }
     this->endAcquisition();
 }
 
 void AcquisitionThread::startAcquisition()
 {
-    //prime the current buffer
-    if(!(this->dataOutputQueue->producerPop(currentBuffer)))
-    {
-        
-        //we were unable to obtain a buffer at acquisition start... this should
-        //be impossible since on acquisition start all the buffers should be stocked up
-        //in the producer queue ready to be used
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Unable to obtain an empty buffer on acq start, something is wrong";
-        throw std::runtime_error("ACQ Thread Error: Unable to obtain an empty buffer on acq start");
-    }
     //start acquisition
     this->digitizer->startAcquisition();
 }
@@ -104,12 +108,8 @@ void AcquisitionThread::endAcquisition()
 
 void AcquisitionThread::doFinalRead()
 {
-    bool haveBuffer = (currentBuffer == nullptr);
-    while(!haveBuffer)
-    {
-        currentBuffer == nullptr;
-        haveBuffer = this->dataOutputQueue->producerPop(currentBuffer);
-    }
+    Utility::ToProcessingBuffer* currentBuffer;
+    this->dataOutputQueue->producerPop(currentBuffer);
     currentBuffer->info.startChannel = this->firstChannel;
     currentBuffer->info.boardNumber = this->modNumber;
     currentBuffer->sizeOfData = this->digitizer->performFinalReadout(currentBuffer->dataBuffer);

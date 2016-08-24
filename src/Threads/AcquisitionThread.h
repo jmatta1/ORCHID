@@ -52,7 +52,6 @@ private:
     InterThread::AcquisitionThreadControl* controller;
     Utility::ToProcessingQueuePair* dataOutputQueue;
     
-    Utility::ToProcessingBuffer* currentBuffer;
     int firstChannel;
     int modNumber;
     
