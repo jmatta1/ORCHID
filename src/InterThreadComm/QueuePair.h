@@ -54,6 +54,8 @@ public:
     void wakeAllConsumer(){if(this->consumerWaiting.load() > 0) this->consumerWaitCondition.notify_all();}
     void wakeAllProducer(){if(this->producerWaiting.load() > 0) this->producerWaitCondition.notify_all();}
     
+    void setForceWake(){notForceWake.store(false);}
+    
     void forceWakeAll(){notForceWake.store(false); consumerWaitCondition.notify_all(); producerWaitCondition.notify_all();}
     
     void clearForce(){notForceWake.store(true);}
