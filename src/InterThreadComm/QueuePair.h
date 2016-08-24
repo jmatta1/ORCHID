@@ -54,11 +54,12 @@ public:
     void wakeAllConsumer(){if(this->consumerWaiting.load() > 0) this->consumerWaitCondition.notify_all();}
     void wakeAllProducer(){if(this->producerWaiting.load() > 0) this->producerWaitCondition.notify_all();}
     
-    void setForceWake(){notForceWake.store(false);}
+    void setProducerForceWake(){prodNotForceWake.store(false);}
+    void setConsumerForceWake(){consNotForceWake.store(false);}
     
-    void forceWakeAll(){notForceWake.store(false); consumerWaitCondition.notify_all(); producerWaitCondition.notify_all();}
+    void forceWakeAll(){consNotForceWake.store(false); prodNotForceWake.store(false); consumerWaitCondition.notify_all(); producerWaitCondition.notify_all();}
     
-    void clearForce(){notForceWake.store(true);}
+    void clearForce(){prodNotForceWake.store(true); consNotForceWake.store(false);}
     
 private:
     //variables for producer waiting
@@ -72,7 +73,8 @@ private:
     std::atomic_int consumerWaiting;
     
     //parameter used to force termination of loops when force override is called
-    std::atomic_bool notForceWake;
+    std::atomic_bool prodNotForceWake;
+    std::atomic_bool consNotForceWake;
     
     //queues
     //queue for full data objects to be sent from producer to consumer
@@ -102,7 +104,7 @@ bool QueuePair<QueueContent, QueueType>::consumerPop(QueueContent& data)
 {
     //this function trys to pop from the queue and waits until there is a data available to do so
     bool success = false;
-    while (!(success = this->consumerQueue.pop(data)) && this->notForceWake.load())
+    while (!(success = this->consumerQueue.pop(data)) && this->consNotForceWake.load())
     {
         //we were not able to pop from the queue, so clearly the producer is lagging
         //make certain the producer is not waiting on something and then wait until the consumer has cleared an element
@@ -141,7 +143,7 @@ bool QueuePair<QueueContent, QueueType>::producerPop(QueueContent& data)
     //this function tries to pop from the producer queue, if it is empty (ie all the buffers are currently in
     //the consumer queue) then we wait for the consumer to make some more empties for us to use
     bool success = false;
-    while (!(success = this->producerQueue.pop(data)) && this->notForceWake.load())
+    while (!(success = this->producerQueue.pop(data)) && this->prodNotForceWake.load())
     {
         //if we are here then we are not able to pop from the queue so clearly the
         //consumer is lagging, make certain that the consumer is not waiting for
