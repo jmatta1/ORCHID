@@ -1074,31 +1074,36 @@ void UIThread::stopDataTaking()
 {
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Acquistion Threads Set To Stop";
     this->acqControl->setToStopped();
-    this->procQueuePair->forceWakeAll();
+    this->procQueuePair->setForceWake();
+    this->procQueuePair->wakeAllProducer();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Acquisition Stop");
     wrefresh(this->textWindow);
     while(this->numAcqThreads > this->acqControl->getThreadsWaiting())
     {//until we see the acquisition threads waiting on their wait condition, sleep and spin
         boost::this_thread::sleep_for(this->refreshPeriod);
-        this->procQueuePair->forceWakeAll();
+        this->procQueuePair->wakeAllProducer();
     }
     this->procQueuePair->clearForce();
     
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Event Processing Threads Set To Stop";
     this->procControl->setToStopped();
+    this->fileMultiQueue->setForceStayAwake();
     this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
+    this->procQueuePair->setForceWake();
+    this->procQueuePair->wakeAllConsumer();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Processing Stop");
     wrefresh(this->textWindow);
     while(this->numProcThreads > this->procControl->getThreadsWaiting())
     {//until we see the acquisition threads waiting on their wait condition, sleep and spin
         boost::this_thread::sleep_for(this->refreshPeriod);
-        this->fileMultiQueue->setForceStayAwake();
         this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
+        this->procQueuePair->setForceWake();
+        this->procQueuePair->wakeAllConsumer();
     }
+    this->procQueuePair->clearForce();
     this->fileMultiQueue->clearForceStayAwake();
-    //TODO put in wait for processing threads to stop
     
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Online Processing Thread Set To Stop";
     //TODO put the online processing thread into stop mode
