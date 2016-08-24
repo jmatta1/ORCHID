@@ -41,6 +41,7 @@ void ProcessingThreadControl::waitForChange()
         procThreadWaitCondition.wait(waitLock);
         waitCount.fetch_add(-1);
     }
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "Leaving Wait For Change";
     //the lock will release on deconstruction
 }
 

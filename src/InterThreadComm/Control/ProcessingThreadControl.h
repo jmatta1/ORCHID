@@ -24,6 +24,7 @@
 // includes from other libraries
 #include<boost/thread.hpp>
 // includes from ORCHID
+#include"Utility/OrchidLogger.h"
 
 namespace InterThread
 {
@@ -39,12 +40,12 @@ public:
     //functions to be accessed by the processing threads
     ProcessingThreadState getCurrentState(){return procState.load();}
     void waitForChange();
-    void acknowledgeTerminate(){++termAckCount;}
+    void acknowledgeTerminate(){termAckCount.fetch_add(1);}
 
     //functions to be accessed by the UI thread
-    void setToRunning(){procState.store(ProcessingThreadState::Running); procThreadWaitCondition.notify_all();}
-    void setToStopped(){procState.store(ProcessingThreadState::Stopped);}
-    void setToTerminate(){procState.store(ProcessingThreadState::Terminate); procThreadWaitCondition.notify_all();}
+    void setToRunning(){procState.store(ProcessingThreadState::Running); BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting to running " << (procState.load() == ProcessingThreadState::Running)?"True":"False"; procThreadWaitCondition.notify_all();}
+    void setToStopped(){procState.store(ProcessingThreadState::Stopped); BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting to running " << (procState.load() == ProcessingThreadState::Stopped)?"True":"False"; }
+    void setToTerminate(){procState.store(ProcessingThreadState::Terminate); BOOST_LOG_SEV(OrchidLog::get(), Information) << "Setting to terminate " << (procState.load() == ProcessingThreadState::Terminate)?"True":"False"; procThreadWaitCondition.notify_all();}
     
     int getThreadsWaiting(){return waitCount.load();}
     int getThreadsTerminated(){return termAckCount.load();}
