@@ -59,13 +59,16 @@ void ProcessingThread::doProcessingLoop()
     Utility::ToProcessingBuffer* dataBuffer;
     while(this->controller->getCurrentState() == InterThread::ProcessingThreadState::Running)
     {
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Started Process Loop";
         //first pull a buffer from the file thread queue, this may cause a wait
         if(dataInputQueue->consumerPop(dataBuffer))
         {//if we got the buffer, proceed, if not make sure we are not being
             //asked to terminate
             processDataBuffer(dataBuffer); //when this finishes the data buffer
             //is completely handled and can be put back on the return queue
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processed Data";
             this->dataInputQueue->consumerPush(dataBuffer);
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Consumer Push Succeeded";
         }
     }
 }
@@ -80,6 +83,7 @@ void ProcessingThread::emptyProcessingBuffer()
         processDataBuffer(dataBuffer); //when this finishes the data buffer
         //is completely handled and can be put back on the return queue
         this->dataInputQueue->consumerPush(dataBuffer);
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Pushed Buffer in Clear Buffer";
     }
 }
 
