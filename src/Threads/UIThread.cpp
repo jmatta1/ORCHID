@@ -1099,7 +1099,7 @@ void UIThread::stopDataTaking()
     {//until we see the acquisition threads waiting on their wait condition, sleep and spin
         boost::this_thread::sleep_for(this->refreshPeriod);
         this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
-        this->procQueuePair->setForceWake();
+        this->procQueuePair->setConsumerForceWake();
         this->procQueuePair->wakeAllConsumer();
     }
     this->procQueuePair->clearForce();
