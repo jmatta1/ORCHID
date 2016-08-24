@@ -32,7 +32,7 @@ bool MpodController::turnCrateOn()
     this->snmpController->snmpGlobalSet(MpodGlobalSetParam::SysMainSwitch, 1);
     //insert this pause so we don't hit the crate 10 microseconds after it acks
     //with setup commands
-    boost::this_thread::sleep_for(boost::chrono::seconds(5));
+    boost::this_thread::sleep_for(boost::chrono::seconds(10));
     return this->setupChannels();
 }
 
@@ -69,7 +69,7 @@ bool MpodController::activateAllChannels()
     }
     //another pause so that channels can start coming up and normalizing and realizing they are rising
     //before things start hammering them
-    boost::this_thread::sleep_for(boost::chrono::seconds(5));
+    boost::this_thread::sleep_for(boost::chrono::seconds(10));
     return true;
 }
 
