@@ -35,7 +35,8 @@ template <typename QueueContent, typename QueueType>
 class QueuePair
 {
 public:
-    QueuePair():producerWaiting(false), consumerWaiting(false), notForceWake(true)
+    QueuePair():producerWaiting(false), consumerWaiting(false),
+        prodNotForceWake(true), consNotForceWake(true)
     {}
     ~QueuePair(){}
     
