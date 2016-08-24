@@ -27,6 +27,7 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 #include"QueueTMP.h"
+#include"Utility/OrchidLogger.h"
 
 namespace InterThread
 {
@@ -97,6 +98,14 @@ bool QueuePair<QueueContent, QueueType>::producerPush(QueueContent data)
     {
         this->consumerWaitCondition.notify_one();
     }
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: producerPush Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: producerPush Bad";
+    }
     return success;
 }
 
@@ -120,6 +129,14 @@ bool QueuePair<QueueContent, QueueType>::consumerPop(QueueContent& data)
         //if we are here then we have woken from the wait, note this
         --(this->consumerWaiting);
     }
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: consumerPop Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: consumerPop Bad";
+    }
     return success;
 }
 
@@ -134,6 +151,14 @@ bool QueuePair<QueueContent, QueueType>::consumerPush(QueueContent data)
     if(this->producerWaiting.load() > 0)//no need to check for success it is guaranteed
     {
         this->producerWaitCondition.notify_one();
+    }
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: consumerPush Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: consumerPush Bad";
     }
     return success;
 }
@@ -160,6 +185,14 @@ bool QueuePair<QueueContent, QueueType>::producerPop(QueueContent& data)
         //if we are here then we need to note that we have woken up
         --(this->producerWaiting);
     }
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: producerPop Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: producerPop Bad";
+    }
     return success;
 }
 
@@ -173,6 +206,14 @@ bool QueuePair<QueueContent, QueueType>::tryProducerPush(QueueContent data)
     {
         this->consumerWaitCondition.notify_one();
     }
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryProducerPush Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryProducerPush Bad";
+    }
     return success;
 }
 
@@ -180,7 +221,16 @@ template <typename QueueContent, typename QueueType>
 bool QueuePair<QueueContent, QueueType>::tryConsumerPop(QueueContent& data)
 {
     //try to pop from the consumer queue, return true for success or false for failure
-    return this->consumerQueue.pop(data);
+    bool success = this->consumerQueue.pop(data);
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPop Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPop Bad";
+    }
+    return success;
 }
 
 template <typename QueueContent, typename QueueType>
@@ -192,6 +242,14 @@ bool QueuePair<QueueContent, QueueType>::tryConsumerPush(QueueContent data)
     {
         this->producerWaitCondition.notify_one();
     }
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPush Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPush Bad";
+    }
     return success;
 }
 
@@ -199,7 +257,16 @@ template <typename QueueContent, typename QueueType>
 bool QueuePair<QueueContent, QueueType>::tryProducerPop(QueueContent& data)
 {
     //try to pop from the producer queue
-    return this->producerQueue.pop(data);
+    bool success = this->producerQueue.pop(data)
+    if(success)
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPush Good";
+    }
+    else
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Information) << "QueuePair: tryConsumerPush Bad";
+    }
+    return success;
 }
 
 
