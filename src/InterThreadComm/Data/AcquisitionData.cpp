@@ -44,13 +44,17 @@ AcquisitionData::AcquisitionData(int numDigiChan, int numMods):
 
 void AcquisitionData::clearData()
 {
-    for(int i=0; i<this->numChannels; ++i)
-    {
-        triggers[i].store(0, std::memory_order_relaxed);
-    }
     for(int i=0; i<this->numModules; ++i)
     {
         dataSizes[i].store(0, std::memory_order_relaxed);
+    }
+}
+
+void AcquisitionData::clearTrigs()
+{
+    for(int i=0; i<this->numChannels; ++i)
+    {
+        triggers[i].store(0, std::memory_order_relaxed);
     }
 }
 
