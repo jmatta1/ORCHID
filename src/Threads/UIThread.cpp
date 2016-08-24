@@ -1087,7 +1087,6 @@ void UIThread::stopDataTaking()
     
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Event Processing Threads Set To Stop";
     this->procControl->setToStopped();
-    this->fileMultiQueue->setForceStayAwake();
     this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
     wclear(this->textWindow);
     mvwprintw(this->textWindow, 0, 0, "Waiting For Processing Stop");
@@ -1095,6 +1094,7 @@ void UIThread::stopDataTaking()
     while(this->numProcThreads > this->procControl->getThreadsWaiting())
     {//until we see the acquisition threads waiting on their wait condition, sleep and spin
         boost::this_thread::sleep_for(this->refreshPeriod);
+        this->fileMultiQueue->setForceStayAwake();
         this->fileMultiQueue->wakeAllProducer<Utility::ProcessingQueueIndex>();
     }
     this->fileMultiQueue->clearForceStayAwake();

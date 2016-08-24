@@ -60,6 +60,19 @@ void ProcessingThread::doProcessingLoop()
     while(this->controller->getCurrentState() == InterThread::ProcessingThreadState::Running)
     {
         BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Started Process Loop";
+        switch(this->controller->getCurrentState())
+        {
+        case InterThread::ProcessingThreadState::Running:
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": See Running";
+            break;
+        case InterThread::ProcessingThreadState::Stopped:
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": See Stopped";
+            break;
+        case InterThread::ProcessingThreadState::Terminate:
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": See Terminate";
+            break;
+        }
+
         //first pull a buffer from the file thread queue, this may cause a wait
         if(dataInputQueue->consumerPop(dataBuffer))
         {//if we got the buffer, proceed, if not make sure we are not being
