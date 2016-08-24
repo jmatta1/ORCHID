@@ -143,7 +143,6 @@ void AsyncOutFileWriteThread<RetQueueType>::runMainLoop()
         //(and terminate signals)
         while(!(this->aOutFile->writeQueue.read_available()) && !(this->aOutFile->emptyQueue.load()))
         {
-            BOOST_LOG_SEV(lg, Information) << "FW Thread: Waiting For Data";
             //first make certain the writer thread is not waiting for some reason
             if(this->aOutFile->producerWaiting.load())
             {
@@ -158,10 +157,8 @@ void AsyncOutFileWriteThread<RetQueueType>::runMainLoop()
         //if there is data available, grab it and write it
         if(this->aOutFile->writeQueue.pop(temp))
         {
-            BOOST_LOG_SEV(lg, Information) << "FW Thread: Grabbing Data";
             //write the buffer
             this->aOutFile->outFile->write(temp->buffer, temp->size);
-            BOOST_LOG_SEV(lg, Information) << "FW Thread: Out file is: "<< aOutFile->outFile->good()<< ", "<<aOutFile->outFile->eof()<<", "<<aOutFile->outFile->fail()<<", "<<aOutFile->outFile->bad();
             //run the call back to return the buffer to whoever owns it
             //this->aOutFile->callBackQueue->push(temp->buffer);
             InterThread::PushSelect<RetQueueType, char*>::push(*(this->aOutFile->callBackQueue), temp->buffer);
@@ -192,7 +189,6 @@ void AsyncOutFileWriteThread<RetQueueType>::clearBuffer()
     BufferPair* temp = nullptr;
     while(this->aOutFile->writeQueue.pop(temp))
     {
-        BOOST_LOG_SEV(lg, Information) << "FW Thread: Grabbing Data";
         //if we are in here then there is data in the buffer to empty before
         //termination
         //write the buffer
@@ -371,14 +367,6 @@ void AsyncOutFile<RetQueueType>::newFile(const std::string& filePath)
     //once we have the lock, we have control of the fstream
     outFile = new std::ofstream(filePath, std::ios_base::binary | std::ios_base::trunc);
     this->isInitialized.store(true);
-    if(outFile->is_open())
-    {
-        BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Opened New File at: " << filePath;
-    }
-    else
-    {
-        BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Could not open new file at: " << filePath;
-    }
     //our changes are done
     //the lock should release on destruction when the function exits
     BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Done prepping new file";
@@ -415,6 +403,7 @@ void AsyncOutFile<RetQueueType>::closeFile()
         this->isInitialized.store(false);
     }
     //our changes are done
+    BOOST_LOG_SEV(lg, Information) << "FO Thread: AsyncOutFile: Done closing current file";
     //the lock should release on destruction when the function exits
 }
 
