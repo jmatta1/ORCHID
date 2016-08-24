@@ -64,14 +64,7 @@ void AcquisitionThread::doAcquisitionLoop()
         if(currentBuffer->sizeOfData != 0)
         {
             //if we have a filled buffer, there must be space for it to be pushed
-            if(this->dataOutputQueue->producerPush(currentBuffer))
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Pushed a buffer";
-            }
-            else
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Failed to push a buffer";
-            }
+            this->dataOutputQueue->producerPush(currentBuffer);
             currentBuffer = nullptr;
             //now pop a buffer
             if(!(this->dataOutputQueue->producerPop(currentBuffer)))
@@ -79,10 +72,6 @@ void AcquisitionThread::doAcquisitionLoop()
                 //if this failed we are being asked to exit the loop while we were waiting for a buffer
                 currentBuffer = nullptr;
                 break;
-            }
-            if(currentBuffer != nullptr)
-            {
-                BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Popped a buffer";
             }
         }
         
@@ -102,10 +91,6 @@ void AcquisitionThread::startAcquisition()
         BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Unable to obtain an empty buffer on acq start, something is wrong";
         throw std::runtime_error("ACQ Thread Error: Unable to obtain an empty buffer on acq start");
     }
-    else
-    {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Popped a buffer";
-    }
     //start acquisition
     this->digitizer->startAcquisition();
 }
@@ -124,10 +109,6 @@ void AcquisitionThread::doFinalRead()
     {
         currentBuffer == nullptr;
         haveBuffer = this->dataOutputQueue->producerPop(currentBuffer);
-        if(!haveBuffer && currentBuffer != nullptr)
-        {
-            BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Popped a buffer but think I didnt";
-        }
     }
     currentBuffer->info.startChannel = this->firstChannel;
     currentBuffer->info.boardNumber = this->modNumber;
@@ -135,27 +116,13 @@ void AcquisitionThread::doFinalRead()
     if(currentBuffer->sizeOfData != 0)
     {
         //if we have a buffer, there must be space for it to be pushed
-        if(this->dataOutputQueue->producerPush(currentBuffer))
-        {
-            BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Producer Pushed a buffer";
-        }
-        else
-        {
-            BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Producer push failed";
-        }
+        this->dataOutputQueue->producerPush(currentBuffer);
         currentBuffer = nullptr;
     }
     else
     {
          //since the buffer is empty, dump it back on to the end of the consumer queue
-        if(this->dataOutputQueue->consumerPush(currentBuffer))
-        {
-            BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Consumer Pushed a buffer";
-        }
-        else
-        {
-            BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Consumer push failed";
-        }
+        this->dataOutputQueue->consumerPush(currentBuffer);
         currentBuffer = nullptr;
     }
 }

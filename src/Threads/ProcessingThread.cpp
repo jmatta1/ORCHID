@@ -63,17 +63,14 @@ void ProcessingThread::doProcessingLoop()
         if(dataInputQueue->consumerPop(dataBuffer))
         {//if we got the buffer, proceed, if not make sure we are not being
             //asked to terminate
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Do Popped buffer";
             processDataBuffer(dataBuffer); //when this finishes the data buffer
             //is completely handled and can be put back on the return queue
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Do Pushed buffer";
             this->dataInputQueue->consumerPush(dataBuffer);
             dataBuffer = nullptr;
         }
     }
     if(dataBuffer != nullptr)
     {
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Do Extra Pushed buffer";
         this->dataInputQueue->consumerPush(dataBuffer);
     }
 }
@@ -84,16 +81,13 @@ void ProcessingThread::emptyProcessingBuffer()
     while(dataInputQueue->tryConsumerPop(dataBuffer))
     {
         //asked to terminate
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Empty Popped buffer";
         processDataBuffer(dataBuffer); //when this finishes the data buffer
         //is completely handled and can be put back on the return queue
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Empty Pushed buffer";
         this->dataInputQueue->consumerPush(dataBuffer);
         dataBuffer = nullptr;
     }
     if(dataBuffer != nullptr)
     {
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Empty Extra Pushed buffer";
         this->dataInputQueue->consumerPush(dataBuffer);
     }
 }
