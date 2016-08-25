@@ -41,6 +41,8 @@ struct PowerBlock
 	std::string mpodIpAddress;
 	std::string weinerMibFileDirectory;
     int pollingRate;
+    bool performPowerOn;
+    bool performPowerOff;
     
     // parameter setters for binding with boost::spirit::qi
     // required parameters
@@ -49,7 +51,9 @@ struct PowerBlock
     void mpodIpAddressSet(const std::string& input);
     void weinerMibFileDirectorySet(const std::string& input);
     void pollingRateSet(int input);
-	
+    void performPowerOnSet(bool input);
+    void performPowerOffSet(bool input);
+    
 	bool validate();
 	void printValidationErrors();
 	

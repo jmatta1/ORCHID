@@ -50,13 +50,16 @@ struct PowerBlockGrammar : qi::grammar<Iterator>
 		using qi::int_;
 		using Utility::eol_;
 		using Utility::separator;
+        using Utility::boolSymbols_;
         
         //define the rules to parse the parameters
-        moduleFile  = (lexeme["PerModuleParameterFile"]  >> '=' > quotedString [phoenix::bind(&PowerBlock::perModuleParameterFileSet,  ptr, qi::_1)] > separator);
-        channelFile = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&PowerBlock::perChannelParameterFileSet, ptr, qi::_1)] > separator);
-        ipAddress   = (lexeme["MpodIPAddress"]           >> '=' > ipAddr       [phoenix::bind(&PowerBlock::mpodIpAddressSet,           ptr, qi::_1)] > separator);
-        mibFile     = (lexeme["WienerMibFileDirectory"]  >> '=' > quotedString [phoenix::bind(&PowerBlock::weinerMibFileDirectorySet,  ptr, qi::_1)] > separator);
-        pollingRate = (lexeme["PollingRate"]             >> '=' > int_         [phoenix::bind(&PowerBlock::pollingRateSet,             ptr, qi::_1)] > separator);
+        moduleFile      = (lexeme["PerModuleParameterFile"]  >> '=' > quotedString [phoenix::bind(&PowerBlock::perModuleParameterFileSet,  ptr, qi::_1)] > separator);
+        channelFile     = (lexeme["PerChannelParameterFile"] >> '=' > quotedString [phoenix::bind(&PowerBlock::perChannelParameterFileSet, ptr, qi::_1)] > separator);
+        ipAddress       = (lexeme["MpodIPAddress"]           >> '=' > ipAddr       [phoenix::bind(&PowerBlock::mpodIpAddressSet,           ptr, qi::_1)] > separator);
+        mibFile         = (lexeme["WienerMibFileDirectory"]  >> '=' > quotedString [phoenix::bind(&PowerBlock::weinerMibFileDirectorySet,  ptr, qi::_1)] > separator);
+        pollingRate     = (lexeme["PollingRate"]             >> '=' > int_         [phoenix::bind(&PowerBlock::pollingRateSet,             ptr, qi::_1)] > separator);
+        performPowerOn  = (lexeme["PerformPowerOn"]          >> '=' > boolSymbols_ [phoenix::bind(&PowerBlock::performPowerOnSet,          ptr, qi::_1)] > separator);
+        performPowerOff = (lexeme["PerformPowerOff"]         >> '=' > boolSymbols_ [phoenix::bind(&PowerBlock::performPowerOffSet,         ptr, qi::_1)] > separator);
         
 		// define the start rule which holds the whole monstrosity and set the rule to skip blanks
 		// if we skipped spaces we could not parse newlines as separators
@@ -64,7 +67,8 @@ struct PowerBlockGrammar : qi::grammar<Iterator>
 		powerBlockRule = lexeme["[PowerBlock]"] >> *eol_
                                > ( 
                                    moduleFile ^ channelFile ^ ipAddress ^
-                                   mibFile    ^ pollingRate
+                                   mibFile    ^ pollingRate ^ performPowerOn ^
+                                   performPowerOff
                                  )
                                > lexeme["[EndBlock]"];
 	}
@@ -80,7 +84,8 @@ private:
 	
 	// parameters
 	qi::rule<Iterator, qi::blank_type> moduleFile, channelFile, ipAddress,
-                                       mibFile,    pollingRate;
+                                       mibFile,    pollingRate, performPowerOn,
+                                       performPowerOff;
 
 	// hold the pointer that we are going to bind to
 	PowerBlock* ptr;

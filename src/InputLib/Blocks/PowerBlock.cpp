@@ -30,7 +30,8 @@ namespace InputParser
 
 PowerBlock::PowerBlock() : perChannelParameterFile(""),
     mpodIpAddress(""), perChannelParameterFileSet_(false),
-    mpodIpAddressSet_(false), pollingRate(1) {}
+    mpodIpAddressSet_(false), pollingRate(1), performPowerOn(true),
+    performPowerOff(true){}
 
 // required parameters
 void PowerBlock::perChannelParameterFileSet(const std::string& input)
@@ -60,6 +61,16 @@ void PowerBlock::weinerMibFileDirectorySet(const std::string& input)
 void PowerBlock::pollingRateSet(int input)
 {
     pollingRate = input;
+}
+
+void PowerBlock::performPowerOnSet(bool input)
+{
+    performPowerOn = input;
+}
+
+void PowerBlock::performPowerOffSet(bool input)
+{
+    performPowerOff = input;
 }
 
 bool PowerBlock::validate()
