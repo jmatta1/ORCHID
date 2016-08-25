@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     boost::log::core::get()->add_sink(coutSink);
     
     boost::log::sources::severity_logger_mt<LogSeverity>& lg = OrchidLog::get();
-    BOOST_LOG_SEV(lg, Trace) << Resources::titleString;
+    BOOST_LOG_SEV(lg, Information) << Resources::titleString;
 
     //parse the input file and ancillary csv files
     InputParser::InputParameters params;
@@ -136,16 +136,16 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Information)  << "Digitizer Module Input File";
     BOOST_LOG_SEV(lg, Information)  << digitizerChannelData ;
     BOOST_LOG_SEV(lg, Information)  << "--------------------------------------------------------------------------------";
-    BOOST_LOG_SEV(lg, Trace)  << "\nReady to start!" << std::flush;
-    BOOST_LOG_SEV(lg, Trace)  << "Press enter to continue\n" <<std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "\nReady to start!" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Press enter to continue\n" <<std::flush;
     std::cin.get();
-    BOOST_LOG_SEV(lg, Trace)  << "Proceeding" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Proceeding" << std::flush;
 
     /*
      * Build the InterThread Statistics structures
      */
     //count the number of voltage channels
-    BOOST_LOG_SEV(lg, Trace)  << "Building statistics accumulators" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Building statistics accumulators" << std::flush;
     int numVoltageChannels = std::count(mpodChannelData.online.begin(),
                                         mpodChannelData.online.end(), true);
     //count the number of temperature channels
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
     /*
      * Build the InterThread Control structures
      */
-    BOOST_LOG_SEV(lg, Trace)  << "Building thread control data structures" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Building thread control data structures" << std::flush;
     // For controlling AcquisitionThread
     InterThread::AcquisitionThreadControl* acqController = new InterThread::AcquisitionThreadControl();
     
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     /*
      * Build the Device Control structures
      */
-    BOOST_LOG_SEV(lg, Trace)  << "Building device control data structures" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Building device control data structures" << std::flush;
     // For Controlling the MPOD (The temperature system needs no control)
     SlowControls::SnmpUtilControl* mpodSnmpController = new SlowControls::SnmpUtilControl(params.powerBlock->mpodIpAddress,
                                                                                           params.powerBlock->weinerMibFileDirectory);
@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
     /*
      * Build the InterThread Buffer/Data queues
      */
-    BOOST_LOG_SEV(lg, Trace)  << "Building interthread data queues" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Building interthread data queues" << std::flush;
     // For transferring data buffers to and from the acquisition
     // threads to the event processing threads
     Utility::ToProcessingQueuePair* toProcessingQueue = new Utility::ToProcessingQueuePair();
@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
     /*
      * Build the callable objects for boost::thread
      */
-    BOOST_LOG_SEV(lg, Trace)  << "Building callable objects and their wrappers" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Building callable objects and their wrappers" << std::flush;
     //make the UI thread callable
     Threads::UIThread* uiThreadCallable =
             new Threads::UIThread(slowData, acqData, fileData, mpodMapper,
@@ -301,7 +301,7 @@ int main(int argc, char* argv[])
     /*
      * Handle the threads
      */
-    BOOST_LOG_SEV(lg, Trace)  << "Building threads" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Building threads" << std::flush;
     // Make the threads
     boost::thread scThread(*scThreadWrapper);
     boost::thread fileThread(*fileThreadWrapper);
@@ -316,7 +316,7 @@ int main(int argc, char* argv[])
         processingThreads.create_thread(*(prThreadWrappers[i]));
     }
     //make the UI thread last
-    BOOST_LOG_SEV(lg, Trace)  << "Starting UI Thread, stopping console logging" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Starting UI Thread, stopping console logging" << std::flush;
     boost::log::core::get()->remove_sink(coutSink);
     coutSink->flush();
     boost::thread uiThread(*uiThreadWrapper);
@@ -326,9 +326,9 @@ int main(int argc, char* argv[])
     boost::log::core::get()->add_sink(coutSink);
 
     //the IO thread has joined proceed with shutdown
-    BOOST_LOG_SEV(lg, Trace)  << "UI thread has rejoined main the thread. Resuming console logging." << std::flush;
-    BOOST_LOG_SEV(lg, Trace)  << "Other threads should have terminated." << std::flush;
-    BOOST_LOG_SEV(lg, Trace)  << "Deleting thread callable objects" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "UI thread has rejoined main the thread. Resuming console logging." << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Other threads should have terminated." << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Deleting thread callable objects" << std::flush;
     //delete the thread callable objects
     delete uiThreadWrapper;
     delete uiThreadCallable;
@@ -358,7 +358,7 @@ int main(int argc, char* argv[])
     delete[] processingThreadCallables;
     
     //delete the data queues
-    BOOST_LOG_SEV(lg, Trace)  << "Deleting interthread data queues" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Deleting interthread data queues" << std::flush;
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::DigitizerToProcessing); ++i)
     {
         Utility::ToProcessingBuffer* temp;
@@ -404,7 +404,7 @@ int main(int argc, char* argv[])
 
     
     //delete the device control structures
-    BOOST_LOG_SEV(lg, Trace)  << "Deleting device controls" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Deleting device controls" << std::flush;
     for(int i=0; i<numDigitizers; ++i)
     {
         delete digitizerList[i];
@@ -417,19 +417,19 @@ int main(int argc, char* argv[])
     delete mpodSnmpController;
     
     //delete the thread control structures
-    BOOST_LOG_SEV(lg, Trace)  << "Deleting thread controls" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Deleting thread controls" << std::flush;
     delete sctController;
     delete fotController;
     delete acqController;
     delete prController;
     
-    BOOST_LOG_SEV(lg, Trace)  << "Deleting statistics accumulators\n" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Deleting statistics accumulators\n" << std::flush;
     //delete shared objects generated for interprocess communication
     delete slowData;
     delete acqData;
     delete fileData;
 
-    BOOST_LOG_SEV(lg, Trace)  << "ORCHID has successfully shut down, have a nice day! :-)\n\n" << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "ORCHID has successfully shut down, have a nice day! :-)\n\n" << std::flush;
 
     return 0;
 }
