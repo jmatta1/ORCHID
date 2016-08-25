@@ -57,7 +57,8 @@ public:
              Utility::ToProcessingQueuePair* procDataQueue,
              Utility::ToFileMultiQueue* fileDataQueue,
              SlowControls::MpodController* mpCtrl,
-             int refreshFrequency, int pollingRate, int numAcqThr, int numPrThr);
+             int refreshFrequency, int pollingRate, int numAcqThr, int numPrThr,
+             bool runPowerUp, bool runPowerDown);
     ~UIThread(){}
 
     //this is the function that is called by boost::thread when making a thread
@@ -195,6 +196,9 @@ private:
     bool runSubLoop;
     //enum to hold what mode we are in
     UIMode mode;
+    //bools to hold if we should actively power on the mpod or merely monitor it
+    bool powerUp;
+    bool powerDown;
     
     /**  Variables for managing basic screen drawing**/
     int numRows;

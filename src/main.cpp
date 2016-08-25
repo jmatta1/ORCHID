@@ -255,7 +255,9 @@ int main(int argc, char* argv[])
                                   acqController, sctController, fotController,
                                   prController, toProcessingQueue, toFileQueues,
                                   mpodController, params.generalBlock->updateFrequency,
-                                  params.powerBlock->pollingRate, numDigitizers, numProcThreads);
+                                  params.powerBlock->pollingRate, numDigitizers,
+                                  numProcThreads, params.powerBlock->performPowerOn,
+                                  params.powerBlock->performPowerOff);
     Threads::ThreadWrapper<Threads::UIThread>* uiThreadWrapper = 
             new Threads::ThreadWrapper<Threads::UIThread>(uiThreadCallable);
 

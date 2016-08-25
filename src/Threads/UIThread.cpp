@@ -49,13 +49,14 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* r
                    Utility::ToProcessingQueuePair* procDataQueue,
                    Utility::ToFileMultiQueue* fileDataQueue,
                    SlowControls::MpodController* mpCtrl, int refreshFrequency,
-                   int pollingRate, int numAcqThr, int numPrThr):
+                   int pollingRate, int numAcqThr, int numPrThr, bool runPowerUp,
+                   bool runPowerDown):
     slowData(slDat), acqData(rtDat), fileData(fiDat), mpodMapper(mpodMap), procQueuePair(procDataQueue),
     fileMultiQueue(fileDataQueue), numAcqThreads(numAcqThr), numProcThreads(numPrThr),
     acqControl(acqCtrl), sctControl(sctCtrl), fileControl(fileCtrl), procControl(procCtrl), mpodController(mpCtrl),
     persistCount(-1), lastFileSize(0), command(""),  persistentMessage(""), runLoop(true),
     refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
-    messageWindow(nullptr), lg(OrchidLog::get())
+    messageWindow(nullptr), lg(OrchidLog::get()), powerUp(runPowerUp), powerDown(runPowerDown)
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
@@ -961,59 +962,73 @@ void UIThread::runGracefulShutdown()
 
 void UIThread::turnOn()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the MPOD Crate";
-    //if we do not have a wait we hit the crate too hard and fast and tell it to do things before it is fully booted
-    wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Pause for MPOD crate bootup.");
-    wrefresh(this->textWindow);
-    if(!this->mpodController->turnCrateOn())
+    if(powerUp)
     {
-        BOOST_LOG_SEV(this->lg, Critical) << "UI Thread: Critical Error: MPOD either did not turn on or did not initialize";
-        this->persistentMessage = "Critical Error: MPOD either did not turn on or did not initialize";
-        this->persistColor = errorColor;
-        this->persistCount = refreshRate*10;
-        this->mpodController->turnCrateOff();//Undo anything that may have happened
-        return; //then return without changing mode
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the MPOD Crate";
+        //if we do not have a wait we hit the crate too hard and fast and tell it to do things before it is fully booted
+        wclear(this->textWindow);
+        mvwprintw(this->textWindow, 0, 0, "Pause for MPOD crate bootup.");
+        wrefresh(this->textWindow);
+        if(!this->mpodController->turnCrateOn())
+        {
+            BOOST_LOG_SEV(this->lg, Critical) << "UI Thread: Critical Error: MPOD either did not turn on or did not initialize";
+            this->persistentMessage = "Critical Error: MPOD either did not turn on or did not initialize";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*10;
+            this->mpodController->turnCrateOff();//Undo anything that may have happened
+            return; //then return without changing mode
+        }
+        wclear(this->textWindow);
+        mvwprintw(this->textWindow, 0, 0, "Pause for MPOD channel starts.");
+        wrefresh(this->textWindow);
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the HV channels";
+        if(!this->mpodController->activateAllChannels())
+        {
+            BOOST_LOG_SEV(this->lg, Critical) << "UI Thread: Critical Error:  Error in turning on HV channels";
+            this->persistentMessage = "Critical Error:  Error in turning on HV channels";
+            this->persistColor = errorColor;
+            this->persistCount = refreshRate*10;
+            this->mpodController->deactivateAllChannels();
+            this->mpodController->turnCrateOff();//Undo anything that may have happened
+            return; //then return without changing mode
+        }
     }
-    wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Pause for MPOD channel starts.");
-    wrefresh(this->textWindow);
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Turning on the HV channels";
-    if(!this->mpodController->activateAllChannels())
+    else
     {
-        BOOST_LOG_SEV(this->lg, Critical) << "UI Thread: Critical Error:  Error in turning on HV channels";
-        this->persistentMessage = "Critical Error:  Error in turning on HV channels";
-        this->persistColor = errorColor;
-        this->persistCount = refreshRate*10;
-        this->mpodController->deactivateAllChannels();
-        this->mpodController->turnCrateOff();//Undo anything that may have happened
-        return; //then return without changing mode
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Skipping MPOD powerup" << std::flush;
     }
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Setting Slow Controls thread to polling" << std::flush;
     this->sctControl->setToPolling();
-    wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp up");
-    wrefresh(this->textWindow);
-    //sleep for 1.5 * poll period to give the slow controls thread a chance to
-    //read when the ramp up is running
-    boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
-    bool stillRamping = true;
-    while(stillRamping)
+    if(powerUp)
     {
         wclear(this->textWindow);
         mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp up");
         wrefresh(this->textWindow);
-        //here we sleep a bit
-        boost::this_thread::sleep_for(this->refreshPeriod);
-        //here we check if there are any channels still ramping their voltages
-        int rampCount = std::count(this->slowData->outputRampUp,
-                                   &(this->slowData->outputRampUp[this->slowData->numVoltageChannels]), true);
-        if(rampCount == 0)
+        //sleep for 1.5 * poll period to give the slow controls thread a chance to
+        //read when the ramp up is running
+        boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
+        bool stillRamping = true;
+        while(stillRamping)
         {
-            stillRamping = false;
+            wclear(this->textWindow);
+            mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp up");
+            wrefresh(this->textWindow);
+            //here we sleep a bit
+            boost::this_thread::sleep_for(this->refreshPeriod);
+            //here we check if there are any channels still ramping their voltages
+            int rampCount = std::count(this->slowData->outputRampUp,
+                                       &(this->slowData->outputRampUp[this->slowData->numVoltageChannels]), true);
+            if(rampCount == 0)
+            {
+                stillRamping = false;
+            }
         }
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: HV done ramping" << std::flush;
     }
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: HV done ramping" << std::flush;
+    else
+    {
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Skipping HV rampup" << std::flush;
+    }
     mode = UIMode::Idle;
     //this->startLine = 0;
     wclear(this->textWindow);
@@ -1023,34 +1038,44 @@ void UIThread::turnOff()
 {
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Putting Slow Controls thread into polling mode";
     this->sctControl->setToPolling();
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting channel ramp down";
-    wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp down");
-    wrefresh(this->textWindow);
-    this->mpodController->deactivateAllChannels();
-    //sleep for 1.5 * poll period to give the slow controls thread a chance to
-    //read when the ramp down is running
-    boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
-    bool stillRamping = true;
-    while(stillRamping)
+    if(powerDown)
     {
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting channel ramp down";
         wclear(this->textWindow);
         mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp down");
         wrefresh(this->textWindow);
-        //here we sleep a bit
-        boost::this_thread::sleep_for(this->refreshPeriod);
-        //here we check if there are any channels still ramping their voltages
-        int rampCount = std::count(this->slowData->outputRampDown,
-                                   &(this->slowData->outputRampDown[this->slowData->numVoltageChannels]), true);
-        
-        if(rampCount == 0)
+        this->mpodController->deactivateAllChannels();
+        //sleep for 1.5 * poll period to give the slow controls thread a chance to
+        //read when the ramp down is running
+        boost::this_thread::sleep_for(this->slowControlsPollingWaitPeriod);
+        bool stillRamping = true;
+        while(stillRamping)
         {
-            stillRamping = false;
+            wclear(this->textWindow);
+            mvwprintw(this->textWindow, 0, 0, "Waiting for voltage ramp down");
+            wrefresh(this->textWindow);
+            //here we sleep a bit
+            boost::this_thread::sleep_for(this->refreshPeriod);
+            //here we check if there are any channels still ramping their voltages
+            int rampCount = std::count(this->slowData->outputRampDown,
+                                       &(this->slowData->outputRampDown[this->slowData->numVoltageChannels]), true);
+            
+            if(rampCount == 0)
+            {
+                stillRamping = false;
+            }
         }
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Done Ramping, stopping slow controls thread";
     }
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Done Ramping, stopping slow controls thread";
+    else
+    {
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Skipping voltage rampdown";
+    }
     this->sctControl->setToStop();
-    this->mpodController->turnCrateOff();
+    if(powerDown)
+    {
+        this->mpodController->turnCrateOff();
+    }
     mode = UIMode::Init;
     wclear(this->textWindow);
 }
