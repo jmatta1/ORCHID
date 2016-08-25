@@ -72,7 +72,7 @@ void SlowControlsThread::operator ()()
                 //poll the mpod
                 this->mpodReader->readAll();
             }
-            else if((loopCount % 30)==0)
+            else if((loopCount % 300)==0)
             {
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Still Polling (# Loops: "<<loopCount<<")";
                 //after that only read the things that actually change
@@ -96,7 +96,7 @@ void SlowControlsThread::operator ()()
                 //poll the mpod
                 this->mpodReader->readAll();
             }
-            else if((loopCount % 120)==0)
+            else if((loopCount % 300)==0)
             {
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Still Writing (# Loops: "<<loopCount<<")";
                 //after that only read the things that actually change
