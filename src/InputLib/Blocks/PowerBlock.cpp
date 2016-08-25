@@ -116,6 +116,8 @@ return os << "[PowerBlock]\n"
     << "    IPAddress                = "   << pb.mpodIpAddress           << "\n"
     << "    WienerMibFileDirectory   = "   << pb.weinerMibFileDirectory  << "\n"
     << "    PollingRate              = "   << pb.pollingRate             << "\n"
+    << "    PerformPowerOn           = "   << pb.performPowerOn          << "\n"
+    << "    PerformPowerOff          = "   << pb.performPowerOff         << "\n"
     << "[EndBlock]";
 }
 
