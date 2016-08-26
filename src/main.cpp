@@ -52,8 +52,6 @@ HFIR background monitoring wall.
 #include"Threads/ProcessingThread.h"
 #include"Threads/ThreadWrapper.h"
 
-#include<fstream>
-
 //pre declare event interface so we can use pointers to it as a type
 class EventInterface;
 
