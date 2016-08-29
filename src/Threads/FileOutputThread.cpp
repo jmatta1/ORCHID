@@ -444,11 +444,10 @@ void FileOutputThread::finalizeDataBuffer()
 
 void FileOutputThread::writeBufferToDisk(int bufferSize)
 {
-    BOOST_LOG_SEV(lg, Information) << "FO Thread: Sending buffer to disk";
     this->outFile->writeBuf(this->currentBuffer, bufferSize);
     this->fileData->increaseSize(bufferSize);
     //now that we have sent that buffer out
-    //get another use in the actual file handling
+    //get another to use in the actual file handling
     this->getNextBuffer();
 }
 
