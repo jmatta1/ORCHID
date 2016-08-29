@@ -175,8 +175,6 @@ private:
     std::string runTitle;
     int runNumber;
     int sequenceNumber;
-    //variable to store the size of the file when we check
-    long long lastFileSize;
     
     //Variables to store temporary data when loading new run parameters
     std::string tempRunTitle;

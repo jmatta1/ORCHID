@@ -54,7 +54,7 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* r
     slowData(slDat), acqData(rtDat), fileData(fiDat), mpodMapper(mpodMap), procQueuePair(procDataQueue),
     fileMultiQueue(fileDataQueue), numAcqThreads(numAcqThr), numProcThreads(numPrThr),
     acqControl(acqCtrl), sctControl(sctCtrl), fileControl(fileCtrl), procControl(procCtrl), mpodController(mpCtrl),
-    persistCount(-1), lastFileSize(0), command(""),  persistentMessage(""), runLoop(true),
+    persistCount(-1), command(""),  persistentMessage(""), runLoop(true),
     refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
     messageWindow(nullptr), lg(OrchidLog::get()), powerUp(runPowerUp), powerDown(runPowerDown)
 {
@@ -66,10 +66,6 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* r
     
     long long int pollPeriod = static_cast<long long int>(2*static_cast<float>(1000000000/pollingRate));
     this->slowControlsPollingWaitPeriod = boost::chrono::nanoseconds(pollPeriod);
-    
-    //set up the logger variable too
-    
-    this->lg = OrchidLog::get();
 }
 
 void UIThread::operator() ()
@@ -203,37 +199,41 @@ void UIThread::drawIdleScreen()
 
 void UIThread::drawFileInfo()
 {
+    static int updateLoops = 1;
     //check if we need to get new values
     if(fileData->fileNameChangeSinceLastGet())
     {
         fileData->getFileName(this->fileName);
+        updateLoops = 0;
     }
     if(fileData->runTitleChangeSinceLastGet())
     {
         fileData->getRunTitle(this->runTitle);
+        updateLoops = 0;
     }
     if(fileData->runNumberChangeSinceLastGet())
     {
         this->runNumber = fileData->getRunNumber();
+        updateLoops = 0;
     }
     if(fileData->sequenceNumberChangeSinceLastGet())
     {
         this->sequenceNumber = fileData->getSequenceNumber();
+        updateLoops = 0;
     }
     //Generate the file info string
     std::ostringstream builder;
     builder << "Run Title: " << this->runTitle << " | Run #: " << this->runNumber;
-    builder << " | File #: " << this->sequenceNumber << " | Recent Rate: ";
+    builder << " | File #: " << this->sequenceNumber << " | Rate: ";
     //get the file size and calculate the current file write rate
     long long tempFileSize = this->fileData->getSize();
-    long long rate = (tempFileSize - this->lastFileSize) * this->rateMultiplier;
-    this->lastFileSize = tempFileSize;
+    long long rate = (tempFileSize * this->rateMultiplier)/updateLoops;
     //calculate if the file write rate is in thousands or millions etc
-    if(rate > 1000000)
+    if(rate > 1048576)
     {
         builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
     }
-    else if(rate > 1000)
+    else if(rate > 1024)
     {
         builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
     }
@@ -241,8 +241,22 @@ void UIThread::drawFileInfo()
     {
         builder << std::setw(4) << std::setfill(' ') << rate;
     }
-    builder << "B/s | Size: " << tempFileSize << "B | File: " << this->fileName;
+    builder << "B/s | Size: ";
+    if(tempFileSize > 1048576)
+    {
+        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
+    }
+    else if(tempFileSize > 1024)
+    {
+        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
+    }
+    else
+    {
+        builder << std::setw(4) << std::setfill(' ') << rate;
+    }
+    builder  << "B | File: " << this->fileName;
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
+    ++updateLoops;
 }
 
 void UIThread::drawGlobalSlowControlsInformation()
@@ -265,13 +279,14 @@ void UIThread::drawAcquisitionGlobalInformation()
     static int updateLoops = 1;
     for(int i=0; i < numAcqThreads; ++i)
     {
-        builder << " Module "<<i<<": "<<(rateMultiplier/updateLoops)*(acqData->dataSizes[i]);
+        int dataRate = (acqData->dataSizes[i]/updateLoops);
+        builder << " Module " << i << ": " << dataRate;
     }
     mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
     ++updateLoops;
-    if((updateLoops%20)==0)
+    if(updateLoops > 6000)
     {
-        updateLoops = 0;
+        updateLoops = 1;
         acqData->clearData();
     }
 }
@@ -318,11 +333,11 @@ void UIThread::drawSlowControlsGrid()
         float termVol =  this->slowData->terminalVoltage[chanInd];
         if(termVol >= 1000.0)
         {
-            builder << std::fixed << std::setw(5) << std::setprecision(3) << (termVol/1000.0) <<"kV | ";
+            builder << std::fixed << std::setw(6) << std::setprecision(3) << (termVol/1000.0) <<"kV | ";
         }
         else
         {
-            builder << std::fixed << std::setw(5) << std::setprecision(1) << termVol <<"V | ";
+            builder << std::fixed << std::setw(6) << std::setprecision(1) << termVol <<"V | ";
         }
         //add the current
         builder << std::fixed << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
