@@ -28,6 +28,7 @@
 
 namespace Events
 {
+typedef short ChanSizeType;
 
 class SlowControlsEvent : public EventInterface
 {
@@ -68,9 +69,9 @@ private:
 
     //general information these do not need to be atomic as they are written
     //once at object creation and never again
-    int numVoltageChannels;
-    int numTemperatureChannels;
-    int binarySize;
+    ChanSizeType numVoltageChannels;
+    ChanSizeType numTemperatureChannels;
+    short binarySize;
 };
 
 }

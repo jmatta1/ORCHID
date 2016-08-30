@@ -51,11 +51,10 @@ SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
     this->channelStatus   = new SlowControls::ChannelStatus[numVolChannels];
     //calculate the size of an event
     //size of the event, event ident, num voltage channels, num temp channels
-    int overhead = 4*sizeof(int);
-    //2 ints + 8 floats + 3 ints + 1 bool + 1 unsigned int per vol channel
-    int sizeOfSingleVoltageChannel = 2*sizeof(int) + 8*sizeof(float) +
-                                     3*sizeof(int) + sizeof(bool) +
-                                     sizeof(unsigned int);
+    int overhead = 2*sizeof(ChanSizeType) + 2*sizeof(short);
+    //2 shorts + 3 floats + 1 int + 1 unsigned int per vol channel
+    int sizeOfSingleVoltageChannel = 2*sizeof(short) + 3*sizeof(float) +
+                                     1*sizeof(int) + sizeof(unsigned int);
     //there are numVoltageChannels worth of this to store, plus the crate status
     //which fits into an int
     int sizeOfVoltage = sizeof(unsigned int) +
@@ -96,10 +95,10 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
     //lots of pointer tricks to come
     size_t index = 0;
     //first write the size of the event
-    *(reinterpret_cast<int*>(&(buff[index]))) = this->binarySize;
-    index += sizeof(int);
-    *(reinterpret_cast<int*>(&(buff[index]))) = Codes::SlowControlsEventCode;
-    index += sizeof(int);
+    *(reinterpret_cast<short*>(&(buff[index]))) = this->binarySize;
+    index += sizeof(short);
+    *(reinterpret_cast<short*>(&(buff[index]))) = Codes::SlowControlsEventCode;
+    index += sizeof(short);
     *(reinterpret_cast<int*>(&(buff[index]))) = this->numVoltageChannels;
     index += sizeof(int);
     *(reinterpret_cast<int*>(&(buff[index]))) = this->numTemperatureChannels;
@@ -110,34 +109,18 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
     //now write the rest of the power information channel by channel
     for(int i =0; i<numVoltageChannels; ++i)
     {
-        *(reinterpret_cast<int*>(&(buff[index])))   = this->boardNumber[i];
-        index += sizeof(int);
-        *(reinterpret_cast<int*>(&(buff[index])))   = this->channelNumber[i];
-        index += sizeof(int);
+        *(reinterpret_cast<short*>(&(buff[index]))) = static_cast<short>(this->boardNumber[i]);
+        index += sizeof(short);
+        *(reinterpret_cast<short*>(&(buff[index]))) = static_cast<short>(this->channelNumber[i]);
+        index += sizeof(short);
         *(reinterpret_cast<float*>(&(buff[index]))) = this->terminalVoltage[i];
         index += sizeof(float);
         *(reinterpret_cast<float*>(&(buff[index]))) = this->senseVoltage[i];
         index += sizeof(float);
-        *(reinterpret_cast<float*>(&(buff[index]))) = this->setVoltage[i];
-        index += sizeof(float);
         *(reinterpret_cast<float*>(&(buff[index]))) = this->current[i];
         index += sizeof(float);
-        *(reinterpret_cast<float*>(&(buff[index]))) = this->rampUpRate[i];
-        index += sizeof(float);
-        *(reinterpret_cast<float*>(&(buff[index]))) = this->rampDownRate[i];
-        index += sizeof(float);
-        *(reinterpret_cast<float*>(&(buff[index]))) = this->maxCurrent[i];
-        index += sizeof(float);
-        *(reinterpret_cast<float*>(&(buff[index]))) = this->maxVoltage[i];
-        index += sizeof(float);
-        *(reinterpret_cast<int*>(&(buff[index])))   = this->currentTripTime[i];
-        index += sizeof(int);
         *(reinterpret_cast<int*>(&(buff[index])))   = this->temperature[i];
         index += sizeof(int);
-        *(reinterpret_cast<int*>(&(buff[index])))   = this->maxTemperature[i];
-        index += sizeof(int);
-        *(reinterpret_cast<bool*>(&(buff[index])))  = this->outputSwitch[i];
-        index += sizeof(bool);
         *(reinterpret_cast<unsigned int*>(&(buff[index]))) = this->channelStatus[i].giveIntRepresentation();
         index += sizeof(unsigned int);
     }
