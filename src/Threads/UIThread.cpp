@@ -236,7 +236,6 @@ void UIThread::drawFileInfo()
     long long tempFileSize = this->fileData->getSize();
     smthFileSize = (expAvgSmthFactor*tempFileSize + (1-expAvgSmthFactor)*tempFileSize);
     float rate = smthFileSize*rateMultiplier/fileUpdateLoops;
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: File Rate is: " << rate << " | " << fileUpdateLoops << " | " << smthFileSize << " | " << tempFileSize;
     //calculate if the file write rate is in thousands or millions etc
     if(rate > 1048576)
     {
