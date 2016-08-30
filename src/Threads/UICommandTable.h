@@ -72,7 +72,7 @@ static const std::map<UICommands, bool> IDLE_MODE_VALID_CMD =
 
 //A lookup for valid commands while in run mode
 static const std::map<UICommands, bool> RUN_MODE_VALID_CMD =
-    map_list_of(UICommands::Quit, false)
+    map_list_of(UICommands::Quit, true)
         (UICommands::TurnOn,    false)
         (UICommands::TurnOff,   false)
         (UICommands::Start,     false)
