@@ -40,7 +40,7 @@ static const int goodColor = 2;
 static const int gridStartLine = 5;
 static const int tempStartCol = 21;
 static const int volStartCol = 40;
-static const int expAvgSmthFactor = 0.1;
+static const int expAvgSmthFactor = 0.02;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
@@ -236,31 +236,32 @@ void UIThread::drawFileInfo()
     long long tempFileSize = this->fileData->getSize();
     smthFileSize = (expAvgSmthFactor*tempFileSize + (1-expAvgSmthFactor)*tempFileSize);
     float rate = smthFileSize*rateMultiplier/fileUpdateLoops;
+    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: File Rate is: " << rate << " | " << fileUpdateLoops << " | " << smthFileSize << " | " << tempFileSize;
     //calculate if the file write rate is in thousands or millions etc
     if(rate > 1048576)
     {
-        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
+        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1048576.0) << "M";
     }
     else if(rate > 1024)
     {
-        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
+        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1024.0) << "k";
     }
     else
     {
-        builder << std::setw(4) << std::setfill(' ') << rate;
+        builder << std::setw(5) << std::setfill(' ') << rate;
     }
     builder << "B/s | Size: ";
     if(smthFileSize > 1048576.0)
     {
-        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(smthFileSize)/1048576.0) << "M";
+        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1048576.0) << "M";
     }
     else if(smthFileSize > 1024.0)
     {
-        builder << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(smthFileSize)/1024.0) << "k";
+        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1024.0) << "k";
     }
     else
     {
-        builder << std::setw(4) << std::setfill(' ') << smthFileSize;
+        builder << std::setw(5) << std::setfill(' ') << smthFileSize;
     }
     builder  << "B | File: " << this->fileName;
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
