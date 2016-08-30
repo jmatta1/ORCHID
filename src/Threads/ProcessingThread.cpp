@@ -213,16 +213,11 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
             event->setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
         }
-        int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
+        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
         event->setBoard(boardNum);
         offset += skip;
-        unsigned long long timeStamp = ((rawBuffer[offset] & 0xFFFF0000) >> 16);
-        timeStamp <<= 31;
-        timeStamp |= baseTimeStamp;
-        event->setTimeStamp(timeStamp);
-        event->setBaseline((rawBuffer[offset] & 0x0000FFFF));
-        event->setFineTimeStamp(0);
+        event->setExtraTimeStamp(((rawBuffer[offset] & 0xFFFF0000) >> 16));
         ++offset;
         //the only flag available is the pileup flag
         event->setFlags(((rawBuffer[offset] & 0x00008000) >> 15));
@@ -254,16 +249,11 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         {
             event->setChannel(baseChan);
         }
-        int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
+        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
         event->setBoard(boardNum);
         offset += skip;
-        unsigned long long timeStamp = ((rawBuffer[offset] & 0xFFFF0000) >> 16);
-        timeStamp <<= 31;
-        timeStamp |= baseTimeStamp;
-        event->setTimeStamp(timeStamp);
-        event->setBaseline(0);
-        event->setFineTimeStamp(0);
+        event->setExtraTimeStamp(((rawBuffer[offset] & 0xFFFF0000) >> 16));
         unsigned short baseFlags = ((rawBuffer[offset] & 0x0000FFFF) >> 13);
         ++offset;
         baseFlags |= ((rawBuffer[offset] & 0x00008000) >> 15);
@@ -297,16 +287,11 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
         {
             event->setChannel(baseChan);
         }
-        int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
+        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
         event->setBoard(boardNum);
         offset += skip;
-        unsigned long long timeStamp = ((rawBuffer[offset] & 0xFFFF0000) >> 16);
-        timeStamp <<= 31;
-        timeStamp |= baseTimeStamp;
-        event->setTimeStamp(timeStamp);
-        event->setBaseline(0);
-        event->setFineTimeStamp((rawBuffer[offset] & 0x000003FF));
+        event->setExtraTimeStamp(((rawBuffer[offset] & 0xFFFF0000) >> 16));
         unsigned short baseFlags = ((rawBuffer[offset] & 0x0000FC00) >> 13);
         ++offset;
         baseFlags |= ((rawBuffer[offset] & 0x00008000) >> 15);
@@ -340,13 +325,11 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
         {
             event->setChannel(baseChan);
         }
-        unsigned int baseTimeStamp = (rawBuffer[offset] & 0x7FFFFFFF);
+        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
         event->setBoard(boardNum);
         offset += skip;
-        event->setTimeStamp(baseTimeStamp);
-        event->setBaseline(0);
-        event->setFineTimeStamp(0);
+        event->setExtraTimeStamp(0);
         //the only flag available is the pileup flag
         event->setFlags(((rawBuffer[offset] & 0x00008000) >> 15));
         event->setShortGate((rawBuffer[offset] & 0x00007FFF));
