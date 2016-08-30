@@ -180,6 +180,13 @@ void Vx1730Digitizer::startAcquisition()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Starting/Arming Acqusition On Digitizer #" << moduleNumber ;
     CAENComm_ErrorCode errVal;
+    //now enable interrupt requests in CAENComm
+    errVal = CAENComm_IRQEnable(digitizerHandle);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
     //now hit the software clear to blank the data
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
     if(errVal < 0)
@@ -193,13 +200,6 @@ void Vx1730Digitizer::startAcquisition()
     if(errVal < 0)
     {
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Starting Acqusition In Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(errVal);
-    }
-    //now enable interrupt requests in CAENComm
-    errVal = CAENComm_IRQEnable(digitizerHandle);
-    if(errVal < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Started/Armed";
@@ -228,7 +228,7 @@ unsigned int Vx1730Digitizer::getData(unsigned int* buffer)
     readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
     if(readError < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Ready Status After Reading Initial Interrupt Event Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Ready Status Before Waiting for IRQ on Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(readError);
     }
     eventReady = (readValue & 0x00000001);
