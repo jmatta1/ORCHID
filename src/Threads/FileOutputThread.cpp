@@ -416,7 +416,7 @@ void FileOutputThread::finalizeDataBuffer()
     std::fill_n(&(this->currentBuffer[this->buffInd]), BufferSizeInBytes - this->buffInd, 0);
     //here we go back to the beginning of the buffer and load the number of events into the header
     reinterpret_cast<unsigned int*>(&(this->currentBuffer[8]))[0] = this->eventCount;
-    //then we write the time this buffer is started
+    //then we write the time this buffer is finalized
     this->currFileTime = boost::posix_time::microsec_clock::universal_time();
     boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
     reinterpret_cast<long long*>(&(this->currentBuffer[24]))[0] = epochTime.total_microseconds();
