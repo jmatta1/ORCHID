@@ -35,26 +35,22 @@ int DppPsdEvent::getSizeOfBinaryRepresentation()
 void DppPsdEvent::getBinaryRepresentation(char* buff)
 {
     int index = 0;
-    *(reinterpret_cast<int*>(&(buff[index]))) = this->binarySize;
-    index += sizeof(int);
-    *(reinterpret_cast<int*>(&(buff[index]))) = Codes::DigitizerPsdEventCode;
-    index += sizeof(int);
-    *(reinterpret_cast<unsigned short*>(&(buff[index]))) = boardNumber;
-    index += sizeof(unsigned short);
-    *(reinterpret_cast<unsigned short*>(&(buff[index]))) = channelNumber;
-    index += sizeof(unsigned short);
+    *(reinterpret_cast<unsigned char*>(&(buff[index])))      = this->binarySize;
+    index += sizeof(unsigned char);
+    *(reinterpret_cast<unsigned char*>(&(buff[index])))      = Codes::DigitizerPsdEventCode;
+    index += sizeof(unsigned char);
+    *(reinterpret_cast<unsigned char*>(&(buff[index])))      = boardNumber;
+    index += sizeof(unsigned char);
+    *(reinterpret_cast<unsigned char*>(&(buff[index])))      = channelNumber;
+    index += sizeof(unsigned char);
     *(reinterpret_cast<unsigned long long*>(&(buff[index]))) = extendedTimestamp;
     index += sizeof(unsigned long long);
-    *(reinterpret_cast<unsigned short*>(&(buff[index]))) = longIntegral;
+    *(reinterpret_cast<unsigned short*>(&(buff[index])))     = longIntegral;
     index += sizeof(unsigned short);
-    *(reinterpret_cast<unsigned short*>(&(buff[index]))) = shortIntegral;
+    *(reinterpret_cast<unsigned short*>(&(buff[index])))     = shortIntegral;
     index += sizeof(unsigned short);
-    *(reinterpret_cast<unsigned short*>(&(buff[index]))) = fineTimeStamp;
-    index += sizeof(unsigned short);
-    *(reinterpret_cast<unsigned short*>(&(buff[index]))) = baseline;
-    index += sizeof(unsigned short);
-    *(reinterpret_cast<unsigned short*>(&(buff[index]))) = flags;
-    index += sizeof(unsigned short);
+    *(reinterpret_cast<unsigned char*>(&(buff[index])))      = flags;
+    index += sizeof(unsigned char);
 }
 
 }

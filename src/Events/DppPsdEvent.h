@@ -31,7 +31,8 @@ class DppPsdEvent : public EventInterface
 {
 public:
     DppPsdEvent():
-        binarySize(2*sizeof(int) + sizeof(unsigned long long) + 7*sizeof(unsigned short)),
+        //binarySize(2*sizeof(int) + sizeof(unsigned long long) + 7*sizeof(unsigned short)),
+        binarySize(5*sizeof(char) + sizeof(unsigned long long) + 2*sizeof(unsigned short)),
         boardNumber(0), channelNumber(0), longIntegral(0),
         shortIntegral(0), extendedTimestamp(0), fineTimeStamp(0),
         baseline(0), flags(0) {}
@@ -44,25 +45,25 @@ public:
     virtual void getBinaryRepresentation(char* buff);
     
     //setters for the event processing threads to dump data into these
-    void setBoard(unsigned short board){boardNumber = board;}
-    void setChannel(unsigned short chan){channelNumber = chan;}
+    void setBoard(unsigned char board){boardNumber = board;}
+    void setChannel(unsigned char chan){channelNumber = chan;}
     void setLongGate(unsigned short lGate){longIntegral = lGate;} 
     void setShortGate(unsigned short sGate){shortIntegral = sGate;}
     void setTimeStamp(unsigned long long tStamp){extendedTimestamp = tStamp;}
     void setFineTimeStamp(unsigned short ftStamp){fineTimeStamp = ftStamp;}
     void setBaseline(unsigned short bsl){baseline = bsl;}
-    void setFlags(unsigned short flg){flags = flg;}
+    void setFlags(unsigned char flg){flags = flg;}
     
 private:
-    int binarySize;
-    unsigned short boardNumber;
-    unsigned short channelNumber;
+    short binarySize;
+    unsigned char boardNumber;
+    unsigned char channelNumber;
     unsigned long long extendedTimestamp;
     unsigned short longIntegral;
     unsigned short shortIntegral;
     unsigned short fineTimeStamp;
     unsigned short baseline;//could be zero based on extras word options
-    unsigned short flags;//bit[0] = PUR flag, bit[1] = over-range, bit[2] = trigger lost
+    unsigned char flags;//bit[0] = PUR flag, bit[1] = over-range, bit[2] = trigger lost
 };
 
 
