@@ -24,8 +24,8 @@ namespace Events
 
 namespace Codes
 {
-static const int SlowControlsEventCode = 0x00000001;
-static const int DigitizerPsdEventCode = 0x00000002;
+static const short SlowControlsEventCode = 0x00000001;
+static const char DigitizerPsdEventCode = 0x00000002;
 }
 
 }
