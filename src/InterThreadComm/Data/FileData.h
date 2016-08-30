@@ -51,8 +51,8 @@ public:
     void setInitState(char state){isInitted.store(state);}
     
     //getters
-    int getRunNumber(){return runNumber.load(); runNumberTest.store(false);}
-    int getSequenceNumber(){return sequenceNumber.load(); sequenceNumberTest.store(false);}
+    int getRunNumber(){runNumberTest.store(false); return runNumber.load();}
+    int getSequenceNumber(){sequenceNumberTest.store(false); return sequenceNumber.load();}
     long long getSize(){return size.load();}
     void getFileName(std::string& fName);
     void getRunTitle(std::string& rTitle);
