@@ -59,7 +59,7 @@ public:
              SlowControls::MpodController* mpCtrl,
              int refreshFrequency, int pollingRate, int numAcqThr, int numPrThr,
              bool runPowerUp, bool runPowerDown);
-    ~UIThread(){}
+    ~UIThread(){delete[] smthDigiSize;}
 
     //this is the function that is called by boost::thread when making a thread
     void operator() ();
@@ -175,6 +175,9 @@ private:
     std::string runTitle;
     int runNumber;
     int sequenceNumber;
+    float* smthDigiSize;
+    float smthFileSize;
+    long long updateLoops;
     
     //Variables to store temporary data when loading new run parameters
     std::string tempRunTitle;
