@@ -308,15 +308,15 @@ void UIThread::drawAcquisitionGlobalInformation()
         float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
         if(rate > 999999.95)
         {
-            builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
+            builder << "Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
         }
         else if(rate > 999.95)
         {
-            builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
+            builder << "Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
         }
         else
         {
-            builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << rate;
+            builder << "Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << rate;
         }
         builder << "B/s";
         mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
@@ -329,12 +329,12 @@ void UIThread::drawTriggersGrid()
     //TODO: Add highligting of params outside range
     int currentRow = gridStartLine;
     //now draw the topmost separators
-    mvwprintw(this->textWindow, currentRow, volStartCol, "-------------------");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "-------------------");
     ++currentRow;
-    mvwprintw(this->textWindow, currentRow, volStartCol, "| Chan | Rate(Hz) |");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "| Chan | Rate(Hz) |");
     ++currentRow;
     //more separators
-    mvwprintw(this->textWindow, currentRow, volStartCol, "===================");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "===================");
     ++currentRow;
     //now loop through the digitizer channels
     int currDataLine = currentRow;
@@ -358,12 +358,12 @@ void UIThread::drawTriggersGrid()
         {
             builder << std::fixed << std::setw(8) << std::setprecision(1) << trigRate <<"  |";
         }
-        mvwprintw(this->textWindow, currDataLine, volStartCol, builder.str().c_str());
+        mvwprintw(this->textWindow, currDataLine, trigStartCol, builder.str().c_str());
         ++chanInd;
         ++currDataLine;
     }
     currentRow = currDataLine;
-    mvwprintw(this->textWindow, currentRow, volStartCol, "===================");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "===================");
     
 }
 
