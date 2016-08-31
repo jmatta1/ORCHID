@@ -246,7 +246,6 @@ void UIThread::drawFileInfo()
     builder << " | File #: " << this->sequenceNumber << " | Rate: ";
     //get the file size and calculate the current file write rate
     long long tempFileSize = this->fileData->getSize();
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Grabbed File Data: " << i << " | "<< tempFileSize;
     smthFileSize = (expAvgSmthFactor*static_cast<float>(tempFileSize) + (1-expAvgSmthFactor)*smthFileSize);
     float rate = smthFileSize*rateMultiplier/fileUpdateLoops;
     //calculate if the file write rate is in thousands or millions etc
@@ -305,7 +304,6 @@ void UIThread::drawAcquisitionGlobalInformation()
     for(int i=0; i < numAcqThreads; ++i)
     {
         unsigned long long tempDataSize = (acqData->dataSizes[i]);
-        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Grabbed Digi Data: " << i << " | "<< tempDataSize;
         smthDigiSize[i] = (expAvgSmthFactor*static_cast<float>(tempDataSize) + (1-expAvgSmthFactor)*smthDigiSize[i]);
         float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
         if(rate > 999999.95)
@@ -349,7 +347,6 @@ void UIThread::drawTriggersGrid()
         builder << "| " << std::setw(4) << std::setfill('0') << chanInd << " | " << std::setfill(' ');
         //add the voltage
         unsigned long long tempTrigs = (acqData->triggers[chanInd].load());
-        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Grabbed Triggers: " << chanInd << " | "<< tempTrigs;
         smthTrigRate[chanInd] = (expAvgSmthFactor*static_cast<float>(tempTrigs) + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
         float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
         if(trigRate >= 999.95)//choose 999.95 to prevent rounding weirdness
