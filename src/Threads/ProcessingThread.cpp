@@ -244,10 +244,12 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         if(rawBuffer[offset] & 0x80000000)
         {
             event->setChannel(baseChan + 1);
+            this->acqData->incrTrigs(baseChan + 1);
         }
         else
         {
             event->setChannel(baseChan);
+            this->acqData->incrTrigs(baseChan);
         }
         event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
@@ -282,10 +284,12 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
         if(rawBuffer[offset] & 0x80000000)
         {
             event->setChannel(baseChan + 1);
+            this->acqData->incrTrigs(baseChan + 1);
         }
         else
         {
             event->setChannel(baseChan);
+            this->acqData->incrTrigs(baseChan);
         }
         event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
@@ -320,10 +324,12 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
         if(rawBuffer[offset] & 0x80000000)
         {
             event->setChannel(baseChan + 1);
+            this->acqData->incrTrigs(baseChan + 1);
         }
         else
         {
             event->setChannel(baseChan);
+            this->acqData->incrTrigs(baseChan);
         }
         event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
