@@ -352,11 +352,11 @@ void UIThread::drawTriggersGrid()
         float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
         if(trigRate >= 9999.95)//choose 999.95 to prevent rounding weirdness
         {
-            builder << std::fixed << std::setw(6) << std::setprecision(3) << (trigRate/1000.0) << " k |";
+            builder << std::fixed << std::setw(6) << std::setprecision(1) << (trigRate/1000.0) << " k |";
         }
         else
         {
-            builder << std::fixed << std::setw(8) << std::setprecision(1) << trigRate <<" |";
+            builder << std::fixed << std::setw(8) << std::setprecision(0) << trigRate <<" |";
         }
         mvwprintw(this->textWindow, currDataLine, trigStartCol, builder.str().c_str());
         ++chanInd;
@@ -413,7 +413,7 @@ void UIThread::drawSlowControlsGrid()
         }
         else
         {
-            builder << std::fixed << std::setw(6) << std::setprecision(1) << termVol <<"V | ";
+            builder << std::fixed << std::setw(5) << std::setprecision(1) << termVol <<" V | ";
         }
         //add the current
         builder << std::fixed << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
