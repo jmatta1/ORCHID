@@ -214,7 +214,7 @@ void UIThread::drawFileInfo()
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
         wmove(this->textWindow, 0, 0);
-        wclrtoeol(this->messageWindow);
+        wclrtoeol(this->textWindow);
     }
     if(fileData->runTitleChangeSinceLastGet())
     {
@@ -222,7 +222,7 @@ void UIThread::drawFileInfo()
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
         wmove(this->textWindow, 0, 0);
-        wclrtoeol(this->messageWindow);
+        wclrtoeol(this->textWindow);
     }
     if(fileData->runNumberChangeSinceLastGet())
     {
@@ -230,7 +230,7 @@ void UIThread::drawFileInfo()
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
         wmove(this->textWindow, 0, 0);
-        wclrtoeol(this->messageWindow);
+        wclrtoeol(this->textWindow);
     }
     if(fileData->sequenceNumberChangeSinceLastGet())
     {
@@ -238,7 +238,7 @@ void UIThread::drawFileInfo()
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
         wmove(this->textWindow, 0, 0);
-        wclrtoeol(this->messageWindow);
+        wclrtoeol(this->textWindow);
     }
     //Generate the file info string
     std::ostringstream builder;
@@ -301,7 +301,7 @@ void UIThread::drawAcquisitionGlobalInformation()
 {
     std::ostringstream builder;
     wmove(this->textWindow, 2, 0);
-    wclrtoeol(this->messageWindow);
+    wclrtoeol(this->textWindow);
     for(int i=0; i < numAcqThreads; ++i)
     {
         unsigned long long tempDataSize = (acqData->dataSizes[i]);
