@@ -251,15 +251,15 @@ void UIThread::drawFileInfo()
     //calculate if the file write rate is in thousands or millions etc
     if(rate > 999999.95)
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1048576.0) << "M";
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(1) << (rate/1048576.0) << "M";
     }
     else if(rate > 999.95)
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1024.0) << "k";
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(1) << (rate/1024.0) << "k";
     }
     else
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << rate;
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << rate;
     }
     builder << "B/s | Size: ";
     if(smthFileSize > 999999999.95)
