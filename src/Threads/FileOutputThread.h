@@ -39,7 +39,7 @@
 namespace Threads
 {
 //256MB of memory for buffers, approx 2 second of HDD write
-enum {BufferCount=128, BufferSizeInBytes=2097152, BufferOverHead=8192, MaxBuffersPerFile=3};
+enum {BufferCount=128, BufferSizeInBytes=2097152, BufferOverHead=8192, MaxBuffersPerFile=986};
 typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount> > BufferQueue;
 
 class FileOutputThread

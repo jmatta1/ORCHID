@@ -450,13 +450,13 @@ void FileOutputThread::writeBufferToDisk(int bufferSize)
     this->fileData->increaseSize(bufferSize);
     //now that we have sent that buffer out
     //get another to use in the actual file handling
+    ++bufferNumber;
     this->getNextBuffer();
 }
 
 void FileOutputThread::getNextBuffer()
 {
     this->bufferQueue.pop(this->currentBuffer);
-    ++bufferNumber;
     this->buffInd = 0;
 }
 
