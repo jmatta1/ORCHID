@@ -394,6 +394,7 @@ void FileOutputThread::transferData(int eventSize)
             this->fileData->incrementSequenceNumber();
             this->buildFileName();
             this->fileData->setFileName(this->currentFileName);
+            this->fileData->setSize(0);
             this->outFile->newFile(this->currentFileName);
             //reset the buffer number to 0 now that we have a new file
             this->bufferNumber = 0;
