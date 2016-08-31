@@ -303,7 +303,7 @@ void UIThread::drawAcquisitionGlobalInformation()
     
     for(int i=0; i < numAcqThreads; ++i)
     {
-        int tempDataSize = (acqData->dataSizes[i]);
+        unsigned long long tempDataSize = (acqData->dataSizes[i]);
         smthDigiSize[i] = (expAvgSmthFactor*tempDataSize + (1-expAvgSmthFactor)*smthDigiSize[i]);
         float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
         if(rate > 999999.95)
@@ -347,7 +347,8 @@ void UIThread::drawTriggersGrid()
         //first add the channel in the usual format
         builder << "| " << std::setw(4) << std::setfill('0') << chanInd << " | " << std::setfill(' ');
         //add the voltage
-        int tempTrigs = (acqData->triggers[chanInd]);
+        unsigned long long tempTrigs = (acqData->triggers[chanInd].load());
+        BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Grabbed Triggers: " << tempTrigs;
         smthTrigRate[chanInd] = (expAvgSmthFactor*tempTrigs + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
         float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
         if(trigRate >= 999.95)//choose 999.95 to prevent rounding weirdness
@@ -356,7 +357,7 @@ void UIThread::drawTriggersGrid()
         }
         else
         {
-            builder << std::fixed << std::setw(8) << std::setprecision(1) << trigRate <<"  |";
+            builder << std::fixed << std::setw(8) << std::setprecision(1) << trigRate <<" |";
         }
         mvwprintw(this->textWindow, currDataLine, trigStartCol, builder.str().c_str());
         ++chanInd;
