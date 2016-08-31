@@ -59,7 +59,7 @@ public:
              SlowControls::MpodController* mpCtrl,
              int refreshFrequency, int pollingRate, int numAcqThr, int numPrThr,
              bool runPowerUp, bool runPowerDown);
-    ~UIThread(){delete[] smthDigiSize;}
+    ~UIThread(){delete[] smthDigiSize; delete[] smthTrigRate;}
 
     //this is the function that is called by boost::thread when making a thread
     void operator() ();
@@ -94,6 +94,8 @@ private:
     void drawGlobalSlowControlsInformation();
     //this function draws the slow controls information tables
     void drawSlowControlsGrid();
+    //this function draws the triggers information
+    void drawTriggersGrid();
     //this function draws the digitizer line
     void drawAcquisitionGlobalInformation();
     //This function handles drawing the command in progress in the message window
@@ -175,13 +177,17 @@ private:
     std::string runTitle;
     int runNumber;
     int sequenceNumber;
-    float* smthDigiSize;
     float smthFileSize;
     long long updateLoops;
     
     //Variables to store temporary data when loading new run parameters
     std::string tempRunTitle;
     int tempRunNumber;
+    
+    //variables for showing digitizer info
+    float* smthDigiSize;
+    float* smthTrigRate;
+    
     
     /**  Variables for managing the user interface**/
     //amount of time to sleep for

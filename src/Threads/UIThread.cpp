@@ -38,6 +38,7 @@ namespace Threads
 static const int errorColor = 1;
 static const int goodColor = 2;
 static const int gridStartLine = 5;
+static const int trigStartCol = 1;
 static const int tempStartCol = 21;
 static const int volStartCol = 40;
 static const int expAvgSmthFactor = 0.02;
@@ -58,7 +59,7 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* r
     persistCount(-1), command(""),  persistentMessage(""), runLoop(true),
     refreshRate(refreshFrequency), mode(UIMode::Init), textWindow(nullptr),
     messageWindow(nullptr), lg(OrchidLog::get()), powerUp(runPowerUp), powerDown(runPowerDown),
-    smthFileSize(0.0), smthDigiSize(nullptr), updateLoops(0)
+    smthFileSize(0.0), smthDigiSize(nullptr), updateLoops(0), smthTrigRate(nullptr)
 {
     //calculate the refresh period in seconds then multiply by one billion to get
     //nanoseconds, which is what boost thread takes
@@ -68,7 +69,10 @@ UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* r
     
     long long int pollPeriod = static_cast<long long int>(2*static_cast<float>(1000000000/pollingRate));
     this->slowControlsPollingWaitPeriod = boost::chrono::nanoseconds(pollPeriod);
+    
     smthDigiSize = new float[numAcqThr];
+    
+    smthTrigRate = new float[acqData->numChannels];
 }
 
 void UIThread::operator() ()
@@ -234,7 +238,7 @@ void UIThread::drawFileInfo()
     builder << " | File #: " << this->sequenceNumber << " | Rate: ";
     //get the file size and calculate the current file write rate
     long long tempFileSize = this->fileData->getSize();
-    smthFileSize = (expAvgSmthFactor*tempFileSize + (1-expAvgSmthFactor)*tempFileSize);
+    smthFileSize = (expAvgSmthFactor*tempFileSize + (1-expAvgSmthFactor)*smthFileSize);
     float rate = smthFileSize*rateMultiplier/fileUpdateLoops;
     //calculate if the file write rate is in thousands or millions etc
     if(rate > 1048576)
@@ -288,7 +292,7 @@ void UIThread::drawAcquisitionGlobalInformation()
     for(int i=0; i < numAcqThreads; ++i)
     {
         int tempDataSize = (acqData->dataSizes[i]);
-        smthDigiSize[i] = (expAvgSmthFactor*tempDataSize + (1-expAvgSmthFactor)*tempDataSize);
+        smthDigiSize[i] = (expAvgSmthFactor*tempDataSize + (1-expAvgSmthFactor)*smthDigiSize[i]);
         float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
         if(rate > 1048576.0)
         {
@@ -306,6 +310,49 @@ void UIThread::drawAcquisitionGlobalInformation()
         mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
     }
     ++updateLoops;
+}
+
+void UIThread::drawTriggersGrid()
+{
+    //TODO: Add highligting of params outside range
+    int currentRow = gridStartLine;
+    //now draw the topmost separators
+    mvwprintw(this->textWindow, currentRow, volStartCol, "-------------------");
+    ++currentRow;
+    mvwprintw(this->textWindow, currentRow, volStartCol, "| Chan | Rate(Hz) |");
+    ++currentRow;
+    //more separators
+    mvwprintw(this->textWindow, currentRow, volStartCol, "===================");
+    ++currentRow;
+    //now loop through the digitizer channels
+    int currDataLine = currentRow;
+    int stopLine = currentRow + this->acqData->numChannels;
+    int chanInd = 0;
+    while(currDataLine < stopLine)
+    {
+        //build the trigger data string
+        std::ostringstream builder;
+        //first add the channel in the usual format
+        builder << "| " << std::setw(4) << std::setfill('0') << chanInd << " | " << std::setfill(' ');
+        //add the voltage
+        int tempTrigs = (acqData->triggers[chanInd]);
+        smthTrigRate[chanInd] = (expAvgSmthFactor*tempTrigs + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
+        float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
+        if(trigRate >= 999.95)//choose 999.95 to prevent rounding weirdness
+        {
+            builder << std::fixed << std::setw(7) << std::setprecision(3) << (trigRate/1000.0) <<"k |";
+        }
+        else
+        {
+            builder << std::fixed << std::setw(8) << std::setprecision(1) << trigRate <<"  |";
+        }
+        mvwprintw(this->textWindow, currDataLine, volStartCol, builder.str().c_str());
+        ++chanInd;
+        ++currDataLine;
+    }
+    currentRow = currDataLine;
+    mvwprintw(this->textWindow, currentRow, volStartCol, "===================");
+    
 }
 
 void UIThread::drawSlowControlsGrid()
@@ -379,6 +426,8 @@ void UIThread::drawRunningScreen()
     this->drawAcquisitionGlobalInformation();
     //draw the slow controls global info line
     this->drawGlobalSlowControlsInformation();
+    //draw the slow controls info grid();
+    this->drawTriggersGrid();
     //draw the slow controls info grid();
     this->drawSlowControlsGrid();
     //draw the message stuff
@@ -1114,11 +1163,15 @@ void UIThread::turnOff()
 
 void UIThread::startDataTaking()
 {
-    updateLoops = 0;
+    updateLoops = 1;
     smthFileSize = 0.0;
     for(int i=0; i<numAcqThreads; ++i)
     {
         smthDigiSize[i] = 0.0;
+    }
+    for(int i=0; i<acqData->numChannels; ++i)
+    {
+        smthTrigRate[i] = 0.0;
     }
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting File Writing";
     this->fileControl->setToWriting();
