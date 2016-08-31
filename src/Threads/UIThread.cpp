@@ -259,7 +259,7 @@ void UIThread::drawFileInfo()
     }
     else
     {
-        builder << std::fixed << std::setw(6) << std::setfill(' ') << rate;
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(0) << rate;
     }
     builder << "B/s | Size: ";
     if(smthFileSize > 999999999.95)
@@ -276,7 +276,7 @@ void UIThread::drawFileInfo()
     }
     else
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << smthFileSize;
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(0) << smthFileSize;
     }
     builder  << "B | File: " << this->fileName;
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
