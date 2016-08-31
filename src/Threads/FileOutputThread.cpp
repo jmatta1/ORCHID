@@ -389,6 +389,7 @@ void FileOutputThread::transferData(int eventSize)
         //here we make certain that we are not at capacity
         if (this->bufferNumber >= MaxBuffersPerFile)
         {
+            this->outFile->closeFile();
             //increment sequence number and set up the new file
             ++(this->sequenceNumber);
             this->fileData->incrementSequenceNumber();
