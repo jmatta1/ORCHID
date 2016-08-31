@@ -213,24 +213,32 @@ void UIThread::drawFileInfo()
         fileData->getFileName(this->fileName);
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
+        wmove(this->textWindow, 0, 0);
+        wclrtoeol(this->messageWindow);
     }
     if(fileData->runTitleChangeSinceLastGet())
     {
         fileData->getRunTitle(this->runTitle);
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
+        wmove(this->textWindow, 0, 0);
+        wclrtoeol(this->messageWindow);
     }
     if(fileData->runNumberChangeSinceLastGet())
     {
         this->runNumber = fileData->getRunNumber();
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
+        wmove(this->textWindow, 0, 0);
+        wclrtoeol(this->messageWindow);
     }
     if(fileData->sequenceNumberChangeSinceLastGet())
     {
         this->sequenceNumber = fileData->getSequenceNumber();
         smthFileSize = 0.0;
         fileUpdateLoops = 1;
+        wmove(this->textWindow, 0, 0);
+        wclrtoeol(this->messageWindow);
     }
     //Generate the file info string
     std::ostringstream builder;
@@ -241,11 +249,11 @@ void UIThread::drawFileInfo()
     smthFileSize = (expAvgSmthFactor*tempFileSize + (1-expAvgSmthFactor)*smthFileSize);
     float rate = smthFileSize*rateMultiplier/fileUpdateLoops;
     //calculate if the file write rate is in thousands or millions etc
-    if(rate > 1048576)
+    if(rate > 999999.95)
     {
         builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1048576.0) << "M";
     }
-    else if(rate > 1024)
+    else if(rate > 999.95)
     {
         builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1024.0) << "k";
     }
@@ -254,15 +262,15 @@ void UIThread::drawFileInfo()
         builder << std::fixed << std::setw(5) << std::setfill(' ') << rate;
     }
     builder << "B/s | Size: ";
-    if(smthFileSize > 1073741824.0)
+    if(smthFileSize > 999999999.95)
     {
         builder << std::fixed << std::setw(5) << std::setfill(' ') << static_cast<int>(smthFileSize/1048576.0) << "M";
     }
-    else if(smthFileSize > 1048576.0)
+    else if(smthFileSize > 999999.95)
     {
         builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1048576.0) << "M";
     }
-    else if(smthFileSize > 1024.0)
+    else if(smthFileSize > 999.95)
     {
         builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1024.0) << "k";
     }
@@ -298,11 +306,11 @@ void UIThread::drawAcquisitionGlobalInformation()
         int tempDataSize = (acqData->dataSizes[i]);
         smthDigiSize[i] = (expAvgSmthFactor*tempDataSize + (1-expAvgSmthFactor)*smthDigiSize[i]);
         float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
-        if(rate > 1048576.0)
+        if(rate > 999999.95)
         {
             builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
         }
-        else if(rate > 1024.0)
+        else if(rate > 999.95)
         {
             builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
         }
