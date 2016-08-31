@@ -300,7 +300,8 @@ void UIThread::drawGlobalSlowControlsInformation()
 void UIThread::drawAcquisitionGlobalInformation()
 {
     std::ostringstream builder;
-    
+    wmove(this->textWindow, 2, 0);
+    wclrtoeol(this->messageWindow);
     for(int i=0; i < numAcqThreads; ++i)
     {
         unsigned long long tempDataSize = (acqData->dataSizes[i]);
