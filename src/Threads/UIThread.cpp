@@ -41,7 +41,7 @@ static const int gridStartLine = 5;
 static const int trigStartCol = 1;
 static const int tempStartCol = 21;
 static const int volStartCol = 40;
-static const int expAvgSmthFactor = 0.02;
+static const int expAvgSmthFactor = 0.2;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
