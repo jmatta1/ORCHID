@@ -243,28 +243,32 @@ void UIThread::drawFileInfo()
     //calculate if the file write rate is in thousands or millions etc
     if(rate > 1048576)
     {
-        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1048576.0) << "M";
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1048576.0) << "M";
     }
     else if(rate > 1024)
     {
-        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1024.0) << "k";
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (rate/1024.0) << "k";
     }
     else
     {
-        builder << std::setw(5) << std::setfill(' ') << rate;
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << rate;
     }
     builder << "B/s | Size: ";
-    if(smthFileSize > 1048576.0)
+    if(smthFileSize > 1073741824.0)
     {
-        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1048576.0) << "M";
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << static_cast<int>(smthFileSize/1048576.0) << "M";
+    }
+    else if(smthFileSize > 1048576.0)
+    {
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1048576.0) << "M";
     }
     else if(smthFileSize > 1024.0)
     {
-        builder << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1024.0) << "k";
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1024.0) << "k";
     }
     else
     {
-        builder << std::setw(5) << std::setfill(' ') << smthFileSize;
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << smthFileSize;
     }
     builder  << "B | File: " << this->fileName;
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
@@ -296,15 +300,15 @@ void UIThread::drawAcquisitionGlobalInformation()
         float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
         if(rate > 1048576.0)
         {
-            builder << " Module " << i << ": " << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
+            builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1048576.0) << "M";
         }
         else if(rate > 1024.0)
         {
-            builder << " Module " << i << ": " << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
+            builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (static_cast<float>(rate)/1024.0) << "k";
         }
         else
         {
-            builder << " Module " << i << ": " << std::setw(4) << std::setfill(' ') << rate;
+            builder << " Module " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << rate;
         }
         builder << "B/s";
         mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
