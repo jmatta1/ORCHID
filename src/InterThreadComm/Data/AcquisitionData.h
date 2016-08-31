@@ -39,8 +39,8 @@ struct AcquisitionData
     void addTrigs(int chan, unsigned count){triggers[chan].fetch_add(count);}
     void incrTrigs(int chan){triggers[chan].fetch_add(1);}
 
-    std::atomic_uint* dataSizes;
-    std::atomic_uint* triggers;
+    std::atomic_ullong* dataSizes;
+    std::atomic_ullong* triggers;
 
     int numChannels;
     int numModules;
