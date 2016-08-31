@@ -41,7 +41,7 @@ static const int gridStartLine = 5;
 static const int trigStartCol = 1;
 static const int tempStartCol = 22;
 static const int volStartCol = 40;
-static const float expAvgSmthFactor = 0.2;
+static const float expAvgSmthFactor = 0.1;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
@@ -268,11 +268,11 @@ void UIThread::drawFileInfo()
     }
     else if(smthFileSize > 999999.95)
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1048576.0) << "M";
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(0) << (smthFileSize/1048576.0) << "M";
     }
     else if(smthFileSize > 999.95)
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(3) << (smthFileSize/1024.0) << "k";
+        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(0) << (smthFileSize/1024.0) << "k";
     }
     else
     {
@@ -305,19 +305,19 @@ void UIThread::drawAcquisitionGlobalInformation()
     for(int i=0; i < numAcqThreads; ++i)
     {
         unsigned long long tempDataSize = (acqData->dataSizes[i]);
-        smthDigiSize[i] = (expAvgSmthFactor*static_cast<float>(tempDataSize) + (1-expAvgSmthFactor)*smthDigiSize[i]);
+        smthDigiSize[i] = (expAvgSmthFactor*tempDataSize + (1-expAvgSmthFactor)*smthDigiSize[i]);
         float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
         if(rate > 999999.95)
         {
-            builder << "Mod " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (rate/1048576.0) << "M";
+            builder << "Mod " << i << ": " << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(1) << (rate/1048576.0) << "M";
         }
         else if(rate > 999.95)
         {
-            builder << "Mod " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << std::setprecision(3) << (rate/1024.0) << "k";
+            builder << "Mod " << i << ": " << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(1) << (rate/1024.0) << "k";
         }
         else
         {
-            builder << "Mod " << i << ": " << std::fixed << std::setw(4) << std::setfill(' ') << rate;
+            builder << "Mod " << i << ": " << std::fixed << std::setw(5) << std::setfill(' ') << rate;
         }
         builder << "B/s";
         mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
@@ -348,11 +348,11 @@ void UIThread::drawTriggersGrid()
         builder << "| " << std::setw(4) << std::setfill('0') << chanInd << " | " << std::setfill(' ');
         //add the voltage
         unsigned long long tempTrigs = (acqData->triggers[chanInd].load());
-        smthTrigRate[chanInd] = (expAvgSmthFactor*static_cast<float>(tempTrigs) + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
+        smthTrigRate[chanInd] = (expAvgSmthFactor*tempTrigs + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
         float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
-        if(trigRate >= 999.95)//choose 999.95 to prevent rounding weirdness
+        if(trigRate >= 9999.95)//choose 999.95 to prevent rounding weirdness
         {
-            builder << std::fixed << std::setw(7) << std::setprecision(3) << (trigRate/1000.0) <<"k |";
+            builder << std::fixed << std::setw(6) << std::setprecision(3) << (trigRate/1000.0) << " k |";
         }
         else
         {
@@ -413,7 +413,7 @@ void UIThread::drawSlowControlsGrid()
         }
         else
         {
-            builder << std::fixed << std::setw(5) << std::setprecision(1) << termVol <<"V  | ";
+            builder << std::fixed << std::setw(6) << std::setprecision(1) << termVol <<"V | ";
         }
         //add the current
         builder << std::fixed << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
