@@ -1,9 +1,38 @@
+/***************************************************************************//**
+********************************************************************************
+**
+** @file onedspectrum.cpp
+** @author James Till Matta
+** @date 27 Apr, 2016
+** @brief
+**
+** @copyright Copyright (C) 2016 James Till Matta
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+**
+** @details Holds implementation for functions in the 1-D spectrum class which
+** allows the reading and writing of 1 dimensional spectra in radware format
+**
+********************************************************************************
+*******************************************************************************/
 #include "onedspectrum.h"
-
+// includes for C system headers
+// includes for C++ system headers
 #include<fstream>
 #include<vector>
+// includes from other libraries
+// includes from ORCHID
 #include"stringutil.h"
 #include"byteutil.h"
+
+
+namespace Utility
+{
+
+namespace RdwrSpe
+{
 using std::vector;
 using std::fstream;
 using std::ios_base;
@@ -245,4 +274,7 @@ bool OneDSpectrum::writeCSV(const string &fileName)
 
 
 	return true;
+}
+
+}
 }

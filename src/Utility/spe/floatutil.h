@@ -1,5 +1,35 @@
-#ifndef FLOATUTIL_H
-#define FLOATUTIL_H
+/***************************************************************************//**
+********************************************************************************
+**
+** @file floatutil.h
+** @author James Till Matta
+** @date 27 Apr, 2016
+** @brief
+**
+** @copyright Copyright (C) 2016 James Till Matta
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+**
+** @details Holds definitions of functions for getting info from IEEE 754 floats
+**
+********************************************************************************
+*******************************************************************************/
+#ifndef ORCHID_SRC_UTILITY_SPE_FLOATUTIL_H
+#define ORCHID_SRC_UTILITY_SPE_FLOATUTIL_H
+// includes for C system headers
+// includes for C++ system headers
+// includes from other libraries
+// includes from ORCHID
+
+
+namespace Utility
+{
+
+namespace RdwrSpe
+{
+
 
 //a simple negative test for floats this MIGHT be platform specific
 //If the platform used the IEEE standard for floats then it should work but
@@ -25,4 +55,7 @@ inline static float negZero()
 	return (out=-out);
 }
 
-#endif // FLOATUTIL_H
+}
+}
+
+#endif // ORCHID_SRC_UTILITY_SPE_FLOATUTIL_H

@@ -1,8 +1,37 @@
-#ifndef SRC_UTILITY_ONEDSPECTRUM_H
-#define SRC_UTILITY_ONEDSPECTRUM_H
-
+/***************************************************************************//**
+********************************************************************************
+**
+** @file onedspectrum.h
+** @author James Till Matta
+** @date 27 Apr, 2016
+** @brief
+**
+** @copyright Copyright (C) 2016 James Till Matta
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+**
+** @details Holds definitions for functions in the 1-D spectrum class which
+** allows the reading and writing of 1 dimensional spectra in radware format
+**
+********************************************************************************
+*******************************************************************************/
+#ifndef ORCHID_SRC_UTILITY_SPE_ONEDSPECTRUM_H
+#define ORCHID_SRC_UTILITY_SPE_ONEDSPECTRUM_H
+// includes for C system headers
+// includes for C++ system headers
 #include <string>
+// includes from other libraries
+// includes from ORCHID
 #include "floatutil.h"
+
+
+namespace Utility
+{
+
+namespace RdwrSpe
+{
 using std::string;
 
 class OneDSpectrum
@@ -125,4 +154,7 @@ void OneDSpectrum::setChan(int channel, float value)
 	histogram[channel]=value;
 }
 
-#endif // MULTIFASE_SRC_UTILITY_ONEDSPECTRUM_H
+
+}
+}
+#endif // ORCHID_SRC_UTILITY_SPE_ONEDSPECTRUM_H
