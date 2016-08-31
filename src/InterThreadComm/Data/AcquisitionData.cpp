@@ -29,12 +29,12 @@ namespace InterThread
 AcquisitionData::AcquisitionData(int numDigiChan, int numMods):
     numChannels(numDigiChan), numModules(numMods)
 {
-    this->triggers = new std::atomic_uint[this->numChannels];
+    this->triggers = new std::atomic_ullong[this->numChannels];
     for(int i=0; i<this->numChannels; ++i)
     {
         triggers[i].store(0);
     }
-    this->dataSizes = new std::atomic_uint[this->numModules];
+    this->dataSizes = new std::atomic_ullong[this->numModules];
     for(int i=0; i<this->numModules; ++i)
     {
         dataSizes[i].store(0);
