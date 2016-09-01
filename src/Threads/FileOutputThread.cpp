@@ -195,25 +195,24 @@ void FileOutputThread::grabNewRunParameters()
     {
         //the run number has changed, we do not need to prep a new run folder,
         //we merely need to build a new file name and make a new file
+        this->outFile->closeFile();
         this->runNumber = tempRunNumber;
         this->sequenceNumber = 0;
         this->buildFileName();
-        //now make a new file
-        this->outFile->newFile(this->currentFileName);
-        this->writeFileHeader();
     }
     else
     {
         //either the run title or both the run title and number have changed
         //prep a new folder and build a new run title then set a new file
+        this->outFile->closeFile();
         this->runNumber = tempRunNumber;
         this->currentRunTitle = tempRunTitle;
         this->sequenceNumber = 0;
         this->prepNewRunFolder();
-        //now make a new file
-        this->outFile->newFile(this->currentFileName);
-        this->writeFileHeader();
     }
+    //now make a new file
+    this->outFile->newFile(this->currentFileName);
+    this->writeFileHeader();
     this->fileData->setFileNameAndRunTitle(this->currentFileName,this->currentRunTitle);
     this->fileData->setRunNumber(this->runNumber);
     this->fileData->setSequenceNumber(this->sequenceNumber);
