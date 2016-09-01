@@ -348,7 +348,7 @@ void UIThread::drawTriggersGrid()
         builder << "| " << std::setw(4) << std::setfill(' ') << chanInd << " | " << std::setfill(' ');
         //add the voltage
         unsigned long long tempTrigs = (acqData->triggers[chanInd].load());
-        if(updateLoops%20)
+        if((updateLoops%20 == 0)
         {
             BOOST_LOG_SEV(lg, Information) << "UI Thread: Channel "<<chanInd<<" Triggers = "<<tempTrigs;
         }
