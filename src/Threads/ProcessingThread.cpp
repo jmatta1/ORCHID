@@ -106,9 +106,9 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
         //first makes sure the board aggregate leads with the right info
         if(((rawBuffer[offset] & 0xF0000000UL)!=0xA0000000UL) && ((rawBuffer[offset] & 0x0FFFFFFFUL) <= (dataSize - offset)))
         {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Found corrupted board aggregate";
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Brd #: " << std::dec << board << " Size: " << dataSize << " Offset: " << offset;
+            BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Found corrupted board aggregate";
+            BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
+            BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Brd #: " << std::dec << board << " Size: " << dataSize << " Offset: " << offset;
             //now skip the rest of the buffer
             break;
         }
@@ -133,6 +133,7 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
     {
         if(((chanMask >> loopCount) & 0x01) == 1)
         {
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing channel aggregate for pair: "<< (2*loopCount+startChan);
             offset += processChannelAggregate(buffer, offset, (2*loopCount+startChan));
         }
         //offset now points at the last channel aggregate event, increment it by
