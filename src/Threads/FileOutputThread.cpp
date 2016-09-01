@@ -386,6 +386,10 @@ void FileOutputThread::transferData(int eventSize)
     else
     {//otherwise, write the buffer to disk and write this event to the next buffer
         this->finalizeDataBuffer();//this finalizes the event and writes the buffer to disk
+        if((this->bufferNumber % 58)==0)
+        {
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: Output Buffer # " << this->bufferNumber;
+        }
         //here we make certain that we are not at capacity
         if (this->bufferNumber >= MaxBuffersPerFile)
         {
