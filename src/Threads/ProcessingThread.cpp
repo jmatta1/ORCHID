@@ -114,9 +114,9 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
             //now skip the rest of the buffer
             break;
         }
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": "<< loopCount<<" "<< counters[0]<<" "<< counters[1]<<" "<< counters[2]<<" "<< counters[3]<<" "<< counters[4]<<" "<< counters[5]<<" "<< counters[6]<<" "<< counters[7]<<" "<< counters[8]<<" "<< counters[9]<<" "<< counters[10]<<" "<< counters[11]<<" "<< counters[12]<<" "<< counters[13]<<" "<< counters[14]<<" "<< counters[15];
         //if we have the right header, process the board aggregate
         offset += processBoardAggregate(buffer, offset);
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": "<< loopCount<<" "<< counters[0]<<" "<< counters[1]<<" "<< counters[2]<<" "<< counters[3]<<" "<< counters[4]<<" "<< counters[5]<<" "<< counters[6]<<" "<< counters[7]<<" "<< counters[8]<<" "<< counters[9]<<" "<< counters[10]<<" "<< counters[11]<<" "<< counters[12]<<" "<< counters[13]<<" "<< counters[14]<<" "<< counters[15];
         ++loopCount;
     }
 }
