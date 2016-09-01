@@ -101,8 +101,10 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
     int offset = 0;
     acqData->addData(board, 4*dataSize);
     //now loop through the board aggregates
+    int loopCount = 0;
     while(offset < dataSize)
     {
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing board agg # " << loopCount;
         //first makes sure the board aggregate leads with the right info
         if(((rawBuffer[offset] & 0xF0000000UL)!=0xA0000000UL) && ((rawBuffer[offset] & 0x0FFFFFFFUL) <= (dataSize - offset)))
         {
@@ -114,6 +116,7 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
         }
         //if we have the right header, process the board aggregate
         offset += processBoardAggregate(buffer, offset);
+        ++loopCount;
     }
 }
 
@@ -133,7 +136,6 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
     {
         if(((chanMask >> loopCount) & 0x01) == 1)
         {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing channel aggregate for pair: "<< (2*loopCount+startChan);
             offset += processChannelAggregate(buffer, offset, (2*loopCount+startChan));
         }
         //offset now points at the last channel aggregate event, increment it by
@@ -157,6 +159,7 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
     bool waveformEnabled = ((rawBuffer[offset] & 0x08000000UL) != 0);
     short extraFormat = ((rawBuffer[offset] & 0x07000000UL) >> 24);
     ++offset;
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Processing channel aggregate for pair: "<< baseChan;
     if(extraEnabled)
     {
         int skip = 0;
