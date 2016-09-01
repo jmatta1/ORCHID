@@ -317,7 +317,7 @@ void UIThread::drawAcquisitionGlobalInformation()
         }
         else
         {
-            builder << "Mod " << i << ": " << std::fixed << std::setw(5) << std::setfill(' ') << rate;
+            builder << "Mod " << i << ": " << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(1) << rate;
         }
         builder << "B/s";
         mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
