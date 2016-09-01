@@ -63,6 +63,7 @@ private:
     
     bool notTerminated;
     int threadNumber;
+    long long counters[16];
     
     //logger
     boost::log::sources::severity_logger_mt<LogSeverity>& lg;

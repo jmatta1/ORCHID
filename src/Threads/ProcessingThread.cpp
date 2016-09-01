@@ -114,6 +114,7 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
             //now skip the rest of the buffer
             break;
         }
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": "<< loopCount<<" "<< counters[0]<<" "<< counters[1]<<" "<< counters[2]<<" "<< counters[3]<<" "<< counters[4]<<" "<< counters[5]<<" "<< counters[6]<<" "<< counters[7]<<" "<< counters[8]<<" "<< counters[9]<<" "<< counters[10]<<" "<< counters[11]<<" "<< counters[12]<<" "<< counters[13]<<" "<< counters[14]<<" "<< counters[15];
         //if we have the right header, process the board aggregate
         offset += processBoardAggregate(buffer, offset);
         ++loopCount;
@@ -178,7 +179,7 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
         case 0x2:
             offset += processEventsWithExtras3(rawBuffer, offset, stopOffset, baseChan, board, skip);
             break;
-            //ignore case 0x5, useless
+            //ignore case 0x5, extras word, it is useless
         default:
             offset += processEventsWithoutExtras(rawBuffer, offset, stopOffset, baseChan, board, skip+1);
             break;
@@ -211,11 +212,13 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
         {
             event->setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
+            ++(counters[baseChan+1]);
         }
         else
         {
             event->setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
+            ++(counters[baseChan]);
         }
         event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
@@ -249,11 +252,13 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         {
             event->setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
+            ++(counters[baseChan+1]);
         }
         else
         {
             event->setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
+            ++(counters[baseChan]);
         }
         event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
@@ -289,11 +294,13 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
         {
             event->setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
+            ++(counters[baseChan+1]);
         }
         else
         {
             event->setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
+            ++(counters[baseChan]);
         }
         event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
@@ -329,11 +336,13 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
         {
             event->setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
+            ++(counters[baseChan+1]);
         }
         else
         {
             event->setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
+            ++(counters[baseChan]);
         }
         event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
         ++offset;
