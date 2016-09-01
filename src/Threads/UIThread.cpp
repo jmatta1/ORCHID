@@ -345,7 +345,7 @@ void UIThread::drawTriggersGrid()
         //build the trigger data string
         std::ostringstream builder;
         //first add the channel in the usual format
-        builder << "| " << std::setw(4) << std::setfill('0') << chanInd << " | " << std::setfill(' ');
+        builder << "| " << std::setw(4) << std::setfill(' ') << chanInd << " | " << std::setfill(' ');
         //add the voltage
         unsigned long long tempTrigs = (acqData->triggers[chanInd].load());
         smthTrigRate[chanInd] = (expAvgSmthFactor*tempTrigs + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
@@ -557,13 +557,13 @@ void UIThread::handleCommand()
             this->startDataTaking();
             break;
         case 'u':
-            BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Cannot Start, no Run Title or Run Number";
+            BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Cannot Start Run, no Run Title or Run Number";
             this->persistentMessage = "Error:  Must set run title and number";
             this->persistColor = errorColor;
             this->persistCount = refreshRate*5;
             break;
         case 'n':
-            BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Cannot Start, no Run Number";
+            BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Cannot Start Run, no Run Number";
             this->persistentMessage = "Error:  Must set at least number";
             this->persistColor = errorColor;
             this->persistCount = refreshRate*5;
