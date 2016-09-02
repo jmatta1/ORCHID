@@ -78,6 +78,7 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     std::string result = "";
     //lock the command running mutex
     boost::lock_guard<boost::mutex> lock(this->commandMutex);
+    BOOST_LOG_SEV(OrchidLog::get(), Information) << "command is: "<<command;
     //open a pipe that takes the output of the snmp command to be run
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe)
