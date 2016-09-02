@@ -678,10 +678,10 @@ void Vx1730Digitizer::writeCommonRegisterData()
     
     //give the readback results
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Common Register Readback for Digitizer #" << moduleNumber;
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:  Addr |   Written  |   Read   ";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:   Addr |   Written  |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
     }
 }
 
@@ -762,10 +762,10 @@ void Vx1730Digitizer::writeGroupRegisterData()
     
     //give the readback results
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:Group Register Readback for Digitizer #" << moduleNumber;
-    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:  Addr |   Written  |   Read   ";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread:   Addr |   Written  |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: 0x" << std::hex << std::setw(4) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
     }
 }
 
@@ -886,7 +886,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread:    Addr   |   Written  |   Read   ";
     for(int i=0; i<regCount; ++i)
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread:0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: 0x" << std::hex << std::setw(8) << std::setfill('0') << addrArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << dataArray[i] << " | 0x" << std::hex << std::setw(8) << std::setfill('0') << rdbkArray[i] << std::dec;
     }
 }
 
