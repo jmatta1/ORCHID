@@ -274,7 +274,7 @@ unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
     using LowLvl::Vx1730CommonReadRegistersAddr;
     using LowLvl::Vx1730WriteRegisters;
     using LowLvl::Vx1730IbcastWriteRegistersAddr;
-    //hit the software trigger for a data flush
+    //hit the software force data flush for a data flush
     CAENComm_ErrorCode readError;
     readError = CAENComm_Write32(digitizerHandle, Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>::value, 0x00000001);
     if(readError < 0)
@@ -599,7 +599,7 @@ void Vx1730Digitizer::writeCommonRegisterData()
     dataArray[regCount] = 0x00UL;
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MonitorDacMode>::value;
-    dataArray[regCount] = 0x00000003UL;
+    dataArray[regCount] = 0x00000000UL;
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MemBuffAlmtFullLvl>::value;
     dataArray[regCount] = (this->moduleData->memBuffAlmostFullLevel[moduleNumber] & 0x000003FF);
@@ -610,14 +610,11 @@ void Vx1730Digitizer::writeCommonRegisterData()
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::DisableExtTrig>::value;
     dataArray[regCount] = ( (this->moduleData->useExtTrigger[moduleNumber]) ? 0x00000000 : 0x00000001);
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::DisableExtTrig>::value;
-    dataArray[regCount] = ( (this->moduleData->useExtTrigger[moduleNumber]) ? 0x00000000 : 0x00000001);
-    ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontLvdsIoNew>::value;
     dataArray[regCount] = 0x00000000;
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ReadoutCtrl>::value;
-    dataArray[regCount] = 0x00000088;
+    dataArray[regCount] = 0x00000098;
     ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::InterruptStatID>::value;
     dataArray[regCount] = (0xFFFFFFFF & moduleNumber);
@@ -1000,6 +997,8 @@ unsigned int Vx1730Digitizer::calculateTrigOutEnableMaskRegVal()
     output |= ((0x03UL & this->moduleData->trigOutGenerationLogic[moduleNumber]) << 8);
     output |= ((0x07UL & this->moduleData->trigOutMajorityLevel[moduleNumber]) << 10);
     output |= ((0x01UL & this->moduleData->extTrigInTrigOut[moduleNumber]) << 30);
+    //enable software trigger output
+    output |= 0x80000000;
     return output;
 }
 
@@ -1013,6 +1012,8 @@ unsigned int Vx1730Digitizer::calculateGlblTrigMaskRegVal()
     {
         output |= 0x40000000;
     }
+    //to enable software trigger
+    output |= 0x80000000;
     return output;
 }
 
