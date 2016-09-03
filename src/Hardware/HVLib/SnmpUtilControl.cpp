@@ -81,9 +81,11 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     BOOST_LOG_SEV(OrchidLog::get(), Information) << "command is: "<<command;
     //open a pipe that takes the output of the snmp command to be run
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
+    //FILE* pipe = popen(command.c_str(), "r");
     if (!pipe)
     {
         BOOST_LOG_SEV(OrchidLog::get(), Critical) << "popen() failed in SnmpUtilControl!";
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Got the popen() error: " << strerror(errno);
         throw std::runtime_error("popen() failed in SnmpUtilControl!");
     }
     while (!feof(pipe.get()))
