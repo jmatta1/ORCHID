@@ -208,7 +208,7 @@ int main(int argc, char* argv[])
             biggestBuffer =  bufferSize;
         }
     }
-    
+    BOOST_LOG_SEV(lg, Information)  << "Allocated read buffers are: " << biggestBuffer << std::flush;
     /*
      * Build the InterThread Buffer/Data queues
      */
