@@ -348,10 +348,6 @@ void UIThread::drawTriggersGrid()
         builder << "| " << std::setw(4) << std::setfill(' ') << chanInd << " | " << std::setfill(' ');
         //add the voltage
         unsigned long long tempTrigs = (acqData->triggers[chanInd].load());
-        if((updateLoops%20) == 0)
-        {
-            BOOST_LOG_SEV(lg, Information) << "UI Thread: Channel "<<chanInd<<" Triggers = "<<tempTrigs;
-        }
         smthTrigRate[chanInd] = (expAvgSmthFactor*tempTrigs + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
         float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
         if(trigRate >= 9999.95)//choose 999.95 to prevent rounding weirdness
