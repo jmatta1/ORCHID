@@ -467,9 +467,13 @@ void Vx1730Digitizer::calculateMaximumSizes()
     for(int i=channelStartInd; i<stopInd; i+=2)
     {
         int chanPairInd = ((i-channelStartInd)/2);
+        sizePerEvent[chanPairInd] = 0;
         //each event has record length * 8 samples
         //2 samples take 1 lword so 8/2 = 4
-        sizePerEvent[chanPairInd] = (this->channelData->recordLength[i] * 4);
+        if((this->moduleData->recordWaveforms[moduleNumber]))
+        {
+            sizePerEvent[chanPairInd] = (this->channelData->recordLength[i] * 4);
+        }
         //each event has a time trigger tag with 1 lword and the two integrals
         //which also take 1 lword (including the pile up rejection flag in the
         //16th bit of Qshort)
