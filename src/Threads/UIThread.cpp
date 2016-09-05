@@ -39,8 +39,8 @@ static const int errorColor = 1;
 static const int goodColor = 2;
 static const int gridStartLine = 5;
 static const int trigStartCol = 1;
-static const int tempStartCol = 74;
-static const int volStartCol = 33;
+static const int tempStartCol = 76;
+static const int volStartCol = 35;
 static const float expAvgSmthFactor = 0.1;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
@@ -329,12 +329,12 @@ void UIThread::drawTriggersGrid()
     //TODO: Add highligting of params outside range
     int currentRow = gridStartLine;
     //now draw the topmost separators
-    mvwprintw(this->textWindow, currentRow, trigStartCol, "----------------------------");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "-------------------------------");
     ++currentRow;
     mvwprintw(this->textWindow, currentRow, trigStartCol, "| Chan | Rate(Hz) |   Count   |");
     ++currentRow;
     //more separators
-    mvwprintw(this->textWindow, currentRow, trigStartCol, "============================");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "===============================");
     ++currentRow;
     //now loop through the digitizer channels
     int currDataLine = currentRow;
@@ -384,7 +384,7 @@ void UIThread::drawTriggersGrid()
         ++currDataLine;
     }
     currentRow = currDataLine;
-    mvwprintw(this->textWindow, currentRow, trigStartCol, "============================");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "===============================");
     
 }
 
