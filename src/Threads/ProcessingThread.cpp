@@ -63,7 +63,9 @@ void ProcessingThread::doProcessingLoop()
         if(dataInputQueue->consumerPop(dataBuffer))
         {//if we got the buffer, proceed, if not make sure we are not being
             //asked to terminate
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In doProcLoop loop1, db is: " << dataBuffer;
             processDataBuffer(dataBuffer); //when this finishes the data buffer
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In doProcLoop loop2, db is: " << dataBuffer;
             //is completely handled and can be put back on the return queue
             this->dataInputQueue->consumerPush(dataBuffer);
             dataBuffer = nullptr;
@@ -82,7 +84,9 @@ void ProcessingThread::emptyProcessingBuffer()
     while(dataInputQueue->tryConsumerPop(dataBuffer))
     {
         //asked to terminate
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In emptyProcBuffer loop1, db is: " << dataBuffer;
         processDataBuffer(dataBuffer); //when this finishes the data buffer
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In emptyProcBuffer loop2, db is: " << dataBuffer;
         //is completely handled and can be put back on the return queue
         this->dataInputQueue->consumerPush(dataBuffer);
         dataBuffer = nullptr;
@@ -133,6 +137,7 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
     offset += 3;
     //now loop through the board aggregates
     int loopCount = 0;
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In procBoardAgg, db is: " << buffer << ", " << buffer->dataBuffer << ", " << buffer->info.boardNumber << ", " << buffer->info.startChannel << ", " << buffer->sizeOfData;
     while(offset < stopOffset)
     {
         if(((chanMask >> loopCount) & 0x01) == 1)
