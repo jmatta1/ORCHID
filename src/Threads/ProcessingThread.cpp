@@ -210,7 +210,10 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
         //first pull an event from the queue
         Events::EventInterface* prEvent=nullptr;
         this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExt1 prEvent is: " << prEvent;
+        if(prEvent == 0)
+        {
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExts1: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
+        }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
@@ -251,7 +254,10 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         //first pull an event from the queue
         Events::EventInterface* prEvent=nullptr;
         this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExt2 prEvent is: " << prEvent;
+        if(prEvent == 0)
+        {
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExts2: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
+        }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
@@ -294,7 +300,10 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
         //first pull an event from the queue
         Events::EventInterface* prEvent=nullptr;
         this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExt3 prEvent is: " << prEvent;
+        if(prEvent == 0)
+        {
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExts3: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
+        }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
@@ -337,7 +346,10 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
         //first pull an event from the queue
         Events::EventInterface* prEvent=nullptr;
         this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent);
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWoExtras prEvent is: " << prEvent;
+        if(prEvent == 0)
+        {
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWoExtras: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
+        }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
