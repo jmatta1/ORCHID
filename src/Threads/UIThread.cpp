@@ -39,8 +39,8 @@ static const int errorColor = 1;
 static const int goodColor = 2;
 static const int gridStartLine = 5;
 static const int trigStartCol = 1;
-static const int tempStartCol = 22;
-static const int volStartCol = 40;
+static const int tempStartCol = 74;
+static const int volStartCol = 33;
 static const float expAvgSmthFactor = 0.1;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
@@ -329,12 +329,12 @@ void UIThread::drawTriggersGrid()
     //TODO: Add highligting of params outside range
     int currentRow = gridStartLine;
     //now draw the topmost separators
-    mvwprintw(this->textWindow, currentRow, trigStartCol, "-------------------");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "----------------------------");
     ++currentRow;
-    mvwprintw(this->textWindow, currentRow, trigStartCol, "| Chan | Rate(Hz) |");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "| Chan | Rate(Hz) |   Count   |");
     ++currentRow;
     //more separators
-    mvwprintw(this->textWindow, currentRow, trigStartCol, "===================");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "============================");
     ++currentRow;
     //now loop through the digitizer channels
     int currDataLine = currentRow;
@@ -352,18 +352,39 @@ void UIThread::drawTriggersGrid()
         float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
         if(trigRate >= 9999.95)//choose 999.95 to prevent rounding weirdness
         {
-            builder << std::fixed << std::setw(6) << std::setprecision(1) << (trigRate/1000.0) << " k |";
+            builder << std::fixed << std::setw(6) << std::setprecision(1) << (trigRate/1000.0) << " k | ";
         }
         else
         {
-            builder << std::fixed << std::setw(8) << std::setprecision(0) << trigRate <<" |";
+            builder << std::fixed << std::setw(8) << std::setprecision(0) << trigRate <<" | ";
+        }
+        
+        if(smthTrigRate[chanInd] > 999999999999.95)
+        {
+            builder << std::fixed << std::setw(7) << std::setprecision(3) << (smthTrigRate[chanInd]/1000000000000.0) << " T |";
+        }
+        else if(smthTrigRate[chanInd] > 999999999.95)
+        {
+            builder << std::fixed << std::setw(7) << std::setprecision(1) << (smthTrigRate[chanInd]/1000000000.0) << " G |";
+        }
+        else if(smthTrigRate[chanInd] > 999999.95)
+        {
+            builder << std::fixed << std::setw(7) << std::setprecision(1) << (smthTrigRate[chanInd]/1000000.0) << " M |";
+        }
+        else if(smthTrigRate[chanInd] > 999.95)
+        {
+            builder << std::fixed << std::setw(7) << std::setprecision(1) << (smthTrigRate[chanInd]/1000.0) << " k |";
+        }
+        else
+        {
+            builder << std::fixed << std::setw(7) << std::setprecision(1) << smthTrigRate[chanInd] << "   |";
         }
         mvwprintw(this->textWindow, currDataLine, trigStartCol, builder.str().c_str());
         ++chanInd;
         ++currDataLine;
     }
     currentRow = currDataLine;
-    mvwprintw(this->textWindow, currentRow, trigStartCol, "===================");
+    mvwprintw(this->textWindow, currentRow, trigStartCol, "============================");
     
 }
 
