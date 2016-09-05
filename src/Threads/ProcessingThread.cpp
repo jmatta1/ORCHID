@@ -69,6 +69,7 @@ void ProcessingThread::doProcessingLoop()
             dataBuffer = nullptr;
         }
     }
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Leaving doProcLoop loop, db is: " << dataBuffer;
     if(dataBuffer != nullptr)
     {
         this->dataInputQueue->consumerPush(dataBuffer);
@@ -86,6 +87,7 @@ void ProcessingThread::emptyProcessingBuffer()
         this->dataInputQueue->consumerPush(dataBuffer);
         dataBuffer = nullptr;
     }
+    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Leaving emptyProcBuffer loop, db is: " << dataBuffer;
     if(dataBuffer != nullptr)
     {
         this->dataInputQueue->consumerPush(dataBuffer);
