@@ -112,16 +112,19 @@ void AcquisitionThread::doFinalRead()
     this->dataOutputQueue->producerPop(currentBuffer);
     currentBuffer->info.startChannel = this->firstChannel;
     currentBuffer->info.boardNumber = this->modNumber;
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Performing final flush";
     currentBuffer->sizeOfData = this->digitizer->performFinalReadout(currentBuffer->dataBuffer);
     if(currentBuffer->sizeOfData != 0)
     {
         //if we have a buffer, there must be space for it to be pushed
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Final flush gave data, pushing onto queue to processing";
         this->dataOutputQueue->producerPush(currentBuffer);
         currentBuffer = nullptr;
     }
     else
     {
          //since the buffer is empty, dump it back on to the end of the consumer queue
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Final flush gave no data";
         this->dataOutputQueue->consumerPush(currentBuffer);
         currentBuffer = nullptr;
     }
