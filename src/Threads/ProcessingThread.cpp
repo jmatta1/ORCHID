@@ -63,15 +63,12 @@ void ProcessingThread::doProcessingLoop()
         if(dataInputQueue->consumerPop(dataBuffer))
         {//if we got the buffer, proceed, if not make sure we are not being
             //asked to terminate
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In doProcLoop loop1, db is: " << dataBuffer;
             processDataBuffer(dataBuffer); //when this finishes the data buffer
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In doProcLoop loop2, db is: " << dataBuffer;
             //is completely handled and can be put back on the return queue
             this->dataInputQueue->consumerPush(dataBuffer);
             dataBuffer = nullptr;
         }
     }
-    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Leaving doProcLoop loop, db is: " << dataBuffer;
     if(dataBuffer != nullptr)
     {
         this->dataInputQueue->consumerPush(dataBuffer);
@@ -84,14 +81,11 @@ void ProcessingThread::emptyProcessingBuffer()
     while(dataInputQueue->tryConsumerPop(dataBuffer))
     {
         //asked to terminate
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In emptyProcBuffer loop1, db is: " << dataBuffer;
         processDataBuffer(dataBuffer); //when this finishes the data buffer
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In emptyProcBuffer loop2, db is: " << dataBuffer;
         //is completely handled and can be put back on the return queue
         this->dataInputQueue->consumerPush(dataBuffer);
         dataBuffer = nullptr;
     }
-    BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Leaving emptyProcBuffer loop, db is: " << dataBuffer;
     if(dataBuffer != nullptr)
     {
         this->dataInputQueue->consumerPush(dataBuffer);
@@ -139,7 +133,6 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
     int loopCount = 0;
     while(offset < stopOffset)
     {
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": In procBoardAgg, db is: " << buffer << ", " << buffer->dataBuffer << ", " << buffer->info.boardNumber << ", " << buffer->info.startChannel << ", " << buffer->sizeOfData << ", " << offset;
         if(((chanMask >> loopCount) & 0x01) == 1)
         {
             offset += processChannelAggregate(buffer, offset, (2*loopCount+startChan));
@@ -214,10 +207,6 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
             boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
         }
-        if(prEvent == 0)
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExts1: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
-        }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
@@ -261,10 +250,6 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
         {
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
             boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
-        }
-        if(prEvent == 0)
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExts2: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
         }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
@@ -312,10 +297,6 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
             boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
         }
-        if(prEvent == 0)
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWExts3: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
-        }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
@@ -361,10 +342,6 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
         {
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
             boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
-        }
-        if(prEvent == 0)
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": in procEventsWoExtras: " << prEvent << ", " << rawBuffer  << ", " << startOffset << ", " << stopOffset << ", " << baseChan << ", " << boardNum << ", " << skip;
         }
         //put the data into the event
         Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
