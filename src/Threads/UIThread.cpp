@@ -1223,6 +1223,8 @@ void UIThread::startDataTaking()
     {
         smthTrigRate[i] = 0.0;
     }
+    this->acqData->clearData();
+    this->acqData->clearTrigs();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting File Writing";
     this->fileControl->setToWriting();
     //wait to be certain the file thread is up and running before we start anything else
