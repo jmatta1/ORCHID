@@ -96,6 +96,8 @@ private:
     void drawSlowControlsGrid();
     //this function draws the triggers information
     void drawTriggersGrid();
+    //draws the runtime information
+    void drawRuntimeInformation();
     //this function draws the digitizer line
     void drawAcquisitionGlobalInformation();
     //This function handles drawing the command in progress in the message window

@@ -297,6 +297,20 @@ void UIThread::drawGlobalSlowControlsInformation()
     mvwprintw(this->textWindow, 3, 0, builder.str().c_str());
 }
 
+void UIThread::drawRuntimeInformation()
+{
+    std::ostringstream builder;
+    static long long rTime = 0;
+    if(updateLoops%20 == 0)
+    {
+        wmove(this->textWindow, 1, 0);
+        wclrtoeol(this->textWindow);
+        rTime = (updateLoops/rateMultiplier);
+        builder << "Runtime: " << rTime <<" s";
+    }
+    mvwprintw(this->textWindow, 1, 0, builder.str().c_str());
+}
+
 void UIThread::drawAcquisitionGlobalInformation()
 {
     std::ostringstream builder;
@@ -455,7 +469,9 @@ void UIThread::drawRunningScreen()
 {
     //draw the file information line
     this->drawFileInfo();
-    //TODO: draw the acquisition info line
+    //draw the run time line
+    this->drawRuntimeInformation();
+    //Draw the acquisition info line
     this->drawAcquisitionGlobalInformation();
     //draw the slow controls global info line
     this->drawGlobalSlowControlsInformation();
