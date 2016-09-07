@@ -469,12 +469,9 @@ void UIThread::drawRunningScreen()
 {
     //draw the file information line
     this->drawFileInfo();
-    if(!(updateLoops % 10))
-    {
-        currTime = boost::posix_time::microsec_clock::universal_time();
-        runTime = (this->currTime - startTime);
-        milliSeconds = runTime.total_microseconds()/1000;
-    }
+    currTime = boost::posix_time::microsec_clock::universal_time();
+    runTime = (this->currTime - startTime);
+    milliSeconds = runTime.total_microseconds()/1000;
     //draw the run time line
     this->drawRuntimeInformation();
     //Draw the acquisition info line
