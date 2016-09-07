@@ -181,6 +181,10 @@ private:
     int sequenceNumber;
     float smthFileSize;
     long long updateLoops;
+    boost::posix_time::ptime startTime;
+    boost::posix_time::ptime currTime;
+    boost::posix_time::time_duration runTime;
+    long long int milliSeconds;
     
     //Variables to store temporary data when loading new run parameters
     std::string tempRunTitle;

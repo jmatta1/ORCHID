@@ -28,6 +28,7 @@
 #include<boost/thread.hpp>
 #include<boost/algorithm/string.hpp>
 #include <boost/spirit/include/qi.hpp>
+#include<boost/date_time/posix_time/posix_time.hpp>
 // includes from ORCHID
 #include"UICommandTable.h"
 #include"Utility/OrchidLogger.h"
@@ -206,13 +207,13 @@ void UIThread::drawIdleScreen()
 
 void UIThread::drawFileInfo()
 {
-    static int fileUpdateLoops = 1;
+    static boost::posix_time::ptime fileStartTime = boost::posix_time::microsec_clock::universal_time();
     //check if we need to get new values
     if(fileData->fileNameChangeSinceLastGet())
     {
         fileData->getFileName(this->fileName);
         smthFileSize = 0.0;
-        fileUpdateLoops = 1;
+        fileStartTime = boost::posix_time::microsec_clock::universal_time();
         wmove(this->textWindow, 0, 0);
         wclrtoeol(this->textWindow);
     }
@@ -220,7 +221,7 @@ void UIThread::drawFileInfo()
     {
         fileData->getRunTitle(this->runTitle);
         smthFileSize = 0.0;
-        fileUpdateLoops = 1;
+        fileStartTime = boost::posix_time::microsec_clock::universal_time();
         wmove(this->textWindow, 0, 0);
         wclrtoeol(this->textWindow);
     }
@@ -228,7 +229,7 @@ void UIThread::drawFileInfo()
     {
         this->runNumber = fileData->getRunNumber();
         smthFileSize = 0.0;
-        fileUpdateLoops = 1;
+        fileStartTime = boost::posix_time::microsec_clock::universal_time();
         wmove(this->textWindow, 0, 0);
         wclrtoeol(this->textWindow);
     }
@@ -236,10 +237,13 @@ void UIThread::drawFileInfo()
     {
         this->sequenceNumber = fileData->getSequenceNumber();
         smthFileSize = 0.0;
-        fileUpdateLoops = 1;
+        fileStartTime = boost::posix_time::microsec_clock::universal_time();
         wmove(this->textWindow, 0, 0);
         wclrtoeol(this->textWindow);
     }
+    static boost::posix_time::time_duration runTime = (this->currTime - fileStartTime);
+    long long fileMilliSeconds = runTime.total_microseconds()/1000;
+    
     //Generate the file info string
     std::ostringstream builder;
     builder << "Run Title: " << this->runTitle << " | Run #: " << this->runNumber;
@@ -247,7 +251,7 @@ void UIThread::drawFileInfo()
     //get the file size and calculate the current file write rate
     long long tempFileSize = this->fileData->getSize();
     smthFileSize = (expAvgSmthFactor*static_cast<float>(tempFileSize) + (1-expAvgSmthFactor)*smthFileSize);
-    float rate = smthFileSize*rateMultiplier/fileUpdateLoops;
+    float rate = (smthFileSize*1000)/fileMilliSeconds;
     //calculate if the file write rate is in thousands or millions etc
     if(rate > 999999.95)
     {
@@ -280,7 +284,6 @@ void UIThread::drawFileInfo()
     }
     builder  << "B | File: " << this->fileName;
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
-    ++fileUpdateLoops;
 }
 
 void UIThread::drawGlobalSlowControlsInformation()
@@ -301,13 +304,10 @@ void UIThread::drawRuntimeInformation()
 {
     std::ostringstream builder;
     static long long rTime = 0;
-    if(updateLoops%20 == 0)
-    {
-        wmove(this->textWindow, 1, 0);
-        wclrtoeol(this->textWindow);
-        rTime = (updateLoops/rateMultiplier);
-        builder << "Runtime: " << rTime <<" s";
-    }
+    wmove(this->textWindow, 1, 0);
+    wclrtoeol(this->textWindow);
+    rTime = (milliSeconds/1000);
+    builder << "Runtime: " << rTime <<" s";
     mvwprintw(this->textWindow, 1, 0, builder.str().c_str());
 }
 
@@ -320,7 +320,7 @@ void UIThread::drawAcquisitionGlobalInformation()
     {
         unsigned long long tempDataSize = (acqData->dataSizes[i]);
         smthDigiSize[i] = (expAvgSmthFactor*tempDataSize + (1-expAvgSmthFactor)*smthDigiSize[i]);
-        float rate = smthDigiSize[i]*rateMultiplier/updateLoops;
+        float rate = (smthDigiSize[i]*1000)/milliSeconds;
         if(rate > 999999.95)
         {
             builder << "Mod " << i << ": " << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(1) << (rate/1048576.0) << "M";
@@ -363,7 +363,7 @@ void UIThread::drawTriggersGrid()
         //add the voltage
         unsigned long long tempTrigs = (acqData->triggers[chanInd].load());
         smthTrigRate[chanInd] = (expAvgSmthFactor*tempTrigs + (1-expAvgSmthFactor)*smthTrigRate[chanInd]);
-        float trigRate = smthTrigRate[chanInd]*rateMultiplier/updateLoops;
+        float trigRate = (smthTrigRate[chanInd]*1000)/milliSeconds;
         if(trigRate >= 9999.95)//choose 999.95 to prevent rounding weirdness
         {
             builder << std::fixed << std::setw(6) << std::setprecision(1) << (trigRate/1000.0) << " k | ";
@@ -469,6 +469,9 @@ void UIThread::drawRunningScreen()
 {
     //draw the file information line
     this->drawFileInfo();
+    currTime = boost::posix_time::microsec_clock::universal_time();
+    runTime = (this->currTime - startTime);
+    milliSeconds = runTime.total_microseconds()/1000;
     //draw the run time line
     this->drawRuntimeInformation();
     //Draw the acquisition info line
@@ -1225,6 +1228,7 @@ void UIThread::startDataTaking()
     }
     this->acqData->clearData();
     this->acqData->clearTrigs();
+    this->startTime = boost::posix_time::microsec_clock::universal_time();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting File Writing";
     this->fileControl->setToWriting();
     //wait to be certain the file thread is up and running before we start anything else
