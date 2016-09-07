@@ -207,6 +207,8 @@ void UIThread::drawIdleScreen()
 
 void UIThread::drawFileInfo()
 {
+    wmove(this->textWindow, 0, 0);
+    wclrtoeol(this->textWindow);
     static boost::posix_time::ptime fileStartTime;
     static boost::posix_time::time_duration runTime;
     //check if we need to get new values
