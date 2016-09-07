@@ -207,7 +207,8 @@ void UIThread::drawIdleScreen()
 
 void UIThread::drawFileInfo()
 {
-    static boost::posix_time::ptime fileStartTime = boost::posix_time::microsec_clock::universal_time();
+    static boost::posix_time::ptime fileStartTime;
+    static boost::posix_time::time_duration runTime;
     //check if we need to get new values
     if(fileData->fileNameChangeSinceLastGet())
     {
@@ -241,8 +242,8 @@ void UIThread::drawFileInfo()
         wmove(this->textWindow, 0, 0);
         wclrtoeol(this->textWindow);
     }
-    static boost::posix_time::time_duration runTime = (this->currTime - fileStartTime);
-    long long fileMilliSeconds = runTime.total_microseconds()/1000;
+    runTime = (this->currTime - fileStartTime);
+    float fileMilliSeconds = static_cast<float>(runTime.total_microseconds())/1000.0;
     
     //Generate the file info string
     std::ostringstream builder;
