@@ -3,7 +3,7 @@
 [GeneralBlock] # this block of parameters holds the basic values that control the overall running of the DAQ
 WarnRate = 200000   # this is the rate at will we issue warning about the digitizer running too fast currently not implemented
 UpdateFrequency = 20              #the rate in hertz that the UI updates itself
-ProcessingThreadCount = 2
+ProcessingThreadCount = 3
 BaseOutputDirectory = "/media/ORNLData/ORCHID_Data/"
 [EndBlock]
 
