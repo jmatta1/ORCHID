@@ -77,6 +77,8 @@ int main(int argc, char* argv[])
                                              boost::log::keywords::auto_flush = true,
                                              //give every message a timestamp, ThreadID, and severity
                                              boost::log::keywords::format = "[%TimeStamp%] (%ThreadID) <%Severity%>: %Message%"));
+    //set up the storage location for files
+    fileSink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(boost::log::keywords::target = "logs"));
     fileSink->locked_backend()->scan_for_files();
     boost::log::core::get()->add_sink(fileSink);
 
