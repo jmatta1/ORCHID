@@ -133,16 +133,30 @@ void FileOutputThread::prepNewRunFolder()
 void FileOutputThread::buildFileName()
 {
     BOOST_LOG_SEV(lg, Information) << "FO Thread: Starting new file";
-    std::ostringstream builder;
-    builder << this->writeDirectory;
-    if(this->writeDirectory.back()!=boost::filesystem::path::preferred_separator)
+    bool buildFlag = true;
+    while(buildFlag)
     {
-        builder << boost::filesystem::path::preferred_separator;
+        std::ostringstream builder;
+        builder << this->writeDirectory;
+        if(this->writeDirectory.back()!=boost::filesystem::path::preferred_separator)
+        {
+            builder << boost::filesystem::path::preferred_separator;
+        }
+        builder << this->currentRunTitle << "_";
+        builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
+        builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
+        this->currentFileName = builder.str();
+        //check for file existence
+        if ( !boost::filesystem::exists( this->currentFileName ) )
+        {
+          buildFlag = false;
+        }
+        else
+        {
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: " << this->currentFileName << ": File already exists, incrementing sequence number";
+            this->sequenceNumber += 1;
+        }
     }
-    builder << this->currentRunTitle << "_";
-    builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
-    builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
-    this->currentFileName = builder.str();
     BOOST_LOG_SEV(lg, Information) << "FO Thread: New file name is: " << this->currentFileName;
 }
 
