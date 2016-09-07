@@ -149,15 +149,14 @@ void FileOutputThread::buildFileName()
         //check for file existence
         if ( !boost::filesystem::exists( this->currentFileName ) )
         {
-            BOOST_LOG_SEV(lg, Information) << "FO Thread: " << this->currentFileName << ": File doesn't exist, preparing for write";
             buildFlag = false;
         }
         else
         {
             BOOST_LOG_SEV(lg, Information) << "FO Thread: " << this->currentFileName << ": File already exists, incrementing sequence number";
             this->sequenceNumber += 1;
+            this->fileData->incrementSequenceNumber();
         }
-        this->fileData->incrementSequenceNumber();
     }
     BOOST_LOG_SEV(lg, Information) << "FO Thread: New file name is: " << this->currentFileName;
 }
