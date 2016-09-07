@@ -26,7 +26,7 @@
 #include<string>
 // includes from other libraries
 #include<boost/thread.hpp>
-#include "boost/date_time/posix_time/posix_time.hpp"
+#include<boost/date_time/posix_time/posix_time.hpp>
 // includes from ORCHID
 #include"Utility/OrchidLogger.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
