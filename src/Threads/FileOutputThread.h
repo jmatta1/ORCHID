@@ -58,7 +58,7 @@ private:
     //make the file name based on run info
     void buildFileName();
     //this function handles new parameters
-    void grabNewRunParameters();
+    bool grabNewRunParameters();
     //this function handles the actual writing loop
     void doWriteLoop();
     //this function simply doubles the size of the event buffer

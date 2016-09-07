@@ -149,13 +149,15 @@ void FileOutputThread::buildFileName()
         //check for file existence
         if ( !boost::filesystem::exists( this->currentFileName ) )
         {
-          buildFlag = false;
+            BOOST_LOG_SEV(lg, Information) << "FO Thread: " << this->currentFileName << ": File doesn't exist, preparing for write";
+            buildFlag = false;
         }
         else
         {
             BOOST_LOG_SEV(lg, Information) << "FO Thread: " << this->currentFileName << ": File already exists, incrementing sequence number";
             this->sequenceNumber += 1;
         }
+        this->fileData->incrementSequenceNumber();
     }
     BOOST_LOG_SEV(lg, Information) << "FO Thread: New file name is: " << this->currentFileName;
 }
@@ -179,8 +181,10 @@ void FileOutputThread::operator()()
             break;
         case InterThread::FileOutputThreadState::NewRunParams:
             BOOST_LOG_SEV(lg, Information) << "FO Thread: New Parameters";
-            this->grabNewRunParameters();
-            this->fileData->setInitState('i');
+            if(this->grabNewRunParameters())
+            {
+                this->fileData->setInitState('i');
+            }
             break;
         case InterThread::FileOutputThreadState::Writing:
             BOOST_LOG_SEV(lg, Information) << "FO Thread: Writing";
@@ -195,15 +199,15 @@ void FileOutputThread::operator()()
     this->fileThreadController->setThreadDone();
 }
 
-void FileOutputThread::grabNewRunParameters()
+bool FileOutputThread::grabNewRunParameters()
 {
     std::string tempRunTitle;
     int tempRunNumber;
     this->fileThreadController->getNewRunParams(tempRunTitle, tempRunNumber);
     if(tempRunTitle == this->currentRunTitle && tempRunNumber == this->runNumber)
     {
-        //everything is the same, do nothing
-        return;
+        //everything is the same, do nothing, and do not change init state
+        return false;
     }
     else if(tempRunTitle == this->currentRunTitle && tempRunNumber != this->runNumber)
     {
@@ -231,6 +235,7 @@ void FileOutputThread::grabNewRunParameters()
     this->fileData->setRunNumber(this->runNumber);
     this->fileData->setSequenceNumber(this->sequenceNumber);
     this->fileData->setSize(0);
+    return true;
 }
 
 void FileOutputThread::writeFileHeader()
