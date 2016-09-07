@@ -61,7 +61,7 @@ public:
     
     void forceWakeAll(){consNotForceWake.store(false); prodNotForceWake.store(false); consumerWaitCondition.notify_all(); producerWaitCondition.notify_all();}
     
-    void clearForce(){prodNotForceWake.store(true); consNotForceWake.store(false);}
+    void clearForce(){prodNotForceWake.store(true); consNotForceWake.store(true);}
     
 private:
     //variables for producer waiting
