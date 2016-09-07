@@ -18,6 +18,7 @@ HFIR background monitoring wall.
 #include<boost/log/utility/setup/file.hpp>
 #include<boost/log/sinks/text_file_backend.hpp>
 #include<boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/expressions.hpp>
 #include <boost/core/null_deleter.hpp>
 // includes from ORCHID
 // ORCHID utilities
@@ -70,19 +71,24 @@ int main(int argc, char* argv[])
 
     //initialize the logging file
     boost::log::register_simple_formatter_factory< LogSeverity, char >("Severity");
+    boost::log::add_common_attributes();
     typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> FileSink;
     boost::shared_ptr<FileSink> fileSink(new FileSink(
                                              boost::log::keywords::file_name = "orchid_%N.log",          //file name format
                                              boost::log::keywords::rotation_size = (8*1024*1024),        //rotate to a new file every 8 megabytes
-                                             boost::log::keywords::auto_flush = true,
-                                             //give every message a timestamp, ThreadID, and severity
-                                             boost::log::keywords::format = "[%TimeStamp%] (%ThreadID) <%Severity%>: %Message%"));
+                                             boost::log::keywords::auto_flush = true));
+    //give every message a timestamp, ThreadID, and severity
+    fileSink->set_formatter(boost::log::expressions::format("[%1%] (%2%) <%3%>: %4%")
+                            % boost::log::expressions::attr< unsigned int >("TimeStamp")
+                            % boost::log::expressions::attr< unsigned int >("ThreadID")
+                            % boost::log::expressions::attr< unsigned int >("Severity")
+                            % boost::log::expressions::smessage);
+            //boost::log::keywords::format = "[%%] (%ThreadID) <%Severity%>: %Message%"
     //set up the storage location for files
     fileSink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(boost::log::keywords::target = "logs"));
     fileSink->locked_backend()->scan_for_files();
     boost::log::core::get()->add_sink(fileSink);
 
-    boost::log::add_common_attributes();
     //set up to dump to the console as well
     boost::shared_ptr<std::ostream> coutStream(&std::cout, boost::null_deleter());
     typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> text_sink;
