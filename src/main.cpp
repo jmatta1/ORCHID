@@ -70,17 +70,18 @@ int main(int argc, char* argv[])
 
     //initialize the logging file
     boost::log::register_simple_formatter_factory< LogSeverity, char >("Severity");
-    boost::log::add_file_log(
-                boost::log::keywords::file_name = "orchid_%N.log",          //file name format
-                boost::log::keywords::rotation_size = (8*1024*1024),        //rotate to a new file every megabyte
-                boost::log::keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0, 0, 0),  //or rotate at midnight
-                boost::log::keywords::auto_flush = true,
-                //boost::log::keywords::format = "[%TimeStamp%]  (%LineID%) <%Severity%>: %Message%");  //give every message a timestamp
-                boost::log::keywords::format = "[%TimeStamp%] <%Severity%>: %Message%");  //give every message a timestamp and severity
-    //set up to dump to the console as well
-    //boost::log::add_console_log();
+    typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_file_backend> FileSink;
+    boost::shared_ptr<FileSink> fileSink(new FileSink(
+                                             boost::log::keywords::file_name = "orchid_%N.log",          //file name format
+                                             boost::log::keywords::rotation_size = (8*1024*1024),        //rotate to a new file every 8 megabytes
+                                             boost::log::keywords::auto_flush = true,
+                                             //give every message a timestamp, ThreadID, and severity
+                                             boost::log::keywords::format = "[%TimeStamp%] (%ThreadID) <%Severity%>: %Message%"));
+    fileSink->locked_backend()->scan_for_files();
+    boost::log::core::get()->add_sink(fileSink);
+
     boost::log::add_common_attributes();
-    
+    //set up to dump to the console as well
     boost::shared_ptr<std::ostream> coutStream(&std::cout, boost::null_deleter());
     typedef boost::log::sinks::synchronous_sink<boost::log::sinks::text_ostream_backend> text_sink;
     boost::shared_ptr<text_sink> coutSink = boost::make_shared<text_sink>();
