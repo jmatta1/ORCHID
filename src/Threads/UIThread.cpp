@@ -271,19 +271,19 @@ void UIThread::drawFileInfo()
     builder << "B/s | Size: ";
     if(smthFileSize > 999999999.95)
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << static_cast<int>(smthFileSize/1048576.0) << "M";
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << static_cast<int>(smthFileSize/1048576.0) << "M";
     }
     else if(smthFileSize > 999999.95)
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(0) << (smthFileSize/1048576.0) << "M";
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(0) << (smthFileSize/1048576.0) << "M";
     }
     else if(smthFileSize > 999.95)
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(0) << (smthFileSize/1024.0) << "k";
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(0) << (smthFileSize/1024.0) << "k";
     }
     else
     {
-        builder << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(0) << smthFileSize;
+        builder << std::fixed << std::setw(6) << std::setfill(' ') << std::setprecision(0) << smthFileSize;
     }
     builder  << "B | File: " << this->fileName;
     mvwprintw(this->textWindow, 0, 0, builder.str().c_str());
