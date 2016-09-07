@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
                                                boost::log::keywords::file_name = "orchid_%N.log",          //file name format
                                                boost::log::keywords::rotation_size = (8*1024*1024),        //rotate to a new file every 8 megabytes
                                                boost::log::keywords::auto_flush = true,
-                                               boost::log::keywords::format = "[%TimeStamp%] (%ThreadID) <%Severity%>: %Message%");  //give messages a time, ThreadID, and severity
+                                               boost::log::keywords::format = "[%TimeStamp%] (%ThreadID%) <%Severity%>: %Message%");  //give messages a time, ThreadID, and severity
     //set up the storage location for files
     fileSink->locked_backend()->set_file_collector(boost::log::sinks::file::make_collector(boost::log::keywords::target = "logs"));
     fileSink->locked_backend()->scan_for_files();
