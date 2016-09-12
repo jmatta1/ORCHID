@@ -234,6 +234,7 @@ bool FileOutputThread::grabNewRunParameters()
     this->fileData->setRunNumber(this->runNumber);
     this->fileData->setSequenceNumber(this->sequenceNumber);
     this->fileData->setSize(0);
+    this->bufferNumber = 0;
     return true;
 }
 
