@@ -64,7 +64,7 @@ public:
     
     
     //function for the file thread to use to wait for data
-    //this has no checks for the existance of data, such must be outside this class
+    //this has no checks for the existence of data, such must be outside this class
     void consumerWaitForData()
     {
         boost::unique_lock<boost::mutex> waitLock(this->consumerWaitMutex);
