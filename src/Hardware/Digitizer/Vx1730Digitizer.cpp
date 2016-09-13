@@ -902,6 +902,20 @@ unsigned int Vx1730Digitizer::calculateDppAlgCtrlRegVal(int i)
     output |= ((channelData->dppTriggerCounting[i] & 0x01UL) << 5);
     output |= ((channelData->discMode[i] & 0x01UL) << 6);
     //skip the internal test pulse stuff
+    
+    //code for using the internal test pulse
+//    if( (i != 0) || (i != 2) || (i != 4) || (i != 6) || (i != 8) || (i != 10) || (i != 12) || (i != 14) )
+    if( i > -1)
+    {
+        output |= 0x100;//internal test pulser on
+        output |= 0x400;//100kHz
+    }
+    else
+    {
+        output |= 0x100;//internal test pulser on
+        output |= 0x600;//1MHz
+    }
+    
     output |= ((channelData->pulsePolarity[i] & 0x01UL) << 16);
     output |= ((channelData->trigMode[i] & 0x03UL) << 18);
     output |= ((channelData->baselineMean[i] & 0x07UL) << 20);
