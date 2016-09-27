@@ -396,10 +396,12 @@ void AsyncOutFile<RetQueueType>::closeFile()
     //therefor we block any addition to the write queue until the mutex is locked by us anyways
     boost::unique_lock<boost::mutex> writeLock(this->writeMutex);
     //once we have the lock, we have control of the fstream
-    if(this->isInitialized.load())
+    if(outFile!=nullptr)
     {
         outFile->close();
         delete outFile;
+        outFile=nullptr;
+        BOOST_LOG_SEV(lg, Information) << "FW Thread: Closing and Deleting Outfile";
         this->isInitialized.store(false);
     }
     //our changes are done
