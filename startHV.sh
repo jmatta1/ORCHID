@@ -1,6 +1,6 @@
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u0 F 1700
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u1 F 1700
-snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u2 F 700
+#snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u2 F 700
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u8 F 1000
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u9 F 1000
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u10 F 1000
@@ -9,7 +9,7 @@ snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u13 F 1000
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u14 F 1000
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u15 F 1000
-#snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u100 F 1240
+snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u100 F 1240
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u101 F 1240
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u102 F 1240
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u103 F 1240
@@ -17,7 +17,7 @@ snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputVoltage.u105 F 1240
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u0 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u1 i 1
-snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u2 i 1
+#snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u2 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u8 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u9 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u10 i 1
@@ -26,7 +26,7 @@ snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u13 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u14 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u15 i 1
-#snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u100 i 1
+snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u100 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u101 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u102 i 1
 snmpset -v 2c -M /usr/share/snmp/mibs -m +WIENER-CRATE-MIB -c guru 192.168.11.11 outputSwitch.u103 i 1
