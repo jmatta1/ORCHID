@@ -18,8 +18,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_ASYNCIO_ASYNCOUTFILE_H
-#define ORCHID_SRC_ASYNCIO_ASYNCOUTFILE_H
+#ifndef ORCHID_SRC_IO_ASYNCOUTFILE_H
+#define ORCHID_SRC_IO_ASYNCOUTFILE_H
 // includes for C system headers
 // includes for C++ system headers
 #include<fstream>
@@ -34,7 +34,7 @@
 #include<InterThreadComm/QueueTMP.h>
 #include"Utility/OrchidLogger.h"
 
-namespace AsyncIO
+namespace IO
 {
 
 enum{QueueCapacity = 100};
@@ -441,4 +441,4 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
 }
 
 }
-#endif //ORCHID_SRC_ASYNCIO_ASYNCOUTFILE_H
+#endif //ORCHID_SRC_IO_ASYNCOUTFILE_H

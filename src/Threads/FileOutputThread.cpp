@@ -69,7 +69,7 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
     //pop a buffer from the queue to serve as what we are filling now
     this->getNextBuffer();
     //make the asynchronous output file uninitialized
-    this->outFile = new AsyncIO::AsyncOutFile<BufferQueue>(&(this->bufferQueue));
+    this->outFile = new IO::AsyncOutFile<BufferQueue>(&(this->bufferQueue));
     //this->outFile = new AsyncIO::AsyncOutFile<BufferQueue>(this->currentFileName, &(this->bufferQueue));
     //write the file header
     //this->writeFileHeader();

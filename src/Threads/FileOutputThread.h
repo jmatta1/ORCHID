@@ -85,7 +85,7 @@ private:
      * File Data
      */
     //this is the underlying asynchronous file that we use to dump full buffers
-    AsyncIO::AsyncOutFile<BufferQueue>* outFile;
+    IO::AsyncOutFile<BufferQueue>* outFile;
     //this is the underlying queue full of buffers to store data to be sent to
     //the file when the time comes
     BufferQueue bufferQueue;
