@@ -37,34 +37,22 @@ public:
     FileData();
     ~FileData(){}
     //setters
-    void setFileNameAndRunTitle(const std::string& fName, const std::string& rTitle);
     void setFileName(const std::string& fName);
-    void setRunTitle(const std::string& rTitle);
-    void setRunNumber(int rn){runNumber.store(rn); runNumberTest.store(true);}
     void setSequenceNumber(int sn){sequenceNumber.store(sn); sequenceNumberTest.store(true);}
     void setSize(long long s){size.store(s);}
-    void incrementRunNumber(){++runNumber; sequenceNumberTest.store(true);}
     void incrementSequenceNumber(){++sequenceNumber; sequenceNumberTest.store(true);}
-    void increaseRunNumber(int diff){runNumber.fetch_add(diff); runNumberTest.store(true);}
     void increaseSequenceNumber(int diff){sequenceNumber.fetch_add(diff); sequenceNumberTest.store(true);}
     void increaseSize(long long diff){size.fetch_add(diff);}
-    void setInitState(char state){isInitted.store(state);}
     
     //getters
-    int getRunNumber(){runNumberTest.store(false); return runNumber.load();}
     int getSequenceNumber(){sequenceNumberTest.store(false); return sequenceNumber.load();}
     long long getSize(){return size.load();}
     void getFileName(std::string& fName);
-    void getRunTitle(std::string& rTitle);
-    void getFileNameAndRunTitle(std::string& fName, std::string& rTitle);
-    char getInitState(){return isInitted.load();}
     //tester functions
     //why repeatedly lock and unlock mutexes when we can simply check
     //an atomic boolean and see if it is true or not
     //these should not change often so testing the boolean is effecient
     bool fileNameChangeSinceLastGet(){return fileNameTest.load();}
-    bool runTitleChangeSinceLastGet(){return runTitleTest.load();}
-    bool runNumberChangeSinceLastGet(){return runNumberTest.load();}
     bool sequenceNumberChangeSinceLastGet(){return sequenceNumberTest.load();}
     
 private:
@@ -72,18 +60,12 @@ private:
     boost::shared_mutex nonAtomicAccess;
     //string data
     std::string fileName;
-    std::string runTitle;
     //atomic integers
-    std::atomic_int runNumber;
     std::atomic_int sequenceNumber;
     std::atomic_llong size;
-    //file initialized or not
-    std::atomic_char isInitted;
     
     //atomic boolean test
     std::atomic_bool fileNameTest;
-    std::atomic_bool runTitleTest;
-    std::atomic_bool runNumberTest;
     std::atomic_bool sequenceNumberTest;
 };
 
