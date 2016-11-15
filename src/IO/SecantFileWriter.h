@@ -1,7 +1,7 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file TemplarFile.h
+** @file SecantFileWriter.h
 ** @author James Till Matta
 ** @date 06 June, 2016
 ** @brief
@@ -13,16 +13,17 @@
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
 ** @details Holds the defintion of the class that takes event data and places it
-** into the structured and CRCed file structure common to TEMPLAr applications
+** into the structured and CRCed file structure common to SECANT applications
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_IO_TEMPLARFILE_H
-#define ORCHID_SRC_IO_TEMPLARFILE_H
+#ifndef SECANT_SRC_IO_TEMPLARFILE_H
+#define SECANT_SRC_IO_TEMPLARFILE_H
 
 // includes for C system headers
 // includes for C++ system headers
 #include<string>
+#include<mutex>
 // includes from other libraries
 // includes from ORCHID
 #include"AsyncOutFile.h"
@@ -55,6 +56,8 @@ private:
     void prepNewRunFolder();
     //make the file name based on run info
     void buildFileName();
+    //construct a file from data
+    void makeNewFile();
     //takes an empty buffer, preps it, and loads it into the current buffer ptr
     void prepDataBuffer();
     //takes a full buffer, and writes the checksums for its contents into the header then sends it to disk
@@ -90,11 +93,13 @@ private:
     std::string baseDirectory;
     //the directory that we are currently writing to (outDirectory/runTitle/filename.dat.#)
     std::string writeDirectory;
-    //the file name
-    std::string currentFileName;
+    //the file name (RunTitle_RunNumber_FileNumber.dat.SequenceNumber)
+    std::string fileName;
+    //the full file path
+    std::string filePath;
     //the run title
-    std::string currentRunTitle;
-    //stores which file number this is
+    std::string runTitle;
+    //stores which file number this is (IE which file writing thread owns us)
     int fileNumber;
     //the run number
     int runNumber;
@@ -104,6 +109,9 @@ private:
     //statistics variable
     //this is the variable that stores file statistics
     InterThread::FileData* fileData;
+    
+    //mutex to lock when modifying the filesystem directory structure
+    static std::mutex fileSystemLock;
     
     //logger
     LoggerType& lg;
