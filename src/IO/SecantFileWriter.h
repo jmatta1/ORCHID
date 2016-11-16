@@ -32,7 +32,7 @@
 namespace IO
 {
 //256MB of memory for buffers, approx 2 second of HDD write
-enum {BufferCount=128, BufferSizeInBytes=2097152, BufferOverHead=8192, MaxBuffersPerFile=999};
+enum {BufferCount=128, BufferSizeInBytes=2097152, BufferOverHead=8192, MaxBuffersPerFile=1000};
 typedef boost::log::sources::severity_logger_mt<LogSeverity> LoggerType;
 typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount> > BufferQueue;
 
@@ -43,11 +43,11 @@ public:
                      int fNumber, const std::string& baseOutputDirectory);
     ~SecantFileWriter();
     //this function handles getting new parameters, it is called by the thread
-    //in charge of the particular file
+    //in charge of the particular file when the thread moves into running mode
     void setNewRunParameters(const std::string& runName, int runNumber);
     //used by the outputting thread to write events to the file
     void writeEvent(char* event, int size);
-    //used by the processing thread to tell the class to output any buffered
+    //used by the outputting thread to tell the class to output any buffered
     //data to file and close the file
     void endRun();
     
@@ -58,8 +58,6 @@ private:
     void buildFileName();
     //construct a file from data
     void makeNewFile();
-    //takes an empty buffer, preps it, and loads it into the current buffer ptr
-    void prepDataBuffer();
     //takes a full buffer, and writes the checksums for its contents into the header then sends it to disk
     void finalizeDataBuffer();
     //write buffers of indeterminate size to disk
@@ -105,6 +103,9 @@ private:
     int runNumber;
     //the sequence number for this file
     int sequenceNumber;
+    
+    //crc32 computer
+    boost::crc_optimal<32, 0x32583499, 0x00000000, 0x00000000, false, false> crcComputer;
     
     //statistics variable
     //this is the variable that stores file statistics
