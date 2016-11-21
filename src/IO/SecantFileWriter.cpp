@@ -129,7 +129,7 @@ void SecantFileWriter::writeEvent(char *event, int size)
         this->finalizeDataBuffer();
         this->writeBufferToDisk(BufferProperties::SizeInBytes);
         ++(this->bufferNumber);
-        if(this->bufferNumber == MaxBuffersPerFile)
+        if(this->bufferNumber >= MaxBuffersPerFile)
         {//the file now contains whatever the maximum number of data buffers is
             //therefore we need close out this file and make and prep a new file
             this->outFile->closeFile();
