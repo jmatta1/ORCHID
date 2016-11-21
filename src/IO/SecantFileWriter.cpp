@@ -29,19 +29,35 @@
 #include<boost/date_time/posix_time/posix_time.hpp>
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
-#include<boost/crc.hpp>
 // includes from ORCHID
 #include"Utility/SecantConfig.h"
 
 namespace IO
 {
 
+namespace BufferProperties
+{
+static const unsigned int SizeInBytes=2097152;
+static const unsigned int OverHead=SizeInBytes/256;
+static const unsigned int MetaDataSize=32;
+static const unsigned int CrcStartIndex=OverHead/256;
+static const unsigned int CrcInputSize = 1024;
+static const unsigned int CrcOutputSize = 4;
+static const unsigned int DataSizeIndex = 8;
+static const unsigned int EventCountIndex = 12;
+static const unsigned int StopTimeIndex = 24;
+static const unsigned int SecantBufferStartSeparator = 0xF0F0F0F0;
+}
+
+static const unsigned int MaxBuffersPerFile=1000;
 static const boost::posix_time::ptime Epoch(boost::posix_time::time_from_string("1970-01-01 00:00:00.000"));
 
-static const int SecantFileRevisionNumber = 0x00000001;
+namespace HeaderProperties
+{
+static const unsigned int SecantFileRevisionNumber = 0x00000001;
 static const unsigned long long int SecantByteOrderMagicNumber = 0x0102040810204080ULL;
 static const unsigned long long int SecantFileHeaderTerminator = 0xF0F0F0F0F0F0F0F0ULL;
-static const unsigned int SecantBufferStartSeparator = 0xF0F0F0F0;
+}
 
 SecantFileWriter::SecantFileWriter(InterThread::FileData *fileDat,
                                    LoggerType &logger, int fNumber,
@@ -56,7 +72,7 @@ SecantFileWriter::SecantFileWriter(InterThread::FileData *fileDat,
     //load the queue with buffers of the appropriate size
     for(int i=0; i<BufferCount ; ++i)
     {
-        char* allocBuffer = new (std::nothrow) char[BufferSizeInBytes];
+        char* allocBuffer = new (std::nothrow) char[BufferProperties::SizeInBytes];
         if(allocBuffer == nullptr)
         {
             BOOST_LOG_SEV(lg, Critical) << "FO Thread: Error In File Write Buffer Allocation";
@@ -103,11 +119,45 @@ void SecantFileWriter::setNewRunParameters(const std::string& runName, int runNu
     this->writeBufferHeader();
 }
 
+void SecantFileWriter::writeEvent(char *event, int size)
+{
+    //TODO implement compression when we write data to the buffer
+    //first check if there is enough space for the event
+    if((size + this->buffInd) > BufferProperties::SizeInBytes)
+    {//if we are here this is not enough space, finalize the buffer, write it
+        //to disk and then see if we need to make a new file
+        this->finalizeDataBuffer();
+        this->writeBufferToDisk(BufferProperties::SizeInBytes);
+        ++(this->bufferNumber);
+        if(this->bufferNumber == MaxBuffersPerFile)
+        {//the file now contains whatever the maximum number of data buffers is
+            //therefore we need close out this file and make and prep a new file
+            this->outFile->closeFile();
+            //increment sequence number and set up the new file
+            ++(this->sequenceNumber);
+            this->buildFileName();
+            //create the new file
+            this->makeNewFile();
+        }
+        //if we are here, regardless of if we had to make a new file we need to
+        //grab a buffer and write the buffer header to it
+        //finally grab a buffer, and prep it for when events start flowing in
+        this->getNextBuffer();
+        this->writeBufferHeader();
+    }
+    //if we are here then we can transfer the event to the buffer
+    //wether the buffer is new, or the file is new, or whatever, we can transfer
+    //the buffer now
+    std::copy(event, (event + size), &(this->currentBuffer[this->buffInd]));
+    ++(this->eventCount);
+    this->buffInd += eventSize;
+}
+
 void SecantFileWriter::endRun()
 {
     //to close out a run the first thing we do is finalize then write the buffer
     this->finalizeDataBuffer();
-    this->writeBufferToDisk(BufferSizeInBytes);
+    this->writeBufferToDisk(BufferProperties::SizeInBytes);
     //now that the buffer is written tell the asynchronus file to close itself
     this->outFile->closeFile();
 }
@@ -198,10 +248,10 @@ void SecantFileWriter::prepAndWriteFileHeader()
     this->getNextBuffer();
     //directly manipulate the buffer to contain the header and send it to disk
     //write the 64bit byte order value
-    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = SecantByteOrderMagicNumber;
+    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = HeaderProperties::SecantByteOrderMagicNumber;
     this->buffInd += 8;
     //write the secant file format version
-    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = SecantFileRevisionNumber;
+    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = HeaderProperties::SecantFileRevisionNumber;
     this->buffInd += 4;
     //write the major version of secant
     reinterpret_cast<unsigned short*>(&(this->currentBuffer[this->buffInd]))[0] = SECANT_MAJOR_VERSION;
@@ -250,7 +300,7 @@ void SecantFileWriter::prepAndWriteFileHeader()
     std::fill_n(reinterpret_cast<unsigned int*>(&this->currentBuffer[this->buffInd]), 981, 0);
     this->buffInd += 3924;
     //write the file header terminator
-    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = ;
+    reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = HeaderProperties::SecantFileHeaderTerminator;
     this->buffInd += 8;
     //send this 4kB header to the file
     this->writeBufferToDisk(this->buffInd);
@@ -274,8 +324,9 @@ void SecantFileWriter::writeBufferToDisk(int bufferSize)
 
 void SecantFileWriter::writeBufferHeader()
 {
+    this->buffInd =0;
     //first we write the buffer separator
-    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = SecantBufferStartTerminator;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = BufferProperties::SecantBufferStartSeparator;
     this->buffInd += 4;
     //then we write which buffer number this is in the file
     reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = this->bufferNumber;
@@ -288,45 +339,45 @@ void SecantFileWriter::writeBufferHeader()
     this->buffInd += 4;
     //then we write the time this buffer is started
     this->currFileTime = boost::posix_time::microsec_clock::universal_time();
-    boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
+    boost::posix_time::time_duration epochTime = (this->currFileTime - Epoch);
     reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_microseconds();
     this->buffInd += 8;
     //now we write a stand in for the time the buffer is finished
     reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0;
     this->buffInd += 8;
     //then we write zero to the remainder of the 8kb, since we are aligned to an 8byte boundary go in 8 byte chunks
-    std::fill_n(reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd])), ((BufferOverHead - 32)/8), 0ULL);
-    this->buffInd = BufferOverHead;
+    std::fill_n(reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd])),
+                ((BufferProperties::OverHead - BufferProperties::MetaDataSize)/8), 0ULL);
+    this->buffInd = BufferProperties::OverHead;
 }
 
 void SecantFileWriter::finalizeDataBuffer()
 {
     //first we load the last of the buffer with zeros
-    std::fill_n(&(this->currentBuffer[this->buffInd]), BufferSizeInBytes - this->buffInd, 0);
+    std::fill_n(&(this->currentBuffer[this->buffInd]), BufferProperties::SizeInBytes - this->buffInd, 0);
     //here we go back to the beginning of the buffer and write the number of bytes in the data section
-    reinterpret_cast<unsigned int*>(&(this->currentBuffer[8]))[0] = (this->buffInd - BufferOverHead);
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[BufferProperties::DataSizeIndex]))[0] = (this->buffInd - BufferProperties::OverHead);
     //then we write the number of events into the header
-    reinterpret_cast<unsigned int*>(&(this->currentBuffer[12]))[0] = this->eventCount;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[BufferProperties::EventCountIndex]))[0] = this->eventCount;
     //then we write the time this buffer is finalized
     this->currFileTime = boost::posix_time::microsec_clock::universal_time();
-    boost::posix_time::time_duration epochTime = (this->currFileTime - epoch);
-    reinterpret_cast<long long*>(&(this->currentBuffer[24]))[0] = epochTime.total_microseconds();
+    boost::posix_time::time_duration epochTime = (this->currFileTime - Epoch);
+    reinterpret_cast<long long*>(&(this->currentBuffer[BufferProperties::StopTimeIndex]))[0] = epochTime.total_microseconds();
     //now skip past the first 32 bytes of the buffer and start writing the 4 byte 32 bit crcs
-    unsigned int writeInd   = 32;
-    unsigned int writeSize  = 4;
-    unsigned int readInd    = BufferOverHead;
-    unsigned int readSize   = 1024;
-    unsigned int blockCount = (BufferSizeInBytes - BufferOverHead)/readSize;
+    unsigned int writeInd   = BufferProperties::CrcStartIndex;
+    unsigned int readInd    = BufferProperties::OverHead;
+    unsigned int blockCount = (BufferProperties::SizeInBytes - BufferProperties::OverHead)/BufferProperties::CrcInputSizeSize;
     //initialize the crc object
     crcComputer.reset();
-    //now cycle through the buffer calculating crc 32 values
+    //now iterate through the buffer calculating crc 32 values
     for(int i=0; i<blockCount; ++i)
     {
-        crcComputer.process_block(&(this->currentBuffer[readInd]),&(this->currentBuffer[readInd+readSize]));
+        crcComputer.process_block(&(this->currentBuffer[readInd]),
+                                  &(this->currentBuffer[readInd + BufferProperties::CrcInputSizeSize]));
         reinterpret_cast<unsigned int*>(&(this->currentBuffer[writeInd]))[0] = crcComputer.checksum();
         crcComputer.reset();
-        writeInd += writeSize;
-        readInd += readSize;
+        writeInd += BufferProperties::CrcOutputSize;
+        readInd += BufferProperties::CrcInputSize;
     }
 }
 

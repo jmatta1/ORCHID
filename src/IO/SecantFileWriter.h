@@ -25,6 +25,7 @@
 #include<string>
 #include<mutex>
 // includes from other libraries
+#include<boost/crc.hpp>
 // includes from ORCHID
 #include"AsyncOutFile.h"
 #include"InterThreadComm/Data/FileData.h"
@@ -32,7 +33,19 @@
 namespace IO
 {
 //256MB of memory for buffers, approx 2 second of HDD write
-enum {BufferCount=128, BufferSizeInBytes=2097152, BufferOverHead=8192, MaxBuffersPerFile=1000};
+//the buffer size in bytes can be any even multiple of 256^2 that is creater
+//than or equal to 2097152 bytes (2MB). The factor of 256^2 comes from the
+//following calculations. The CRC32 I use digests 1024 bytes of data to generate
+//4 bytes of data so the crc takes 1/256 the size that the data takes. then if
+//the buffer size is x bytes, it can be divided into a header section and a
+//data section. The header section contains some basic metadata and the crc.
+//If the data section takes 255*x/256 bytes that leaves x/256 bytes for the
+//header. Of that x/256 bytes, 255*x/256^2 bytes will be needed for the crc and
+//x/256^2 bytes will be available for the metadata. Since there are 32 bytes of
+//metadata x must fulfill x >= 2097152. To keep things evenly dividable then x
+//must also be divisible by 256^2
+enum {BufferCount=128};
+
 typedef boost::log::sources::severity_logger_mt<LogSeverity> LoggerType;
 typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount> > BufferQueue;
 
