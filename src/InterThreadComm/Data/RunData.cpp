@@ -27,8 +27,8 @@
 namespace InterThread
 {
 
-RunData::RunData():runTitle(""), runNumber(0), fileNameTest(true),
-    runTitleTest(true), runNumberTest(true), sequenceNumberTest(true)
+RunData::RunData():runTitle(""), runNumber(0), runTitleTest(true),
+    runNumberTest(true)
 {}
 
 //setters
