@@ -42,9 +42,34 @@ public:
     void acknowledgeTerminate(){++termAckCount;}
 
     //functions to be accessed by the UI thread
-    void setToAcquiring(){acqState.store(AcquisitionThreadState::Acquiring); acqThreadWaitCondition.notify_all();}
-    void setToStopped(){acqState.store(AcquisitionThreadState::Stopped);}
-    void setToTerminate(){acqState.store(AcquisitionThreadState::Terminate); acqThreadWaitCondition.notify_all();}
+    void setToAcquiring()
+    {
+        
+        //enter an artificial block to create and destroy lock before we notify
+        {
+            boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            acqState.store(AcquisitionThreadState::Acquiring);
+        }
+        acqThreadWaitCondition.notify_all();
+    }
+    void setToStopped()
+    {
+        //enter an artificial block to create and destroy lock before we notify
+        {
+            boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            acqState.store(AcquisitionThreadState::Stopped);
+        }
+        acqThreadWaitCondition.notify_all();
+    }
+    void setToTerminate()
+    {
+        //enter an artificial block to create and destroy lock before we notify
+        {
+            boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            acqState.store(AcquisitionThreadState::Terminate);
+        }
+        acqThreadWaitCondition.notify_all();
+    }
     
     int getThreadsWaiting(){return waitCount.load();}
     int getThreadsTerminated(){return termAckCount.load();}
@@ -54,7 +79,8 @@ private:
     std::atomic_uint termAckCount;
     
     std::atomic_uint waitCount;
-    boost::condition_variable acqThreadWaitCondition;//we create the mutex for this on the fly so everyone can wake up simultaneously
+    boost::mutex waitMutex;
+    boost::condition_variable acqThreadWaitCondition;
     
 };
 
