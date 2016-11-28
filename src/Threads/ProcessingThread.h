@@ -20,26 +20,53 @@
 #define ORCHID_SRC_THREADS_PROCESSINGTHREAD_H
 // includes for C system headers
 // includes for C++ system headers
+#include<string>
 // includes from other libraries
 // includes from ORCHID
 #include"InterThreadComm/Control/ProcessingThreadControl.h"
 #include"InterThreadComm/Data/AcquisitionData.h"
+#include"InterThreadComm/Data/RunData.h"
+#include"InterThreadComm/Data/FileData.h"
+#include"IO/SecantFileWriter.h"
 #include"Utility/CommonTypeDefs.h"
 #include"Utility/OrchidLogger.h"
 
 namespace Threads
 {
 
+struct EventBuffer
+{
+public:
+    inline EventBuffer(int maxSize):size(maxSize), buff(new char[maxSize]){}
+    inline ~EventBuffer(){delete[] buff;}
+    
+    inline void setEventSize(unsigned char sz){reinterpret_cast<unsigned char*>(&(buff[0]))[0] = sz;}
+    inline void setEventID(unsigned char id){reinterpret_cast<unsigned char*>(&(buff[1]))[0] = id;}
+    inline void setBoard(unsigned char board){reinterpret_cast<unsigned char*>(&(buff[2]))[0] = board;}
+    inline void setChannel(unsigned char chan){reinterpret_cast<unsigned char*>(&(buff[3]))[0] = chan;}
+    inline void setTimeStamp(unsigned int tStamp){reinterpret_cast<unsigned int*>(&(buff[4]))[0] = tStamp;}
+    inline void setExtraTimeStamp(unsigned short exTStamp){reinterpret_cast<unsigned short*>(&(buff[8]))[0] = exTStamp;}
+    inline void setLongGate(unsigned short lGate){reinterpret_cast<unsigned short*>(&(buff[10]))[0] = lGate;} 
+    inline void setShortGate(unsigned short sGate){reinterpret_cast<unsigned short*>(&(buff[12]))[0] = sGate;}
+    inline void setFlags(unsigned char flg){reinterpret_cast<unsigned char*>(&(buff[14]))[0] = flg;}
+    inline char* getBuffer(){return buff;}
+private:
+    int size;
+    char* buff;
+};
+
 class ProcessingThread
 {
 public:
     ProcessingThread(InterThread::ProcessingThreadControl* prCtrl,
                      Utility::ToProcessingQueuePair* procQueue,
-                     Utility::ToFileMultiQueue* eventQueue,
                      InterThread::AcquisitionData* acqDat,
-                     int thrdNum):
-        controller(prCtrl), dataInputQueue(procQueue), toFileOutputQueue(eventQueue),
-        acqData(acqDat),notTerminated(true), threadNumber(thrdNum), lg(OrchidLog::get()) {}
+                     InterThread::RunData* runDat, InterThread::FileData* fileDat, 
+                     int thrdNum, const std::string& baseOutputDirectory):
+        controller(prCtrl), dataInputQueue(procQueue), acqData(acqDat), runData(runDat),
+        notTerminated(true), threadNumber(thrdNum), evBuff(15), lg(OrchidLog::get()),
+        outputFile(fileDat, OrchidLog::get(), thrdNum, baseOutputDirectory)
+    {evBuff.setEventSize(15); evBuff.setEventID(1);}
     ~ProcessingThread(){}//delete nothing since we own nothing
     
     void operator()();
@@ -58,8 +85,8 @@ private:
     
     InterThread::ProcessingThreadControl* controller;
     Utility::ToProcessingQueuePair* dataInputQueue;
-    Utility::ToFileMultiQueue* toFileOutputQueue;
     InterThread::AcquisitionData* acqData;
+    InterThread::RunData* runData;
     
     bool notTerminated;
     int threadNumber;
@@ -67,6 +94,12 @@ private:
     
     //logger
     boost::log::sources::severity_logger_mt<LogSeverity>& lg;
+    
+    //a temporary buffer of character that holds the event to write to the file
+    EventBuffer evBuff;
+    
+    //the actual output file
+    IO::SecantFileWriter outputFile;
 };
 
 }

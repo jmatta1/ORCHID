@@ -22,7 +22,6 @@
 #include<iomanip>
 // includes from other libraries
 // includes from ORCHID
-#include"Events/DppPsdEvent.h"
 
 namespace Threads
 {
@@ -30,6 +29,8 @@ namespace Threads
 void ProcessingThread::operator()()
 {
     //run the event loop
+    std::string runTitle;
+    int runNumber;
     while(this->notTerminated)
     {
         switch(this->controller->getCurrentState())
@@ -44,9 +45,15 @@ void ProcessingThread::operator()()
             break;
         case InterThread::ProcessingThreadState::Running:
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Starting Processing";
+            //here we grab the run parameters
+            runData->getRunTitle(runTitle);
+            runNumber = runData->getRunNumber();
+            //now pass those parameters to the internal file
+            outputFile.setNewRunParameters(runTitle, runNumber);
             this->doProcessingLoop();
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Clearing buffer queue";
             this->emptyProcessingBuffer();
+            outputFile.endRun();
             break;
         }
     }
@@ -198,42 +205,36 @@ int ProcessingThread::processEventsWithExtras1(unsigned int* rawBuffer, int star
 {
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 2);
+    int skipSize = skip + 1;
     while(offset < scaledStopOffset)
     {
-        //first pull an event from the queue
-        Events::EventInterface* prEvent=nullptr;
-        while(!(this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent)))
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
-            boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
-        }
+        //offset points to the start of an event (the trigger time tag and channel bit)
+        evBuff.setBoard(boardNum);
         //put the data into the event
-        Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
         {
-            event->setChannel(baseChan + 1);
+            evBuff.setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
             ++(counters[baseChan+1]);
         }
         else
         {
-            event->setChannel(baseChan);
+            evBuff.setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
             ++(counters[baseChan]);
         }
-        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
-        ++offset;
-        event->setBoard(boardNum);
-        offset += skip;
-        event->setExtraTimeStamp(((rawBuffer[offset] & 0xFFFF0000) >> 16));
-        ++offset;
+
+        evBuff.setTimeStamp(rawBuffer[offset] & 0x7FFFFFFF);
+        offset += skipSize; //now pointing to the EXTRAS word
+        evBuff.setExtraTimeStamp((rawBuffer[offset] & 0xFFFF0000) >> 16);
+        ++offset; //now pointing to integrals word
+        evBuff.setLongGate((rawBuffer[offset] & 0xFFFF0000) >> 16);
+        evBuff.setShortGate(rawBuffer[offset] & 0x00007FFF);
         //the only flag available is the pileup flag
-        event->setFlags(((rawBuffer[offset] & 0x00008000) >> 15));
-        event->setShortGate((rawBuffer[offset] & 0x00007FFF));
-        event->setLongGate(((rawBuffer[offset] & 0xFFFF0000) >> 16));
+        evBuff.setFlags((rawBuffer[offset] & 0x00008000) >> 15);
         ++offset;
-        //now push the event back onto the queue
-        this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
+        //now write the event to file
+        outputFile.writeEvent(evBuff.getBuffer(), 15);
     }
     return (offset - startOffset);
 }
@@ -242,44 +243,37 @@ int ProcessingThread::processEventsWithExtras2(unsigned int* rawBuffer, int star
 {
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 2);
+    int skipSize = skip + 1;
     while(offset < scaledStopOffset)
     {
-        //first pull an event from the queue
-        Events::EventInterface* prEvent=nullptr;
-        while(!(this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent)))
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
-            boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
-        }
+        //offset points to the start of an event (the trigger time tag and channel bit)
+        evBuff.setBoard(boardNum);
         //put the data into the event
-        Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
         if(rawBuffer[offset] & 0x80000000)
         {
-            event->setChannel(baseChan + 1);
+            evBuff.setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
             ++(counters[baseChan+1]);
         }
         else
         {
-            event->setChannel(baseChan);
+            evBuff.setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
             ++(counters[baseChan]);
         }
-        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
-        ++offset;
-        event->setBoard(boardNum);
-        offset += skip;
-        event->setExtraTimeStamp(((rawBuffer[offset] & 0xFFFF0000) >> 16));
+        evBuff.setTimeStamp(rawBuffer[offset] & 0x7FFFFFFF);
+        offset += skipSize; //now pointing to the EXTRAS word
+        evBuff.setExtraTimeStamp((rawBuffer[offset] & 0xFFFF0000) >> 16);
         unsigned short baseFlags = ((rawBuffer[offset] & 0x0000FFFF) >> 13);
-        ++offset;
-        baseFlags |= ((rawBuffer[offset] & 0x00008000) >> 15);
+        ++offset; //now pointing to integrals word
         //get the pileup flag
-        event->setFlags(baseFlags);
-        event->setShortGate((rawBuffer[offset] & 0x00007FFF));
-        event->setLongGate(((rawBuffer[offset] & 0xFFFF0000) >> 16));
-        ++offset;
-        //now push the event back onto the queue
-        this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
+        baseFlags |= ((rawBuffer[offset] & 0x00008000) >> 15);
+        evBuff.setFlags(baseFlags);
+        evBuff.setLongGate((rawBuffer[offset] & 0xFFFF0000) >> 16);
+        evBuff.setShortGate(rawBuffer[offset] & 0x00007FFF);
+        ++offset; //now pointing to the start of the next event or aggregate
+        //now write the event to the file
+        outputFile.writeEvent(evBuff.getBuffer(), 15);
     }
     return (offset - startOffset);
 }
@@ -288,44 +282,36 @@ int ProcessingThread::processEventsWithExtras3(unsigned int* rawBuffer, int star
 {
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 2);
+    int skipSize = skip + 1;
     while(offset < scaledStopOffset)
     {
-        //first pull an event from the queue
-        Events::EventInterface* prEvent=nullptr;
-        while(!(this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent)))
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
-            boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
-        }
-        //put the data into the event
-        Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
+        //offset points to the start of an event (the trigger time tag and channel bit)
+        evBuff.setBoard(boardNum);
         if(rawBuffer[offset] & 0x80000000)
         {
-            event->setChannel(baseChan + 1);
+            evBuff.setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
             ++(counters[baseChan+1]);
         }
         else
         {
-            event->setChannel(baseChan);
+            evBuff.setChannel(baseChan);
             this->acqData->incrTrigs(baseChan);
             ++(counters[baseChan]);
         }
-        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
-        ++offset;
-        event->setBoard(boardNum);
-        offset += skip;
-        event->setExtraTimeStamp(((rawBuffer[offset] & 0xFFFF0000) >> 16));
+        evBuff.setTimeStamp(rawBuffer[offset] & 0x7FFFFFFF);
+        offset += skipSize; //now pointing to the EXTRAS word
+        evBuff.setExtraTimeStamp((rawBuffer[offset] & 0xFFFF0000) >> 16);
         unsigned short baseFlags = ((rawBuffer[offset] & 0x0000FC00) >> 13);
-        ++offset;
+        ++offset; //now pointing to integrals word
         baseFlags |= ((rawBuffer[offset] & 0x00008000) >> 15);
         //get the pileup flag
-        event->setFlags(baseFlags);
-        event->setShortGate((rawBuffer[offset] & 0x00007FFF));
-        event->setLongGate(((rawBuffer[offset] & 0xFFFF0000) >> 16));
-        ++offset;
-        //now push the event back onto the queue
-        this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
+        evBuff.setFlags(baseFlags);
+        evBuff.setLongGate((rawBuffer[offset] & 0xFFFF0000) >> 16);
+        evBuff.setShortGate(rawBuffer[offset] & 0x00007FFF);
+        ++offset; //now pointing to the start of the next event or aggregate
+        //now write the event to the file
+        outputFile.writeEvent(evBuff.getBuffer(), 15);
     }
     return (offset - startOffset);
 }
@@ -334,41 +320,33 @@ int ProcessingThread::processEventsWithoutExtras(unsigned int* rawBuffer, int st
 {
     int offset = startOffset;
     int scaledStopOffset = stopOffset - (skip + 1);
+    int skipSize = skip + 1;
     while(offset < scaledStopOffset)
     {
-        //first pull an event from the queue
-        Events::EventInterface* prEvent=nullptr;
-        while(!(this->toFileOutputQueue->producerPop<Utility::ProcessingQueueIndex>(prEvent)))
-        {
-            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": waiting for empty events after a force wake";
-            boost::this_thread::sleep_for(boost::chrono::nanoseconds(1000));
-        }
-        //put the data into the event
-        Events::DppPsdEvent* event = static_cast<Events::DppPsdEvent*>(prEvent);
+        //offset points to the start of an event (the trigger time tag and channel bit)
+        evBuff.setBoard(boardNum);
         if(rawBuffer[offset] & 0x80000000)
         {
-            event->setChannel(baseChan + 1);
+            evBuff.setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan + 1);
             ++(counters[baseChan+1]);
         }
         else
         {
-            event->setChannel(baseChan);
+            evBuff.setChannel(baseChan + 1);
             this->acqData->incrTrigs(baseChan);
             ++(counters[baseChan]);
         }
-        event->setTimeStamp((rawBuffer[offset] & 0x7FFFFFFF));
-        ++offset;
-        event->setBoard(boardNum);
-        offset += skip;
-        event->setExtraTimeStamp(0);
+        evBuff.setTimeStamp(rawBuffer[offset] & 0x7FFFFFFF);
+        offset += skipSize; //now pointing to integrals word
+        evBuff.setExtraTimeStamp(0);
         //the only flag available is the pileup flag
-        event->setFlags(((rawBuffer[offset] & 0x00008000) >> 15));
-        event->setShortGate((rawBuffer[offset] & 0x00007FFF));
-        event->setLongGate(((rawBuffer[offset] & 0xFFFF0000) >> 16));
-        ++offset;
-        //now push the event back onto the queue
-        this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
+        evBuff.setFlags((rawBuffer[offset] & 0x00008000) >> 15);
+        evBuff.setLongGate((rawBuffer[offset] & 0xFFFF0000) >> 16);
+        evBuff.setShortGate(rawBuffer[offset] & 0x00007FFF);
+        ++offset; //now pointing to the start of the next event or aggregate
+        //now write the event to the file
+        outputFile.writeEvent(evBuff.getBuffer(), 15);
     }
     return (offset - startOffset);
 }
