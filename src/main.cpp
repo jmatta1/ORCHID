@@ -47,7 +47,6 @@ HFIR background monitoring wall.
 // ORCHID threads
 #include"Threads/UIThread.h"
 #include"Threads/SlowControlsThread.h"
-#include"Threads/FileOutputThread.h"
 #include"Threads/AcquisitionThread.h"
 #include"Threads/ProcessingThread.h"
 #include"Threads/ThreadWrapper.h"
@@ -224,25 +223,6 @@ int main(int argc, char* argv[])
         temp->dataBuffer = new unsigned int[biggestBuffer];
         toProcessingQueue->consumerPush(temp);
     }
-    
-    // transfers full slow controls events from the slow controls thread to the
-    // file output thread. Also transfers empty sc events back to sc thread. Also
-    // transfers full data events from the processing threads to the file output
-    // thread, also transfers empty data events from the file output thread to
-    // the processing threads
-    Utility::ToFileMultiQueue* toFileQueues = new Utility::ToFileMultiQueue();
-    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile); ++i)
-    {
-        //we use comsumer push since consumers push to the empty object return
-        toFileQueues->consumerPush<Utility::ProcessingQueueIndex>(new Events::DppPsdEvent());
-    }
-    //here we load the queue with empty slow controls events
-    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
-    {
-        //we use consumer push since consumers push to the empty object return
-        toFileQueues->consumerPush<Utility::SlowControlsQueueIndex>(new Events::SlowControlsEvent(numVoltageChannels, numTemperatureChannels));
-    }
-    
 
     int numProcThreads = params.generalBlock->processingThreadCount;
     /*
@@ -260,12 +240,6 @@ int main(int argc, char* argv[])
                                   params.powerBlock->performPowerOff);
     Threads::ThreadWrapper<Threads::UIThread>* uiThreadWrapper = 
             new Threads::ThreadWrapper<Threads::UIThread>(uiThreadCallable);
-
-    //make the file thread callable
-    Threads::FileOutputThread* fileThreadCallable =
-            new Threads::FileOutputThread(toFileQueues, fileData, fotController, params.generalBlock);
-    Threads::ThreadWrapper<Threads::FileOutputThread>* fileThreadWrapper =
-            new Threads::ThreadWrapper<Threads::FileOutputThread>(fileThreadCallable);
     
     //make the slow controls callable
     Threads::SlowControlsThread* scThreadCallable =
@@ -304,7 +278,6 @@ int main(int argc, char* argv[])
     BOOST_LOG_SEV(lg, Information)  << "Building threads" << std::flush;
     // Make the threads
     boost::thread scThread(*scThreadWrapper);
-    boost::thread fileThread(*fileThreadWrapper);
     boost::thread_group acquisitionThreads;
     for(int i = 0; i<numDigitizers; ++i)
     {
@@ -334,8 +307,6 @@ int main(int argc, char* argv[])
     delete uiThreadCallable;
     delete scThreadWrapper;
     delete scThreadCallable;
-    delete fileThreadWrapper;
-    delete fileThreadCallable;
     for(int i = 0; i<numDigitizers; ++i)
     {
         delete acqThreadWrappers[i];
@@ -373,34 +344,6 @@ int main(int argc, char* argv[])
         }
     }
     delete toProcessingQueue;
-    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile); ++i)
-    {
-        Events::EventInterface* temp;
-        //we use producer pop because that pulls empty events from the queue index
-        if(toFileQueues->tryProducerPop<Utility::ProcessingQueueIndex>(temp))
-        {
-            delete temp;
-        }
-        else
-        {
-            BOOST_LOG_SEV(lg, Warning)  << "Proc To File Pop Failed: " << i << std::flush;
-        }
-    }
-    //here we load the queue with empty slow controls events
-    for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
-    {
-        Events::EventInterface* temp;
-        //we use producer pop because that pulls empty events from the queue index
-        if(toFileQueues->tryProducerPop<Utility::SlowControlsQueueIndex>(temp))
-        {
-            delete temp;
-        }
-        else
-        {
-            BOOST_LOG_SEV(lg, Warning)  << "SC To File Pop Failed: " << i << std::flush;
-        }
-    }
-    delete toFileQueues;
 
     
     //delete the device control structures
