@@ -39,6 +39,8 @@ namespace IO
 
 enum{QueueCapacity = 100};
 
+typedef boost::log::sources::severity_logger_mt<LogSeverity> LoggerType;
+
 //utility class used inside async file out
 struct BufferPair
 {
@@ -59,7 +61,7 @@ template <typename RetQueueType>
 class AsyncOutFileWriteThread
 {
 public:
-    AsyncOutFileWriteThread(AsyncOutFile<RetQueueType>* aof);
+    AsyncOutFileWriteThread(AsyncOutFile<RetQueueType>* aof, LoggerType& log);
     void operator()();
 private:
     void waitForInitialization();
@@ -69,15 +71,15 @@ private:
     AsyncOutFile<RetQueueType>* aOutFile;
     
     //logger
-    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
+    LoggerType& lg;
 };
 
 /*
  * Implementation of the AsyncOutFileWriteThread
  */
 template <typename RetQueueType>
-AsyncOutFileWriteThread<RetQueueType>::AsyncOutFileWriteThread(AsyncOutFile<RetQueueType>* aof):
-    aOutFile(aof), lg(OrchidLog::get()) {}
+AsyncOutFileWriteThread<RetQueueType>::AsyncOutFileWriteThread(AsyncOutFile<RetQueueType>* aof, LoggerType& log):
+    aOutFile(aof), lg(log) {}
 
 template <typename RetQueueType>
 void AsyncOutFileWriteThread<RetQueueType>::operator ()()
@@ -214,8 +216,8 @@ template <typename RetQueueType>
 class AsyncOutFile
 {
 public:
-    AsyncOutFile(RetQueueType* cbQueue);
-    AsyncOutFile(const std::string& filePath, RetQueueType* cbQueue);
+    AsyncOutFile(RetQueueType* cbQueue, LoggerType& log);
+    AsyncOutFile(const std::string& filePath, RetQueueType* cbQueue, LoggerType& log);
     ~AsyncOutFile();
     
     //waits until writes are done and then stops writes, and makes a new file
@@ -274,7 +276,7 @@ private:
     boost::thread* writeThread;
     
     //logger
-    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
+    LoggerType& lg;
 };
 
 /*
@@ -282,11 +284,11 @@ private:
  */
 
 template <typename RetQueueType>
-AsyncOutFile<RetQueueType>::AsyncOutFile(RetQueueType* cbQueue): outFile(nullptr),
-    isInitialized(false), writerWaiting(false), producerWaiting(false),
+AsyncOutFile<RetQueueType>::AsyncOutFile(RetQueueType* cbQueue, LoggerType& log):
+    outFile(nullptr), isInitialized(false), writerWaiting(false), producerWaiting(false),
     callBackQueue(cbQueue), terminateWhenEmpty(false), emptyQueue(false),
     readyToInitialize(true), writeTerminated(false), writeCallable(nullptr),
-    writeThread(nullptr), lg(OrchidLog::get()) 
+    writeThread(nullptr), lg(log) 
 {
     //load the return queue with spare BSCTriples
     for(int i=0; i<QueueCapacity; ++i)
@@ -294,17 +296,17 @@ AsyncOutFile<RetQueueType>::AsyncOutFile(RetQueueType* cbQueue): outFile(nullptr
         returnQueue.push(new BufferPair);
     }
     //now generate the callable and thread for writing
-    writeCallable = new AsyncOutFileWriteThread<RetQueueType>(this);
+    writeCallable = new AsyncOutFileWriteThread<RetQueueType>(this, log);
     writeThread = new boost::thread(*writeCallable);
 }
 
 template <typename RetQueueType>
-AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueType* cbQueue):
+AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueType* cbQueue, LoggerType& log):
     outFile(new std::ofstream(filePath, std::ios_base::binary | std::ios_base::trunc)),
     isInitialized(false), writerWaiting(false), producerWaiting(false),
     callBackQueue(cbQueue), terminateWhenEmpty(false), emptyQueue(false),
     readyToInitialize(true), writeTerminated(false), writeCallable(nullptr),
-    writeThread(nullptr), lg(OrchidLog::get()) 
+    writeThread(nullptr), lg(log) 
 {
     //load the return queue with spare BSCTriples
     for(int i=0; i<QueueCapacity; ++i)
@@ -312,7 +314,7 @@ AsyncOutFile<RetQueueType>::AsyncOutFile(const std::string &filePath, RetQueueTy
         returnQueue.push(new BufferPair);
     }
     //now generate the callable and thread for writing
-    writeCallable = new AsyncOutFileWriteThread<RetQueueType>(this);
+    writeCallable = new AsyncOutFileWriteThread<RetQueueType>(this, log);
     writeThread = new boost::thread(*writeCallable);
     isInitialized.store(true);
     readyToInitialize.store(false);
