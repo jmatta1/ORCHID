@@ -39,7 +39,7 @@ public:
     //setters
     void setRunTitle(const std::string& rTitle);
     void setRunNumber(int rn){runNumber.store(rn); runNumberTest.store(true);}
-    void incrementRunNumber(){++runNumber; sequenceNumberTest.store(true);}
+    void incrementRunNumber(){++runNumber; runNumberTest.store(true);}
     void increaseRunNumber(int diff){runNumber.fetch_add(diff); runNumberTest.store(true);}
     
     //getters
