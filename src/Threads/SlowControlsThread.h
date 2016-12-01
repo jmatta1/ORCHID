@@ -45,7 +45,8 @@ public:
     SlowControlsThread(SlowControls::MpodReader* mRead, InterThread::SlowData* slDat,
                        InterThread::SlowControlsThreadController* sctCtrl,
                        int refreshRate, InterThread::RunData* runDat, 
-                       InterThread::FileData* fileDat, int thrdNum, LoggerType& log);
+                       InterThread::FileData* fileDat, int thrdNum,
+                       const std::string& baseOutputDirectory, LoggerType& log);
     ~SlowControlsThread(){delete[] eventBuffer;}
     
     // the function that makes this object callable which actually executes the thread

@@ -30,16 +30,18 @@ namespace Threads
 SlowControlsThread::SlowControlsThread(SlowControls::MpodReader* mRead,
                                        InterThread::SlowData* slDat,
                                        InterThread::SlowControlsThreadController* sctCtrl,
-                                       int refreshRate, InterThread::RunData* runDat, 
-                                       nterThread::FileData* fileDat, int thrdNum, LoggerType& log):
-    mpodReader(mRead), slowData(slDat), sctControl(sctCtrl),
-    notTerminated(true), scEvent(slDat->numVoltageChannels, slDat->numTemperatureChannels),
-    outputFile(), lg(log)
+                                       int refreshRate, InterThread::RunData* runDat,
+                                       InterThread::FileData* fileDat,
+                                       int thrdNum, LoggerType& log,
+                                       const std::string& baseOutputDirectory):
+    mpodReader(mRead), slowData(slDat), sctControl(sctCtrl), notTerminated(true),
+    scEvent(slDat->numVoltageChannels, slDat->numTemperatureChannels), lg(log),
+    outputFile(fileDat, log, thrdNum, baseOutputDirectory)
 {
     long long int refreshNanoseconds = (1000000000/refreshRate);
     this->refreshPeriod = boost::chrono::nanoseconds(refreshNanoseconds);
     this->eventSize = scEvent.getSizeOfBinaryRepresentation();
-    this->eventBuffer = new char*[this->eventSize];
+    this->eventBuffer = new char[this->eventSize];
     
 }
 
