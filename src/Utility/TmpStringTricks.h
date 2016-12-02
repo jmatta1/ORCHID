@@ -92,7 +92,7 @@ struct IntToString
 //this class counts the number of digits in an integer
 //this is to be used in tandem with IntToStr so that they can work with the
 //AppendChars and AppendStrings stuff above
-template <int value, int count>
+template <unsigned long long value, int count>
 struct IntDigitCount
 {
     static constexpr int digits()
