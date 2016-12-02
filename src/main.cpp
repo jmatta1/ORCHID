@@ -37,7 +37,6 @@ HFIR background monitoring wall.
 #include"Events/DppPsdEvent.h"
 // ORCHID interprocess communication control objects
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
-#include"InterThreadComm/Control/FileOutputThreadController.h"
 #include"InterThreadComm/Control/AcquisitionThreadControl.h"
 #include"InterThreadComm/Control/ProcessingThreadControl.h"
 // ORCHID device objects
@@ -209,7 +208,7 @@ int main(int argc, char* argv[])
             biggestBuffer =  bufferSize;
         }
     }
-    BOOST_LOG_SEV(lg, Information)  << "Allocated read buffers are: " << biggestBuffer << std::flush;
+    BOOST_LOG_SEV(lg, Information)  << "Allocated acquisition buffers are: " << biggestBuffer << std::flush;
     /*
      * Build the InterThread Buffer/Data queues
      */
