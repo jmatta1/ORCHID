@@ -46,7 +46,7 @@ void SlowControlsThreadController::waitForNewState()
 void SlowControlsThreadController::slowControlsThreadSleep(const boost::chrono::nanoseconds& sleepTime)
 {
     //figure out the time that we need to sleep until
-    boost::chrono::time_point endTime(boost::chrono::system_clock::now() + sleepTime);
+    auto endTime(boost::chrono::system_clock::now() + sleepTime);
     //set up the variable that will hold how the condition variable returned (timeout or something else)
     boost::cv_status condVarStatus(boost::cv_status::no_timeout);
     //lock the wait mutex
