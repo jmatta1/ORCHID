@@ -62,10 +62,10 @@ public:
                      Utility::ToProcessingQueuePair* procQueue,
                      InterThread::AcquisitionData* acqDat,
                      InterThread::RunData* runDat, InterThread::FileData* fileDat, 
-                     int thrdNum, const std::string& baseOutputDirectory):
+                     int thrdNum, const std::string& baseOutputDirectory, Utility::LoggerType& log):
         controller(prCtrl), dataInputQueue(procQueue), acqData(acqDat), runData(runDat),
-        notTerminated(true), threadNumber(thrdNum), evBuff(15), lg(OrchidLog::get()),
-        outputFile(fileDat, OrchidLog::get(), thrdNum, baseOutputDirectory)
+        notTerminated(true), threadNumber(thrdNum), evBuff(15),
+        outputFile(fileDat, log, thrdNum, baseOutputDirectory), lg(log)
     {evBuff.setEventSize(15); evBuff.setEventID(1);}
     ~ProcessingThread(){}//delete nothing since we own nothing
     
