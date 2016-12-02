@@ -22,21 +22,21 @@
 
 // includes for C system headers
 // includes for C++ system headers
+#include<string>
 // includes from other libraries
 #include<boost/chrono.hpp>
 // includes from ORCHID
-#include"IO/SecantFileWriter.h"
-#include"Hardware/HVLib/MpodReader.h"
-#include"InterThreadComm/Data/SlowData.h"
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
-#include"Utility/OrchidLogger.h"
-#include"Events/SlowControlsEvent.h"
+#include"Hardware/HVLib/MpodReader.h"
+#include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/Data/RunData.h"
+#include"InterThreadComm/Data/SlowData.h"
+#include"Utility/CommonTypeDefs.h"
+#include"Events/SlowControlsEvent.h"
+#include"IO/SecantFileWriter.h"
 
 namespace Threads
 {
-
-typedef boost::log::sources::severity_logger_mt<LogSeverity> LoggerType;
 
 class SlowControlsThread
 {
@@ -46,18 +46,18 @@ public:
                        InterThread::SlowControlsThreadController* sctCtrl,
                        int refreshRate, InterThread::RunData* runDat, 
                        InterThread::FileData* fileDat, int thrdNum,
-                       const std::string& baseOutputDirectory, LoggerType& log);
+                       Utility::LoggerType& log, const std::string& baseOutputDirectory);
     ~SlowControlsThread(){delete[] eventBuffer;}
     
     // the function that makes this object callable which actually executes the thread
     void operator() ();
 private:
-    inline void publishInternalData()
+    void publishInternalData()
     {
         slowData->readVoltageData(this->mpodReader->voltageData);
     }
 
-    inline void writeScEventToFile()
+    void writeScEventToFile()
     {
         //put the data into the event
         scEvent.ReadVoltageData(this->mpodReader->voltageData);
@@ -70,14 +70,16 @@ private:
     void doWritingLoop();
     void doPollingLoop();
     
-    SlowControls::MpodReader* mpodReader;
-    InterThread::SlowData* slowData;
+    //the controller for this thread
     InterThread::SlowControlsThreadController* sctControl;
+    //to maintain the event
+    bool notTerminated;
+    //time to pause the loop between reads
     boost::chrono::nanoseconds refreshPeriod;
     
-    IO::SecantFileWriter outFile;
-    
-    bool notTerminated;
+    //the slow controls data
+    SlowControls::MpodReader* mpodReader;
+    InterThread::SlowData* slowData;
     
     //stuff for writing to file
     Events::SlowControlsEvent scEvent;
@@ -91,7 +93,7 @@ private:
     IO::SecantFileWriter outputFile;
     
     //logger
-    LoggerType& lg;
+    Utility::LoggerType& lg;
 };
 
 }

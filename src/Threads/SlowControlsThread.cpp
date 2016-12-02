@@ -32,7 +32,7 @@ SlowControlsThread::SlowControlsThread(SlowControls::MpodReader* mRead,
                                        InterThread::SlowControlsThreadController* sctCtrl,
                                        int refreshRate, InterThread::RunData* runDat,
                                        InterThread::FileData* fileDat,
-                                       int thrdNum, LoggerType& log,
+                                       int thrdNum, Utility::LoggerType& log,
                                        const std::string& baseOutputDirectory):
     mpodReader(mRead), slowData(slDat), sctControl(sctCtrl), notTerminated(true),
     scEvent(slDat->numVoltageChannels, slDat->numTemperatureChannels), lg(log),
