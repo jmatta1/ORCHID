@@ -27,8 +27,11 @@
 namespace SlowControls
 {
 
+static const boost::posix_time::ptime Epoch(boost::posix_time::time_from_string("1970-01-01 00:00:00.000"));
+
 void MpodReader::readAll()
 {
+    this->voltageData.beginRead = (boost::posix_time::microsec_clock::universal_time() - Epoch).total_microseconds();
     this->walkTerminalVoltages();
     this->walkSenseVoltages();
     this->walkSetVoltages();
@@ -42,16 +45,19 @@ void MpodReader::readAll()
     this->walkOutputSwitches();
     this->walkChannelStatuses();
     this->getCrateStatus();
+    this->voltageData.finishRead = (boost::posix_time::microsec_clock::universal_time() - Epoch).total_microseconds();
 }
 
 void MpodReader::readActive()
 {
+    this->voltageData.beginRead = (boost::posix_time::microsec_clock::universal_time() - Epoch).total_microseconds();
     this->walkTerminalVoltages();
     this->walkSenseVoltages();
     this->walkCurrents();
     this->walkTemperatures();
     this->walkChannelStatuses();
     this->getCrateStatus();
+    this->voltageData.finishRead = (boost::posix_time::microsec_clock::universal_time() - Epoch).total_microseconds();
 }
 
 }

@@ -110,6 +110,7 @@ public:
     VoltageData(int channels, InputParser::MpodChannelData* channelData);
     ~VoltageData(){}
     
+    unsigned long long beginRead;
     std::vector<int>           boardNumber;
     std::vector<int>           channelNumber;
     std::vector<float>         terminalVoltage;
@@ -126,6 +127,7 @@ public:
     std::vector<bool>          outputSwitch;
     std::vector<ChannelStatus> channelStatus;
     CrateStatus                crateStatus;
+    unsigned long long finishRead;
     
     //measured voltages
     void loadTerminalVoltages(const std::string& input) {   parseMultiLineFloat(input, this->terminalVoltage, 1.0);}
