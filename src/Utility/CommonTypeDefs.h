@@ -28,6 +28,7 @@
 namespace Utility
 {
 typedef InterThread::RawBufferTriple<InterThread::BoardInfo> ToProcessingBuffer;
+typedef boost::log::sources::severity_logger_mt<LogSeverity> LoggerType;
 
 //queue types
 typedef boost::lockfree::queue<Events::EventInterface*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile)> > ProcessedEventQueue;

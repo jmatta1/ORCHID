@@ -29,6 +29,7 @@
 // includes from ORCHID
 #include"AsyncOutFile.h"
 #include"InterThreadComm/Data/FileData.h"
+#include"Utility/CommonTypeDefs.h"
 
 namespace IO
 {
@@ -46,13 +47,12 @@ namespace IO
 //must also be divisible by 256^2
 enum {BufferCount=128};
 
-typedef boost::log::sources::severity_logger_mt<LogSeverity> LoggerType;
 typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount> > BufferQueue;
 
 class SecantFileWriter
 {
 public:
-    SecantFileWriter(InterThread::FileData* fileDat, LoggerType& logger,
+    SecantFileWriter(InterThread::FileData* fileDat, Utility::LoggerType& logger,
                      int fNumber, const std::string& baseOutputDirectory);
     ~SecantFileWriter();
     //this function handles getting new parameters, it is called by the thread
@@ -128,7 +128,7 @@ private:
     static std::mutex fileSystemLock;
     
     //logger
-    LoggerType& lg;
+    Utility::LoggerType& lg;
 };
 
 }

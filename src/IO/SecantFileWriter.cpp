@@ -60,7 +60,7 @@ static const unsigned long long int SecantFileHeaderTerminator = 0xF0F0F0F0F0F0F
 }
 
 SecantFileWriter::SecantFileWriter(InterThread::FileData *fileDat,
-                                   LoggerType &logger, int fNumber,
+                                   Utility::LoggerType& logger, int fNumber,
                                    const std::string &baseOutputDirectory):
     currentBuffer(nullptr), buffInd(0), bufferNumber(0),
     eventCount(0), baseDirectory(baseOutputDirectory), writeDirectory(""),
