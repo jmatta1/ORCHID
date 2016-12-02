@@ -117,10 +117,10 @@ void SlowControlsThread::doWritingLoop()
     //poll the mpod
     //first time we enter into write mode, read *everything*
     this->mpodReader->readAll();
-    //publish the data for the UI Thread
-    this->publishInternalData();
     //write the event to file
     this->writeScEventToFile();
+    //publish the data for the UI Thread
+    this->publishInternalData();
     //make a simple variable to count the number of times we have looped
     unsigned long long loopCount = 0;
     //set up the loop to run until we change state
@@ -135,10 +135,10 @@ void SlowControlsThread::doWritingLoop()
         //only read the things that actually changed
         //poll the mpod
         this->mpodReader->readActive();
-        //publish the data for the UI Thread
-        this->publishInternalData();
         //write the event to file
         this->writeScEventToFile();
+        //publish the data for the UI Thread
+        this->publishInternalData();
         ++loopCount;
     }
     //close the internal file
