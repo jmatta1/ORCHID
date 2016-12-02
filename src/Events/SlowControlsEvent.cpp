@@ -31,8 +31,8 @@ namespace Events
 {
 
 SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
-    numVoltageChannels(numVolChannels), numTemperatureChannels(numTempChannels),
-    binarySize(0)
+    eventTime(0), numVoltageChannels(numVolChannels),
+    numTemperatureChannels(numTempChannels), binarySize(0)
 {
     this->boardNumber     = new int[numVolChannels];
     this->channelNumber   = new int[numVolChannels];
@@ -50,8 +50,8 @@ SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
     this->outputSwitch    = new bool[numVolChannels];
     this->channelStatus   = new SlowControls::ChannelStatus[numVolChannels];
     //calculate the size of an event
-    //size of the event, event ident, num voltage channels, num temp channels
-    int overhead = 2*sizeof(ChanSizeType) + 2*sizeof(short);
+    //size of the event, event ident, num voltage channels, num temp channels, and the current time
+    int overhead = 2*sizeof(ChanSizeType) + 2*sizeof(short) + 2*sizeof(unsigned long long int);
     //2 shorts + 3 floats + 1 int + 1 unsigned int per vol channel
     int sizeOfSingleVoltageChannel = 2*sizeof(short) + 3*sizeof(float) +
                                      1*sizeof(int) + sizeof(unsigned int);
@@ -97,10 +97,19 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
     //first write the size of the event
     *(reinterpret_cast<short*>(&(buff[index]))) = this->binarySize;
     index += sizeof(short);
+    //write the event type code
     *(reinterpret_cast<short*>(&(buff[index]))) = Codes::SlowControlsEventCode;
     index += sizeof(short);
+    //write the time of reading start
+    *(reinterpret_cast<short*>(&(buff[index]))) = this->eventStartTime;
+    index += sizeof(unsigned long long int);
+    //write the time of reading stop
+    *(reinterpret_cast<short*>(&(buff[index]))) = this->eventStopTime;
+    index += sizeof(unsigned long long int);
+    //write the number of voltage channels
     *(reinterpret_cast<int*>(&(buff[index]))) = this->numVoltageChannels;
     index += sizeof(int);
+    //write the number of temperature channels
     *(reinterpret_cast<int*>(&(buff[index]))) = this->numTemperatureChannels;
     index += sizeof(int);
     //now write the power crate information
@@ -109,18 +118,25 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
     //now write the rest of the power information channel by channel
     for(int i =0; i<numVoltageChannels; ++i)
     {
+        //board number
         *(reinterpret_cast<short*>(&(buff[index]))) = static_cast<short>(this->boardNumber[i]);
         index += sizeof(short);
+        //channel number
         *(reinterpret_cast<short*>(&(buff[index]))) = static_cast<short>(this->channelNumber[i]);
         index += sizeof(short);
+        //channel terminal voltage
         *(reinterpret_cast<float*>(&(buff[index]))) = this->terminalVoltage[i];
         index += sizeof(float);
+        //channel sense voltage
         *(reinterpret_cast<float*>(&(buff[index]))) = this->senseVoltage[i];
         index += sizeof(float);
+        //channel currents
         *(reinterpret_cast<float*>(&(buff[index]))) = this->current[i];
         index += sizeof(float);
+        //channel temperatures
         *(reinterpret_cast<int*>(&(buff[index])))   = this->temperature[i];
         index += sizeof(int);
+        //channel status
         *(reinterpret_cast<unsigned int*>(&(buff[index]))) = this->channelStatus[i].giveIntRepresentation();
         index += sizeof(unsigned int);
     }
@@ -130,6 +146,9 @@ void SlowControlsEvent::getBinaryRepresentation(char* buff)
 
 void SlowControlsEvent::ReadVoltageData(const SlowControls::VoltageData& data)
 {
+    //set the time data
+    this->eventStartTime = data.beginRead;
+    this->eventStopTime = data.finishRead;
     //set up the loop for transfering per channel information
     std::size_t i=0, j=0;
     std::size_t dataSize = data.terminalVoltage.size();

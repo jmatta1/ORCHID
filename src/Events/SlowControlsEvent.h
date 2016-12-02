@@ -30,17 +30,17 @@ namespace Events
 {
 typedef short ChanSizeType;
 
-class SlowControlsEvent : public EventInterface
+class SlowControlsEvent
 {
 public:
     SlowControlsEvent(int numVolChannels, int numTempChannels);
-    virtual ~SlowControlsEvent();
+    ~SlowControlsEvent();
     
     //functions to retrieve the binary representation
-    virtual int getSizeOfBinaryRepresentation();
+    int getSizeOfBinaryRepresentation();
     //the buffer provided to this function will be at *least* the size
     //returned by getSizeOfBinaryRepresentation
-    virtual void getBinaryRepresentation(char* buff);
+    void getBinaryRepresentation(char* buff);
     
     void ReadVoltageData(const SlowControls::VoltageData& data);
     //void ReadTemperatureData()
@@ -67,6 +67,11 @@ private:
 
     //Temperature Sensor Information
 
+    
+    //event timing
+    unsigned long long int eventStartTime;
+    unsigned long long int eventStopTime;
+    
     //general information these do not need to be atomic as they are written
     //once at object creation and never again
     ChanSizeType numVoltageChannels;
