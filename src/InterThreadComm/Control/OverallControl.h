@@ -18,12 +18,12 @@
 namespace InterThread
 {
 
-class OverallThreadControl
+class OverallControl
 {
 public:
-    OverallThreadControl(AcquisitionThreadControl* acqCtrl, ProcessingThreadControl* prcCtrl,
-                         SlowControlsThreadController* slwCtrl, FileData* filDat);
-    ~OverallThreadControl(){}
+    OverallControl(AcquisitionThreadControl* acqCtrl, ProcessingThreadControl* prcCtrl,
+                   SlowControlsThreadController* slwCtrl, FileData* filDat);
+    ~OverallControl(){}
     
     //sends terminate and waits for response to groups of threads in the following order:
     //first turn off the production of data
