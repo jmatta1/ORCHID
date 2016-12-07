@@ -31,7 +31,7 @@ namespace Events
 {
 
 SlowControlsEvent::SlowControlsEvent(int numVolChannels, int numTempChannels):
-    eventTime(0), numVoltageChannels(numVolChannels),
+    numVoltageChannels(numVolChannels),
     numTemperatureChannels(numTempChannels), binarySize(0)
 {
     this->boardNumber     = new int[numVolChannels];

@@ -22,6 +22,7 @@
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
+#include<boost/date_time/posix_time/posix_time.hpp>
 // includes from ORCHID
 #include"InputLib/Blocks/MpodChannelData.h"
 namespace SlowControls
