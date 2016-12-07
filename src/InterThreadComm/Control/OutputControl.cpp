@@ -18,7 +18,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"RunData.h"
+#include"OutputControl.h"
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -27,23 +27,23 @@
 namespace InterThread
 {
 
-RunData::RunData():runTitle(""), runNumber(0), runTitleTest(true),
+OutputControl::OutputControl():runTitle(""), runNumber(0), runTitleTest(true),
     runNumberTest(true)
 {}
 
 //setters
-void RunData::setRunTitle(const std::string& rTitle)
+void OutputControl::setRunTitle(const std::string& rTitle)
 {
     boost::upgrade_lock<boost::shared_mutex> lock(nonAtomicAccess);
     boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
-    //now we have exclusive, writers, access
+    //now we have exclusive, a.k.a. writers, access
     runTitle = rTitle;
     runTitleTest.store(true);
     //when the locks go out of scope they unlock
 }
 
 
-void RunData::getRunTitle(std::string& rTitle)
+void OutputControl::getRunTitle(std::string& rTitle)
 {
     boost::shared_lock<boost::shared_mutex> lock(nonAtomicAccess);
     rTitle = runTitle;

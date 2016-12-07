@@ -30,13 +30,14 @@ namespace Threads
 SlowControlsThread::SlowControlsThread(SlowControls::MpodReader* mRead,
                                        InterThread::SlowData* slDat,
                                        InterThread::SlowControlsThreadController* sctCtrl,
-                                       int refreshRate, InterThread::RunData* runDat,
+                                       int refreshRate, InterThread::OutputControl* outCtrl,
                                        InterThread::FileData* fileDat,
                                        int thrdNum, Utility::LoggerType& log,
                                        const std::string& baseOutputDirectory):
-    mpodReader(mRead), slowData(slDat), sctControl(sctCtrl), notTerminated(true),
-    scEvent(slDat->numVoltageChannels, slDat->numTemperatureChannels), lg(log),
-    outputFile(fileDat, log, thrdNum, baseOutputDirectory)
+    sctControl(sctCtrl), notTerminated(true), mpodReader(mRead), slowData(slDat),
+    scEvent(slDat->numVoltageChannels, slDat->numTemperatureChannels), 
+    outputCtrl(outCtrl), outputFile(fileDat, log, thrdNum, baseOutputDirectory),
+    lg(log)
 {
     long long int refreshNanoseconds = (1000000000/refreshRate);
     this->refreshPeriod = boost::chrono::nanoseconds(refreshNanoseconds);
@@ -109,8 +110,10 @@ void SlowControlsThread::doWritingLoop()
     BOOST_LOG_SEV(lg, Information) << "SC Thread: Started Writing";
     
     //start the slow controls file
-    runData->getRunTitle(runTitle);
-    runNumber = runData->getRunNumber();
+    int runNumber;
+    std::string runTitle;
+    outputCtrl->getRunTitle(runTitle);
+    runNumber = outputCtrl->getRunNumber();
     //now pass those parameters to the internal file
     outputFile.setNewRunParameters(runTitle, runNumber);
     

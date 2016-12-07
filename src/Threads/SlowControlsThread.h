@@ -29,7 +29,7 @@
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"Hardware/HVLib/MpodReader.h"
 #include"InterThreadComm/Data/FileData.h"
-#include"InterThreadComm/Data/RunData.h"
+#include"InterThreadComm/Control/OutputControl.h"
 #include"InterThreadComm/Data/SlowData.h"
 #include"Utility/CommonTypeDefs.h"
 #include"Events/SlowControlsEvent.h"
@@ -44,7 +44,7 @@ public:
     //construction and destruction
     SlowControlsThread(SlowControls::MpodReader* mRead, InterThread::SlowData* slDat,
                        InterThread::SlowControlsThreadController* sctCtrl,
-                       int refreshRate, InterThread::RunData* runDat, 
+                       int refreshRate, InterThread::OutputControl* outCtrl, 
                        InterThread::FileData* fileDat, int thrdNum,
                        Utility::LoggerType& log, const std::string& baseOutputDirectory);
     ~SlowControlsThread(){delete[] eventBuffer;}
@@ -85,9 +85,7 @@ private:
     Events::SlowControlsEvent scEvent;
     char* eventBuffer;
     int eventSize;
-    InterThread::RunData* runData;
-    int runNumber;
-    std::string runTitle;
+    InterThread::OutputControl* outputCtrl;
     
     //the actual output file
     IO::SecantFileWriter outputFile;

@@ -29,8 +29,6 @@ namespace Threads
 void ProcessingThread::operator()()
 {
     //run the event loop
-    std::string runTitle;
-    int runNumber;
     while(this->notTerminated)
     {
         switch(this->controller->getCurrentState())
@@ -45,9 +43,12 @@ void ProcessingThread::operator()()
             break;
         case InterThread::ProcessingThreadState::Running:
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Starting Processing";
+            //create a couple intermediates to hold the runTitle and runNumber
+            std::string runTitle;
+            int runNumber;
             //here we grab the run parameters
-            runData->getRunTitle(runTitle);
-            runNumber = runData->getRunNumber();
+            outputCtrl->getRunTitle(runTitle);
+            runNumber = outputCtrl->getRunNumber();
             //now pass those parameters to the internal file
             outputFile.setNewRunParameters(runTitle, runNumber);
             this->doProcessingLoop();

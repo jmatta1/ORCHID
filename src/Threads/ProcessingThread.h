@@ -25,7 +25,7 @@
 // includes from ORCHID
 #include"InterThreadComm/Control/ProcessingThreadControl.h"
 #include"InterThreadComm/Data/AcquisitionData.h"
-#include"InterThreadComm/Data/RunData.h"
+#include"InterThreadComm/Control/OutputControl.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"IO/SecantFileWriter.h"
 #include"Utility/CommonTypeDefs.h"
@@ -61,11 +61,11 @@ public:
     ProcessingThread(InterThread::ProcessingThreadControl* prCtrl,
                      Utility::ToProcessingQueuePair* procQueue,
                      InterThread::AcquisitionData* acqDat,
-                     InterThread::RunData* runDat, InterThread::FileData* fileDat, 
+                     InterThread::OutputControl* outCtrl, InterThread::FileData* fileDat, 
                      int thrdNum, const std::string& baseOutputDirectory, Utility::LoggerType& log):
-        controller(prCtrl), dataInputQueue(procQueue), acqData(acqDat), runData(runDat),
-        notTerminated(true), threadNumber(thrdNum), evBuff(15),
-        outputFile(fileDat, log, thrdNum, baseOutputDirectory), lg(log)
+        controller(prCtrl), dataInputQueue(procQueue), acqData(acqDat), outputCtrl(outCtrl),
+        notTerminated(true), threadNumber(thrdNum), lg(log), evBuff(15),
+        outputFile(fileDat, log, thrdNum, baseOutputDirectory)
     {evBuff.setEventSize(15); evBuff.setEventID(1);}
     ~ProcessingThread(){}//delete nothing since we own nothing
     
@@ -86,7 +86,7 @@ private:
     InterThread::ProcessingThreadControl* controller;
     Utility::ToProcessingQueuePair* dataInputQueue;
     InterThread::AcquisitionData* acqData;
-    InterThread::RunData* runData;
+    InterThread::OutputControl* outputCtrl;
     
     bool notTerminated;
     int threadNumber;

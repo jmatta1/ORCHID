@@ -31,11 +31,11 @@
 namespace InterThread
 {
 
-class RunData
+class OutputControl
 {
 public:
-    RunData();
-    ~RunData(){}
+    OutputControl();
+    ~OutputControl(){}
     //setters
     void setRunTitle(const std::string& rTitle);
     void setRunNumber(int rn){runNumber.store(rn); runNumberTest.store(true);}
