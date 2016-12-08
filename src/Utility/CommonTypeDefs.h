@@ -19,27 +19,20 @@
 #ifndef ORCHID_SRC_UTILITY_COMMONTYPEDEFS_H
 #define ORCHID_SRC_UTILITY_COMMONTYPEDEFS_H
 
-#include"Events/EventInterface.h"
-#include"InterThreadComm/InterThreadQueueSizes.h"
-#include"InterThreadComm/MultiQueuePair.h"
 #include"InterThreadComm/QueuePair.h"
 #include"InterThreadComm/RawBufferTriple.h"
 
 namespace Utility
 {
-typedef InterThread::RawBufferTriple<InterThread::BoardInfo> ToProcessingBuffer;
-typedef boost::log::sources::severity_logger_mt<LogSeverity> LoggerType;
+using ToProcessingBuffer = InterThread::RawBufferTriple<InterThread::BoardInfo>;
+using LoggerType = boost::log::sources::severity_logger_mt<LogSeverity>;
 
 //queue types
-typedef boost::lockfree::queue<Events::EventInterface*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile)> > ProcessedEventQueue;
-typedef boost::lockfree::spsc_queue<Events::EventInterface*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile)> > SlowControlEventQueue;
-typedef boost::lockfree::queue<ToProcessingBuffer*, boost::lockfree::capacity<InterThread::getEnumVal(InterThread::QueueSizes::DigitizerToProcessing)> > ToProcessingQueue;
-
-//Queues for sending things to file type
-typedef InterThread::MultiQueuePair<Events::EventInterface*, ProcessedEventQueue, SlowControlEventQueue> ToFileMultiQueue;
-enum{ProcessingQueueIndex = 0, SlowControlsQueueIndex = 1};
+template<int QueueSize>
+using ToProcessingQueue = boost::lockfree::queue<ToProcessingBuffer*, boost::lockfree::capacity<QueueSize> >;
 
 //queues for sending things from digitizer to processing
-typedef InterThread::QueuePair<ToProcessingBuffer*, ToProcessingQueue> ToProcessingQueuePair;
+template<int QueueSize>
+typedef InterThread::QueuePair<ToProcessingBuffer*, ToProcessingQueue<QueueSize> > ToProcessingQueuePair;
 }
 #endif //ORCHID_SRC_UTILITY_COMMONTYPEDEFS_H
