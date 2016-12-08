@@ -17,7 +17,7 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"SlowControlsThreadController.h"
+#include"SlowControlsThreadControl.h"
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
