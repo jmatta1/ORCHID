@@ -38,7 +38,6 @@ void OutputControl::setRunTitle(const std::string& rTitle)
     boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
     //now we have exclusive, a.k.a. writers, access
     runTitle = rTitle;
-    runTitleTest.store(true);
     //when the locks go out of scope they unlock
 }
 
@@ -47,7 +46,6 @@ void OutputControl::getRunTitle(std::string& rTitle)
 {
     boost::shared_lock<boost::shared_mutex> lock(nonAtomicAccess);
     rTitle = runTitle;
-    runTitleTest.store(false);
 }
 
 }
