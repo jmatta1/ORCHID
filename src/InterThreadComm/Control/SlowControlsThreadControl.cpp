@@ -26,7 +26,7 @@
 namespace InterThread
 {
 
-void SlowControlsThreadController::waitForNewState()
+void SlowControlsThreadControl::waitForNewState()
 {
     //lock the wait mutex
     boost::unique_lock<boost::mutex> waitLock(this->waitMutex);
@@ -43,7 +43,7 @@ void SlowControlsThreadController::waitForNewState()
     }
 }
 
-void SlowControlsThreadController::slowControlsThreadSleep(const boost::chrono::nanoseconds& sleepTime)
+void SlowControlsThreadControl::slowControlsThreadSleep(const boost::chrono::nanoseconds& sleepTime)
 {
     //figure out the time that we need to sleep until
     auto endTime(boost::chrono::system_clock::now() + sleepTime);

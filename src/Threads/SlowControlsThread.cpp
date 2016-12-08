@@ -29,7 +29,7 @@ namespace Threads
 {
 SlowControlsThread::SlowControlsThread(SlowControls::MpodReader* mRead,
                                        InterThread::SlowData* slDat,
-                                       InterThread::SlowControlsThreadController* sctCtrl,
+                                       InterThread::SlowControlsThreadControl* sctCtrl,
                                        int refreshRate, InterThread::OutputControl* outCtrl,
                                        InterThread::FileData* fileDat,
                                        int thrdNum, Utility::LoggerType& log,

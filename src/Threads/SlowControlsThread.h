@@ -26,7 +26,7 @@
 // includes from other libraries
 #include<boost/chrono.hpp>
 // includes from ORCHID
-#include"InterThreadComm/Control/SlowControlsThreadController.h"
+#include"InterThreadComm/Control/SlowControlsThreadControl.h"
 #include"Hardware/HVLib/MpodReader.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/Control/OutputControl.h"
@@ -43,7 +43,7 @@ class SlowControlsThread
 public:
     //construction and destruction
     SlowControlsThread(SlowControls::MpodReader* mRead, InterThread::SlowData* slDat,
-                       InterThread::SlowControlsThreadController* sctCtrl,
+                       InterThread::SlowControlsThreadControl* sctCtrl,
                        int refreshRate, InterThread::OutputControl* outCtrl, 
                        InterThread::FileData* fileDat, int thrdNum,
                        Utility::LoggerType& log, const std::string& baseOutputDirectory);
@@ -71,7 +71,7 @@ private:
     void doPollingLoop();
     
     //the controller for this thread
-    InterThread::SlowControlsThreadController* sctControl;
+    InterThread::SlowControlsThreadControl* sctControl;
     //to maintain the event
     bool notTerminated;
     //time to pause the loop between reads

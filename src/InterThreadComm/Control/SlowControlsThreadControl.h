@@ -32,14 +32,14 @@ namespace InterThread
 
 enum class SlowControlsThreadState  : char {Terminate, Stopped, Polling, Writing};
 
-class SlowControlsThreadController
+class SlowControlsThreadControl
 {
 public:
     //construction and destruction
-    SlowControlsThreadController():
+    SlowControlsThreadControl():
         currentState(SlowControlsThreadState::Stopped), threadWaiting(false),
         threadSleeping(false), threadDone(false){}
-    ~SlowControlsThreadController(){}
+    ~SlowControlsThreadControl(){}
     
     //functions for the slow controls thread to access
     SlowControlsThreadState getState(){return this->currentState.load();}
