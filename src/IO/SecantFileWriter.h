@@ -117,7 +117,14 @@ private:
     //the sequence number for this file
     int sequenceNumber;
     
-    //crc32 computer
+    //crc32 computer, polynomial chosen from https://users.ece.cmu.edu/~koopman/crc/crc32.html
+    //notes on how to interpret it can be found at https://users.ece.cmu.edu/~koopman/crc/notes.html
+    //the boost crc polynomial demands 1+X notation, the site above gives the polynomial in X+1 notation
+    //therefore the 0x32583499 becomes 0x992c1a4c with a full form notation of 0x132583499
+    //written out, this polynomial has the form x^32 +x^29 +x^28 +x^25 +x^22 +x^20 +x^19 +x^13 +x^12 +x^10 +x^7 +x^4 +x^3 +1
+    //for an input of 32738 bits or less this polynomial misses zero 5 bit and
+    //smaller errors of any kind, including within the outputted crc itself, above
+    //that input size it starts to miss more kinds of errors
     boost::crc_optimal<32, 0x32583499, 0x00000000, 0x00000000, false, false> crcComputer;
     
     //statistics variable
