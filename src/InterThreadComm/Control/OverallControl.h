@@ -36,6 +36,18 @@
 namespace InterThread
 {
 
+//a minor class that allows me to put a member function in a
+template <typename CtrlClass, typename RetType>
+class ValueChecker
+{
+public:
+    ValueChecker(CtrlClass* ins, RetType (CtrlClass::* func)):instance(ins), function(func){}
+    RetType operator()() const {return (instance->*function)();}
+private:
+    CtrlClass* instance;
+    RetType (CtrlClass::* function)();
+};
+
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 class OverallControl
 {
@@ -75,7 +87,11 @@ public:
     //sets the file data using the given runTitle and runNum, then puts the
     //slow controls thread into writing mode, puts the processing threads into
     //active mode, and finally puts the acquisition threads into acquiring mode
-    bool startAcquisition(const std::string& runTitle, int runNum);
+    //this is a dumb function, it just sets things to go, SECANT files should not
+    //overwrite previously existing data, but they avoid this by incrementing the
+    //sequence number, the user needs to check for runtitle and run number collisions
+    //elsewhere
+    void startRun(const std::string& runTitle, int runNum);
 private:
     //internal functions that encapsulate the logic needed for certain operations
     //regarding controlling threads
@@ -83,6 +99,32 @@ private:
     void terminateSlowControls();
     void terminateProcessing();
     
+    void stopAcquisition();
+    void stopSlowControls();
+    void stopProcessing();
+    
+    void setSlowControlsToPoll();
+    
+    void startProcessing();
+    void startSlowControls();
+    void startAcquisition();
+    
+    void forceQueuesAwake();
+    void clearQueuesWake();
+    
+    //convenience class to encapsulate my loop and recheck value idiom
+    template<typename CtrlClass, typename RetType>
+    void waitForValue(ValueChecker<CtrlClass, RetType>& valCheck, const RetType& targetValue, int waitTimeInMicroseconds) const;
+    
+    inline void logIndivModStart(const char* thrType, const char* setState)
+    {
+        BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT "<<thrType<<" to "<<setState;
+    }
+    
+    inline void logIndivModStop(const char* thrType, const char* setState)
+    {
+        BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT "<<thrType<<" to "<<setState;
+    }
     
     AcquisitionThreadControl* acquisitionCtrl;
     ProcessingThreadControl* processingCtrl;
@@ -99,6 +141,10 @@ private:
     //Array of acquisition to processing queues
     std::array<InterThreadQueue*, NumProdConsGroups> dataQueues;
 };
+
+/*******************************************************************************
+** Public Member Functions
+*******************************************************************************/
 
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 OverallControl<NumProdConsGroups, NumBuffersPerGroup>::OverallControl(Utility::LoggerType& log, int numAcqThrd, int numPrcThrd):
@@ -151,167 +197,213 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::idleEverything()
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::pollSlowControls()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting all SECANT threads to idle";
+    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting all SECANT threads to poll Slow Controls";
     this->stopAcquisition();
     this->setSlowControlsToPoll();
     this->stopProcessing();
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting all SECANT threads to idle";
+    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting all SECANT threads to poll Slow Controls";
+}
+
+template<int NumProdConsGroups, int NumBuffersPerGroup>
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::startRun(const std::string& runTitle, int runNum)
+{
+    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Passing run title and number to output control";
+    this->outputCtrl->setRunTitle(runTitle);
+    this->outputCtrl->setRunNumber(runNum);
+    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting all SECANT threads to running/writing";
+    this->startProcessing();//start the processing threads
+    this->startSlowControls();//start the 
+    this->startAcquisition();
+    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting all SECANT threads to running/writing";
+}
+
+/*******************************************************************************
+** Private Member Functions
+*******************************************************************************/
+//private set to running functions
+template<int NumProdConsGroups, int NumBuffersPerGroup>
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::startAcquisition()
+{
+    this->logIndivModStart("Acquisition Threads", "Running");
+    //set acquisition to terminate
+    this->acquisitionCtrl->setToAcquiring();
+    //do a pause and check in this thread to wait until all acquisition threads signal they are done
+    ValueChecker<AcquisitionThreadControl, int> checker(acquisitionCtrl, &(AcquisitionThreadControl::getThreadsWaiting));
+    this->waitForValue(checker, 0, 100);
+    this->logIndivModStop("Acquisition Threads", "Running");
+}
+
+template<int NumProdConsGroups, int NumBuffersPerGroup>
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::startSlowControls()
+{
+    this->logIndivModStart("SlowControls Thread", "Writing");
+    //set acquisition to terminate
+    this->slowControlsCtrl->setToWriting();
+    
+    //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, &(SlowControlsThreadControl::isSleeping));
+    this->waitForValue(checker, true, 50);
+    this->logIndivModStop("SlowControls Thread", "Writing");
+}
+
+template<int NumProdConsGroups, int NumBuffersPerGroup>
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::startProcessing()
+{
+    this->logIndivModStart("Processing Threads", "Running");
+    //set processing to run
+    this->processingCtrl->setToRunning();
+    
+    //do a pause and check in this thread to wait until all acquisition threads signal they are done
+    ValueChecker<ProcessingThreadControl, int> checker(processingCtrl, &(ProcessingThreadControl::getThreadsWaiting));
+    this->waitForValue(checker, 0, 100);
+    
+    this->logIndivModStop("Processing Threads", "Running");
 }
 
 //the private set sc to polling function
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::setSlowControlsToPoll()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT slow controls thread to poll";
-    //set acquisition to terminate
+    this->logIndivModStart("SlowControls Thread", "polling");
+    //set acquisition to poll
     this->slowControlsCtrl->setToPolling();
     
-    //do a pause and check in this thread to wait until we see the slow controlls thread sleeping
-    while(!(this->slowControlsCtrl->isSleeping()))
-    {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(50));
-    }
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT slow controls thread to poll";
+    //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, &(SlowControlsThreadControl::isSleeping));
+    this->waitForValue(checker, true, 50);
+    this->logIndivModStop("SlowControls Thread", "polling");
 }
 
 //the private set to idle functions
 template<int NumProdConsGroups, int NumBuffersPerGroup>
-void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::idleAcquisition()
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::stopAcquisition()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT acquisition threads to stop";
-    //set acquisition to terminate
+    this->logIndivModStart("Acquisition Threads", "stop");
+    //set acquisition to stop
     this->acquisitionCtrl->setToStopped();
-    //force any acquisition threads waiting on the availability of an outgoing
-    //queue to spin until they get rid of their data
-    for(auto&& queue: dataQueues)
-    {
-        queue->forceWakeAll();
-    }
+    this->forceQueuesAwake();
     
     //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    while(!(this->acquisitionCtrl->getThreadsWaiting() == this->numAcqThreads))
-    {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(100));
-    }
+    ValueChecker<AcquisitionThreadControl, int> checker(acquisitionCtrl, &(AcquisitionThreadControl::getThreadsWaiting));
+    this->waitForValue(checker, this->numAcqThreads, 100);
     
-    //clear the force wake condition from the queues
-    for(auto&& queue: dataQueues)
-    {
-        queue->clearForce();
-    }
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT acquisition threads to stop";
+    this->clearQueuesWake();
+    this->logIndivModStop("Acquisition Threads", "stop");
 }
 
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::stopSlowControls()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT slow controls thread to stop";
-    //set acquisition to terminate
+    this->logIndivModStart("SlowControls Thread", "stop");
+    //set acquisition to stop
     this->slowControlsCtrl->setToStop();
     
     //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
-    while(!(this->slowControlsCtrl->isWaiting()))
-    {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(100));
-    }
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT slow controls thread to stop";
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, &(SlowControlsThreadControl::isWaiting));
+    this->waitForValue(checker, true, 100);
+    this->logIndivModStop("SlowControls Thread", "stop");
 }
 
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::stopProcessing()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT processing threads to stop";
-    //set processing to terminate
+    this->logIndivModStart("Processing Threads", "stop");
+    //set processing to stop
     this->processingCtrl->setToStopped();
     //force any acquisition threads waiting on the availability of an outgoing
     //queue to spin until they get rid of their data
-    for(auto&& queue: dataQueues)
-    {
-        queue->forceWakeAll();
-    }
+    this->forceQueuesAwake();
     
     //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    while(!(this->processingCtrl->getThreadsWaiting() == this->numProcessingThreads))
-    {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(100));
-    }
+    ValueChecker<ProcessingThreadControl, int> checker(processingCtrl, &(ProcessingThreadControl::getThreadsWaiting));
+    this->waitForValue(checker, this->numProcessingThreads, 100);
     
     //clear the force wake condition from the queues
-    for(auto&& queue: dataQueues)
-    {
-        queue->clearForce();
-    }
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT processing threads to stop";
+    this->clearQueuesWake();
+    this->logIndivModStop("Processing Threads", "stop");
 }
 
 //the private terminate functions
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::terminateAcquisition()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT acquisition threads to terminate";
+    this->logIndivModStart("Acquisition Threads", "terminate");
     //set acquisition to terminate
     this->acquisitionCtrl->setToTerminate();
     //force any acquisition threads waiting on the availability of an outgoing
     //queue to spin until they get rid of their data
-    for(auto&& queue: dataQueues)
-    {
-        queue->forceWakeAll();
-    }
+    this->forceQueuesAwake();
     
     //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    while(!(this->acquisitionCtrl->getThreadsTerminated() == this->numAcqThreads))
-    {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(100));
-    }
+    ValueChecker<AcquisitionThreadControl, int> checker(acquisitionCtrl, &(AcquisitionThreadControl::getThreadsTerminated));
+    this->waitForValue(checker, this->numAcqThreads, 100);
     
     //clear the force wake condition from the queues
-    for(auto&& queue: dataQueues)
-    {
-        queue->clearForce();
-    }
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT acquisition threads to terminate";
+    this->clearQueuesWake();
+    this->logIndivModStop("Acquisition Threads", "terminate");
 }
 
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::terminateSlowControls()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT slow controls thread to terminate";
+    this->logIndivModStart("SlowControls Thread", "terminate");
     //set acquisition to terminate
     this->slowControlsCtrl->setToTerminate();
     
     //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
-    while(!(this->slowControlsCtrl->isDone()))
-    {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(100));
-    }
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT slow controls thread to terminate";
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, &(SlowControlsThreadControl::isDone));
+    this->waitForValue(checker, true, 100);
+    this->logIndivModStop("SlowControls Thread", "terminate");
 }
 
 template<int NumProdConsGroups, int NumBuffersPerGroup>
 void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::terminateProcessing()
 {
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Setting SECANT processing threads to terminate";
+    this->logIndivModStart("Processing Threads", "terminate");
     //set processing to terminate
     this->processingCtrl->setToTerminate();
+    //force any acquisition threads waiting on the availability of an outgoing
+    //queue to spin until they get rid of their data
+    this->forceQueuesAwake();
+    
+    //do a pause and check in this thread to wait until all acquisition threads signal they are done
+    ValueChecker<ProcessingThreadControl, int> checker(processingCtrl, &(ProcessingThreadControl::getThreadsTerminated));
+    this->waitForValue(checker, this->numProcessingThreads, 100);
+    
+    this->clearQueuesWake();
+    this->logIndivModStop("Processing Threads", "terminate");
+}
+
+template<int NumProdConsGroups, int NumBuffersPerGroup>
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::forceQueuesAwake()
+{
     //force any acquisition threads waiting on the availability of an outgoing
     //queue to spin until they get rid of their data
     for(auto&& queue: dataQueues)
     {
         queue->forceWakeAll();
     }
-    
-    //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    while(!(this->processingCtrl->getThreadsTerminated() == this->numProcessingThreads))
-    {
-        boost::this_thread::sleep_for(boost::chrono::microseconds(100));
-    }
-    
+}
+
+template<int NumProdConsGroups, int NumBuffersPerGroup>
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::clearQueuesWake()
+{
     //clear the force wake condition from the queues
     for(auto&& queue: dataQueues)
     {
         queue->clearForce();
     }
-    BOOST_LOG_SEV(this->lg, Information) << "Overall Control: Done setting SECANT processing threads to terminate";
+}
+
+template<int NumProdConsGroups, int NumBuffersPerGroup>
+template<typename CtrlClass, typename RetType>
+void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::waitForValue<CtrlClass, RetType>(
+        ValueChecker<CtrlClass, RetType>& valCheck, const RetType& targetValue, int waitTimeInMicroseconds)
+{
+    while( valCheck() != targetValue )
+    {
+        boost::this_thread::sleep_for(boost::chrono::microseconds(waitTimeInMicroseconds));
+    }
 }
 
 }
