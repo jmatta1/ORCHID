@@ -41,7 +41,7 @@ public:
     void setRunNumber(int rn){runNumber.store(rn);}
     
     //getters
-    int getRunNumber(){runNumberTest.store(false); return runNumber.load();}
+    int getRunNumber(){return runNumber.load();}
     void getRunTitle(std::string& rTitle);
     
 private:
