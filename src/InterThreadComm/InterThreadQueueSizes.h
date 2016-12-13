@@ -28,22 +28,13 @@
 namespace InterThread
 {
 
-enum class QueueSizes : int 
+namespace QueueSizes
 {
-    SlowControlToFile       = 50, //if we fall 50 polling periods behind we are in real trouble
-    DigitizerToProcessing   = 80,
-    ProcessingToFile        = 60000
-};
-//Digitizer to processing can be *REALLY* big, for 0 trace samples
-//  (6 bytes per event) and the values governing events per channel aggregate
-//  and board aggregates per blt maxed, it comes to a little under 12MB per buffer
 
-//here is a quick template meta program to cast the strongly typed enums to ints
-//for purposes of accessing the actual values
-template<typename Enum>
-constexpr typename std::underlying_type<Enum>::type getEnumVal(Enum val)
-{
-    return static_cast<typename std::underlying_type<Enum>::type>(val);
+static const int AcqToProc = 80;
+//Digitizer to processing can be *REALLY* big, for 0 trace samples
+//  (12 bytes per event) and the maximum of 1023 events per channel aggregate and
+//  255 board aggregates per BLT one gets a little under 24MB per buffer
 }
 
 }
