@@ -29,7 +29,7 @@
 #include"InterThreadComm/Data/FileData.h"
 #include"IO/SecantFileWriter.h"
 #include"Utility/CommonTypeDefs.h"
-#include"Utility/OrchidLogger.h"
+#include"InterThreadComm/InterThreadQueueSizes.h"
 
 namespace Threads
 {
@@ -55,11 +55,13 @@ private:
     char* buff;
 };
 
+using InterThread::QueueSizes::AcqToProc;
+
 class ProcessingThread
 {
 public:
     ProcessingThread(InterThread::ProcessingThreadControl* prCtrl,
-                     Utility::ToProcessingQueuePair* procQueue,
+                     Utility::ToProcessingQueuePair<AcqToProc>* procQueue,
                      InterThread::AcquisitionData* acqDat,
                      InterThread::OutputControl* outCtrl, InterThread::FileData* fileDat, 
                      int thrdNum, const std::string& baseOutputDirectory, Utility::LoggerType& log):
@@ -84,7 +86,7 @@ private:
     
     
     InterThread::ProcessingThreadControl* controller;
-    Utility::ToProcessingQueuePair* dataInputQueue;
+    Utility::ToProcessingQueuePair<AcqToProc>* dataInputQueue;
     InterThread::AcquisitionData* acqData;
     InterThread::OutputControl* outputCtrl;
     

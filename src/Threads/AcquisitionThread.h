@@ -25,17 +25,18 @@
 #include"Hardware/Digitizer/Vx1730Digitizer.h"
 #include"InterThreadComm/Control/AcquisitionThreadControl.h"
 #include"Utility/CommonTypeDefs.h"
+#include"InterThreadComm/InterThreadQueueSizes.h"
 #include"Utility/OrchidLogger.h"
 
 namespace Threads
 {
-
+using InterThread::QueueSizes::AcqToProc;
 class AcquisitionThread
 {
 public:
     AcquisitionThread(Digitizer::Vx1730Digitizer* digi, InterThread::AcquisitionThreadControl* acCtrl,
-                      Utility::ToProcessingQueuePair* procQueue):digitizer(digi),
-        controller(acCtrl), dataOutputQueue(procQueue), notTerminated(true),
+                      Utility::ToProcessingQueuePair<AcqToProc>* procQueue):
+        digitizer(digi), controller(acCtrl), dataOutputQueue(procQueue), notTerminated(true),
         lg(OrchidLog::get()) { firstChannel = digi->getModuleStartChannel();
                                modNumber = digi->getModuleNumber();}
     ~AcquisitionThread(){}//delete nothing since we own nothing
@@ -50,7 +51,7 @@ private:
     
     Digitizer::Vx1730Digitizer* digitizer;
     InterThread::AcquisitionThreadControl* controller;
-    Utility::ToProcessingQueuePair* dataOutputQueue;
+    Utility::ToProcessingQueuePair<AcqToProc>* dataOutputQueue;
     
     int firstChannel;
     int modNumber;
