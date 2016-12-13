@@ -33,6 +33,6 @@ using ToProcessingQueue = boost::lockfree::queue<ToProcessingBuffer*, boost::loc
 
 //queues for sending things from digitizer to processing
 template<int QueueSize>
-typedef InterThread::QueuePair<ToProcessingBuffer*, ToProcessingQueue<QueueSize> > ToProcessingQueuePair;
+using ToProcessingQueuePair = InterThread::QueuePair<ToProcessingBuffer*, ToProcessingQueue<QueueSize> >;
 }
 #endif //ORCHID_SRC_UTILITY_COMMONTYPEDEFS_H
