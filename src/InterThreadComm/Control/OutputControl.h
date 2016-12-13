@@ -34,7 +34,7 @@ namespace InterThread
 class OutputControl
 {
 public:
-    OutputControl();
+    OutputControl():runTitle(""), runNumber(0){}
     ~OutputControl(){}
     //setters
     void setRunTitle(const std::string& rTitle);

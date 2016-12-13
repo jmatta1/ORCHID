@@ -27,10 +27,6 @@
 namespace InterThread
 {
 
-OutputControl::OutputControl():runTitle(""), runNumber(0), runTitleTest(true),
-    runNumberTest(true)
-{}
-
 //setters
 void OutputControl::setRunTitle(const std::string& rTitle)
 {
