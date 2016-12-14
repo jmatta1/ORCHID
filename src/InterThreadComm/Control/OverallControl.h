@@ -234,8 +234,8 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::startAcquisition()
     //set acquisition to terminate
     this->acquisitionCtrl->setToAcquiring();
     //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    ValueChecker<AcquisitionThreadControl, int> checker(acquisitionCtrl, (&AcquisitionThreadControl::getThreadsWaiting));
-    this->waitForValue(checker, 0, 100);
+    ValueChecker<AcquisitionThreadControl, int> checker(acquisitionCtrl, (&AcquisitionThreadControl::getThreadsStarted));
+    this->waitForValue(checker, 0, 50);
     this->logIndivModStop("Acquisition Threads", "Running");
 }
 
@@ -247,7 +247,7 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::startSlowControls()
     this->slowControlsCtrl->setToWriting();
     
     //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
-    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isSleeping));
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isWriting));
     this->waitForValue(checker, true, 50);
     this->logIndivModStop("SlowControls Thread", "Writing");
 }
@@ -260,7 +260,7 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::startProcessing()
     this->processingCtrl->setToRunning();
     
     //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    ValueChecker<ProcessingThreadControl, int> checker(processingCtrl, (&ProcessingThreadControl::getThreadsWaiting));
+    ValueChecker<ProcessingThreadControl, int> checker(processingCtrl, (&ProcessingThreadControl::getThreadsRunning));
     this->waitForValue(checker, 0, 100);
     
     this->logIndivModStop("Processing Threads", "Running");
@@ -275,7 +275,7 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::setSlowControlsToPol
     this->slowControlsCtrl->setToPolling();
     
     //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
-    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isSleeping));
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isPolling));
     this->waitForValue(checker, true, 50);
     this->logIndivModStop("SlowControls Thread", "polling");
 }
@@ -290,7 +290,7 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::stopAcquisition()
     this->forceQueuesAwake();
     
     //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    ValueChecker<AcquisitionThreadControl, int> checker(acquisitionCtrl, (&AcquisitionThreadControl::getThreadsWaiting));
+    ValueChecker<AcquisitionThreadControl, int> checker(acquisitionCtrl, (&AcquisitionThreadControl::getThreadsStopped));
     this->waitForValue(checker, this->numAcqThreads, 100);
     
     this->clearQueuesWake();
@@ -305,7 +305,7 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::stopSlowControls()
     this->slowControlsCtrl->setToStop();
     
     //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
-    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isWaiting));
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isStopped));
     this->waitForValue(checker, true, 100);
     this->logIndivModStop("SlowControls Thread", "stop");
 }
@@ -321,7 +321,7 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::stopProcessing()
     this->forceQueuesAwake();
     
     //do a pause and check in this thread to wait until all acquisition threads signal they are done
-    ValueChecker<ProcessingThreadControl, int> checker(processingCtrl, (&ProcessingThreadControl::getThreadsWaiting));
+    ValueChecker<ProcessingThreadControl, int> checker(processingCtrl, (&ProcessingThreadControl::getThreadsStopped));
     this->waitForValue(checker, this->numProcessingThreads, 100);
     
     //clear the force wake condition from the queues
@@ -357,7 +357,7 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::terminateSlowControl
     this->slowControlsCtrl->setToTerminate();
     
     //do a pause and check in this thread to wait until the slow controls thread acknowledges shutdown
-    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isDone));
+    ValueChecker<SlowControlsThreadControl, bool> checker(slowControlsCtrl, (&SlowControlsThreadControl::isTerminated));
     this->waitForValue(checker, true, 100);
     this->logIndivModStop("SlowControls Thread", "terminate");
 }
