@@ -28,11 +28,10 @@ namespace InterThread
 void AcquisitionThreadControl::waitForChange()
 {
     boost::unique_lock<boost::mutex> waitLock(waitMutex);
+    acknowledgeStop();
     while(this->acqState.load() == AcquisitionThreadState::Stopped)
     {
-        waitCount.fetch_add(1);
         acqThreadWaitCondition.wait(waitLock);
-        waitCount.fetch_add(-1);
     }
     //the lock will release on deconstruction
 }

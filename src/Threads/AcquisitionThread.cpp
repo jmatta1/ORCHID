@@ -41,10 +41,13 @@ void AcquisitionThread::operator ()()
             break;
         case InterThread::AcquisitionThreadState::Stopped:
             BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Stopped and waiting for instructions";
+            //There is no need to acknowledge the stop, it happens automatically in waitForChange
+            //this->controller->acknowledgeStop();
             this->controller->waitForChange();
             break;
         case InterThread::AcquisitionThreadState::Acquiring:
             BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Starting Acquisition";
+            this->controller->acknowledgeStart();
             this->doAcquisitionLoop();
             break;
         }

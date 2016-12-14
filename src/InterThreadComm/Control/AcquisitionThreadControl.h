@@ -33,21 +33,24 @@ enum class AcquisitionThreadState : char {Acquiring, Stopped, Terminate};
 class AcquisitionThreadControl
 {
 public:
-    AcquisitionThreadControl():acqState(AcquisitionThreadState::Stopped),
-        termAckCount(0), waitCount(0) {}
+    AcquisitionThreadControl():
+        acqState(AcquisitionThreadState::Stopped), termAckCount(0),
+        stopAckCount(0), startAckCount(0) {}
     
     //functions to be accessed by the acquisition threads
     AcquisitionThreadState getCurrentState(){return acqState.load();}
     void waitForChange();
-    void acknowledgeTerminate(){++termAckCount;}
+    void acknowledgeTerminate(){termAckCount.fetch_add(1);}
+    void acknowledgeStart(){startAckCount.fetch_add(1);}
+    
 
     //functions to be accessed by the UI thread
     void setToAcquiring()
     {
-        
         //enter an artificial block to create and destroy lock before we notify
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            if(acqState.load() != AcquisitionThreadState::Acquiring) startAckCount.store(0);
             acqState.store(AcquisitionThreadState::Acquiring);
         }
         acqThreadWaitCondition.notify_all();
@@ -57,6 +60,7 @@ public:
         //enter an artificial block to create and destroy lock before we notify
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            if(acqState.load() != AcquisitionThreadState::Stopped) stopAckCount.store(0);
             acqState.store(AcquisitionThreadState::Stopped);
         }
         acqThreadWaitCondition.notify_all();
@@ -66,22 +70,27 @@ public:
         //enter an artificial block to create and destroy lock before we notify
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            if(acqState.load() != AcquisitionThreadState::Terminate) termAckCount.store(0);
             acqState.store(AcquisitionThreadState::Terminate);
         }
         acqThreadWaitCondition.notify_all();
     }
     
-    int getThreadsWaiting(){return waitCount.load();}
+    int getThreadsStopped(){return stopAckCount.load();}
+    int getThreadsStarted(){return stopAckCount.load();}
     int getThreadsTerminated(){return termAckCount.load();}
     
 private:
+    //called by wait for change
+    void acknowledgeStop(){stopAckCount.fetch_add(1);}
+
     std::atomic<AcquisitionThreadState> acqState;
     std::atomic_uint termAckCount;
+    std::atomic_uint stopAckCount;
+    std::atomic_uint startAckCount;
     
-    std::atomic_uint waitCount;
     boost::mutex waitMutex;
     boost::condition_variable acqThreadWaitCondition;
-    
 };
 
 }
