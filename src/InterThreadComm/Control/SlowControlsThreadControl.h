@@ -37,15 +37,17 @@ class SlowControlsThreadControl
 public:
     //construction and destruction
     SlowControlsThreadControl():
-        currentState(SlowControlsThreadState::Stopped), threadWaiting(false),
-        threadSleeping(false), threadDone(false){}
+        currentState(SlowControlsThreadState::Stopped), threadWriting(false),
+        threadPolling(false), threadStopped(false), threadTerminated(false){}
     ~SlowControlsThreadControl(){}
     
     //functions for the slow controls thread to access
     SlowControlsThreadState getState(){return this->currentState.load();}
     void waitForNewState();
     void slowControlsThreadSleep(const boost::chrono::nanoseconds& sleepTime);
-    void setDone(){this->threadDone.store(true);}
+    void acknowledgeTerminate(){this->threadTerminated.store(true);}
+    void acknowledgePolling(){threadPolling.store(false);}
+    void acknowledgeWriting(){threadWriting.store(false);}
     
     //functions for the UI thread to access
     void setToTerminate()
@@ -60,6 +62,8 @@ public:
         //another state change, this way it cannot have that happen
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            //check to make sure the state was not already terminate
+            if(currentState.load() != SlowControlsThreadState::Terminate) threadTerminated.store(false);
             this->currentState.store(SlowControlsThreadState::Terminate);
         }
         this->waitCondition.notify_all();
@@ -76,6 +80,8 @@ public:
         //another state change, this way it cannot have that happen
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            //check to make sure the state was not already Stopped
+            if(currentState.load() != SlowControlsThreadState::Stopped) threadStopped.store(false);
             this->currentState.store(SlowControlsThreadState::Stopped);
         }
         this->waitCondition.notify_all();
@@ -92,6 +98,8 @@ public:
         //another state change, this way it cannot have that happen
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            //check to make sure the state was not already polling
+            if(currentState.load() != SlowControlsThreadState::Polling) threadPolling.store(false);
             this->currentState.store(SlowControlsThreadState::Polling);
         }
         this->waitCondition.notify_all();
@@ -108,25 +116,30 @@ public:
         //another state change, this way it cannot have that happen
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            //check to make sure the state was not already writing
+            if(currentState.load() != SlowControlsThreadState::Writing) threadWriting.store(false);
             this->currentState.store(SlowControlsThreadState::Writing);
         }
         this->waitCondition.notify_all();
     }
-    bool isWaiting(){return this->threadWaiting.load();}
-    bool isSleeping(){return this->threadSleeping.load();}
-    bool isDone(){return this->threadDone.load();}
+    bool isWriting(){return this->threadWriting.load();}
+    bool isPolling(){return this->threadPolling.load();}
+    bool isStopped(){return this->threadStopped.load();}
+    bool isTerminated(){return this->threadTerminated.load();}
     
 private:
+    void acknowledgeStop(){threadStopped.store(false);}
+    
     std::atomic<SlowControlsThreadState> currentState;
+    //termination checking
+    std::atomic_bool threadTerminated;
+    std::atomic_bool threadStopped;
+    std::atomic_bool threadPolling;
+    std::atomic_bool threadWriting;
     
     //thread syncronization
     boost::mutex waitMutex;
     boost::condition_variable waitCondition;
-    std::atomic_bool threadWaiting;
-    std::atomic_bool threadSleeping;
-    
-    //termination checking
-    std::atomic_bool threadDone;
 };
 
 }

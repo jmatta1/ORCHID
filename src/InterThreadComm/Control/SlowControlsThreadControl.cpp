@@ -30,28 +30,25 @@ void SlowControlsThreadControl::waitForNewState()
 {
     //lock the wait mutex
     boost::unique_lock<boost::mutex> waitLock(this->waitMutex);
-    //store the current state to check against
-    SlowControlsThreadState oldState = this->currentState.load();
+    this->acknowledgeStop();
     //use the condition variable to wait until the thread is woken
     //since spurious wake up event are possible put the wait inside a loop to
     //check for the condition that made us wait in the first place
-    while(oldState == this->currentState.load())
+    while(this->currentState.load() == SlowControlsThreadState::Stopped)
     {
-        this->threadWaiting.store(true);
         this->waitCondition.wait(waitLock);
-        this->threadWaiting.store(false);
     }
 }
 
 void SlowControlsThreadControl::slowControlsThreadSleep(const boost::chrono::nanoseconds& sleepTime)
 {
+    //lock the wait mutex
+    boost::unique_lock<boost::mutex> waitLock(this->waitMutex);
     //figure out the time that we need to sleep until
     auto endTime(boost::chrono::system_clock::now() + sleepTime);
     //set up the variable that will hold how the condition variable returned (timeout or something else)
     boost::cv_status condVarStatus(boost::cv_status::no_timeout);
-    //lock the wait mutex
-    boost::unique_lock<boost::mutex> waitLock(this->waitMutex);
-    //store the current state to check against
+    //store the current state to check against, this way if we are wakened by a state 
     SlowControlsThreadState oldState = this->currentState.load();
     //use the condition variable to sleep. We do this instead of this_thread::sleep because this way
     //another thread can wake us prematurely if there was a change of state while we are sleeping
@@ -63,9 +60,7 @@ void SlowControlsThreadControl::slowControlsThreadSleep(const boost::chrono::nan
     //then we had a spurious wakeup and we need to go back to sleep until our chosen time
     while(oldState == this->currentState.load() && condVarStatus != boost::cv_status::timeout)
     {
-        this->threadSleeping.store(true);
         condVarStatus = this->waitCondition.wait_until(waitLock, endTime);
-        this->threadSleeping.store(false);
     }
 }
 

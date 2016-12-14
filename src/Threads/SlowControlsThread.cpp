@@ -59,20 +59,24 @@ void SlowControlsThread::operator ()()
             break;
         case InterThread::SlowControlsThreadState::Stopped:
             //if we are stopped, then wait to not be stopped
+            //there is no need to acknowledge stop, that happens in wait for new state
+            //this->sctControl->acknowledgeStop();
             BOOST_LOG_SEV(lg, Information) << "SC Thread: Stopped";
             this->sctControl->waitForNewState();
             break;
         case InterThread::SlowControlsThreadState::Polling:
+            this->sctControl->acknowledgePolling();
             this->doPollingLoop();
             break;
         case InterThread::SlowControlsThreadState::Writing:
             //call the writing loop
+            this->sctControl->acknowledgeWriting();
             this->doWritingLoop();
             break;
         }
     }
     //just before we exit, tell the controller that we have exited
-    this->sctControl->setDone();
+    this->sctControl->acknowledgeTerminate();
 }
 
 void SlowControlsThread::doPollingLoop()
