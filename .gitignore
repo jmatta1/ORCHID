@@ -2,6 +2,7 @@
 *.mk
 build
 CMakeLists.txt.user
+CMakeLists.txt.user.301bdbd
 orchid
 *.autosave
 orchid_*.log
