@@ -39,10 +39,14 @@ void ProcessingThread::operator()()
             break;
         case InterThread::ProcessingThreadState::Stopped:
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Stopped and waiting for instructions";
+            //There is no need to acknowledge stop, it happens inside wait for change
+            //this->controller->acknowledgeStop();
             this->controller->waitForChange();
             break;
         case InterThread::ProcessingThreadState::Running:
             BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Starting Processing";
+            //acknowledge that we are starting
+            this->controller->acknowledgeStart();
             //create a couple intermediates to hold the runTitle and runNumber
             std::string runTitle;
             int runNumber;

@@ -33,13 +33,15 @@ enum class ProcessingThreadState : char {Running, Stopped, Terminate};
 class ProcessingThreadControl
 {
 public:
-    ProcessingThreadControl():procState(ProcessingThreadState::Stopped),
-        termAckCount(0), waitCount(0) {}
+    ProcessingThreadControl():
+        procState(ProcessingThreadState::Stopped), termAckCount(0),
+        stopAckCount(0), startAckCount(0) {}
     
     //functions to be accessed by the processing threads
     ProcessingThreadState getCurrentState(){return procState.load();}
     void waitForChange();
     void acknowledgeTerminate(){termAckCount.fetch_add(1);}
+    void acknowledgeStart(){startAckCount.fetch_add(1);}
 
     //functions to be accessed by the UI thread
     void setToRunning()
@@ -47,6 +49,7 @@ public:
         //enter an artificial block to create and destroy lock before we notify
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            if(procState.load() != ProcessingThreadState::Running) startAckCount.store(0);
             procState.store(ProcessingThreadState::Running);
         }
         procThreadWaitCondition.notify_all();
@@ -56,6 +59,7 @@ public:
         //enter an artificial block to create and destroy lock before we notify
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            if(procState.load() != ProcessingThreadState::Stopped) stopAckCount.store(0);
             procState.store(ProcessingThreadState::Stopped);
         }
         procThreadWaitCondition.notify_all();
@@ -65,19 +69,24 @@ public:
         //enter an artificial block to create and destroy lock before we notify
         {
             boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            if(procState.load() != ProcessingThreadState::Terminate) termAckCount.store(0);
             procState.store(ProcessingThreadState::Terminate);
         }
         procThreadWaitCondition.notify_all();
     }
     
-    int getThreadsWaiting(){return waitCount.load();}
+    int getThreadsRunning(){return startAckCount.load();}
+    int getThreadsWaiting(){return stopAckCount.load();}
     int getThreadsTerminated(){return termAckCount.load();}
     
 private:
+    void acknowledgeStop(){stopAckCount.fetch_add(1);}
+    
     std::atomic<ProcessingThreadState> procState;
     std::atomic_uint termAckCount;
+    std::atomic_uint stopAckCount;
+    std::atomic_uint startAckCount;
     
-    std::atomic_uint waitCount;
     boost::mutex waitMutex;
     boost::condition_variable procThreadWaitCondition;
 };

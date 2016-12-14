@@ -28,11 +28,10 @@ namespace InterThread
 void ProcessingThreadControl::waitForChange()
 {
     boost::unique_lock<boost::mutex> waitLock(waitMutex);
+    acknowledgeStop();
     while(this->procState.load() == ProcessingThreadState::Stopped)
     {
-        waitCount.fetch_add(1);
         procThreadWaitCondition.wait(waitLock);
-        waitCount.fetch_add(-1);
     }
     //the lock will release on deconstruction
 }
