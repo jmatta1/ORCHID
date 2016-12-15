@@ -31,14 +31,11 @@ HFIR background monitoring wall.
 #include"InterThreadComm/Data/AcquisitionData.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"InterThreadComm/InterThreadQueueSizes.h"
-#include"InterThreadComm/MultiQueuePair.h"
 #include"InterThreadComm/QueuePair.h"
 #include"Events/SlowControlsEvent.h"
 #include"Events/DppPsdEvent.h"
 // ORCHID interprocess communication control objects
-#include"InterThreadComm/Control/SlowControlsThreadController.h"
-#include"InterThreadComm/Control/AcquisitionThreadControl.h"
-#include"InterThreadComm/Control/ProcessingThreadControl.h"
+#include"InterThreadComm/Control/OverallControl.h"
 // ORCHID device objects
 #include"Hardware//HVLib/MpodController.h"
 #include"Hardware/HVLib/SnmpUtilCommands.h"
@@ -97,7 +94,6 @@ int main(int argc, char* argv[])
     InputParser::DigitizerModuleData digitizerModuleData;
     InputParser::DigitizerChannelData digitizerChannelData;
     
-    //TODO: Add reading of digitizer module and channel csv files
     //TODO: Also add the reading of the mapping csv which maps digitizer channel to voltage channel
     if(!Utility::parseAndValidateInput(params, inputFileName) ||
        !Utility::parseAndValidateMpodModule(mpodModuleData, params.powerBlock->perModuleParameterFile) ||
@@ -170,9 +166,6 @@ int main(int argc, char* argv[])
     
     // For controlling SlowControlsThread
     InterThread::SlowControlsThreadController* sctController = new InterThread::SlowControlsThreadController();
-    
-    // For controlling FileOutputThread
-    InterThread::FileOutputThreadController* fotController = new InterThread::FileOutputThreadController();
     
     // For controlling EventProcThread(s)
     InterThread::ProcessingThreadControl* prController = new  InterThread::ProcessingThreadControl();
