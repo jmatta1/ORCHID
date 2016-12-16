@@ -1,7 +1,7 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file OrchidLogger.h
+** @file SecantLogger.h
 ** @author James Till Matta
 ** @date 03 June, 2016
 ** @brief
@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_UTILITY_ORCHIDLOGGER_H
-#define ORCHID_SRC_UTILITY_ORCHIDLOGGER_H
+#ifndef ORCHID_SRC_UTILITY_SECANTLOGGER_H
+#define ORCHID_SRC_UTILITY_SECANTLOGGER_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -40,6 +40,6 @@ enum LogSeverity
 };
 
 //make a global logger
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(OrchidLog, boost::log::sources::severity_logger_mt<LogSeverity>)
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(SecantLog, boost::log::sources::severity_logger_mt<LogSeverity>)
 
-#endif //ORCHID_SRC_UTILITY_ORCHIDLOGGER_H
+#endif //ORCHID_SRC_UTILITY_SECANTLOGGER_H
