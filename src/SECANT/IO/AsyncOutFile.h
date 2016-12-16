@@ -32,7 +32,9 @@
 #include<boost/lockfree/queue.hpp>
 // includes from ORCHID
 #include<InterThreadComm/QueueTMP.h>
-#include"Utility/OrchidLogger.h"
+#include"SECANT/Utility/SecantLogger.h"
+namespace SECANT
+{
 
 namespace IO
 {
@@ -442,5 +444,6 @@ void AsyncOutFile<RetQueueType>::writeBuf(char* outBuffer, int size)
     }
 }
 
+}
 }
 #endif //ORCHID_SRC_IO_ASYNCOUTFILE_H
