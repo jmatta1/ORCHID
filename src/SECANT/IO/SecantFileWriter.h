@@ -30,6 +30,8 @@
 #include"AsyncOutFile.h"
 #include"InterThreadComm/Data/FileData.h"
 #include"Utility/CommonTypeDefs.h"
+namespace SECANT
+{
 
 namespace IO
 {
@@ -138,5 +140,6 @@ private:
     Utility::LoggerType& lg;
 };
 
+}
 }
 #endif //ORCHID_SRC_IO_TEMPLARFILE_H

@@ -26,11 +26,13 @@
 #include<chrono>
 #include<sstream>
 // includes from other libraries
-#include<boost/date_time/posix_time/posix_time.hpp>
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
 // includes from ORCHID
-#include"Utility/SecantConfig.h"
+#include"SECANT/Utility/SecantConfig.h"
+#include"SECANT/Utility/SecantTime.h"
+namespace SECANT
+{
 
 namespace IO
 {
@@ -50,7 +52,7 @@ static const unsigned int SecantBufferStartSeparator = 0xF0F0F0F0;
 }
 
 static const unsigned int MaxBuffersPerFile=1000;
-static const boost::posix_time::ptime Epoch(boost::posix_time::time_from_string("1970-01-01 00:00:00.000"));
+
 
 namespace HeaderProperties
 {
@@ -263,8 +265,7 @@ void SecantFileWriter::prepAndWriteFileHeader()
     reinterpret_cast<unsigned short*>(&(this->currentBuffer[this->buffInd]))[0] = SECANT_PATCH_VERSION;
     this->buffInd += 2;
     //write the number of microseconds after the unix epoch when this file header was written
-    boost::posix_time::time_duration epochTime = (boost::posix_time::microsec_clock::universal_time() - Epoch);
-    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_microseconds();
+    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = Secant::Time::getTimeSinceEpoch();
     this->buffInd += 8;
     //write the ascii string representing the local time when this file was written
     std::string fileTimeString = boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time());
@@ -337,8 +338,7 @@ void SecantFileWriter::writeBufferHeader()
     reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = 0;
     this->buffInd += 4;
     //then we write the time this buffer is started
-    boost::posix_time::time_duration epochTime = (boost::posix_time::microsec_clock::universal_time() - Epoch);
-    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = epochTime.total_microseconds();
+    reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = Secant::Time::getTimeSinceEpoch();
     this->buffInd += 8;
     //now we write a stand in for the time the buffer is finished
     reinterpret_cast<long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0;
@@ -358,8 +358,7 @@ void SecantFileWriter::finalizeDataBuffer()
     //then we write the number of events into the header
     reinterpret_cast<unsigned int*>(&(this->currentBuffer[BufferProperties::EventCountIndex]))[0] = this->eventCount;
     //then we write the time this buffer is finalized
-    boost::posix_time::time_duration epochTime = (boost::posix_time::microsec_clock::universal_time() - Epoch);
-    reinterpret_cast<long long*>(&(this->currentBuffer[BufferProperties::StopTimeIndex]))[0] = epochTime.total_microseconds();
+    reinterpret_cast<long long*>(&(this->currentBuffer[BufferProperties::StopTimeIndex]))[0] = Secant::Time::getTimeSinceEpoch();
     //now skip past the first 32 bytes of the buffer and start writing the 4 byte 32 bit crcs
     unsigned int writeInd   = BufferProperties::CrcStartIndex;
     unsigned int readInd    = BufferProperties::OverHead;
@@ -378,4 +377,5 @@ void SecantFileWriter::finalizeDataBuffer()
     }
 }
 
+}
 }
