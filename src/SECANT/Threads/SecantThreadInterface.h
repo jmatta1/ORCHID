@@ -18,6 +18,9 @@
 **
 ********************************************************************************
 *******************************************************************************/
+#ifndef SECANT_SRC_THREADS_SECANTTHREADINTERFACE_H
+#define SECANT_SRC_THREADS_SECANTTHREADINTERFACE_H
+
 
 namespace Secant
 {
@@ -34,3 +37,4 @@ public:
 }
 
 }
+#endif //SECANT_SRC_THREADS_SECANTTHREADINTERFACE_H
