@@ -56,7 +56,7 @@ public:
     * called once in the thread functor's lifetime I deem this virtual call to
     * be an acceptable cost
     */
-    virtual ~SecantThreadInterface;
+    virtual ~SecantThreadInterface(){}
     
     /** @brief Function Call Operator
     * 
