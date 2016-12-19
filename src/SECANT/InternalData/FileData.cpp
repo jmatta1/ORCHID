@@ -24,7 +24,7 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace SECANT
+namespace Secant
 {
 
 namespace InterThreadData

@@ -27,7 +27,7 @@
 // includes from other libraries
 #include<boost/thread.hpp>
 // includes from ORCHID
-namespace SECANT
+namespace Secant
 {
 
 namespace InterThreadData

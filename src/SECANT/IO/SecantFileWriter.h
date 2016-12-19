@@ -30,7 +30,7 @@
 #include"AsyncOutFile.h"
 #include"SECANT/InternalData/FileData.h"
 #include"Utility/CommonTypeDefs.h"
-namespace SECANT
+namespace Secant
 {
 
 namespace IO

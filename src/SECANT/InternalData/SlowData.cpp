@@ -25,7 +25,7 @@
 // includes from ORCHID
 #include"Hardware/HVLib/VoltageData.h"
 
-namespace SECANT
+namespace Secant
 {
 
 namespace InterThreadData

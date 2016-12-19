@@ -31,7 +31,7 @@
 // includes from ORCHID
 #include"SECANT/Utility/SecantConfig.h"
 #include"SECANT/Utility/SecantTime.h"
-namespace SECANT
+namespace Secant
 {
 
 namespace IO

@@ -33,7 +33,7 @@
 // includes from ORCHID
 #include<InterThreadComm/QueueTMP.h>
 #include"SECANT/Utility/SecantLogger.h"
-namespace SECANT
+namespace Secant
 {
 
 namespace IO
