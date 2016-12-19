@@ -27,7 +27,10 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace InterThread
+namespace Secant
+{
+
+namespace InterThreadCtrl
 {
 
 enum class SlowControlsThreadState  : char {Terminate, Stopped, Polling, Writing};
@@ -142,6 +145,7 @@ private:
     boost::condition_variable waitCondition;
 };
 
+}
 }
 
 #endif //ORCHID_SRC_INTERTHREADCOMM_CONTROLS_SLOWCONTROLSTHREADCONTROL_H

@@ -23,7 +23,10 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace InterThread
+namespace Secant
+{
+
+namespace InterThreadCtrl
 {
 
 void SlowControlsThreadControl::waitForNewState()
@@ -64,4 +67,5 @@ void SlowControlsThreadControl::slowControlsThreadSleep(const boost::chrono::nan
     }
 }
 
+}
 }

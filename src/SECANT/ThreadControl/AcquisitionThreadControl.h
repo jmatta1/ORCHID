@@ -25,7 +25,10 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 
-namespace InterThread
+namespace Secant
+{
+
+namespace InterThreadCtrl
 {
 
 enum class AcquisitionThreadState : char {Acquiring, Stopped, Terminate};
@@ -94,5 +97,5 @@ private:
 };
 
 }
-
+}
 #endif //ORCHID_SRC_INTERTHREADCOMM_CONTROL_DIGITIZERTHREADCONTROL_H

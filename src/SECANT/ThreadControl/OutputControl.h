@@ -28,7 +28,10 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 
-namespace InterThread
+namespace Secant
+{
+
+namespace InterThreadCtrl
 {
 
 class OutputControl
@@ -53,5 +56,6 @@ private:
     std::atomic_int runNumber;
 };
 
+}
 }
 #endif //ORCHID_SRC_FILE_RUNDATA_H

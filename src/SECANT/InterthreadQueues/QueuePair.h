@@ -27,7 +27,9 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 #include"QueueTMP.h"
-#include"Utility/OrchidLogger.h"
+
+namespace Secant
+{
 
 namespace InterThread
 {
@@ -204,5 +206,6 @@ bool QueuePair<QueueContent, QueueType>::tryProducerPop(QueueContent& data)
 }
 
 
+}
 }
 #endif //ORCHID_SRC_INTERTHREADCOMM_QUEUEPAIR_H

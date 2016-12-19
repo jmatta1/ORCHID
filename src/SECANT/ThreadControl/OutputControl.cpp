@@ -24,7 +24,10 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace InterThread
+namespace Secant
+{
+
+namespace InterThreadCtrl
 {
 
 //setters
@@ -44,4 +47,5 @@ void OutputControl::getRunTitle(std::string& rTitle)
     rTitle = runTitle;
 }
 
+}
 }

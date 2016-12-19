@@ -25,7 +25,10 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 
-namespace InterThread
+namespace Secant
+{
+
+namespace InterThreadCtrl
 {
 
 enum class ProcessingThreadState : char {Running, Stopped, Terminate};
@@ -91,5 +94,6 @@ private:
     boost::condition_variable procThreadWaitCondition;
 };
 
+}
 }
 #endif //ORCHID_SRC_INTERTHREADCOMM_CONTROL_PROCESSINGTHREADCONTROL_H

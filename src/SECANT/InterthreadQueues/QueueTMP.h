@@ -31,6 +31,9 @@
 #include<boost/thread.hpp>
 // includes from ORCHID
 
+namespace Secant
+{
+
 namespace InterThread
 {
 
@@ -138,5 +141,6 @@ struct WakeAllConditionsFunctor
     int operator()(boost::condition_variable& condVar){condVar.notify_all(); return 0;}
 };
 
+}
 }
 #endif //ORCHID_SRC_INTERTHREADCOMM_MULTIQUEUETMP_H

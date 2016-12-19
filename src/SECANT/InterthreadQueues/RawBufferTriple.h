@@ -19,6 +19,9 @@
 #ifndef ORCHID_SRC_INTERTHREADCOMM_RAWBUFFER_TRIPLE_H
 #define ORCHID_SRC_INTERTHREADCOMM_RAWBUFFER_TRIPLE_H
 
+namespace Secant
+{
+
 namespace InterThread
 {
 
@@ -36,5 +39,6 @@ struct RawBufferTriple
     BufferInfo info;
 };
 
+}
 }
 #endif //ORCHID_SRC_INTERTHREADCOMM_RAWBUFFER_TRIPLE_H

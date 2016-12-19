@@ -22,7 +22,10 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace InterThread
+namespace Secant
+{
+
+namespace InterThreadCtrl
 {
 
 void ProcessingThreadControl::waitForChange()
@@ -36,4 +39,5 @@ void ProcessingThreadControl::waitForChange()
     //the lock will release on deconstruction
 }
 
+}
 }
