@@ -61,7 +61,7 @@ static const unsigned long long int SecantByteOrderMagicNumber = 0x0102040810204
 static const unsigned long long int SecantFileHeaderTerminator = 0xF0F0F0F0F0F0F0F0ULL;
 }
 
-SecantFileWriter::SecantFileWriter(InterThread::FileData *fileDat,
+SecantFileWriter::SecantFileWriter(InterThreadData::FileData *fileDat,
                                    Utility::LoggerType& logger, int fNumber,
                                    const std::string &baseOutputDirectory):
     currentBuffer(nullptr), buffInd(0), bufferNumber(0),

@@ -27,8 +27,10 @@
 // includes from other libraries
 #include<boost/thread.hpp>
 // includes from ORCHID
+namespace SECANT
+{
 
-namespace InterThread
+namespace InterThreadData
 {
 
 class FileData
@@ -69,5 +71,6 @@ private:
     std::atomic_bool sequenceNumberTest;
 };
 
+}
 }
 #endif //ORCHID_SRC_FILE_FILEINFO_H

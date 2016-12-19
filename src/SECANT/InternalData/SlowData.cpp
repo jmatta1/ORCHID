@@ -25,7 +25,10 @@
 // includes from ORCHID
 #include"Hardware/HVLib/VoltageData.h"
 
-namespace InterThread
+namespace SECANT
+{
+
+namespace InterThreadData
 {
 
 SlowData::SlowData(int numVolChan, int numTempChan):
@@ -279,4 +282,5 @@ void SlowData::genChannelInfoString(int channel, std::string& out)
     out = output.str();
 }
 
+}
 }

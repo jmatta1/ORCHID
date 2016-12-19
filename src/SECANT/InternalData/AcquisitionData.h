@@ -26,7 +26,10 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace InterThread
+namespace SECANT
+{
+
+namespace InterThreadData
 {
 
 struct AcquisitionData
@@ -46,5 +49,6 @@ struct AcquisitionData
     int numModules;
 };
 
+}
 }
 #endif //ORCHID_SRC_DIGILIB_RATEDATA_H

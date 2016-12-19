@@ -23,7 +23,10 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-namespace InterThread
+namespace SECANT
+{
+
+namespace InterThreadData
 {
 
 AcquisitionData::AcquisitionData(int numDigiChan, int numMods):
@@ -59,4 +62,4 @@ void AcquisitionData::clearTrigs()
 }
 
 }
-
+}

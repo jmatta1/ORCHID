@@ -28,8 +28,13 @@
 // includes from ORCHID
 #include"Hardware/HVLib/VoltageData.h"
 
-namespace InterThread
+namespace SECANT
 {
+
+namespace InterThreadData
+{
+
+}
 struct SlowData
 {
     SlowData(int numVolChan, int numTempChan);
@@ -102,5 +107,6 @@ struct SlowData
     int numTemperatureChannels;
 };
 
+}
 }
 #endif //ORCHID_SRC_SLOWCONTROLS_SLOWDATA_H

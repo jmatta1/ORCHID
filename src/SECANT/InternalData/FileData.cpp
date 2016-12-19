@@ -24,7 +24,10 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace InterThread
+namespace SECANT
+{
+
+namespace InterThreadData
 {
 
 FileData::FileData():fileName(""), sequenceNumber(0), size(0),
@@ -48,4 +51,5 @@ void FileData::getFileName(std::string& fName)
     fileNameTest.store(false);
 }
 
+}
 }

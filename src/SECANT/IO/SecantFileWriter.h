@@ -28,7 +28,7 @@
 #include<boost/crc.hpp>
 // includes from ORCHID
 #include"AsyncOutFile.h"
-#include"InterThreadComm/Data/FileData.h"
+#include"SECANT/InternalData/FileData.h"
 #include"Utility/CommonTypeDefs.h"
 namespace SECANT
 {
@@ -54,7 +54,7 @@ typedef boost::lockfree::spsc_queue<char*, boost::lockfree::capacity<BufferCount
 class SecantFileWriter
 {
 public:
-    SecantFileWriter(InterThread::FileData* fileDat, Utility::LoggerType& logger,
+    SecantFileWriter(InterThreadData::FileData* fileDat, Utility::LoggerType& logger,
                      int fNumber, const std::string& baseOutputDirectory);
     ~SecantFileWriter();
     //this function handles getting new parameters, it is called by the thread
@@ -131,7 +131,7 @@ private:
     
     //statistics variable
     //this is the variable that stores file statistics
-    InterThread::FileData* fileData;
+    InterThreadData::FileData* fileData;
     
     //mutex to lock when modifying the filesystem directory structure
     static std::mutex fileSystemLock;
