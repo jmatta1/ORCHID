@@ -25,7 +25,14 @@
 #ifndef SECANT_SRC_THREADS_SECANTSLOWCONTROLSTHREAD_H
 #define SECANT_SRC_THREADS_SECANTSLOWCONTROLSTHREAD_H
 
+// includes for C system headers
+// includes for C++ system headers
+#include<memory>
+#include<vector>
+// includes from other libraries
+// includes from SECANT
 #include"SECANT/UserInterfaces/SlowControlsInterface.h"
+#include"SECANT/IO/SecantFileWriter.h"
 
 namespace Secant
 {
@@ -47,8 +54,10 @@ namespace Threads
  */
 class SecantSlowControlsThread
 {
+    using HardwareList = std::vector<std::unique_ptr<Interfaces::SlowControlsInterface> >;
 public:
-    /** @brief Default constructor
+    /**
+     * @brief SecantSlowControlsThread Default Contructor
      * 
      * Builds a new slow controls thread functor.
      */
@@ -57,7 +66,7 @@ public:
     
     /** @brief Register Slow Controls Hardware Object
      * 
-     * @param scHardware Pointer to an object that inherits the SlowControlsInterface
+     * @param newHardware unique pointer to an object that inherits the SlowControlsInterface
      * 
      * @return successful True if the registration occurred before this thread was started, false otherwise
      * 
@@ -65,15 +74,46 @@ public:
      * vector of pointers that are to be checked every loop. It will not do this
      * if the thread is actually running as opposed to sitting idle before starting
      */
-    bool registerSlowControlsObject(Interfaces::SlowControlsInterface* newHardware);
+    bool registerSlowControlsObject(std::unique_ptr<Interfaces::SlowControlsInterface>&& newHardware);
     
-    /** @brief Function Call Operator
+    /** @brief operator()
     * 
     * This function is the entry point for the thread to call. Within this
     * function the current state of the thread is examined and appropriate
     * actions are taken based on that
     */
-    virtual void operator()();
+    void operator()();
+private:
+    //the actual list of slow controls devices to be probed
+    /**
+     * @brief hardwareList
+     * 
+     * This vector stores the list of unique pointers to the slow controls hardware
+     */
+    HardwareList hardwareList;
+
+    //the file to hold the output of the slow controls thread
+    /**
+     * @brief outputFile
+     * 
+     * The file that is used to write slow controls data to disk
+     */
+    IO::SecantFileWriter outputFile;
+    
+    /**
+     * @brief outputArray
+     * 
+     * This holds the character array that slow controls dumps data to for event
+     * outputting
+     */
+    std::unique_ptr<char*> outputArray;
+    
+    /**
+     * @brief outputArraySize
+     * 
+     * Contains the size of the array that slow controls dumps data to
+     */
+    std::size_t outputArraySize;
 };
 
 }
