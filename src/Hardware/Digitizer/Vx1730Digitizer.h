@@ -80,6 +80,13 @@ private:
     void writeIndividualRegisterData();
     void calculateMaximumSizes();
     
+    //wait for SPI flags to clear
+    void openDigitizer();
+    void clearResetAndSync();
+    void calibrateDigitizer();
+    void waitForChanSpiIdle(unsigned chNum);
+    void waitForChanCal(unsigned chNum);
+    
     //functions to calculate register values for common registers
     unsigned int calculateBoardConfigRegVal();
     void calculateAcqCtrlRegBase();
