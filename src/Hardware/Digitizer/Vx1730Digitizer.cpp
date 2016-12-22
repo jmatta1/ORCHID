@@ -93,9 +93,6 @@ Vx1730Digitizer::~Vx1730Digitizer()
 
 void Vx1730Digitizer::setupDigitizer()
 {
-    using LowLvl::Vx1730WriteRegisters;
-    using LowLvl::Vx1730CommonWriteRegistersAddr;
-    
     //check to make sure we have 8 or 16 channels
     if ((numChannel != 8) && (numChannel != 16))
     {
@@ -157,7 +154,13 @@ void Vx1730Digitizer::stopAcquisition()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Stopping/Disarming Acqusition On Digitizer #" << moduleNumber;
     //now take the acquisition control register base and write it, it should already have bit[2] == 0
-    CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acquisitionCtrlRegBase);
+    CAENComm_ErrorCode errVal;
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acquisitionCtrlRegBase);
+    if(errVal < 0)
+    {
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Stopping Acquisition For Digitizer #" << moduleNumber;
+        this->writeErrorAndThrow(errVal);
+    }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Stopped/Disarmed";
     acqRunning = false;
 }
