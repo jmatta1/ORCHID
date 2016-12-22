@@ -26,6 +26,7 @@
 #include"InputLib/Blocks/DigitizerModuleData.h"
 #include"InputLib/Blocks/DigitizerChannelData.h"
 #include"Utility/OrchidLogger.h"
+#include"Vx1730DigitizerRegisters.h"
 
 namespace Digitizer
 {
@@ -75,10 +76,47 @@ private:
     unsigned int readImpromptuDataAvailable(unsigned int* buffer);
     unsigned int readInterruptDataAvailable(unsigned int* buffer);
     
+    unsigned int readEvent(unsigned int* buffer);
+    bool isEventReady()
+    {
+        using LowLvl::Vx1730ReadRegisters;
+        using LowLvl::Vx1730CommonReadRegistersAddr;
+        CAENComm_ErrorCode readError;
+        unsigned int readValue = 0;
+        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Ready Status From Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readError);
+        }
+        return ((readValue & 0x00000001)!=0);
+    }
+    
+    void forceDataFlush()
+    {
+        using LowLvl::Vx1730WriteRegisters;
+        using LowLvl::Vx1730IbcastWriteRegistersAddr;
+        //hit the software force data flush for a data flush
+        CAENComm_ErrorCode readError;
+        readError = CAENComm_Write32(digitizerHandle, Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>::value, 0x00000001);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Forcing data flush for digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readError);
+        }
+    }
+    
     void writeCommonRegisterData();
     void writeGroupRegisterData();
     void writeIndividualRegisterData();
     void calculateMaximumSizes();
+    
+    //wait for SPI flags to clear
+    void openDigitizer();
+    void clearResetAndSync();
+    void calibrateDigitizer();
+    void waitForChanSpiIdle(unsigned chNum);
+    void waitForChanCal(unsigned chNum);
     
     //functions to calculate register values for common registers
     unsigned int calculateBoardConfigRegVal();
