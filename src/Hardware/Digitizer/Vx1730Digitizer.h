@@ -26,6 +26,7 @@
 #include"InputLib/Blocks/DigitizerModuleData.h"
 #include"InputLib/Blocks/DigitizerChannelData.h"
 #include"Utility/OrchidLogger.h"
+#include"Vx1730DigitizerRegisters.h"
 
 namespace Digitizer
 {
@@ -74,6 +75,22 @@ private:
     unsigned int waitForInterruptToReadData(unsigned int* buffer);
     unsigned int readImpromptuDataAvailable(unsigned int* buffer);
     unsigned int readInterruptDataAvailable(unsigned int* buffer);
+    
+    unsigned int readEvent(unsigned int* buffer);
+    bool isEventReady()
+    {
+        using LowLvl::Vx1730ReadRegisters;
+        using LowLvl::Vx1730CommonReadRegistersAddr;
+        CAENComm_ErrorCode readError;
+        unsigned int readValue = 0;
+        readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::ReadoutStatus>::value, &readValue);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Ready Status From Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readError);
+        }
+        return ((readValue & 0x00000001)!=0);
+    }
     
     void writeCommonRegisterData();
     void writeGroupRegisterData();
