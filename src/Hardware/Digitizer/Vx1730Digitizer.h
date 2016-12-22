@@ -92,6 +92,20 @@ private:
         return ((readValue & 0x00000001)!=0);
     }
     
+    void forceDataFlush()
+    {
+        using LowLvl::Vx1730WriteRegisters;
+        using LowLvl::Vx1730IbcastWriteRegistersAddr;
+        //hit the software force data flush for a data flush
+        CAENComm_ErrorCode readError;
+        readError = CAENComm_Write32(digitizerHandle, Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>::value, 0x00000001);
+        if(readError < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Forcing data flush for digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readError);
+        }
+    }
+    
     void writeCommonRegisterData();
     void writeGroupRegisterData();
     void writeIndividualRegisterData();

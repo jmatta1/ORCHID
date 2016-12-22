@@ -216,17 +216,7 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
 //returns bytes read
 unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
 {
-    using LowLvl::Vx1730WriteRegisters;
-    using LowLvl::Vx1730IbcastWriteRegistersAddr;
-    //hit the software force data flush for a data flush
-    CAENComm_ErrorCode readError;
-    readError = CAENComm_Write32(digitizerHandle, Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ForcedDataFlush>::value, 0x00000001);
-    if(readError < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Forcing data flush for digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(readError);
-    }
-    
+    this->forceDataFlush();    
     bool eventReady = true;
     unsigned int* bufferEdge = buffer;
     unsigned int dataRead = 0;
@@ -279,6 +269,7 @@ unsigned int Vx1730Digitizer::readEvent(unsigned int* buffer)
     int sizeRead=0;
     unsigned int* bufferEdge = buffer;
     unsigned int eventSize = 0;
+    unsigned int dataRead = 0;
     //first read the size of the data to be read
     CAENComm_ErrorCode readError;
     readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
