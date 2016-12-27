@@ -20,6 +20,7 @@
 #define ORCHID_SRC_HARDWARE_DIGITIZER_DIGITIZER_H
 // includes for C system headers
 // includes for C++ system headers
+#include<array>
 // includes from other libraries
 #include<CAENComm.h>
 // includes from ORCHID
@@ -30,6 +31,47 @@
 
 namespace Digitizer
 {
+
+enum class InternalPulserRate {OneKHz, TenKHz, HundredKHz, OneMHz};
+struct PulserSetting
+{
+public:
+    void setChannelRate(int channel, InternalPulserRate rate)
+    {
+        active[channel] = true;
+        rates[channel] = lookupRateValue(rate);
+    }
+    void setAllChannelRates(InternalPulserRate rate)
+    {
+        unsigned int val = lookupRateValue(rate);
+        for(auto&& x: rates) x = val;
+        for(auto&& x: active) x = true;
+    }
+    void disableChannelPulser(int channel)
+    {
+        active[channel] = false;
+        rates[channel] = 0;
+    }
+
+    std::array<unsigned int, 16> rates;
+    std::array<bool, 16> active;
+private:
+    unsigned int lookupRateValue(InternalPulserRate rate)
+    {
+        switch(rate)
+        {
+        case InternalPulserRate::OneKHz:
+            return 0;
+        case InternalPulserRate::TenKHz:
+            return 1;
+        case InternalPulserRate::HundredKHz:
+            return 2;
+        case InternalPulserRate::OneMHz:
+            return 3;
+        }
+    }
+};
+
 //Todo: add some mechanism to reduce the number of individual channel reads
 //  while acquiring data, maybe use the number of aggregates to trigger an IRQ
 //  as a bare minimum to wait for?
@@ -44,6 +86,8 @@ public:
     //parameters, it then needs to wait a little while, run the calibration,
     //and then wait a little more time
     void setupDigitizer();
+    
+    void setupPulsing(PulserSetting& pulseSetting){}
     
     //puts the digitizer in running mode
     void startAcquisition();
