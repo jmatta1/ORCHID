@@ -1061,14 +1061,13 @@ void Vx1730Digitizer::openDigitizer()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     CAENComm_ErrorCode errVal;
     InputParser::LinkType lType = moduleData->linkType[moduleNumber];
-    if(lType == InputParser::LinkType::Optical)
+    if(lType == InputParser::LinkType::DirectOptical)
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via Optical Link, Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
-                                     moduleData->vmeBaseAddr[moduleNumber],
-                                     &(this->digitizerHandle));
+                                     0, &(this->digitizerHandle));
     }
     else
     {
@@ -1085,11 +1084,12 @@ void Vx1730Digitizer::openDigitizer()
     }
     else
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via Optical Link, Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
-                                     0, &(this->digitizerHandle));
+                                     moduleData->vmeBaseAddr[moduleNumber],
+                                     &(this->digitizerHandle));
     }*/
     //check for an error in opening the digitizer
     if (errVal < 0)
