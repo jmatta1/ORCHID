@@ -261,38 +261,39 @@ unsigned int Vx1730Digitizer::readInterruptDataAvailable(unsigned int* buffer)
     }
     return dataRead;
 }
-//MaxMbltReadSizeInLongWords
+
 unsigned int Vx1730Digitizer::readEvent(unsigned int* buffer)
 {
     using LowLvl::Vx1730ReadRegisters;
     using LowLvl::Vx1730CommonReadRegistersAddr;
     int totalSizeRead=0;
     unsigned int* bufferEdge = buffer;
-    unsigned int sizeActuallyRead = 0;
+    int sizeReadInMblt = 0;
     //there is no need to read the size of the event, we will get CAENComm_Terminated when we hit the end in the super sized block scheme
     CAENComm_ErrorCode readResult;
     do
     {
-        int bufferSpaceRemaining = (maxSizeOfBoardAggregateBlock - dataRead);
+        int bufferSpaceRemaining = (maxSizeOfBoardAggregateBlock - totalSizeRead);
         int readMaxSize = ((MaxMbltReadSizeInLongWords > bufferSpaceRemaining) ? bufferSpaceRemaining : MaxMbltReadSizeInLongWords);
+        sizeReadInMblt = 0;
         readResult = CAENComm_MBLTRead(this->digitizerHandle,
                                        Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
                                        bufferEdge,
                                        readMaxSize,
-                                       &sizeActuallyRead);
+                                       &sizeReadInMblt);
 
         if(readResult == CAENComm_Success || readResult == CAENComm_Terminated)
         {//we are either partway through reading the event or done reading the event
             //either way, we need to update size read, if we are done with the read,
             //it does not matter if we update bufferEdge
-            totalSizeRead += sizeActuallyRead;
-            bufferEdge += sizeActuallyRead;
+            totalSizeRead += sizeReadInMblt;
+            bufferEdge += sizeReadInMblt;
             break;
         }
         else
         {
             BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error in Reading Data From Digitizer #" << moduleNumber;
-            this->writeErrorAndThrow(readError);
+            this->writeErrorAndThrow(readResult);
         }
     }
     while(readResult != CAENComm_Terminated);
