@@ -120,20 +120,9 @@ void Vx1730Digitizer::startAcquisition()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Starting/Arming Acqusition On Digitizer #" << moduleNumber ;
     CAENComm_ErrorCode errVal;
-    //now enable interrupt requests in CAENComm
-    errVal = CAENComm_IRQEnable(digitizerHandle);
-    if(errVal < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(errVal);
-    }
+    this->enableInterrupts();
     //now hit the software clear to blank the data
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
-    if(errVal < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Clearing Digitizer For Acquisition Start in Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(errVal);
-    }
+    this->softwareClear();
     //now take the acquisition control register base, add bit 2 and write it
     unsigned int acqusitionRegister = (acquisitionCtrlRegBase | 0x4UL);
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acqusitionRegister);
@@ -205,6 +194,7 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     //presume acqusition has been started, now wait on an interrupt
     CAENComm_ErrorCode readError;
     ++interuptWaitAttempts;
+    this->enableInterrupts();
     readError = CAENComm_IRQWait(digitizerHandle, IrqTimeoutMs);
     if(readError == CAENComm_CommTimeout)
     {//timing out is not an error
@@ -1062,12 +1052,7 @@ void Vx1730Digitizer::clearResetAndSync()
         this->writeErrorAndThrow(errVal);
     }
     //now hit the software clear to blank the data
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000000);
-    if(errVal < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Clearing Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(errVal);
-    }
+    this->softwareClear();
     //hit the sync for force the phase-lock loop to realign all clock outputs
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClckSync>::value, 0x00000000);
     if(errVal < 0)
@@ -1092,7 +1077,12 @@ void Vx1730Digitizer::openDigitizer()
                                      moduleData->vmeBaseAddr[moduleNumber],
                                      &(this->digitizerHandle));
     }
-    else if(lType == InputParser::LinkType::USB)
+    else
+    {
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: No support for non-optical link, digitizers";
+        throw std::runtime_error("Vx1730 Error - Unsupported Connection Type");
+    }
+    /*else if(lType == InputParser::LinkType::USB)
     {
         BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via USB: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_USB,
@@ -1107,7 +1097,7 @@ void Vx1730Digitizer::openDigitizer()
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
                                      0, &(this->digitizerHandle));
-    }
+    }*/
     //check for an error in opening the digitizer
     if (errVal < 0)
     {

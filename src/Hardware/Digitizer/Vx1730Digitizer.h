@@ -106,6 +106,31 @@ private:
         }
     }
     
+    void softwareClear()
+    {
+        using LowLvl::Vx1730WriteRegisters;
+        using LowLvl::Vx1730CommonWriteRegistersAddr;
+        CAENComm_ErrorCode errVal;
+        errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
+        if(errVal < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Clearing Digitizer For Acquisition Start in Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(errVal);
+        }
+    }
+    
+    void enableInterrupts()
+    {
+        CAENComm_ErrorCode errVal;
+        //now enable interrupt requests in CAENComm
+        errVal = CAENComm_IRQEnable(digitizerHandle);
+        if(errVal < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(errVal);
+        }
+    }
+    
     void writeCommonRegisterData();
     void writeGroupRegisterData();
     void writeIndividualRegisterData();
