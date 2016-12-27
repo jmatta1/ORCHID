@@ -59,7 +59,7 @@ public:
     
     //give the max possible size of a buffer in bytes so that they can be pre-
     //allocated for the queueing system
-    int getSizeOfReadBufferIn32BitInts(){return maxSizeOfBoardAggregateBlock;}
+    int getSizeOfReadBufferIn32BitInts(){return maxSizeForAllocation;}
     
     //return the channel 0 index
     int getModuleStartChannel(){return channelStartInd;}
@@ -181,6 +181,7 @@ private:
     int maxSizeOfBoardAggregate;
     int maxSizeOfBoardAggregateBlock;
     int maxBufferFillForAnotherRead;
+    int maxSizeForAllocation;
     //variables to hold persistent values for use later
     unsigned int acquisitionCtrlRegBase;
     

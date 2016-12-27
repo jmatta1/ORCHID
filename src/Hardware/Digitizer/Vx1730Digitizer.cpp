@@ -33,6 +33,8 @@ namespace Digitizer
 
 enum {MultiRWArraySize = 320, IrqTimeoutMs = 5000};
 
+static const int MaxMbltReadSizeIn32bitWords = 0x200000; //8MB
+
 Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* modData,
                                  InputParser::DigitizerChannelData* chanData) :
     moduleNumber(modNum), channelStartInd(0), numChannel(1), digitizerHandle(0),
@@ -268,6 +270,7 @@ unsigned int Vx1730Digitizer::readEvent(unsigned int* buffer)
     unsigned int* bufferEdge = buffer;
     unsigned int eventSize = 0;
     unsigned int dataRead = 0;
+    //there is no need to read the size of the event, we will get CAENComm_Terminated when we hit the end in the super sized block scheme
     //first read the size of the data to be read
     CAENComm_ErrorCode readError;
     readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
@@ -330,7 +333,7 @@ void Vx1730Digitizer::calculateMaximumSizes()
         //which also take 1 lword (including the pile up rejection flag in the
         //16th bit of Qshort)
         sizePerEvent[chanPairInd] += 2;
-        //determine if the extras word is being written, if it is, add 2 bytes
+        //determine if the extras word is being written, if it is, add 1lword
         if(this->moduleData->recExtrasWord[i])
         {
             sizePerEvent[chanPairInd] += 1;
@@ -355,6 +358,8 @@ void Vx1730Digitizer::calculateMaximumSizes()
     }
     maxSizeOfBoardAggregateBlock = (maxSizeOfBoardAggregate * this->moduleData->aggregatesPerBlockTransfer[moduleNumber]);
     maxBufferFillForAnotherRead = (maxSizeOfBoardAggregateBlock - maxSizeOfBoardAggregate);
+    //the plus two is because of a quirk of the readout system needing a tiny bit of extra room to ensure we get CAENCOMM terminated
+    maxSizeForAllocation = (maxSizeOfBoardAggregateBlock + 2);
 }
 
 //log an error and throw an exception to close things
