@@ -143,6 +143,8 @@ void Vx1730Digitizer::startAcquisition()
         this->writeErrorAndThrow(errVal);
     }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Started/Armed";
+    interuptWaitAttempts = 0;
+    interuptTimeouts = 0;
     acqRunning = true;
 }
 
@@ -161,6 +163,10 @@ void Vx1730Digitizer::stopAcquisition()
         this->writeErrorAndThrow(errVal);
     }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Stopped/Disarmed";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Interrupt Wait Attempts: "
+                                   << interuptWaitAttempts << " Timeouts: " << interuptTimeouts;
+    interuptWaitAttempts = 0;
+    interuptTimeouts = 0;
     acqRunning = false;
 }
 
@@ -198,9 +204,11 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     using LowLvl::Vx1730CommonReadRegistersAddr;
     //presume acqusition has been started, now wait on an interrupt
     CAENComm_ErrorCode readError;
+    ++interuptWaitAttempts;
     readError = CAENComm_IRQWait(digitizerHandle, IrqTimeoutMs);
     if(readError == CAENComm_CommTimeout)
     {//timing out is not an error
+        ++interuptTimeouts;
         return 0;
     }
     else if(readError < 0)
