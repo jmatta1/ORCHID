@@ -33,7 +33,7 @@ namespace Digitizer
 
 enum {MultiRWArraySize = 320, IrqTimeoutMs = 5000};
 
-static const int MaxMbltReadSizeIn32bitWords = 0x200000; //8MB
+static const int MaxMbltReadSizeInLongWords = 0x200000; //8MB
 
 Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* modData,
                                  InputParser::DigitizerChannelData* chanData) :
@@ -261,56 +261,43 @@ unsigned int Vx1730Digitizer::readInterruptDataAvailable(unsigned int* buffer)
     }
     return dataRead;
 }
-
+//MaxMbltReadSizeInLongWords
 unsigned int Vx1730Digitizer::readEvent(unsigned int* buffer)
 {
     using LowLvl::Vx1730ReadRegisters;
     using LowLvl::Vx1730CommonReadRegistersAddr;
-    int sizeRead=0;
+    int totalSizeRead=0;
     unsigned int* bufferEdge = buffer;
-    unsigned int eventSize = 0;
-    unsigned int dataRead = 0;
+    unsigned int sizeActuallyRead = 0;
     //there is no need to read the size of the event, we will get CAENComm_Terminated when we hit the end in the super sized block scheme
-    //first read the size of the data to be read
-    CAENComm_ErrorCode readError;
-    readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
-    if(readError < 0)
+    CAENComm_ErrorCode readResult;
+    do
     {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Size For Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(readError);
-    }
-    
-    //now read the bottom 4kb until everything is read
-    while(eventSize > 0)
-    {
-        unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
-        sizeRead = 0;
-        if((readSize % 2) == 1)//I think the super strange error happens when I make MBLT transfer something other than a multiple of 2 long words
-        {
-            readError = CAENComm_BLTRead(digitizerHandle,
-                                         Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                         bufferEdge, readSize, &sizeRead);
+        int bufferSpaceRemaining = (maxSizeOfBoardAggregateBlock - dataRead);
+        int readMaxSize = ((MaxMbltReadSizeInLongWords > bufferSpaceRemaining) ? bufferSpaceRemaining : MaxMbltReadSizeInLongWords);
+        readResult = CAENComm_MBLTRead(this->digitizerHandle,
+                                       Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                       bufferEdge,
+                                       readMaxSize,
+                                       &sizeActuallyRead);
+
+        if(readResult == CAENComm_Success || readResult == CAENComm_Terminated)
+        {//we are either partway through reading the event or done reading the event
+            //either way, we need to update size read, if we are done with the read,
+            //it does not matter if we update bufferEdge
+            totalSizeRead += sizeActuallyRead;
+            bufferEdge += sizeActuallyRead;
+            break;
         }
         else
         {
-            readError = CAENComm_MBLTRead(digitizerHandle,
-                                          Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                          bufferEdge, readSize, &sizeRead);
-        }
-        
-        if(readError == CAENComm_Terminated || readError == CAENComm_Success)
-        {
-            eventSize -= sizeRead;
-            dataRead += sizeRead;
-            bufferEdge += sizeRead;
-        }
-        else
-        {
-            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error in Reading Data From Digitizer #" << moduleNumber;
             this->writeErrorAndThrow(readError);
         }
     }
-    return dataRead;
+    while(readResult != CAENComm_Terminated);
+    
+    return totalSizeRead;
 }
 
 //calculate the max possible size of a buffer in lwords so that they can be pre-
