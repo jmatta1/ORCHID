@@ -243,7 +243,7 @@ void FileOutputThread::writeFileHeader()
     //directly manipulate the buffer to contain the header and send it to disk
     reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = 0x0102040810204080ULL;
     this->buffInd += 8;
-    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000001;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = 0x00000001;
     this->buffInd += 4;
     reinterpret_cast<unsigned short*>(&(this->currentBuffer[this->buffInd]))[0] = ORCHID_MAJOR_VERSION;
     this->buffInd += 2;
@@ -275,9 +275,9 @@ void FileOutputThread::writeFileHeader()
         this->currentBuffer[this->buffInd] = '\0';
         this->buffInd += 1;
     }
-    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = this->runNumber;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = this->runNumber;
     this->buffInd += 4;
-    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = this->sequenceNumber;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = this->sequenceNumber;
     this->buffInd += 4;
     //reserve 3924 bytes in the buffer header for whatever
     std::fill_n(reinterpret_cast<unsigned int*>(&this->currentBuffer[this->buffInd]), 981, 0);
