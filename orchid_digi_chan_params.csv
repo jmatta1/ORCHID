@@ -13,7 +13,7 @@
 #, 13) Trigger Threshold     = Threshold for LED or to arm the CFD (in LSB units(0.12mv in 2Vpp, or 0.03mV for 0.5Vpp)),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 14) Fixed Baseline        = Fixed Baseline value (when not using baseline mean which must be turned off),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 15) Shaped Trigger Width  = num samples for the shaped trigger (8ns steps),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-#, 16) Trigger Hold Off      = time to block channel from triggering again (8ns steps),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+#, 16) Trigger Hold Off      = time to block channel from triggering again (8ns steps, 1 unit = 8ns),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 17) PSD Threshold         = When Selecting events online (gamma or neutron), define psd limit for the selection (multiply value by 1024 and convert to int), also use PSDCut=True,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 18) Charge Sensitivity    = charge per lsb unit (for 2Vpp: 0=5fC, 1=20fC, 2=80fC, 3=320fC, 4=320fC) (for 0.5Vpp: 0=1.25fC, 1=5fC, 2=20fC, 3=80fC, 4=320fC),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 #, 19) Charge Pedestal On    = (T/F) add fixed value of 1024 to charge (useful when en close to 0),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
