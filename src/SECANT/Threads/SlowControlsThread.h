@@ -74,7 +74,7 @@ public:
      * 
      * @param newHardware unique pointer to an object that inherits the SlowControlsInterface
      * 
-     * @return successful True if the registration occurred before this thread was started, false otherwise
+     * @return True if the registration occurred before this thread was started, False otherwise
      * 
      * This function appends the given slow controls interface pointer to the
      * vector of pointers that are to be checked every loop. It will not do this
