@@ -253,7 +253,7 @@ void SecantFileWriter::prepAndWriteFileHeader()
     reinterpret_cast<unsigned long long*>(&(this->currentBuffer[this->buffInd]))[0] = HeaderProperties::SecantByteOrderMagicNumber;
     this->buffInd += 8;
     //write the secant file format version
-    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = HeaderProperties::SecantFileRevisionNumber;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = HeaderProperties::SecantFileRevisionNumber;
     this->buffInd += 4;
     //write the major version of secant
     reinterpret_cast<unsigned short*>(&(this->currentBuffer[this->buffInd]))[0] = SECANT_MAJOR_VERSION;
@@ -291,10 +291,10 @@ void SecantFileWriter::prepAndWriteFileHeader()
         this->buffInd += 1;
     }
     //write the run number
-    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = this->runNumber;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = this->runNumber;
     this->buffInd += 4;
     //write the sequence number of the file
-    reinterpret_cast<unsigned long*>(&(this->currentBuffer[this->buffInd]))[0] = this->sequenceNumber;
+    reinterpret_cast<unsigned int*>(&(this->currentBuffer[this->buffInd]))[0] = this->sequenceNumber;
     this->buffInd += 4;
     //reserve 3924 bytes in the buffer header for whatever
     std::fill_n(reinterpret_cast<unsigned int*>(&this->currentBuffer[this->buffInd]), 981, 0);

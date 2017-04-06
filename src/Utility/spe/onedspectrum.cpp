@@ -183,7 +183,7 @@ bool OneDSpectrum::readCSV(const string &fileName)
 
 	for(int i=0; i<channels; ++i )
 	{
-		conv.fromString<float>(temp,spec[static_cast<long unsigned int>(i)]);
+		conv.fromString<float>(temp,spec[static_cast<unsigned int>(i)]);
 		histogram[i] = temp;
 	}
 	return true;
@@ -207,7 +207,7 @@ bool OneDSpectrum::writeSpectrum(const string &fileName)
 
 	//trim the name and write it to the string
 	string temp=specName.substr(0,7);
-	output.write(temp.c_str(),static_cast<long int>(temp.size()+1));
+	output.write(temp.c_str(),static_cast<int>(temp.size()+1));
 	//just in case the string was less than 8 characters (counting the null terminator)
 	rawData = new char;
 	*rawData=0;

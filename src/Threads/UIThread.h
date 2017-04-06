@@ -171,7 +171,7 @@ private:
     //integer to store persistent message color in
     int persistColor;
     //counter for number of refreshes persistent messages persist for
-    long persistCount;
+    int persistCount;
     
     /**Variables for displaying file info*/
     std::string fileName;
