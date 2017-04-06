@@ -52,17 +52,23 @@ namespace Threads
  * 
  * @author Author: James Till Matta
  */
-class SecantSlowControlsThread
+class SlowControlsThread
 {
     using HardwareList = std::vector<std::unique_ptr<Interfaces::SlowControlsInterface> >;
 public:
     /**
-     * @brief SecantSlowControlsThread Default Contructor
+     * @brief SlowControlsThread Default Contructor
      * 
      * Builds a new slow controls thread functor.
      */
-    SecantSlowControlsThread();
+    SlowControlsThread();
     
+    /**
+     * @brief SlowControlsThread Destructor
+     * 
+     * Deletes the current slow controls thread functor.
+     */
+    SlowControlsThread();
     
     /** @brief Register Slow Controls Hardware Object
      * 

@@ -20,8 +20,8 @@
 ** 
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_THREADS_SECANTTHREADINTERFACE_H
-#define SECANT_SRC_THREADS_SECANTTHREADINTERFACE_H
+#ifndef SECANT_SRC_THREADS_THREADINTERFACE_H
+#define SECANT_SRC_THREADS_THREADINTERFACE_H
 
 
 namespace Secant
@@ -44,7 +44,7 @@ namespace Threads
  * 
  * @author Author: James Till Matta
  */
-class SecantThreadInterface
+class ThreadInterface
 {
 public:
     /** @brief Virtual Destructor
@@ -56,7 +56,7 @@ public:
     * called once in the thread functor's lifetime I deem this virtual call to
     * be an acceptable cost
     */
-    virtual ~SecantThreadInterface(){}
+    virtual ~ThreadInterface(){}
     
     /** @brief Function Call Operator
     * 
