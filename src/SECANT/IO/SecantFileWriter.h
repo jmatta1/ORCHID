@@ -17,8 +17,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_IO_TEMPLARFILE_H
-#define SECANT_SRC_IO_TEMPLARFILE_H
+#ifndef SECANT_SRC_IO_SECANTFILEWRITER_H
+#define SECANT_SRC_IO_SECANTFILEWRITER_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -142,4 +142,4 @@ private:
 
 }
 }
-#endif //ORCHID_SRC_IO_TEMPLARFILE_H
+#endif //SECANT_SRC_IO_SECANTFILEWRITER_H
