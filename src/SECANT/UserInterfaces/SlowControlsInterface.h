@@ -51,9 +51,9 @@ public:
     */
     virtual ~SlowControlsInterface(){}
     
-    /** @brief Gives the max size necessary for the event output buffer
+    /** @brief Gets the max size necessary for the event output buffer
      * 
-     * @return sizeInBytes The size in bytes this class needs for output
+     * @return The maximum size in bytes this class needs for output
      * 
      * This function is used by the slow controls thread to get the maximum
      * amount of space that needs to be allocated by the slow controls thread
@@ -63,9 +63,9 @@ public:
     
     /** @brief Probe the slow controls hardware and write data to the buffer
     * 
-    * @param outputBuffer This buffer holds the data that is to be output after the query
+    * @param outputBuffer[out] This buffer holds the data that is to be output after the query
     * 
-    * @return usedSize This value should be the total number of bytes used for the write
+    * @return This value should be the total number of bytes used for the write
     * 
     * This function is used by the slow controls thread to query the buffer the
     * slow controls object represents and to write the recieved data into the
