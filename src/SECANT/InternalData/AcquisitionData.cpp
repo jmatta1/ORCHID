@@ -30,15 +30,24 @@ namespace InterThreadData
 AcquisitionData::AcquisitionData(int numMods): numModules(numMods)
 {
     //allocate and initialize the array of atomic integers
-    this->dataSizes = new std::atomic_ullong[this->numModules];
-    for(int i=0; i<this->numModules; ++i) dataSizes[i].store(0);
+    dataSizes = new std::atomic_ullong[numModules];
+    buffers = new std::atomic_uint[numModules];
+    for(int i=0; i<numModules; ++i)
+    {
+        dataSizes[i].store(0);
+        buffers[i].store(0);
+    }
 }
 
 
 void AcquisitionData::clearData()
 {
     //clear the array of atomic integers
-    for(int i=0; i<this->numModules; ++i) dataSizes[i].store(0);
+    for(int i=0; i<this->numModules; ++i)
+    {
+        dataSizes[i].store(0);
+        buffers[i].store(0);
+    }
 }
 
 }

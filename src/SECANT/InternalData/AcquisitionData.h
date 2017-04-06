@@ -57,7 +57,7 @@ struct AcquisitionData
     * 
     * Simply delete the array of atomic integers
     */
-    ~AcquisitionData(){delete[] this->dataSizes;}
+    ~AcquisitionData(){delete[] dataSizes; delete[] buffers;}
 
     /** @brief Clears the list of data sizes
      * 
@@ -74,7 +74,11 @@ struct AcquisitionData
      * Increases cell moduleNum of the array dataSizes by amount, there is no safety
      * mechanism to prevent indexing past the end of the array
      */
-    void addData(int moduleNum, unsigned amount){dataSizes[moduleNum].fetch_add(amount, std::memory_order_relaxed);}
+    void addData(int moduleNum, unsigned amount)
+    {
+        buffers[moduleNum].fetch_add(1, std::memory_order_relaxed);
+        dataSizes[moduleNum].fetch_add(amount, std::memory_order_relaxed);
+    }
 
     /**
      * @brief dataSizes
@@ -82,6 +86,14 @@ struct AcquisitionData
      * This array stores the atomic ints that are increased when data is added
      */
     std::atomic_ullong* dataSizes;
+    
+    /**
+     * @brief dataCounts
+     * 
+     * This array stores the atomic ints that are incremented when data sizes
+     * are increased
+     */
+    std::atomic_uint* buffers;
     
     /**
      * @brief numModules
