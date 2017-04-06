@@ -27,7 +27,7 @@
 namespace Secant
 {
 
-namespace InterThreadData
+namespace OperationData
 {
 
 FileData::FileData():fileName(""), sequenceNumber(0), size(0),

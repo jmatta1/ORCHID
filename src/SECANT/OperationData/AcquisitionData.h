@@ -34,11 +34,13 @@ namespace OperationData
  * 
  * @ingroup SecantData
  * 
- * @brief This class holds atomic variables to store acquisition information
+ * @brief This class holds atomic variables to store acquisition information in
+ * a threadsafe way
  * 
  * This class has a few public members to hold raw acquisition data sizes and
  * buffer counts as well as functions to add to those values and to clear those
- * values
+ * values. All operation of this class is thread safe, though ordering is not
+ * strictly enforced for incrementing
  * 
  * @author Author: James Till Matta
  */
@@ -54,7 +56,7 @@ struct AcquisitionData
     
     /** @brief AcquisitionData Destructor
     * 
-    * Simply delete the array of atomic integers
+    * Simply delete the arrays of atomic integers
     */
     ~AcquisitionData(){delete[] dataSizes; delete[] bufferCount;}
 
@@ -105,24 +107,17 @@ struct AcquisitionData
 
 private:
     /**
-     * @brief dataSizes
-     * 
-     * This array stores the atomic ints that are increased when data is added
+     * @brief Holds data sizes read from acq sources
      */
     std::atomic_ullong* dataSizes;
     
     /**
-     * @brief dataCounts
-     * 
-     * This array stores the atomic ints that are incremented when data sizes
-     * are increased
+     * @brief Holds the number of times dataSizes was increased (# of buffers)
      */
     std::atomic_uint* bufferCount;
     
     /**
-     * @brief numModules
-     * 
-     * This integer holds the number of modules
+     * @brief This integer holds the number of acquisition modules
      */
     int numModules;
 };
