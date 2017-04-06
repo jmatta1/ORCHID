@@ -33,6 +33,8 @@ namespace Digitizer
 
 enum {MultiRWArraySize = 320, IrqTimeoutMs = 5000};
 
+static const int MaxMbltReadSizeInLongWords = 0x200000; //8MB
+
 Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* modData,
                                  InputParser::DigitizerChannelData* chanData) :
     moduleNumber(modNum), channelStartInd(0), numChannel(1), digitizerHandle(0),
@@ -120,20 +122,9 @@ void Vx1730Digitizer::startAcquisition()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Starting/Arming Acqusition On Digitizer #" << moduleNumber ;
     CAENComm_ErrorCode errVal;
-    //now enable interrupt requests in CAENComm
-    errVal = CAENComm_IRQEnable(digitizerHandle);
-    if(errVal < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(errVal);
-    }
+    this->enableInterrupts();
     //now hit the software clear to blank the data
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
-    if(errVal < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Clearing Digitizer For Acquisition Start in Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(errVal);
-    }
+    this->softwareClear();
     //now take the acquisition control register base, add bit 2 and write it
     unsigned int acqusitionRegister = (acquisitionCtrlRegBase | 0x4UL);
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acqusitionRegister);
@@ -143,6 +134,8 @@ void Vx1730Digitizer::startAcquisition()
         this->writeErrorAndThrow(errVal);
     }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Started/Armed";
+    interuptWaitAttempts = 0;
+    interuptTimeouts = 0;
     acqRunning = true;
 }
 
@@ -161,6 +154,10 @@ void Vx1730Digitizer::stopAcquisition()
         this->writeErrorAndThrow(errVal);
     }
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Acquisition Stopped/Disarmed";
+    BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Digitizer #" << moduleNumber << " Interrupt Wait Attempts: "
+                                   << interuptWaitAttempts << " Timeouts: " << interuptTimeouts;
+    interuptWaitAttempts = 0;
+    interuptTimeouts = 0;
     acqRunning = false;
 }
 
@@ -198,9 +195,12 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
     using LowLvl::Vx1730CommonReadRegistersAddr;
     //presume acqusition has been started, now wait on an interrupt
     CAENComm_ErrorCode readError;
+    ++interuptWaitAttempts;
+    this->enableInterrupts();
     readError = CAENComm_IRQWait(digitizerHandle, IrqTimeoutMs);
     if(readError == CAENComm_CommTimeout)
     {//timing out is not an error
+        ++interuptTimeouts;
         return 0;
     }
     else if(readError < 0)
@@ -266,50 +266,39 @@ unsigned int Vx1730Digitizer::readEvent(unsigned int* buffer)
 {
     using LowLvl::Vx1730ReadRegisters;
     using LowLvl::Vx1730CommonReadRegistersAddr;
-    int sizeRead=0;
+    int totalSizeRead=0;
     unsigned int* bufferEdge = buffer;
-    unsigned int eventSize = 0;
-    unsigned int dataRead = 0;
-    //first read the size of the data to be read
-    CAENComm_ErrorCode readError;
-    readError = CAENComm_Read32(digitizerHandle, Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventSize>::value, &eventSize);
-    if(readError < 0)
+    int sizeReadInMblt = 0;
+    //there is no need to read the size of the event, we will get CAENComm_Terminated when we hit the end in the super sized block scheme
+    CAENComm_ErrorCode readResult;
+    do
     {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Reading Event Size For Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(readError);
+        int bufferSpaceRemaining = (maxSizeOfBoardAggregateBlock - totalSizeRead);
+        int readMaxSize = ((MaxMbltReadSizeInLongWords > bufferSpaceRemaining) ? bufferSpaceRemaining : MaxMbltReadSizeInLongWords);
+        sizeReadInMblt = 0;
+        readResult = CAENComm_MBLTRead(this->digitizerHandle,
+                                       Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
+                                       bufferEdge,
+                                       readMaxSize,
+                                       &sizeReadInMblt);
+
+        if(readResult == CAENComm_Success || readResult == CAENComm_Terminated)
+        {//we are either partway through reading the event or done reading the event
+            //either way, we need to update size read, if we are done with the read,
+            //it does not matter if we update bufferEdge
+            totalSizeRead += sizeReadInMblt;
+            bufferEdge += sizeReadInMblt;
+            break;
+        }
+        else
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error in Reading Data From Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(readResult);
+        }
     }
+    while(readResult != CAENComm_Terminated);
     
-    //now read the bottom 4kb until everything is read
-    while(eventSize > 0)
-    {
-        unsigned int readSize = ((eventSize>1024) ? 1024 : eventSize);
-        sizeRead = 0;
-        if((readSize % 2) == 1)//I think the super strange error happens when I make MBLT transfer something other than a multiple of 2 long words
-        {
-            readError = CAENComm_BLTRead(digitizerHandle,
-                                         Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                         bufferEdge, readSize, &sizeRead);
-        }
-        else
-        {
-            readError = CAENComm_MBLTRead(digitizerHandle,
-                                          Vx1730CommonReadRegistersAddr<Vx1730ReadRegisters::EventReadout>::value,
-                                          bufferEdge, readSize, &sizeRead);
-        }
-        
-        if(readError == CAENComm_Terminated || readError == CAENComm_Success)
-        {
-            eventSize -= sizeRead;
-            dataRead += sizeRead;
-            bufferEdge += sizeRead;
-        }
-        else
-        {
-            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In MBLT Read Of Event From Digitizer #" << moduleNumber;
-            this->writeErrorAndThrow(readError);
-        }
-    }
-    return dataRead;
+    return totalSizeRead;
 }
 
 //calculate the max possible size of a buffer in lwords so that they can be pre-
@@ -332,7 +321,7 @@ void Vx1730Digitizer::calculateMaximumSizes()
         //which also take 1 lword (including the pile up rejection flag in the
         //16th bit of Qshort)
         sizePerEvent[chanPairInd] += 2;
-        //determine if the extras word is being written, if it is, add 2 bytes
+        //determine if the extras word is being written, if it is, add 1lword
         if(this->moduleData->recExtrasWord[i])
         {
             sizePerEvent[chanPairInd] += 1;
@@ -357,6 +346,8 @@ void Vx1730Digitizer::calculateMaximumSizes()
     }
     maxSizeOfBoardAggregateBlock = (maxSizeOfBoardAggregate * this->moduleData->aggregatesPerBlockTransfer[moduleNumber]);
     maxBufferFillForAnotherRead = (maxSizeOfBoardAggregateBlock - maxSizeOfBoardAggregate);
+    //the plus two is because of a quirk of the readout system needing a tiny bit of extra room to ensure we get CAENCOMM terminated
+    maxSizeForAllocation = (maxSizeOfBoardAggregateBlock + 2);
 }
 
 //log an error and throw an exception to close things
@@ -755,20 +746,6 @@ unsigned int Vx1730Digitizer::calculateDppAlgCtrlRegVal(int i)
     }
     output |= ((channelData->dppTriggerCounting[i] & 0x01UL) << 5);
     output |= ((channelData->discMode[i] & 0x01UL) << 6);
-    //skip the internal test pulse stuff
-    
-    //code for using the internal test pulse
-//    if( (i != 0) || (i != 2) || (i != 4) || (i != 6) || (i != 8) || (i != 10) || (i != 12) || (i != 14) )
-    /*if( i > 7)
-    {
-        output |= 0x100;//internal test pulser on
-        output |= 0x400;//100kHz
-    }
-    else
-    {
-        output |= 0x100;//internal test pulser on
-        output |= 0x600;//1MHz
-    }*/
     
     output |= ((channelData->pulsePolarity[i] & 0x01UL) << 16);
     output |= ((channelData->trigMode[i] & 0x03UL) << 18);
@@ -1054,12 +1031,7 @@ void Vx1730Digitizer::clearResetAndSync()
         this->writeErrorAndThrow(errVal);
     }
     //now hit the software clear to blank the data
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000000);
-    if(errVal < 0)
-    {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Clearing Digitizer #" << moduleNumber;
-        this->writeErrorAndThrow(errVal);
-    }
+    this->softwareClear();
     //hit the sync for force the phase-lock loop to realign all clock outputs
     errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClckSync>::value, 0x00000000);
     if(errVal < 0)
@@ -1075,16 +1047,20 @@ void Vx1730Digitizer::openDigitizer()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     CAENComm_ErrorCode errVal;
     InputParser::LinkType lType = moduleData->linkType[moduleNumber];
-    if(lType == InputParser::LinkType::Optical)
+    if(lType == InputParser::LinkType::DirectOptical)
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via Optical Link, Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
-                                     moduleData->vmeBaseAddr[moduleNumber],
-                                     &(this->digitizerHandle));
+                                     0, &(this->digitizerHandle));
     }
-    else if(lType == InputParser::LinkType::USB)
+    else
+    {
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: No support for non-optical link, digitizers";
+        throw std::runtime_error("Vx1730 Error - Unsupported Connection Type");
+    }
+    /*else if(lType == InputParser::LinkType::USB)
     {
         BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via USB: Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_USB,
@@ -1094,12 +1070,13 @@ void Vx1730Digitizer::openDigitizer()
     }
     else
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening Digitizer Directly Via Optical Link: Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Opening VME Card Via Optical Link, Digitizer #" << moduleNumber;
         errVal = CAENComm_OpenDevice(CAENComm_OpticalLink,
                                      moduleData->linkNumber[moduleNumber],
                                      moduleData->daisyChainNumber[moduleNumber],
-                                     0, &(this->digitizerHandle));
-    }
+                                     moduleData->vmeBaseAddr[moduleNumber],
+                                     &(this->digitizerHandle));
+    }*/
     //check for an error in opening the digitizer
     if (errVal < 0)
     {

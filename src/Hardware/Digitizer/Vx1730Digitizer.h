@@ -20,6 +20,7 @@
 #define ORCHID_SRC_HARDWARE_DIGITIZER_DIGITIZER_H
 // includes for C system headers
 // includes for C++ system headers
+#include<array>
 // includes from other libraries
 #include<CAENComm.h>
 // includes from ORCHID
@@ -30,6 +31,7 @@
 
 namespace Digitizer
 {
+
 //Todo: add some mechanism to reduce the number of individual channel reads
 //  while acquiring data, maybe use the number of aggregates to trigger an IRQ
 //  as a bare minimum to wait for?
@@ -59,7 +61,7 @@ public:
     
     //give the max possible size of a buffer in bytes so that they can be pre-
     //allocated for the queueing system
-    int getSizeOfReadBufferIn32BitInts(){return maxSizeOfBoardAggregateBlock;}
+    int getSizeOfReadBufferIn32BitInts(){return maxSizeForAllocation;}
     
     //return the channel 0 index
     int getModuleStartChannel(){return channelStartInd;}
@@ -106,6 +108,31 @@ private:
         }
     }
     
+    void softwareClear()
+    {
+        using LowLvl::Vx1730WriteRegisters;
+        using LowLvl::Vx1730CommonWriteRegistersAddr;
+        CAENComm_ErrorCode errVal;
+        errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClear>::value, 0x00000001);
+        if(errVal < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error In Clearing Digitizer For Acquisition Start in Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(errVal);
+        }
+    }
+    
+    void enableInterrupts()
+    {
+        CAENComm_ErrorCode errVal;
+        //now enable interrupt requests in CAENComm
+        errVal = CAENComm_IRQEnable(digitizerHandle);
+        if(errVal < 0)
+        {
+            BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Enabling Interrupts For Digitizer #" << moduleNumber;
+            this->writeErrorAndThrow(errVal);
+        }
+    }
+    
     void writeCommonRegisterData();
     void writeGroupRegisterData();
     void writeIndividualRegisterData();
@@ -146,12 +173,17 @@ private:
     unsigned int* rdbkArray;
     CAENComm_ErrorCode* cycleErrsArray;
     int arraySize;
+    
+    unsigned long long interuptWaitAttempts = 0;
+    unsigned long long interuptTimeouts = 0;
+    
     //variables to hold sizes of parts of the readout (in 32 bit ints
     int sizePerEvent[8];
     int sizePerChanPairAggregate[8];
     int maxSizeOfBoardAggregate;
     int maxSizeOfBoardAggregateBlock;
     int maxBufferFillForAnotherRead;
+    int maxSizeForAllocation;
     //variables to hold persistent values for use later
     unsigned int acquisitionCtrlRegBase;
     
