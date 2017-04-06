@@ -7,3 +7,4 @@ orchid
 *.autosave
 orchid_*.log
 data
+doc/Secant_Doc
