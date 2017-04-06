@@ -24,7 +24,7 @@
 namespace Secant
 {
 
-namespace InterThreadData
+namespace OperationData
 {
 
 AcquisitionData::AcquisitionData(int numMods): numModules(numMods)

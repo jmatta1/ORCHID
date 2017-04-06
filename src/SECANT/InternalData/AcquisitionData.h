@@ -27,7 +27,7 @@
 namespace Secant
 {
 
-namespace InterThreadData
+namespace OperationData
 {
 /*!
  * @class AcquisitionData
