@@ -13,8 +13,6 @@
 **
 ** @details Holds the definition of the class that is used to accumulate read
 ** sizes from the digitizers
-**
-** @ingroup SecantData 
 ** 
 ********************************************************************************
 *******************************************************************************/
@@ -34,12 +32,13 @@ namespace InterThreadData
 /*!
  * @class AcquisitionData
  * 
- * @ingroup SecantInterThreadData
+ * @ingroup SecantData
  * 
- * @brief This class holds atomic variables to store acquisition data sizes
+ * @brief This class holds atomic variables to store acquisition information
  * 
- * This class has a few public members to hold raw acquisition data sizes as
- * well as functions to add to those values and to clear those values
+ * This class has a few public members to hold raw acquisition data sizes and
+ * buffer counts as well as functions to add to those values and to clear those
+ * values
  * 
  * @author Author: James Till Matta
  */
@@ -57,7 +56,7 @@ struct AcquisitionData
     * 
     * Simply delete the array of atomic integers
     */
-    ~AcquisitionData(){delete[] dataSizes; delete[] buffers;}
+    ~AcquisitionData(){delete[] dataSizes; delete[] bufferCount;}
 
     /** @brief Clears the list of data sizes
      * 
@@ -76,10 +75,35 @@ struct AcquisitionData
      */
     void addData(int moduleNum, unsigned amount)
     {
-        buffers[moduleNum].fetch_add(1, std::memory_order_relaxed);
+        bufferCount[moduleNum].fetch_add(1, std::memory_order_relaxed);
         dataSizes[moduleNum].fetch_add(amount, std::memory_order_relaxed);
     }
 
+    /** @brief Returns the number of modules
+     * 
+     * @return The number of acquisition modules
+     */
+    int getNumModules(){return numModules;}
+
+    /** @brief Gets the total data read for that module
+     * 
+     * @param[in] moduleNum Which module number you want this data for
+     * 
+     * @return The size in bytes of the data the acquisition system has read
+     * since the last call to clearData()
+     */
+    unsigned long long getDataRead(int moduleNum){return dataSizes[moduleNum].load(std::memory_order_relaxed);}
+    
+    /** @brief Gets the total number of bufferCount read for that module
+     * 
+     * @param[in] moduleNum Which module number you want this data for
+     * 
+     * @return The number of buffers the acquisition system has read since the
+     * last call to clearData()
+     */
+    unsigned int getNumModules(int moduleNum){return dataSizes[moduleNum].load(std::memory_order_relaxed);}
+
+private:
     /**
      * @brief dataSizes
      * 
@@ -93,7 +117,7 @@ struct AcquisitionData
      * This array stores the atomic ints that are incremented when data sizes
      * are increased
      */
-    std::atomic_uint* buffers;
+    std::atomic_uint* bufferCount;
     
     /**
      * @brief numModules
