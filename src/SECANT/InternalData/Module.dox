@@ -1,0 +1,5 @@
+/*!
+* @defgroup SecantData Data structures that SECANT uses and publishes for user
+* code to access
+*
+*/

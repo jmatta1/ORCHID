@@ -1,10 +1,9 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file RateData.h
 ** @author James Till Matta
 ** @date 27 Apr, 2016
-** @brief
+** @brief Definition for AcquisitionData
 **
 ** @copyright Copyright (C) 2016 James Till Matta
 **
@@ -12,14 +11,15 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds the definition of the class that is used to accumulate trigger
-** information from the digitizers, that in turn is used to calculate trigger
-** rates by the ui
+** @details Holds the definition of the class that is used to accumulate read
+** sizes from the digitizers
 **
+** @ingroup SecantData 
+** 
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_DIGILIB_RATEDATA_H
-#define ORCHID_SRC_DIGILIB_RATEDATA_H
+#ifndef SECANT_SRC_SECANT_INTERNAL_DATA
+#define SECANT_SRC_SECANT_INTERNAL_DATA
 // includes for C system headers
 // includes for C++ system headers
 #include<atomic>
@@ -31,21 +31,63 @@ namespace Secant
 
 namespace InterThreadData
 {
-
+/*!
+ * @class AcquisitionData
+ * 
+ * @ingroup SecantInterThreadData
+ * 
+ * @brief This class holds atomic variables to store acquisition data sizes
+ * 
+ * This class has a few public members to hold raw acquisition data sizes as
+ * well as functions to add to those values and to clear those values
+ * 
+ * @author Author: James Till Matta
+ */
 struct AcquisitionData
 {
-    AcquisitionData(int numDigiChan, int numMods);
-    ~AcquisitionData(){delete[] this->dataSizes; delete[] this->triggers;}
+    /** @brief AcquisitionData Default Constructor
+    * 
+    * @param[in] numMods The number of modules we need to keep track of
+    * 
+    * Create an AcquisitionData object set up for numMods modules
+    */
+    AcquisitionData(int numMods);
+    
+    /** @brief AcquisitionData Destructor
+    * 
+    * Simply delete the array of atomic integers
+    */
+    ~AcquisitionData(){delete[] this->dataSizes;}
+
+    /** @brief Clears the list of data sizes
+     * 
+     * Sets all the elements of dataSizes to 0
+     */
     void clearData();
-    void clearTrigs();
-    void addData(int digi, unsigned amount){dataSizes[digi].fetch_add(amount);}
-    void addTrigs(int chan, unsigned count){triggers[chan].fetch_add(count);}
-    void incrTrigs(int chan){triggers[chan].fetch_add(1);}
+    
+    /** @brief Increases the amount of data read for moduleNum by amount
+     * 
+     * @param[in] moduleNum The module number to add to the size of read data for
+     * 
+     * @param[in] amount The amount of data to add to the size of read data
+     * 
+     * Increases cell moduleNum of the array dataSizes by amount, there is no safety
+     * mechanism to prevent indexing past the end of the array
+     */
+    void addData(int moduleNum, unsigned amount){dataSizes[moduleNum].fetch_add(amount, std::memory_order_relaxed);}
 
+    /**
+     * @brief dataSizes
+     * 
+     * This array stores the atomic ints that are increased when data is added
+     */
     std::atomic_ullong* dataSizes;
-    std::atomic_ullong* triggers;
-
-    int numChannels;
+    
+    /**
+     * @brief numModules
+     * 
+     * This integer holds the number of modules
+     */
     int numModules;
 };
 

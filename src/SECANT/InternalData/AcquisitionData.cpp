@@ -1,10 +1,9 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file RateData.cpp
 ** @author James Till Matta
 ** @date 27 Apr, 2016
-** @brief
+** @brief Implementation for AcquisitionData
 **
 ** @copyright Copyright (C) 2016 James Till Matta
 **
@@ -13,8 +12,7 @@
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
 ** @details Holds the implementation of the class that is used to accumulate
-** trigger information from the digitizers, that in turn is used to calculate
-** trigger rates by the ui
+** read sizes from the digitizers
 **
 ********************************************************************************
 *******************************************************************************/
@@ -29,36 +27,18 @@ namespace Secant
 namespace InterThreadData
 {
 
-AcquisitionData::AcquisitionData(int numDigiChan, int numMods):
-    numChannels(numDigiChan), numModules(numMods)
+AcquisitionData::AcquisitionData(int numMods): numModules(numMods)
 {
-    this->triggers = new std::atomic_ullong[this->numChannels];
-    for(int i=0; i<this->numChannels; ++i)
-    {
-        triggers[i].store(0);
-    }
+    //allocate and initialize the array of atomic integers
     this->dataSizes = new std::atomic_ullong[this->numModules];
-    for(int i=0; i<this->numModules; ++i)
-    {
-        dataSizes[i].store(0);
-    }
+    for(int i=0; i<this->numModules; ++i) dataSizes[i].store(0);
 }
 
 
 void AcquisitionData::clearData()
 {
-    for(int i=0; i<this->numModules; ++i)
-    {
-        dataSizes[i].store(0, std::memory_order_relaxed);
-    }
-}
-
-void AcquisitionData::clearTrigs()
-{
-    for(int i=0; i<this->numChannels; ++i)
-    {
-        triggers[i].store(0, std::memory_order_relaxed);
-    }
+    //clear the array of atomic integers
+    for(int i=0; i<this->numModules; ++i) dataSizes[i].store(0);
 }
 
 }
