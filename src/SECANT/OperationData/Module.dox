@@ -1,5 +1,13 @@
 /*!
-* @defgroup SecantData Data structures that SECANT uses and publishes for user
-* code to access
+* @defgroup SecantData Secant Operation Data
+* @brief Data about SECANT operation, acq read rate, etc
+* 
+* These classes contain SECANT operation data for user usage.
+*
+* The per module acquisition read rate and number of buffers are in Secant::OperationData::AcquisitionData
+*
+* The file path, sequence number, and size are in Secant::OperationData::FileData.
+*
+* The number of SlowControls polling events is in Secant::OperationData::SlowControlsData.
 *
 */
