@@ -30,7 +30,7 @@
 namespace Secant
 {
 
-namespace InterThreadCtrl
+namespace ThreadCtrl
 {
 
 enum class SlowControlsThreadState  : char {Terminate, Stopped, Polling, Writing};

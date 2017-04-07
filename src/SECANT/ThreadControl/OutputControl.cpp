@@ -27,7 +27,7 @@
 namespace Secant
 {
 
-namespace InterThreadCtrl
+namespace ThreadCtrl
 {
 
 //setters

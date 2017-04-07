@@ -29,11 +29,12 @@
 #include"ProcessingThreadControl.h"
 #include"OutputControl.h"
 //the queues between acquisition threads and processing threads
-#include"InterThreadComm/QueuePair.h"
+#include"SECANT/InterthreadQueues/QueuePair.h"
 //a couple type defs for sanities sake
 #include"Utility/CommonTypeDefs.h"
-
-namespace InterThread
+namespace Secant
+{
+namespace ThreadCtrl
 {
 
 template<int NumProdConsGroups, int NumBuffersPerGroup>
@@ -402,4 +403,5 @@ void OverallControl<NumProdConsGroups, NumBuffersPerGroup>::clearQueuesWake()
 }
 
 
+}
 }

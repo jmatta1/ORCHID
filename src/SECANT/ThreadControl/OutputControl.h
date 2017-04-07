@@ -31,7 +31,7 @@
 namespace Secant
 {
 
-namespace InterThreadCtrl
+namespace ThreadCtrl
 {
 
 class OutputControl

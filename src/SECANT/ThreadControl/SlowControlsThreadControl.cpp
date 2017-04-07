@@ -26,7 +26,7 @@
 namespace Secant
 {
 
-namespace InterThreadCtrl
+namespace ThreadCtrl
 {
 
 void SlowControlsThreadControl::waitForNewState()

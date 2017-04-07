@@ -25,7 +25,7 @@
 namespace Secant
 {
 
-namespace InterThreadCtrl
+namespace ThreadCtrl
 {
 
 void ProcessingThreadControl::waitForChange()

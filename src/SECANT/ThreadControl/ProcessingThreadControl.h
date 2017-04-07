@@ -28,7 +28,7 @@
 namespace Secant
 {
 
-namespace InterThreadCtrl
+namespace ThreadCtrl
 {
 
 enum class ProcessingThreadState : char {Running, Stopped, Terminate};
