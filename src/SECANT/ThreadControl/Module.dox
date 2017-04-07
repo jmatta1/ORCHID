@@ -1,0 +1,15 @@
+/*!
+* @defgroup SecantThreadControl SECANT Thread Control
+* @brief Classes for controlling the state of SECANT threads
+* 
+* These classes contain functions for controlling the operation of SECANT acquisition, processing, and slow controls threads.
+*
+* The class that manages all of these control classes, which is intended for user use is Secant::ThreadCtrl::OverallControl
+*
+* The class that controls all acquisition threads is Secant::ThreadCtrl::AcquisitionThreadControl
+*
+* The class that controls all processing threads is Secant::ThreadCtrl::ProcessingThreadControl
+*
+* The class that controls the slow controls thread is Secant::ThreadCtrl::SlowControlsThreadControl
+*
+*/
