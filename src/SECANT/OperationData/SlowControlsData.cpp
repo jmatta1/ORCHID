@@ -1,7 +1,6 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file SlowData.cpp
 ** @author James Till Matta
 ** @date 27 Apr, 2016
 ** @brief
@@ -18,12 +17,11 @@
 ********************************************************************************
 *******************************************************************************/
 
-#include"SlowData.h"
+#include"SlowControlsData.h"
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-#include"Hardware/HVLib/VoltageData.h"
 
 namespace Secant
 {
@@ -31,7 +29,28 @@ namespace Secant
 namespace OperationData
 {
 
+SlowControlsData::SlowControlsData(int numScDevices):numSlowControlsDevices(numScDevices)
+{
+    readTimes = new std::atomic_ullong[numSlowControlsDevices];
+    readSizes = new std::atomic_ullong[numSlowControlsDevices];
+    readCount = new std::atomic_uint[numSlowControlsDevices];
+    for(int i=0; i<numSlowControlsDevices; ++i)
+    {
+        readTimes[i].store(0ULL);
+        readSizes[i].store(0ULL);
+        readCount[i].store(0);
+    }
+}
 
+void SlowControlsData::clearData()
+{
+    for(int i=0; i<numSlowControlsDevices; ++i)
+    {
+        readTimes[i].store(0ULL);
+        readSizes[i].store(0ULL);
+        readCount[i].store(0);
+    }
+}
 
 }
 }
