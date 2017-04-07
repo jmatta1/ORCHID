@@ -1,7 +1,6 @@
 /***************************************************************************//**
 ********************************************************************************
 **
-** @file FileInfo.cpp
 ** @author James Till Matta
 ** @date 26 May, 2016
 ** @brief
@@ -33,12 +32,13 @@ namespace OperationData
 FileData::FileData():fileName(""), sequenceNumber(0), size(0),
     fileNameTest(true), sequenceNumberTest(true){}
 
-//setters
 void FileData::setFileName(const std::string& fName)
 {
+    //get initial, non-exclusive (reader's), lock on nonAtomicAccess
     boost::upgrade_lock<boost::shared_mutex> lock(nonAtomicAccess);
+    //upgrade that lock into an exclusive (writer's) lock
     boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
-    //now we have exclusive, writers, access
+    //now we have exclusive, access, so do what we need to do
     fileName = fName;
     fileNameTest.store(true);
     //when the locks go out of scope they unlock
@@ -46,9 +46,11 @@ void FileData::setFileName(const std::string& fName)
 
 void FileData::getFileName(std::string& fName)
 {
+    //get non-exclusive (reader's), lock on nonAtomicAccess
     boost::shared_lock<boost::shared_mutex> lock(nonAtomicAccess);
     fName = fileName;
     fileNameTest.store(false);
+    //when the lock goes out of scope it unlocks
 }
 
 }
