@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_SLOWCONTROLS_SLOWDATA_H
-#define ORCHID_SRC_SLOWCONTROLS_SLOWDATA_H
+#ifndef ORCHID_SRC_SECANT_OPERATIONDATA_SLOWCONTROLSDATA_H
+#define ORCHID_SRC_SECANT_OPERATIONDATA_SLOWCONTROLSDATA_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -109,4 +109,4 @@ private:
 }
 }
 
-#endif //ORCHID_SRC_SLOWCONTROLS_SLOWDATA_H
+#endif //ORCHID_SRC_SECANT_OPERATIONDATA_SLOWCONTROLSDATA_H
