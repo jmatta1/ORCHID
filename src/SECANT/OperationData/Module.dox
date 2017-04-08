@@ -1,5 +1,5 @@
 /*!
-* @defgroup SecantData SECANT Operation Data
+* @defgroup SecantData Secant Operation Data
 * @brief Data about SECANT operation, acq read rate, etc
 * 
 * These classes contain SECANT operation data for user usage.
