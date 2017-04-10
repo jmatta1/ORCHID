@@ -67,11 +67,11 @@ private:
     WriteThreadPool(int numWriteThreads, WriteThreadPoolMode mode);
     
     WriteMultiQueue& writeQueue; ///<Holds the write queues the threads pull from
-    int threadCount; ///<stores the number of threads to use for concurrent asynchronous writing
-    WriteThreadPoolMode writeMode; ///<Used to build threads with the appropriate operation mode
+    WriteThreadControl& threadController; ///<Class to hold control for writeThreads
     WriteThread** threadCallables; ///<Stores the functors that are run by the threads
     boost::thread_group writeThreads; ///<Boost thread group object that stores the multiple thread objects doing writes
-    WriteThreadControl threadController;
+    int threadCount; ///<stores the number of threads to use for concurrent asynchronous writing
+    WriteThreadPoolMode writeMode; ///<Used to build threads with the appropriate operation mode
     
 
 public: //Deleted methods go in this section because I want the enhanced error

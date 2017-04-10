@@ -29,24 +29,16 @@ namespace IO
 {
 namespace AsyncFile
 {
-
-/*
- * WriteMultiQueue& writeQueue; ///<Holds the write queues the threads pull from
-    int threadCount; ///<stores the number of threads to use for concurrent asynchronous writing
-    WriteThreadPoolMode writeMode; ///<Used to build threads with the appropriate operation mode
-    WriteThread* threadCallables; ///<Stores the functors that are run by the threads
-    boost::thread_group writeThreads; ///<Boost thread group object that stores the multiple thread objects doing writes
-    */
-
 WriteThreadPool::WriteThreadPool(int numWriteThreads, WriteThreadPoolMode mode):
-    writeQueue(WriteMultiQueue::getInstance()), threadCount(numWriteThreads),
-    writeMode(mode)
+    writeQueue(WriteMultiQueue::getInstance()),
+    threadController(WriteThreadControl::getInstance()),
+    threadCount(numWriteThreads), writeMode(mode)
 {
-    threadCallables = new WriteThread*;
+    threadCallables = new WriteThread*[threadCount];
     for(int i = 0; i < threadCount; ++i)
     {
-        threadCallables[i] = new WriteThread(writeMode);
-        
+        threadCallables[i] = new WriteThread(writeMode, threadController);
+        writeThreads.create_thread(*threadCallables[i]);
     }
 }
 
