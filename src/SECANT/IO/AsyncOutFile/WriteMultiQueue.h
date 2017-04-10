@@ -80,11 +80,11 @@ public: //Deleted methods go in this section because I want the enhanced error
     /**
      * @brief Deleted copy constructor because this is a singleton
      */
-    WriteThreadPool(WriteThreadPool const&) = delete;
+    WriteMultiQueue(WriteMultiQueue const&) = delete;
     /**
      * @brief Deleted assignment operator because this is a singleton
      */
-    void operator=(WriteThreadPool const&) = delete;
+    void operator=(WriteMultiQueue const&) = delete;
 };
 
 
