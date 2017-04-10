@@ -11,12 +11,12 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds the definition of the write thread controllers
+** @details Holds the definition of the write thread controller
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADPOOL_H
-#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADPOOL_H
+#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
+#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -44,11 +44,38 @@ namespace AsyncFile
 class WriteThreadControl
 {
 public:
-
+    /**
+     * @brief Gets a reference to the global class instance
+     * @return A reference to the global instance of the class
+     */
+    static WriteThreadControl& getInstance()
+    {
+        //the constructor is only called the first time so things are only initialized once
+        static WriteThreadControl ctrl;
+        return ctrl;
+    }
+    
+private:
+    /**
+     * @brief Private default constructor to make the WriteThreadPool when needed
+     */
+    WriteThreadControl();
+    
+public://Deleted methods go in this section because I want the enhanced error
+    //messages of public deleted methods, but don't want to 'gum up' my actual
+    //function declarations
+    /**
+     * @brief Deleted copy constructor because this is a singleton
+     */
+    WriteThreadControl(WriteThreadControl const&) = delete;
+    /**
+     * @brief Deleted assignment operator because this is a singleton
+     */
+    void operator=(WriteThreadControl const&) = delete;
 };
 
 
 }
 }
 }
-#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADPOOL_H
+#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
