@@ -96,7 +96,6 @@ private:
      */
     WriteThreadPool(int numWriteThreads, WriteThreadPoolMode mode);
     
-    WriteMultiQueue& writeQueue; ///<Holds the write queues the threads pull from
     WriteThreadControl& threadController; ///<Class to hold control for writeThreads
     boost::thread_group writeThreads; ///<Boost thread group object that stores the multiple thread objects doing writes
     WriteThreadPoolMode writeMode; ///<Used to build threads with the appropriate operation mode
