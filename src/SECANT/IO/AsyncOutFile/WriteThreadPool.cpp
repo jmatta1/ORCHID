@@ -29,17 +29,28 @@ namespace IO
 {
 namespace AsyncFile
 {
+
 WriteThreadPool::WriteThreadPool(int numWriteThreads, WriteThreadPoolMode mode):
     writeQueue(WriteMultiQueue::getInstance()),
-    threadController(WriteThreadControl::getInstance()),
-    threadCount(numWriteThreads), writeMode(mode)
+    threadController(WriteThreadControl::getInstance()), writeMode(mode)
 {
-    threadCallables = new WriteThread*[threadCount];
-    for(int i = 0; i < threadCount; ++i)
+    for(int i = 0; i < numWriteThreads; ++i)
     {
-        threadCallables[i] = new WriteThread(writeMode, threadController);
-        writeThreads.create_thread(*threadCallables[i]);
+        //by adding threads like this I think that I make it such that I do not
+        //need to manage the resources for the threads or the callable objects
+        writeThreads.add_thread(new boost::thread(WriteThread(writeMode)));
     }
+    
+    //wait until all threads have come to stop on the controller condition var
+    //then move them into running mode so that they can wait for data/file
+    //objects to come down the queue to them
+    while( threadController.getStoppedCount() != numWriteThreads )
+    {
+        boost::this_thread::sleep_for(boost::chrono::microseconds(50));
+    }
+    //if we are here then all the threads are waiting on the wait condition,
+    //set things to running so that we can get moving
+    threadController.setToRunning();
 }
 
 }

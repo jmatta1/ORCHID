@@ -49,8 +49,38 @@ class WriteThreadPool
 {
 public:
     /**
+     * @brief Sets threads to terminate and calls join_all on the thread group
+     */
+    ~WriteThreadPool()
+    {
+        //do something with the writeQueue to clean things up here
+        threadController.setToTerminate();
+        //wait for everything to close down
+        writeThreads.join_all();
+    }
+    
+    /**
+     * @brief Gets the number of write threads in the pool
+     * @return The number of threads in the thread_group
+     */
+    int size(){return writeThreads.size();}
+    
+    /**
+     * @brief Gets the mode that threads were initialized with
+     * @return The write mode that write threads were initialized with
+     */
+    WriteThreadPoolMode getThreadMode(){return writeMode;}
+    
+    /**
      * @brief Gets a reference to the global class instance
+     * @param[in] numWriteThreads How many write threads to create when first called
+     * @param[in] mode What mode to create the write threads in when first called
      * @return A reference to the global instance of the class
+     * 
+     * The very first time this function is called in an execution it generates
+     * a new global/singleton instance from the parameters passed and returns a
+     * reference to it. All subsequent times, the parameters are ignored and it
+     * simply returns a reference to the already generated instance
      */
     static WriteThreadPool& getInstance(int numWriteThreads=2,
                                         WriteThreadPoolMode mode=WriteThreadPoolMode::Greedy)
@@ -68,9 +98,7 @@ private:
     
     WriteMultiQueue& writeQueue; ///<Holds the write queues the threads pull from
     WriteThreadControl& threadController; ///<Class to hold control for writeThreads
-    WriteThread** threadCallables; ///<Stores the functors that are run by the threads
     boost::thread_group writeThreads; ///<Boost thread group object that stores the multiple thread objects doing writes
-    int threadCount; ///<stores the number of threads to use for concurrent asynchronous writing
     WriteThreadPoolMode writeMode; ///<Used to build threads with the appropriate operation mode
     
 
