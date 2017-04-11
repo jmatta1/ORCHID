@@ -41,7 +41,7 @@ enum class AcquisitionThreadState : char
     Terminate ///<Acquisition thread will clean up and exit once its state is set to this
 };
 
-/*!
+/**
  * @class AcquisitionThreadControl
  * @ingroup SecantThreadControl
  * @brief This class is used to control operation of acquisition threads

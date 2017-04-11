@@ -32,7 +32,7 @@ namespace Secant
 namespace OperationData
 {
 
-/*!
+/**
  * @class FileData
  * @ingroup SecantData
  * @brief This class holds file information in a thread safe way

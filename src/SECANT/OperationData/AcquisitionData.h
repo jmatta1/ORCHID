@@ -29,7 +29,7 @@ namespace Secant
 
 namespace OperationData
 {
-/*!
+/**
  * @class AcquisitionData
  * @ingroup SecantData
  * @brief This class holds atomic variables to store acquisition information in a threadsafe way

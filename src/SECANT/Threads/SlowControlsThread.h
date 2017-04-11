@@ -40,7 +40,7 @@ namespace Secant
 namespace Threads
 {
 
-/*!
+/**
  * @class SecantSlowControlsThread
  * 
  * @ingroup SecantThreads

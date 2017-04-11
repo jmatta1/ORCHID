@@ -29,7 +29,7 @@ namespace Secant
 namespace Interfaces
 {
 
-/*!
+/**
  * @class SlowControlsInterface
  * @ingroup SecantInterfaces
  * @brief This class defines the interface for slow controls hardware classes

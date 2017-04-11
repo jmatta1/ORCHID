@@ -31,7 +31,7 @@ namespace Secant
 namespace OperationData
 {
 
-/*!
+/**
  * @class SlowControlsData
  * @ingroup SecantData
  * @brief This class holds data about the slow controls polling

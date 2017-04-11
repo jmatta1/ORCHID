@@ -30,7 +30,7 @@ namespace Secant
 namespace Threads
 {
 
-/*!
+/**
  * @class SecantThreadInterface
  * 
  * @ingroup SecantThreads
