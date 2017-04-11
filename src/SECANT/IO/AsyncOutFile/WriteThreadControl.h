@@ -47,7 +47,7 @@ enum class WriteThreadMode: char
 /*!
  * @class WriteThreadControl
  * @ingroup SecantIoModule SecantAsyncFile
- * @brief Control class for the write thread pool
+ * @brief Control class for the write threads that are pooled
  * @author James Till Matta
  * 
  * This class allows the thread pool to control the write threads
@@ -78,7 +78,6 @@ public:
      * their operator() block
      */
     void acknowledgeTerminate(){numTerminated.fetch_add(1);}
-    
     /**
      * @brief Used by write threads to declare they have started
      * 
@@ -95,7 +94,6 @@ public:
      * locks a mutex.
      */
     void setToRunning(){changeState(WriteThreadMode::Running, numRunning);}
-    
     /**
      * @brief Sets the write thread mode to stopped
      *
@@ -104,7 +102,6 @@ public:
      * locks a mutex.
      */
     void setToStopped(){changeState(WriteThreadMode::Stopped, numStopped);}
-    
     /**
      * @brief Sets the write thread mode to terminate
      *
@@ -119,13 +116,11 @@ public:
      * @return The value of the atomic integer that stores the number of run acknowledges
      */
     int getRunningCount(){return numRunning.load();}
-    
     /**
      * @brief Retrieves the number of threads that have acknowledges the stop running command
      * @return The value of the atomic integer that stores the number of stop acknowledges
      */
     int getStoppedCount(){return numStopped.load();}
-    
     /**
      * @brief Retrieves the number of threads that have exited their main execution loop
      * @return The value of the atomic integer that stores the number of terminate acknowledges
