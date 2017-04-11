@@ -1,0 +1,18 @@
+/**
+* @defgroup SecantAsyncFile Secant Asynchronous File
+* @brief Classes that allow the asynchronous file writing mechanism to work
+* 
+* These classes support asynchronous file writing for the Secant::IO::AsyncOutFile
+*
+* Secant::IO::AsyncFile::WriteThreadPool is a simple singleton thread pool that
+* is used to keep track of the threads used to perform the asynchronous writing.
+*
+* Secant::IO::AsyncFile::WriteThreadControl is a singleton class that allows
+* setting the state of the threads managed by WriteThreadPool
+*
+* Secant::IO::AsyncFile::WriteThreadControl is the functor that is used to
+* construct the write threads
+*
+* Secant::IO::AsyncFile::WriteMultiQueue is the singleton class that manages the
+* per file write queues and the buffer return queue for the asynchronous out file
+*/
