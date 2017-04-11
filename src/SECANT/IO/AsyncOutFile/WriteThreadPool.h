@@ -69,7 +69,7 @@ public:
      * @brief Gets the mode that threads were initialized with
      * @return The write mode that write threads were initialized with
      */
-    WriteThreadPoolMode getThreadMode(){return writeMode;}
+    WriteThreadMode getThreadMode(){return writeMode;}
     
     /**
      * @brief Gets a reference to the global class instance
@@ -83,7 +83,7 @@ public:
      * simply returns a reference to the already generated instance
      */
     static WriteThreadPool& getInstance(int numWriteThreads=2,
-                                        WriteThreadPoolMode mode=WriteThreadPoolMode::Greedy)
+                                        WriteThreadMode mode=WriteThreadMode::Greedy)
     {
         //the constructor is only called the first time so things are only initialized once
         static WriteThreadPool pool(numWriteThreads, mode);
@@ -94,11 +94,11 @@ private:
     /**
      * @brief Private default constructor to make the WriteThreadPool when needed
      */
-    WriteThreadPool(int numWriteThreads, WriteThreadPoolMode mode);
+    WriteThreadPool(int numWriteThreads, WriteThreadMode mode);
     
     WriteThreadControl& threadController; ///<Class to hold control for writeThreads
     boost::thread_group writeThreads; ///<Boost thread group object that stores the multiple thread objects doing writes
-    WriteThreadPoolMode writeMode; ///<Used to build threads with the appropriate operation mode
+    WriteThreadMode writeMode; ///<Used to build threads with the appropriate operation mode
     
 
 public: //Deleted methods go in this section because I want the enhanced error
