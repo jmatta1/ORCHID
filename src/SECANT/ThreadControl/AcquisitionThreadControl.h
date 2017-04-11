@@ -99,54 +99,27 @@ public:
     /**
      * @brief Changes the desired state to Acquiring
      * 
-     * This function should not be 'hammered' if it is avoidable as, to prevent
-     * races with acquisition threads going into a condition var, it locks a
-     * mutex.
+     * @remark This function should not be 'hammered' if it is avoidable as, to
+     * prevent races with acquisition threads going into a condition var, it
+     * locks a mutex.
      */
-    void setToAcquiring()
-    {
-        //enter an artificial block to create and destroy lock before we notify
-        {
-            boost::unique_lock<boost::mutex> lock(this->waitMutex);
-            if(acqState.load() != AcquisitionThreadState::Acquiring) startAckCount.store(0);
-            acqState.store(AcquisitionThreadState::Acquiring);
-        }
-        acqThreadWaitCondition.notify_all();
-    }
+    void setToAcquiring(){changeState(AcquisitionThreadState::Acquiring, startAckCount);}
     /**
      * @brief Changes the desired state to Stopped
      * 
-     * This function should not be 'hammered' if it is avoidable as, to prevent
-     * races with acquisition threads going into a condition var, it locks a
-     * mutex.
+     * @remark This function should not be 'hammered' if it is avoidable as, to
+     * prevent races with acquisition threads going into a condition var, it
+     * locks a mutex.
      */
-    void setToStopped()
-    {
-        //enter an artificial block to create and destroy lock before we notify
-        {
-            boost::unique_lock<boost::mutex> lock(this->waitMutex);
-            if(acqState.load() != AcquisitionThreadState::Stopped) stopAckCount.store(0);
-            acqState.store(AcquisitionThreadState::Stopped);
-        }
-        acqThreadWaitCondition.notify_all();
-    }
+    void setToStopped(){changeState(AcquisitionThreadState::Stopped, stopAckCount);}
     /**
      * @brief Changes the desired state to Terminate
      * 
-     * This function should not be 'hammered' if it is avoidable as, to prevent
-     * races with acquisition threads going into a condition var, it locks a
-     * mutex.
+     * @remark This function should not be 'hammered' if it is avoidable as, to
+     * prevent races with acquisition threads going into a condition var, it
+     * locks a mutex.
      */
-    void setToTerminate()
-    {
-        //enter an artificial block to create and destroy lock before we notify
-        {
-            boost::unique_lock<boost::mutex> lock(this->waitMutex);
-            if(acqState.load() != AcquisitionThreadState::Terminate) termAckCount.store(0);
-            acqState.store(AcquisitionThreadState::Terminate);
-        }
-        acqThreadWaitCondition.notify_all();
-    }
+    void setToTerminate(){changeState(AcquisitionThreadState::Terminate, termAckCount);}
     
     /**
      * @brief Returns the number of threads that are waiting in the condition var
@@ -176,6 +149,25 @@ private:
      */
     void acknowledgeStop(){stopAckCount.fetch_add(1);}
 
+    /**
+     * @brief Locks the waitMutex, changes the state, resets the ack variable and wakes the threads on the wait condition
+     * @param[in] newState The new target state for the threads
+     * @param[in] ackVariable The particular atomic integer that holds the acknowledge count for that thread state
+     */
+    void changeState(AcquisitionThreadState& newState, std::atomic_int& ackVariable)
+    {
+        //artificial scope to force destruction of the unique_lock prior to notify all
+        {
+            boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            if(acqState.load() != newState)
+            {
+                ackVariable.store(0);
+            }
+            acqState.store(newState);
+        }
+        acqThreadWaitCondition.notify_all();
+    }
+    
     std::atomic<AcquisitionThreadState> acqState;///<Stores the current/desired state of the acquisition threads
     std::atomic_uint termAckCount;///<Stores how many acq threads have acknowledged the change in state to AcquisitionThreadState::Terminate
     std::atomic_uint stopAckCount;///<Stores how many acq threads have acknowledged the change in state to AcquisitionThreadState::Stopped
