@@ -40,7 +40,7 @@ void WriteThreadControl::waitForChange()
     //The system is set to stop, gets to just before the lock, has state changed
     //again and it waits until it somehow wakes up when it should have been doing
     //something else
-    while(this->writeState.load() == WriteThreadMode::Stopped)
+    while(this->writeState.load() == WriteThreadState::Stopped)
     {
         //waiting on the condition variable unlocks the lock allowing state changes
         writeThreadWaitCondition.wait(waitLock);

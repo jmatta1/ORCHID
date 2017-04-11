@@ -37,14 +37,14 @@ namespace AsyncFile
  * @brief The WriteThreadMode enum covers the two modes that write threads need
  * to be in. Running, and set to Terminate
  */
-enum class WriteThreadMode: char
+enum class WriteThreadState: char
 {
     Running, ///<In this state the threads are running and either waiting for data or writing
     Stopped, ///<In this state the threads are waiting on a wait condition to be told to resume
     Terminate ///<When write threads see this mode they shut down and terminate
 };
 
-/*!
+/**
  * @class WriteThreadControl
  * @ingroup SecantIoModule SecantAsyncFile
  * @brief Control class for the write threads that are pooled
@@ -60,7 +60,7 @@ public:
      * @brief Retrieve the currently set state for write threads
      * @return The stored state for write threads
      */
-    WriteThreadMode getCurrentState(){return writeState.load();}
+    WriteThreadState getCurrentState(){return writeState.load();}
     
     /**
      * @brief Allows write threads to pause for a state change
@@ -93,7 +93,7 @@ public:
      * prevent races with acquisition threads going into a condition var, it
      * locks a mutex.
      */
-    void setToRunning(){changeState(WriteThreadMode::Running, numRunning);}
+    void setToRunning(){changeState(WriteThreadState::Running, numRunning);}
     /**
      * @brief Sets the write thread mode to stopped
      *
@@ -101,7 +101,7 @@ public:
      * prevent races with acquisition threads going into a condition var, it
      * locks a mutex.
      */
-    void setToStopped(){changeState(WriteThreadMode::Stopped, numStopped);}
+    void setToStopped(){changeState(WriteThreadState::Stopped, numStopped);}
     /**
      * @brief Sets the write thread mode to terminate
      *
@@ -109,7 +109,7 @@ public:
      * prevent races with acquisition threads going into a condition var, it
      * locks a mutex.
      */
-    void setToTerminate(){changeState(WriteThreadMode::Terminate, numTerminated);}
+    void setToTerminate(){changeState(WriteThreadState::Terminate, numTerminated);}
     
     /**
      * @brief Retrieves the number of threads that have acknowledged the start running command
@@ -153,7 +153,7 @@ private:
      * @param[in] newState The new target state for the threads
      * @param[in] ackVariable The particular atomic integer that holds the acknowledge count for that thread state
      */
-    void changeState(WriteThreadMode& newState, std::atomic_int& ackVariable)
+    void changeState(WriteThreadState& newState, std::atomic_int& ackVariable)
     {
         //artificial scope to force destruction of the unique_lock prior to notify all
         {
@@ -171,11 +171,11 @@ private:
      * @brief Private default constructor to make the WriteThreadPool when needed
      */
     WriteThreadControl():
-        writeState(WriteThreadMode::Stopped), numTerminated(0),
+        writeState(WriteThreadState::Stopped), numTerminated(0),
         numStopped(0), numRunning(0) {}
     
     //member variables
-    std::atomic<WriteThreadMode> writeState;///<Current state of the write threads
+    std::atomic<WriteThreadState> writeState;///<Current state of the write threads
     std::atomic_int numRunning; ///<Count of the number of threads that ack running mode
     std::atomic_int numStopped; ///<Count of the number of threads that ack stopped mode
     std::atomic_int numTerminated; ///<Count of the number of threads that ack terminate

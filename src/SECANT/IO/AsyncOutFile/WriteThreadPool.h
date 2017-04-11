@@ -36,10 +36,10 @@ namespace IO
 namespace AsyncFile
 {
 
-/*!
+/**
  * @class WriteThreadPool
  * @ingroup SecantIoModule SecantAsyncFile
- * @brief This class serves as manager for the Asynchronous Write thread pool
+ * @brief This class serves as the manager for the Asynchronous Write thread pool
  * @author James Till Matta
  * 
  * This class holds the necessary logic and data to manage the thread pool and
