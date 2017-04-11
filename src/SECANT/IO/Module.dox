@@ -1,0 +1,15 @@
+/**
+* @defgroup SecantIoModule Secant IO Classes
+* @brief Classes for writing Secant output files and for accessing certain IO resources (like SNMP)
+* 
+* These classes allow the user to write Secant output files, write generic files
+* in an asynchronous manner, or to access things via SNMP
+*
+* Secant::IO::SecantFileWriter allows full write access to Secant files
+*
+* Secant::IO::SecantWriteInterface only allows writing of a char array to a
+* SecantFile, this iw what is passed to user provided code
+*
+* Secant::IO::AsyncOutFile allows asynchronous file writing (via a thread pool
+* and write queue).
+*/
