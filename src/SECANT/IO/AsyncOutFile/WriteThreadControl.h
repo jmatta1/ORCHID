@@ -170,15 +170,13 @@ private:
     /**
      * @brief Private default constructor to make the WriteThreadPool when needed
      */
-    WriteThreadControl():
-        writeState(WriteThreadState::Stopped), numTerminated(0),
-        numStopped(0), numRunning(0) {}
+    WriteThreadControl(){}
     
     //member variables
-    std::atomic<WriteThreadState> writeState;///<Current state of the write threads
-    std::atomic_int numRunning; ///<Count of the number of threads that ack running mode
-    std::atomic_int numStopped; ///<Count of the number of threads that ack stopped mode
-    std::atomic_int numTerminated; ///<Count of the number of threads that ack terminate
+    std::atomic<WriteThreadState> writeState = WriteThreadState::Stopped;///<Current state of the write threads
+    std::atomic_int numRunning = 0; ///<Count of the number of threads that ack running mode
+    std::atomic_int numStopped = 0; ///<Count of the number of threads that ack stopped mode
+    std::atomic_int numTerminated = 0; ///<Count of the number of threads that ack terminate
     boost::mutex waitMutex; ///<Prevents state change races and allows write threads to wait for a state change
     boost::condition_variable writeThreadWaitCondition; ///<Allows write threads to wait for a state change
     
