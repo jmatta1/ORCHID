@@ -40,7 +40,7 @@ namespace AsyncFile
  */
 static const int MaximumWriteQueueSize = 16384;
 
-/*!
+/**
  * @class WriteMultiQueue
  * @ingroup SecantIoModule SecantAsyncFile
  * @brief The WriteMultiQueue class serves as manager for the asynchronous write queueing
@@ -58,6 +58,41 @@ static const int MaximumWriteQueueSize = 16384;
 class WriteMultiQueue
 {
 public:
+    
+    /**
+     * @brief Puts an empty buffer back on the buffer return queue for use in another write
+     * @param[in] emptyBuffer Pointer to the empty write buffer to be returned for reuse
+     */
+    void pushEmptyBuffer(char* emptyBuffer);
+    
+    /**
+     * @brief Retrieves an empty buffer from the queue, if there are none, wait until there are
+     * @return Pointer to the empty buffer retrieved from the queue
+     */
+    char* popEmptyBuffer();
+    
+    /**
+     * @brief Pushes a full buffer ready for writing onto the write queue for a file
+     * @param[in] The number of the file to write
+     * @param[in] The byte array containing the data to be written
+     * @param[in] The number of bytes to be written in the writeBuffer
+     */
+    void pushFileWrite(int fileNumber, char* writeBuffer, int writeSize);
+    
+    /**
+     * @brief Pulls a write from the queue for file number fileNumber. 
+     * @param[in] fileNumber the index of the file to be written to
+     * @param[out] writeSize the size in bytes of the write
+     * @return pointer to the byte array containing the data to write
+     */
+    char* popFileWrite(int fileNumber, int& writeSize);
+    
+    /**
+     * @brief Checks if there are writes pending in the queue
+     * @return True if there are pending writes, false otherwise
+     */
+    bool dataAvailable(){return 0==queuedWrites.load();}
+    
     /**
      * @brief Gets a reference to the global class instance
      * @return A reference to the global instance of the class
@@ -73,6 +108,10 @@ private:
      * @brief Private default constructor to make the WriteThreadPool when needed
      */
     WriteMultiQueue(){}
+    
+    std::atomic_int queuedWrites = 0;
+    
+    
 
 public: //Deleted methods go in this section because I want the enhanced error
     //messages of public deleted methods, but don't want to 'gum up' my actual
