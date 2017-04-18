@@ -43,3 +43,13 @@ At the 'Data Taking Screen' there are two available commands.
  - TODO: Clean up the format and structure of the ui thread
  - TODO: Convert MPOD reader / controller to use Boost::Asio
  - TODO: Perform overall code cleanup and burn the cruft out of the code
+
+### Notes on thread creation ordering.
+Threads are created in the following order:
+ - Primary, initial execution, thread, created at program start, goes to sleep after UI thread starts.
+ - Asyncrhonous file writer/worker thread
+ - Slow Controls thread;
+ - File output thread
+ - Acquisition thread(s)
+ - Processing thread(s)
+ - UI Thread
