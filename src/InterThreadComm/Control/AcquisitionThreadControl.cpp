@@ -27,18 +27,13 @@ namespace InterThread
 
 void AcquisitionThreadControl::waitForChange()
 {
-    //creation of the mutexes happen rarely, so we can suck it up
-    //since we can have multiple threads waiting here simultaneously, if they all
-    //used the same mutex they would serlialize getting out of the function,
-    //so instead we create the threads on the fly
-    boost::mutex waitMutex;
     boost::unique_lock<boost::mutex> waitLock(waitMutex);
+    waitCount.fetch_add(1);
     while(this->acqState.load() == AcquisitionThreadState::Stopped)
     {
-        waitCount.fetch_add(1);
         acqThreadWaitCondition.wait(waitLock);
-        waitCount.fetch_add(-1);
     }
+    waitCount.fetch_add(-1);
     //the lock will release on deconstruction
 }
 

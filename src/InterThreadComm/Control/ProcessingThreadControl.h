@@ -42,19 +42,31 @@ public:
     void acknowledgeTerminate(){termAckCount.fetch_add(1);}
 
     //functions to be accessed by the UI thread
-    void setToRunning(){procState.store(ProcessingThreadState::Running); procThreadWaitCondition.notify_all();}
-    void setToStopped(){procState.store(ProcessingThreadState::Stopped);}
-    void setToTerminate(){procState.store(ProcessingThreadState::Terminate); procThreadWaitCondition.notify_all();}
+    void setToRunning(){changeState(ProcessingThreadState::Running);}
+    void setToStopped(){changeState(ProcessingThreadState::Stopped);}
+    void setToTerminate(){changeState(ProcessingThreadState::Terminate);}
     
     int getThreadsWaiting(){return waitCount.load();}
     int getThreadsTerminated(){return termAckCount.load();}
     
 private:
+    void changeState(ProcessingThreadState newState)
+    {
+        //artificial scope to force destruction of the unique_lock prior to notify all
+        {
+            boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            procState.store(newState);
+        }
+        procThreadWaitCondition.notify_all();
+    }
+    
+    
     std::atomic<ProcessingThreadState> procState;
     std::atomic_uint termAckCount;
     
     std::atomic_uint waitCount;
-    boost::condition_variable procThreadWaitCondition;//we create the mutex for this on the fly so everyone can wake up simultaneously
+    boost::mutex waitMutex;
+    boost::condition_variable procThreadWaitCondition;
 };
 
 }

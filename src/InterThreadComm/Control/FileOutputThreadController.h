@@ -48,15 +48,11 @@ public:
     {
         rTitle=this->runTitle;
         rNum=this->runNumber;
-        this->currentState.store(this->priorState.load());
+        changeState(this->priorState.load());
     }
     
     //files for the UI thread
-    void setToTerminate()
-    {
-        this->currentState.store(FileOutputThreadState::Terminate);
-        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
-    }
+    void setToTerminate(){changeState(FileOutputThreadState::Terminate);}
     bool setNewRunParameters(const std::string& rTitle, int runNum)
     {
         //check to make certain we have not already set a title change that has
@@ -69,20 +65,11 @@ public:
         this->runTitle = rTitle;
         this->runNumber = runNum;
         this->priorState.store(this->currentState.load());
-        this->currentState.store(FileOutputThreadState::NewRunParams);
-        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
+        changeState(FileOutputThreadState::NewRunParams);
         return true;
     }
-    void setToWaiting()
-    {
-        this->currentState.store(FileOutputThreadState::Waiting);
-        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
-    }
-    void setToWriting()
-    {
-        this->currentState.store(FileOutputThreadState::Writing);
-        if(this->fileThreadWaiting.load()) this->waitCondition.notify_all();
-    }
+    void setToWaiting(){changeState(FileOutputThreadState::Waiting);}
+    void setToWriting(){changeState(FileOutputThreadState::Writing);}
     void uiGetRunParams(std::string& rTitle, int& rNum)
     {
         rTitle=this->runTitle;
@@ -92,6 +79,16 @@ public:
     bool isDone(){return this->threadDone.load();}
     bool isWaiting(){return this->fileThreadWaiting.load();}
 private:
+    void changeState(FileOutputThreadState newState)
+    {
+        //artificial scope to force destruction of the unique_lock prior to notify all
+        {
+            boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            currentState.store(newState);
+        }
+        waitCondition.notify_all();
+    }
+
     //state variable
     std::atomic<FileOutputThreadState> currentState;
     //holds the state of the system before we set NewRunParams

@@ -30,13 +30,12 @@ void FileOutputThreadController::waitForNewState()
     //lock the wait mutex
     boost::unique_lock<boost::mutex> waitLock(this->waitMutex);
     //store the current state to check against
-    FileOutputThreadState oldState = this->currentState.load();
+    this->fileThreadWaiting.store(true);
     //use the condition variable to wait until the thread is woken
     //since spurious wake up event are possible put the wait inside a loop to
     //check for the condition that made us wait in the first place
-    while(oldState == this->currentState.load())
+    while(FileOutputThreadState::Waiting == this->currentState.load())
     {
-        this->fileThreadWaiting.store(true);
         this->waitCondition.wait(waitLock);
     }
     this->fileThreadWaiting.store(false);

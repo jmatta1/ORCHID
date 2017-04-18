@@ -46,30 +46,24 @@ public:
     void setDone(){this->threadDone.store(true);}
     
     //functions for the UI thread to access
-    void setToTerminate()
-    {
-        this->currentState.store(SlowControlsThreadState::Terminate);
-        this->waitCondition.notify_all();
-    }
-    void setToStop()
-    {
-        this->currentState.store(SlowControlsThreadState::Stopped);
-        this->waitCondition.notify_all();
-    }
-    void setToPolling()
-    {
-        this->currentState.store(SlowControlsThreadState::Polling);
-        this->waitCondition.notify_all();
-    }
-    void setToWriting()
-    {
-        this->currentState.store(SlowControlsThreadState::Writing);
-        this->waitCondition.notify_all();
-    }
+    void setToTerminate(){changeState(SlowControlsThreadState::Terminate);}
+    void setToStop(){changeState(SlowControlsThreadState::Stopped);}
+    void setToPolling(){changeState(SlowControlsThreadState::Polling);}
+    void setToWriting(){changeState(SlowControlsThreadState::Writing);}
     bool isWaiting(){return this->threadWaiting.load();}
     bool isDone(){return this->threadDone.load();}
     
 private:
+    void changeState(SlowControlsThreadState newState)
+    {
+        //artificial scope to force destruction of the unique_lock prior to notify all
+        {
+            boost::unique_lock<boost::mutex> lock(this->waitMutex);
+            currentState.store(newState);
+        }
+        waitCondition.notify_all();
+    }
+    
     std::atomic<SlowControlsThreadState> currentState;
     
     //thread syncronization
