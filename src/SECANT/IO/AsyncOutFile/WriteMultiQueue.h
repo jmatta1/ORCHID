@@ -28,6 +28,8 @@
 #include"WriteThread.h"
 #include"WriteMultiQueue.h"
 
+class std::string;
+
 namespace SECANT
 {
 namespace IO
@@ -53,7 +55,9 @@ static const int MaximumWriteQueueSize = 16384;
  * file the ordering of those buffers on disk is a strictly first come first
  * served basis, therefore if buffer mis-ordering is a problem, just have a single
  * thread enqueing buffers, or build a complicated system to order which thread is
- * sending when (why would you do that to yourself?).
+ * sending when (why would you do that to yourself?). Also, if multiple threads
+ * are enquing writes, you still need to find some mechanism to ensure that a
+ * single thread has the responsibility of requesting file name changes
  */
 class WriteMultiQueue
 {
@@ -92,6 +96,18 @@ public:
      * @return True if there are pending writes, false otherwise
      */
     bool dataAvailable(){return 0==queuedWrites.load();}
+    
+    /**
+     * @brief Waits for lock of the file, closes the file and opens the new one
+     * @param[in] fileNumber the index of the file whose name is to be changed
+     * @param[in] filePath a constant reference to the string that contains the path to be written
+     * 
+     * This function will block the calling thread until the thread can lock the
+     * file to change the file name etc. If multiple threads are writing to the
+     * same file, you may not like the result if they all try to use this function
+     * simultaneously... maybe
+     */
+    void changeFileName(int fileNumber, const std::string& filePath);
     
     /**
      * @brief Gets a reference to the global class instance
