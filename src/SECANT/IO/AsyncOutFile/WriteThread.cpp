@@ -46,16 +46,17 @@ void WriteThread::operator ()()
             this->notTerminated = false;
             break;
         case WriteThreadState::Running:
+            controller.acknowledgeRunning();
             if(mode==WriteThreadMode::Greedy)
-            {
-                writeGreedily();
-            }
+            { greedyWriteLoop();}
             else
-            {
-                writeAusterely();
-            }
+            { austereWriteLoop();}
+            // if we are here, clear the writes that are still incoming and then
+            // check state flags
+            clearWriteBufferLoop();
             break;
         case WriteThreadState::Stopped:
+            controller.waitForChange(); // stop gets acked in wait for change
             break;
         }
     }
@@ -64,14 +65,14 @@ void WriteThread::operator ()()
     controller.acknowledgeTerminate();
 }
 
-void WriteThread::writeGreedily()
+void WriteThread::greedyWriteLoop()
 {
     
 }
 
-void WriteThread::writeAusterely()
+void WriteThread::austereWriteLoop()
 {
-    
+
 }
 
 }

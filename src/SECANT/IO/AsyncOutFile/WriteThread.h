@@ -91,7 +91,7 @@ private:
     /**
      * @brief Execution loop for Greedy mode
      */
-    void writeGreedily();
+    void greedyWriteLoop();
     
     /**
      * @brief Execute an Austere write cycle
@@ -99,7 +99,17 @@ private:
      * The austere write cycle passes through each queue, taking a single write
      * buffer (if available) from each
      */
-    void writeAusterely();
+    void austereWriteLoop();
+    
+    /**
+     * @brief Used when leaving run mode to clear any writes remaining
+     * 
+     * This loop runs in a greedy way, clearing all writes for a given file
+     * prior to moving on to the next file. This should not matter since, in
+     * theory we only get to this state when writing of files is shutting down
+     * for at least a little while
+     */
+    void clearWriteBufferLoop();
     
     
     
