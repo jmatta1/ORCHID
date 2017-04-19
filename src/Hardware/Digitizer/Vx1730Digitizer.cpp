@@ -98,7 +98,8 @@ void Vx1730Digitizer::setupDigitizer()
     if ((numChannel != 8) && (numChannel != 16))
     {
         BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Error Digitizer #" << moduleNumber << " does not have 8 or 16 channels";
-        throw std::runtime_error("Vx1730 Error - Wrong Channel Count");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Wrong Channel Count");
     }
     
     //open the digitizer
@@ -357,59 +358,73 @@ void Vx1730Digitizer::writeErrorAndThrow(CAENComm_ErrorCode errVal)
     {
     case CAENComm_Success:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Success\n";
-        throw std::runtime_error("Vx1730 Error - Success");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Success");
         break;
     case CAENComm_VMEBusError:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: VME Bus Error During Cycle\n";
-        throw std::runtime_error("Vx1730 Error - VME Bus Error During Cycle");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - VME Bus Error During Cycle");
         break;
     case CAENComm_CommError:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Communication Error\n";
-        throw std::runtime_error("Vx1730 Error - Communication Error");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Communication Error");
         break;
     case CAENComm_GenericError:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Unspecified Error\n";
-        throw std::runtime_error("Vx1730 Error - Unspecified Error");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Unspecified Error");
         break;
     case CAENComm_InvalidParam:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Invalid Parameter\n";
-        throw std::runtime_error("Vx1730 Error - Invalid Parameter");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Invalid Parameter");
         break;
     case CAENComm_InvalidLinkType:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Invalid Link Type\n";
-        throw std::runtime_error("Vx1730 Error - Invalid Link Type");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Invalid Link Type");
         break;
     case CAENComm_InvalidHandler:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Invalid Device Handler\n";
-        throw std::runtime_error("Vx1730 Error - Invalid Device Handler");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Invalid Device Handler");
         break;
     case CAENComm_CommTimeout:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Communication Timeout\n";
-        throw std::runtime_error("Vx1730 Error - Communication Timeout");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Communication Timeout");
         break;
     case CAENComm_DeviceNotFound:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Unable To Open Requested Device\n";
-        throw std::runtime_error("Vx1730 Error - Unable To Open Requested Device");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Unable To Open Requested Device");
         break;
     case CAENComm_MaxDevicesError:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Maximum Number of Devices Exceeded\n";
-        throw std::runtime_error("Vx1730 Error - Maximum Number of Devices Exceeded");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Maximum Number of Devices Exceeded");
         break;
     case CAENComm_DeviceAlreadyOpen:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Device Already Open\n";
-        throw std::runtime_error("Vx1730 Error - Device Already Open");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Device Already Open");
         break;
     case CAENComm_NotSupported:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Not Supported Function\n";
-        throw std::runtime_error("Vx1730 Error - Not Supported Function");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Not Supported Function");
         break;
     case CAENComm_UnusedBridge:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: There Are No Boards Controlled By That Bridge\n";
-        throw std::runtime_error("Vx1730 Error - There Are No Boards Controlled By That Bridge");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - There Are No Boards Controlled By That Bridge");
         break;
     case CAENComm_Terminated:
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Digitizer #" << moduleNumber << " - Code: Communication Terminated By Device\n";
-        throw std::runtime_error("Vx1730 Error - Communication Terminated By Device");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Vx1730 Error - Communication Terminated By Device");
         break;
     }
 }

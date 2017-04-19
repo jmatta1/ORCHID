@@ -25,6 +25,7 @@
 #include<sstream>
 #include<iomanip>
 #include<algorithm>
+#include<cstdlib>
 // includes from other libraries
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
@@ -59,7 +60,8 @@ FileOutputThread::FileOutputThread(Utility::ToFileMultiQueue* queueInput,
         if(allocBuffer == nullptr)
         {
             BOOST_LOG_SEV(lg, Critical) << "FO Thread: Error In File Write Buffer Allocation";
-            throw std::runtime_error("Error In File Write Buffer Allocation");
+            std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+            //throw std::runtime_error("Error In File Write Buffer Allocation");
         }
         //technically this thread should not push, only pop, but I think that it
         //is legal in this case since concurrent use of the queue has no hope of 
@@ -111,19 +113,22 @@ void FileOutputThread::prepNewRunFolder()
     if(!boost::filesystem::is_directory(writePath))
     {
         BOOST_LOG_SEV(lg, Critical) << "FO Thread: Could not create data directory in file thread";
-        throw std::runtime_error("Could not create data directory in file thread");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Could not create data directory in file thread");
     }
     writePath.append(this->currentRunTitle);
     boost::filesystem::create_directories(writePath, mkDirErr);
     if(!boost::filesystem::is_directory(writePath))
     {
         BOOST_LOG_SEV(lg, Critical) << "FO Thread: Could not create run directory in file thread";
-        throw std::runtime_error("Could not create run directory in file thread");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Could not create run directory in file thread");
     }
     if(!boost::filesystem::is_directory(writePath, mkDirErr))
     {
         BOOST_LOG_SEV(lg, Critical) << "FO Thread: No run directory detected despite creation";
-        throw std::runtime_error("No run directory detected despite creation");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("No run directory detected despite creation");
     }
     this->writeDirectory = writePath.native();
     BOOST_LOG_SEV(lg, Information) << "FO Thread: Made new folder at: " << this->writeDirectory;
