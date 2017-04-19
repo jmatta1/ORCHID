@@ -20,6 +20,7 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<iomanip>
+#include<cstdlib>
 // includes from other libraries
 #include<boost/chrono.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
