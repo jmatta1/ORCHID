@@ -25,6 +25,7 @@
 #include<ctime>
 #include<chrono>
 #include<sstream>
+#include<cstdlib>
 // includes from other libraries
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include<boost/filesystem.hpp>
@@ -78,7 +79,8 @@ SecantFileWriter::SecantFileWriter(InterThreadData::FileData *fileDat,
         if(allocBuffer == nullptr)
         {
             BOOST_LOG_SEV(lg, Critical) << "FO Thread: Error In File Write Buffer Allocation";
-            throw std::runtime_error("Error In File Write Buffer Allocation");
+            std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+            //throw std::runtime_error("Error In File Write Buffer Allocation");
         }
         //technically this thread should not push, only pop, but I think that it
         //is legal in this case since concurrent use of the queue has no hope of 
@@ -181,7 +183,8 @@ void SecantFileWriter::prepNewRunFolder()
         if(!boost::filesystem::is_directory(writePath, errCode))
         {
             BOOST_LOG_SEV(lg, Critical) << "SecantFileWriter: Could not create data directory in file thread";
-            throw std::runtime_error("Could not create data directory in file thread");
+            std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+            //throw std::runtime_error("Could not create data directory in file thread");
         }
     }
     //append the run title to the base output 
@@ -194,7 +197,8 @@ void SecantFileWriter::prepNewRunFolder()
         if(!boost::filesystem::is_directory(writePath, errCode))
         {
             BOOST_LOG_SEV(lg, Critical) << "SecantFileWriter: Could not create run directory in file thread";
-            throw std::runtime_error("Could not create run directory in file thread");
+            std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+            //throw std::runtime_error("Could not create run directory in file thread");
         }
     }
     this->writeDirectory = writePath.native();

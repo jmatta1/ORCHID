@@ -21,6 +21,7 @@
 // includes for C system headers
 // includes for C++ system headers
 #include<sstream>
+#include<cstdlib>
 #include<string>
 #include<iomanip>
 #include<cstdio>
@@ -85,7 +86,8 @@ std::string SnmpUtilControl::runCommand(const std::string& command)
     {
         BOOST_LOG_SEV(OrchidLog::get(), Critical) << "popen() failed in SnmpUtilControl!";
         BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Got the popen() error: " << strerror(errno);
-        throw std::runtime_error("popen() failed in SnmpUtilControl!");
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("popen() failed in SnmpUtilControl!");
     }
     while (!feof(pipe.get()))
     {
@@ -103,7 +105,11 @@ std::string SnmpUtilControl::convertToUniversalChannel(int board,
                                                        int channel) const
 {
     //TODO, support for multiple chained crates?
-    if( (board < 0) || (board > 9) ) throw std::runtime_error("Invalid board number (not in the range [0, 9]");
+    if( (board < 0) || (board > 9) )
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Invalid board number (not in the range [0, 9]";
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Invalid board number (not in the range [0, 9]");
     std::ostringstream channelNamer;
     channelNamer << ".u";
     if((board!=0))
