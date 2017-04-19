@@ -25,6 +25,7 @@
 #include<iomanip>
 #include<cstdio>
 #include<memory>
+#include<cstdlib>
 #include<stdexcept>
 #include<iostream>
 // includes from other libraries
@@ -104,7 +105,12 @@ std::string SnmpUtilControl::convertToUniversalChannel(int board,
                                                        int channel) const
 {
     //TODO, support for multiple chained crates?
-    if( (board < 0) || (board > 9) ) throw std::runtime_error("Invalid board number (not in the range [0, 9]");
+    if( (board < 0) || (board > 9) )
+    {
+        BOOST_LOG_SEV(OrchidLog::get(), Critical) << "Invalid board number (not in the range [0, 9]";
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
+        //throw std::runtime_error("Invalid board number (not in the range [0, 9]");
+    }
     std::ostringstream channelNamer;
     channelNamer << ".u";
     if((board!=0))
