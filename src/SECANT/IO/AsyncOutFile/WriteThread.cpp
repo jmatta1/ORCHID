@@ -67,12 +67,20 @@ void WriteThread::operator ()()
 
 void WriteThread::greedyWriteLoop()
 {
-    
+    while(controller.getCurrentState() == WriteThreadState::Running)
+    {
+        
+    }
 }
 
 void WriteThread::austereWriteLoop()
 {
 
+}
+
+void WriteThread::clearWriteBufferLoop()
+{
+    
 }
 
 }
