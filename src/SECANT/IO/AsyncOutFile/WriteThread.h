@@ -43,8 +43,21 @@ class WriteMultiQueue;
  * to select which mode you want.
  * | Mode Selection   | Peak Write Speed Less Than<br/>or Equal To DiskSpeed| Peak Write Speed<br/>Greater Than Disk Speed|
  * |:----------------:|:----------------------------:|:---------------------------:|
- * |Number Of Write Threads<br/>Greater Than Number of Files|WriteThreadMode::Greedy<br/>is appropriate|WriteThreadMode::Greedy<br/>is appropriate|
+ * |Number Of Write Threads<br/>Greater Than Number of Files|WriteThreadMode::Greedy<br/>is appropriate|WriteThreadMode::Greedy<br/> *might* be appropriate|
  * |Number Of Write Threads Less<br/>Than or Equal To Number Files|WriteThreadMode::Greedy<br/>is appropriate|WriteThreadMode::Austere<br/>is appropriate|
+ * 
+ * @remarks If running in greedy mode and the peak write speed is greater than
+ * the disk speed there may be difficulty changing file name if writes are
+ * coming from more than one thread (i.e. writes keep being enqueued even as
+ * another thread is waiting for a lock to change the file name. If there is only
+ * a single thread writing then trying to change the file name, regardless of the
+ * peak write speed the queue will eventually empty and the lock will be granted
+ * to the thread trying to change the name instead of the write thread (which
+ * will hold the lock for as along as there is data to write to that file).
+ * However, when there is a thread continuing to enqueue writes for that file
+ * then the thread doing the writing may never stop, in which case it will never
+ * release the file lock and so the thread trying to change the name will never
+ * get custody of the lock to change the name.
  */
 enum class WriteThreadMode : char 
 {
