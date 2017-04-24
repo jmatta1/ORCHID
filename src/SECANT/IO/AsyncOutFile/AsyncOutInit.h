@@ -11,8 +11,7 @@
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 **
-** @details Holds the defintion of the singleton class that coordinates the pool
-** of threads that perform file writes. Also holds the write mode enumeration
+** @details Holds a class that initializes the AsyncOutputFile system
 **
 ********************************************************************************
 *******************************************************************************/
@@ -25,6 +24,7 @@
 #include"WriteThreadPool.h"
 #include"WriteMultiQueue.h"
 #include"ConcurrentOfstreamCollection.h"
+#include"WrapperClearingHouse.h"
 
 namespace SECANT
 {
@@ -48,12 +48,14 @@ class AsyncOutInit
 public:
     AsyncOutInit(int numFiles=4, WriteThreadMode mode=WriteThreadMode::Greedy,
                  int numWriteThreads=2, int bufferSize=2*1024*1024, int numBuffers=200):
-        queues(WriteMultiQueue::getInstance(numFiles, bufferSize, numBuffers)),
         collection(ConcurrentOfstreamCollection::getInstance(numFiles)),
+        clearingHouse(WrapperClearingHouse::getInstance(numFiles)),
+        queues(WriteMultiQueue::getInstance(numFiles, bufferSize, numBuffers)),
         pool(WriteThreadPool::getInstance(numWriteThreads, mode)){}
 private:
-    WriteMultiQueue& queues;
     ConcurrentOfstreamCollection& collection;
+    WrapperClearingHouse& clearingHouse;
+    WriteMultiQueue& queues;
     WriteThreadPool& pool;
 };
 
