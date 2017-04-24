@@ -30,6 +30,15 @@ namespace IO
 {
 namespace AsyncFile
 {
+/**
+ * @class ConcurrentOfstreamWrapper
+ * @ingroup SecantIoModule SecantAsyncFile
+ * @brief The ConcurrentOfstreamWrapper class bundles an ofstream with a mutex to allow safe concurrent access
+ * @author James Till Matta
+ * 
+ * This class holds the ofstream and guard mutex for a given file managed by the
+ * asynchronous IO system
+ */
 class ConcurrentOfstreamWrapper
 {
 public:
