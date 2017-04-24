@@ -10,9 +10,29 @@
 * Secant::IO::AsyncFile::WriteThreadControl is a singleton class that allows
 * setting the state of the threads managed by WriteThreadPool
 *
-* Secant::IO::AsyncFile::WriteThreadControl is the functor that is used to
-* construct the write threads
+* Secant::IO::AsyncFile::WriteThread is the functor that is used to construct
+* the write threads
 *
 * Secant::IO::AsyncFile::WriteMultiQueue is the singleton class that manages the
 * per file write queues and the buffer return queue for the asynchronous out file
+*
+* Secant::IO:AsyncFile::ConcurrentOfstreamWrapper is a wrapper for output fstreams
+* that allows changing file names (in a locked fashion) and an unsafe write which
+* should be used between successful calls to its tryForLock and unlock functions
+*
+* Secant::IO:AsyncFile::ConcurrentOfstreamCollection is a simple access container
+* for a set of ConcurrentOfstreamWrapper objects
+*
+* Secant::IO::AsyncOutFile is a simple interface that users have to the asynchronous
+* output mechanisms that the classes within the Secant::IO::AsyncFile namespace
+* cooperatively give rise to
+*
+* Secant::IO::AsyncOutInit is a simple class that is used to initialize the various
+* singletons that are necessary for the AsyncFile system to work, in the correct order
+* and with the correct data etc, it can be destructed immediately after construction
+* it merely exists to ensure that the first calls to get instance for each of the
+* singletons comes from it and nowhere else
+*
+* The appropriate initialization order for the classes is Secant::IO::AsyncFile::WriteMultiQueue,
+* Secant::IO::AsyncFile::ConcurrentOfstreamCollection, and finally Secant::IO::AsyncFile::WriteThreadPool
 */
