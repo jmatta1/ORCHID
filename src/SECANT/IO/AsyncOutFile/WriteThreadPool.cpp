@@ -31,7 +31,8 @@ namespace AsyncFile
 {
 
 WriteThreadPool::WriteThreadPool(int numWriteThreads, WriteThreadMode mode):
-    threadController(WriteThreadControl::getInstance()), writeMode(mode)
+    threadController(WriteThreadControl::getInstance()), 
+    writeQueues(WriteMultiQueue::getInstance()), writeMode(mode)
 {
     for(int i = 0; i < numWriteThreads; ++i)
     {

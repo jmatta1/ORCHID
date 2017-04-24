@@ -53,8 +53,10 @@ public:
      */
     ~WriteThreadPool()
     {
-        //do something with the writeQueue to clean things up here
+        //Tell the write threads that it is time to go
         threadController.setToTerminate();
+        //make sure the write threads are not waiting on data from the queues to get said message
+        writeQueues.forceWakeFromWait();
         //wait for everything to close down
         writeThreads.join_all();
     }
@@ -97,6 +99,7 @@ private:
     WriteThreadPool(int numWriteThreads, WriteThreadMode mode);
     
     WriteThreadControl& threadController; ///<Class to hold control for writeThreads
+    WriteMultiQueue& writeQueues; ///<Class to hold write and buffer queues
     boost::thread_group writeThreads; ///<Boost thread group object that stores the multiple thread objects doing writes
     WriteThreadMode writeMode; ///<Used to build threads with the appropriate operation mode
     
