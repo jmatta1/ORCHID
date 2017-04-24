@@ -3,8 +3,8 @@
 **
 ** @author James Till Matta
 ** @date 24 April, 2017
-** @brief Holds the defintion of the class that wraps fstream with mutexes /
-** locks
+** @brief Holds the implementation of the class that wraps fstream with mutexes
+** / locks as needed
 **
 ** @copyright Copyright (C) 2016 James Till Matta
 **
@@ -28,7 +28,20 @@ namespace AsyncFile
 
 void ConcurrentOfstreamWrapper::changeFileName(const std::string& filePath)
 {
-    
+    boost::unique_lock fileLock(fileMutex);
+    if(initialized.load())
+    {
+        file.close();
+        file.open(filePath, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    }
+    else
+    {
+        file.open(filePath, std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+        initialized.store(true);
+    }
+    writeCount.store(0);
+    fileSize.store(0);
+    //fileMutex unlocks on deconstruction of fileLock
 }
 
 }
