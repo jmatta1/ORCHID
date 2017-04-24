@@ -79,7 +79,7 @@ class WriteMultiQueue
     using BufferStack = boost::lockfree::stack<char*, boost::lockfree::capacity<MaximumWriteQueueSize> >;
     using WriteQueue = boost::lockfree::queue<BufferData*, boost::lockfree::capacity<MaximumWriteQueueSize> >;
 public:
-    
+    ~WriteMultiQueue(){delete[] bufferCount; delete[] writeQueues;}
     /**
      * @brief Puts an empty buffer back on the buffer return queue for use in another write
      * @param[in] emptyBuffer Pointer to the empty write buffer to be returned for reuse
@@ -127,6 +127,14 @@ public:
     void waitForData();
     
     /**
+     * @brief Forces threads waiting for data to wake even if there is no data
+     * 
+     * This is used in shutdown to forcibly wake threads that are waiting so that
+     * they can see the terminate flag
+     */
+    void forceWakeFromWait(){notForceWake.store(false); consumerWait.notify_all(); producerWait.notify_all();}
+    
+    /**
      * @brief Checks if there are writes pending in the queue
      * @return True if there are pending writes, false otherwise
      */
@@ -159,6 +167,9 @@ public:
     
     /**
      * @brief Gets a reference to the global class instance
+     * @param[in] numFiles The number of output files to be managed, defaults to 4
+     * @param[in] bufferSize The size of a buffer in bytes, defaults to 2MB
+     * @param[in] numBuffers The number of buffers to allocate for use, defaults to 200
      * @return A reference to the global instance of the class
      */
     static WriteMultiQueue& getInstance(int numFiles=4, int bufferSize=2*1024*1024, int numBuffers=200)
@@ -172,6 +183,8 @@ private:
      * @brief Private default constructor to make the WriteThreadPool when needed
      */
     WriteMultiQueue(int numFiles, int bufferSize, int numBuffers);
+    
+    std::atomic_bool notForceWake = true;
     
     std::atomic_int* bufferCount; ///<Array of atomic integers that count the number of writes in each queue
     std::atomic_int queuedWrites = 0; ///<Total number of writes enqueued

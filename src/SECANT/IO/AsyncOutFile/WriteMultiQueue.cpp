@@ -69,7 +69,7 @@ char* WriteMultiQueue::popEmptyBuffer()
     //that way if there is no buffer to be had, we wait until notified that there
     //is a buffer to be had
     char* tempBuffer = nullptr;
-    while(!emptyBuffers.pop(tempBuffer))
+    while(!emptyBuffers.pop(tempBuffer)  && notForceWake.load())
     {
         //lock the mutex so we can wait on the condition variable
         boost::unique_lock waitLock(producerMutex);
@@ -129,15 +129,16 @@ char* WriteMultiQueue::popFileWrite(int fileNumber, int& writeSize)
 
 void WriteMultiQueue::waitForData()
 {
-    while(queuedWrites.load() == 0)
+    while(queuedWrites.load() == 0 && notForceWake.load())
     {
         //lock the mutex so we can wait on the condition variable
         boost::unique_lock waitLock(producerMutex);
-        //do a timed wait on the condition variable. It is timed because there
-        //is the possiblity of a new empty buffer being pushed onto the queue
-        //between the call to pop and this call to wait. This way, if that did
-        //happen we would wake to check for a buffer anyways
-        producerWait.wait(waitLock);
+        //this is not a timed wait because if we are entering here then the
+        //write queues were empty just a moment ago. If we miss the notify from
+        //the first enqueue that is ok, the second enqueue will wake us up and
+        //it is doubtful that being super prompt in the wakeup will hurt in the
+        //long run
+        consumerWait.wait(waitLock);
     }
 }
 
