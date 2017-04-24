@@ -23,6 +23,7 @@
 // includes from ORCHID
 #include"WriteThreadControl.h"
 #include"WriteMultiQueue.h"
+#include"ConcurrentOfstreamCollection.h"
 
 namespace SECANT
 {
@@ -33,7 +34,8 @@ namespace AsyncFile
 
 WriteThread::WriteThread(WriteThreadMode mode):
     writeMode(mode), writeQueue(WriteMultiQueue::getInstance()),
-    controller(WriteThreadControl::getInstance()){}
+    controller(WriteThreadControl::getInstance()),
+    files(ConcurrentOfstreamCollection::getInstance()){}
 
 void WriteThread::operator ()()
 {
@@ -67,20 +69,107 @@ void WriteThread::operator ()()
 
 void WriteThread::greedyWriteLoop()
 {
+    int numFiles = files.getNumberFiles();
+    //Keep looping while we are set to running
     while(controller.getCurrentState() == WriteThreadState::Running)
     {
-        
+        //keep going while there is data available
+        while(writeQueue.dataAvailable())
+        {
+            doGreedyWriteCycle();
+        }
+        //if we are here then there is no more data available and it is time to wait for more data
+        writeQueue.waitForData();
     }
 }
 
 void WriteThread::austereWriteLoop()
 {
-
+    int numFiles = files.getNumberFiles();
+    //Keep looping while we are set to running
+    while(controller.getCurrentState() == WriteThreadState::Running)
+    {
+        //keep going while there is data available
+        while(writeQueue.dataAvailable())
+        {
+            doGreedyWriteCycle();
+        }
+        //if we are here then there is no more data available and it is time to wait for more data
+        writeQueue.waitForData();
+    }
 }
 
-void WriteThread::clearWriteBufferLoop()
+void WriteThread::doGreedyWriteCycle()
 {
-    
+    //iterate through all the files
+    for(int i=0; i<numFiles; ++i)
+    {
+        //first check if there are writes for this file
+        if(writeQueue.fileHasWrites(i))
+        {
+            //if we see that there are writes to the file, get a file ref
+            //and then try to lock the file
+            ConcurrentOfstreamWrapper& currFile = files.getFileReference(i);
+            if(currFile.tryForLock())//if false another thread beat us to the lock, go on to the next queue / file
+            {
+                //we have the lock, check if there is still data
+                if(!writeQueue.fileHasWrites(i))
+                {//if we are here then another thread beat us to the punch and did the writing before we locked
+                    currFile.unlock();
+                    continue;
+                }
+                //if we are here, then there is data to be written for the file
+                while(writeQueue.fileHasWrites(i))
+                {
+                    doPopWritePushAction(i, currFile);
+                }
+                //we have exhausted the write queue, unlock the file and go to the next file
+                currFile.unlock();
+            }
+        }
+    }
+}
+
+void WriteThread::doAustereWriteCycle()
+{
+    //iterate through all the files
+    for(int i=0; i<numFiles; ++i)
+    {
+        //first check if there are writes for this file
+        if(writeQueue.fileHasWrites(i))
+        {
+            //if we see that there are writes to the file, get a file ref
+            //and then try to lock the file
+            ConcurrentOfstreamWrapper& currFile = files.getFileReference(i);
+            if(currFile.tryForLock())//if false another thread beat us to the lock, go on to the next queue / file
+            {
+                //we have the lock, check if there is still data
+                if(!writeQueue.fileHasWrites(i))
+                {//if we are here then another thread beat us to the punch and did the writing before we locked
+                    currFile.unlock();
+                    continue;
+                }
+                //if we are here, then there is data to be written for the file
+                doPopWritePushAction(i, currFile);
+                //we have done one write, unlock the file and go to the next file
+                currFile.unlock();
+            }
+        }
+    }
+}
+
+void WriteThread::doPopWritePushAction(int fileNum, ConcurrentOfstreamWrapper& currFile)
+{
+    int writeSize = 0;
+    char* tempBuffer = writeQueue.popFileWrite(fileNum, writeSize);
+    if(tempBuffer == nullptr && writeSize == 0)
+    {//there was no buffer to pop when we got here, which should not have been able to happen
+        return;
+    }
+    //write the buffer
+    currFile.unsafeWrite(tempBuffer, writeSize);
+    //return the buffer
+    writeQueue.pushEmptyBuffer(tempBuffer);
 }
 
 }

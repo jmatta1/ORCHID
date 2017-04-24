@@ -32,6 +32,7 @@ namespace AsyncFile
 //predeclarations to allow references to these in the class declaration without their inclusion
 class WriteThreadControl;
 class WriteMultiQueue;
+class ConcurrentOfstreamCollection;
 
 /**
  * @ingroup SecantIoModule SecantAsyncFile
@@ -115,6 +116,16 @@ private:
     void austereWriteLoop();
     
     /**
+     * @brief Used to run the inner loop of the writing in greedy mode
+     */
+    void doGreedyWriteCycle();
+    
+    /**
+     * @brief Used to run the inner loop of the writing in austere mode
+     */
+    void doAustereWriteCycle();
+    
+    /**
      * @brief Used when leaving run mode to clear any writes remaining
      * 
      * This loop runs in a greedy way, clearing all writes for a given file
@@ -122,13 +133,18 @@ private:
      * theory we only get to this state when writing of files is shutting down
      * for at least a little while
      */
-    void clearWriteBufferLoop();
+    void clearWriteBufferLoop(){doGreedyWriteCycle();}
     
-    
+    /**
+     * @brief Does the heavy lifting of popping a buffer, writing data, and pushing the empty buffer
+     * @param[in] fileNum The index of the file to write
+     */
+    void doPopWritePushAction(int fileNum, ConcurrentOfstreamWrapper& currFile);
     
     WriteThreadMode writeMode; ///<Holds the mode to be used to call the appropriate private function at execution start
     WriteMultiQueue& writeQueue; ///<Holds reference to the WriteMultiQueue singleton
-    WriteThreadControl& controller; ///Holds reference to the WriteThreadController singleton
+    WriteThreadControl& controller; ///<Holds reference to the WriteThreadController singleton
+    ConcurrentOfstreamCollection& files; ///<Holds reference to the list of ofstream files
 };
 
 }
