@@ -23,6 +23,7 @@
 // includes from other libraries
 #include<boost/lockfree/queue.hpp>
 #include<boost/lockfree/stack.hpp>
+#include<boost/thread.hpp>
 // includes from ORCHID
 #include"WriteThread.h"
 #include"WriteMultiQueue.h"
@@ -51,8 +52,8 @@ static const int MaximumWriteQueueSize = 2048;
 struct BufferData
 {
 public:
-    char* writeBuffer;
-    int writeSize;
+    char* writeBuffer = nullptr;
+    int writeSize = 0;
 };
 
 /**
@@ -74,13 +75,17 @@ public:
  */
 class WriteMultiQueue
 {
-    using BufferStack = boost::lockfree::stack<BufferData*, boost::lockfree::capacity<MaximumWriteQueueSize> >;
+    using ContainerStack = boost::lockfree::stack<BufferData*, boost::lockfree::capacity<MaximumWriteQueueSize> >;
+    using BufferStack = boost::lockfree::stack<char*, boost::lockfree::capacity<MaximumWriteQueueSize> >;
     using WriteQueue = boost::lockfree::queue<BufferData*, boost::lockfree::capacity<MaximumWriteQueueSize> >;
 public:
     
     /**
      * @brief Puts an empty buffer back on the buffer return queue for use in another write
      * @param[in] emptyBuffer Pointer to the empty write buffer to be returned for reuse
+     * 
+     * This function does not block ever, there should always be enough space on
+     * the return buffer stack for buffers that were allocated by the constructor
      */
     void pushEmptyBuffer(char* emptyBuffer);
     
@@ -102,27 +107,37 @@ public:
      * @brief Pulls a write from the queue for file number fileNumber. 
      * @param[in] fileNumber the index of the file to be written to
      * @param[out] writeSize the size in bytes of the write
-     * @return pointer to the byte array containing the data to write
+     * @return pointer to the byte array containing the data to write or nullptr
+     * 
+     * This tries to pop a file buffer so that it can be written by one of the
+     * writer threads. However, in certain cases it is possible that the write
+     * could have been grabbed already and disposed of by a different writer
+     * thread. In that case, if there are no further writes available for the
+     * requested file, this function will return a nullptr after it sets
+     * writeSize to zero
      */
     char* popFileWrite(int fileNumber, int& writeSize);
+    
+    /**
+     * @brief Allows a writer thread to sit and wait for writes to be enqueued
+     * for *any* of the files
+     * 
+     * A thread will return from this function when a write has been enqueued
+     */
+    void waitForData();
     
     /**
      * @brief Checks if there are writes pending in the queue
      * @return True if there are pending writes, false otherwise
      */
-    bool dataAvailable(){return 0!=queuedWrites.load();}
+    bool dataAvailable(){return 0 < queuedWrites.load();}
     
     /**
-     * @brief Waits for lock of the file, closes the file and opens the new one
-     * @param[in] fileNumber the index of the file whose name is to be changed
-     * @param[in] filePath a constant reference to the string that contains the path to be written
-     * 
-     * This function will block the calling thread until the thread can lock the
-     * file to change the file name etc. If multiple threads are writing to the
-     * same file, you may not like the result if they all try to use this
-     * function simultaneously... maybe
+     * @brief Checks if the write queue for that file has queued writes
+     * @param[in] fileNumber the index of the file to be written to
+     * @return True if there are queued writes for that file, false otherwise
      */
-    void changeFileName(int fileNumber, const std::string& filePath);
+    bool fileHasWrites(int fileNumber){return 0 < bufferCount[fileNumber].load();}
     
     /**
      * @brief Returns the buffer size the WriteMultiQueue was constructed with
@@ -135,6 +150,12 @@ public:
      * @return The number of buffers that were allocated at WriteMultiQueue construction
      */
     int getNumberOfBuffers(){return totalBufferCount;}
+    
+    /**
+     * @brief Returns the number of files / write queues
+     * @return The number of files / write queues
+     */
+    int getNumberOfFiles(){return queueCount;}
     
     /**
      * @brief Gets a reference to the global class instance
@@ -152,15 +173,20 @@ private:
      */
     WriteMultiQueue(int numFiles, int bufferSize, int numBuffers);
     
-    
-    std::atomic_int* bufferCounts; ///<Array of atomic integers that count the number of writes in each queue
+    std::atomic_int* bufferCount; ///<Array of atomic integers that count the number of writes in each queue
     std::atomic_int queuedWrites = 0; ///<Total number of writes enqueued
     WriteQueue* writeQueues; ///<Array of write queues for each file
     BufferStack emptyBuffers; ///<Stack of buffers available for filling, this is a stack so that if write speeds are not insane, only a small subset of buffers ever get used
-    BufferStack emptyContainers; ///<Stack of empty BufferData objects for use in pushing the two push functions
+    ContainerStack emptyContainers; ///<Stack of empty BufferData objects for use in pushing the two push functions
     int bufferSizeInBytes; ///<Holds the buffer size in bytes that this queue was constructed with
     int totalBufferCount; ///<Holds the number of buffers that this queue was constructed with
+    int queueCount; ///<Holds the number of write queues / buffers
     
+    boost::mutex consumerMutex; ///<Locked by the write threads when they want to wait for data to appear for any file
+    boost::condition_variable consumerWait; ///<Used by the write threads to wait for data to appear for any file
+    
+    boost::mutex producerMutex; ///<Locked by the threads that enqueue writes when they want to wait for an empty buffer to appear on the stack
+    boost::condition_variable producerWait; ///<Used by the threads that enqueue writes when they want to wait for an empty buffer
 
 public: //Deleted methods go in this section because I want the enhanced error
     //messages of public deleted methods, but don't want to 'gum up' my actual
