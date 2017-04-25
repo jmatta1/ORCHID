@@ -30,7 +30,7 @@
 // includes from other libraries
 // includes from ORCHID
 #include"SECANT/IO/SecantFileWriter.h"
-namespace Secant
+namespace SECANT
 {
 
 namespace IO

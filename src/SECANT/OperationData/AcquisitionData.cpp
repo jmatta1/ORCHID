@@ -21,7 +21,7 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-namespace Secant
+namespace SECANT
 {
 
 namespace OperationData

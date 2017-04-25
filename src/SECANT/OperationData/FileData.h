@@ -26,7 +26,7 @@
 // includes from other libraries
 #include<boost/thread.hpp>
 // includes from ORCHID
-namespace Secant
+namespace SECANT
 {
 
 namespace OperationData

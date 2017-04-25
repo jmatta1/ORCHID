@@ -23,7 +23,7 @@
 // includes from other libraries
 // includes from ORCHID
 
-namespace Secant
+namespace SECANT
 {
 
 namespace OperationData
