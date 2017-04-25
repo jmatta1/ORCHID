@@ -6,3 +6,9 @@ orchid
 *.autosave
 orchid_*.log
 data
+*.aux
+*.log
+*.out
+*.pdf
+*.synctex.gz
+*.toc
