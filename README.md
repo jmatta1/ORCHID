@@ -1,5 +1,5 @@
 # ORCHID
-<img src="https://github.com/jmatta1/ORCHID/raw/master/doc/resources/orchid.jpg" width="320" height="200" />
+
 ### ORCHID - ORnl Conditions at HfIr Daq
 ORCHID is a concurrent data acquisition system built to take data from the Detector Array for measurement of Neutrons and Gammas (DANG) at HFIR.
 
