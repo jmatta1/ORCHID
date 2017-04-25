@@ -22,9 +22,9 @@
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-#include"WriteMultiQueue.h"
-#include"ConcurrentOfstreamCollection.h"
-#include"WrapperClearingHouse.h"
+#include"AsyncOutFile/WriteMultiQueue.h"
+#include"AsyncOutFile/ConcurrentOfstreamCollection.h"
+#include"AsyncOutFile/WrapperClearingHouse.h"
 
 namespace SECANT
 {
@@ -64,6 +64,12 @@ public:
      * @return Pointer to an empty buffer
      */
     char* getEmptyBuffer(){return writeQueue.popEmptyBuffer();}
+    
+    /**
+     * @brief Returns an empty buffer to the writeQueue so that the queue can dealloc it on deconstruction
+     * @param[in] emptyBuffer Pointer to the empty buffer to be returned
+     */
+    void pushEmptyBuffer(char* emptyBuffer){writeQueue.pushEmptyBuffer(emptyBuffer);}
     
     /**
      * @brief Places a buffer on the queue for writing
