@@ -147,6 +147,10 @@ int ProcessingThread::processBoardAggregate(Utility::ToProcessingBuffer* buffer,
 
 int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffer, int startOffset, int baseChan)
 {
+    if(baseChan>14)
+    {
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": saw an out of bounds base channel.";
+    }
     //grab a couple useful things in the buffer
     unsigned int* rawBuffer = buffer->dataBuffer;
     int board = buffer->info.boardNumber;
@@ -189,6 +193,7 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
         {
             skip = (sampleSlotsPerEvent/2);
         }
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Seeing a \"Non-extras\" event buffer";
         offset += processEventsWithoutExtras(rawBuffer, offset, stopOffset, baseChan, board, skip);
     }
     return (offset-startOffset);
