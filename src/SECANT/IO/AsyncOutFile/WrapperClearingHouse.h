@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRAPPERCLEARINGHOUSE_H
-#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRAPPERCLEARINGHOUSE_H
+#ifndef SECANT_SRC_IO_ASYNCOUTFILE_WRAPPERCLEARINGHOUSE_H
+#define SECANT_SRC_IO_ASYNCOUTFILE_WRAPPERCLEARINGHOUSE_H
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -89,4 +89,4 @@ public: //Deleted methods go in this section because I want the enhanced error
 }
 }
 }
-#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRAPPERCLEARINGHOUSE_H
+#endif //SECANT_SRC_IO_ASYNCOUTFILE_WRAPPERCLEARINGHOUSE_H

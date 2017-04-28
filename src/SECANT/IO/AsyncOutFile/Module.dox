@@ -16,11 +16,11 @@
 * SECANT::IO::AsyncFile::WriteMultiQueue is the singleton class that manages the
 * per file write queues and the buffer return queue for the asynchronous out file
 *
-* SECANT::IO:AsyncFile::ConcurrentOfstreamWrapper is a wrapper for output fstreams
+* SECANT::IO::AsyncFile::ConcurrentOfstreamWrapper is a wrapper for output fstreams
 * that allows changing file names (in a locked fashion) and an unsafe write which
 * should be used between successful calls to its tryForLock and unlock functions
 *
-* SECANT::IO:AsyncFile::ConcurrentOfstreamCollection is a singleton simple access
+* SECANT::IO::AsyncFile::ConcurrentOfstreamCollection is a singleton simple access
 * container for a set of ConcurrentOfstreamWrapper objects
 *
 * SECANT::IO::AsyncFile::WrapperClearingHouse is a singleton used to coordinate

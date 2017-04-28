@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREAD_H
-#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREAD_H
+#ifndef SECANT_SRC_IO_ASYNCOUTFILE_WRITETHREAD_H
+#define SECANT_SRC_IO_ASYNCOUTFILE_WRITETHREAD_H
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -39,9 +39,10 @@ class ConcurrentOfstreamCollection;
  * @brief Represents the possible states of write thread pool
  * 
  * There are four possible situations for the asynchronous file writing system
- * in three of them WriteThreadPoolMode::Greedy mode is appropriate. In the
- * other, WriteThreadPoolMode::Austere is appropriate. Below is a table show how
- * to select which mode you want.
+ * in two of them WriteThreadPoolMode::Greedy mode is appropriate. In the
+ * other, WriteThreadPoolMode::Austere is appropriate. In the final situation
+ * either may be appropriate, see the remarks below the table. Below is a table
+ * showing how to select which mode you want.
  * | Mode Selection   | Peak Write Speed Less Than<br/>or Equal To DiskSpeed| Peak Write Speed<br/>Greater Than Disk Speed|
  * |:----------------:|:----------------------------:|:---------------------------:|
  * |Number Of Write Threads<br/>Greater Than Number of Files|WriteThreadMode::Greedy<br/>is appropriate|WriteThreadMode::Greedy<br/> *might* be appropriate|
@@ -150,4 +151,4 @@ private:
 }
 }
 }
-#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREAD_H
+#endif //SECANT_SRC_IO_ASYNCOUTFILE_WRITETHREAD_H

@@ -14,8 +14,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_CONCURRENTFSTREAMCOLLECTION_H
-#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_CONCURRENTFSTREAMCOLLECTION_H
+#ifndef SECANT_SRC_IO_ASYNCOUTFILE_CONCURRENTFSTREAMCOLLECTION_H
+#define SECANT_SRC_IO_ASYNCOUTFILE_CONCURRENTFSTREAMCOLLECTION_H
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
@@ -91,4 +91,4 @@ public: //Deleted methods go in this section because I want the enhanced error
 }
 }
 
-#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_CONCURRENTFSTREAMCOLLECTION_H
+#endif //SECANT_SRC_IO_ASYNCOUTFILE_CONCURRENTFSTREAMCOLLECTION_H

@@ -14,8 +14,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_CONCURRENTFSTREAMWRAPPER_H
-#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_CONCURRENTFSTREAMWRAPPER_H
+#ifndef SECANT_SRC_IO_ASYNCOUTFILE_CONCURRENTFSTREAMWRAPPER_H
+#define SECANT_SRC_IO_ASYNCOUTFILE_CONCURRENTFSTREAMWRAPPER_H
 // includes for C system headers
 // includes for C++ system headers
 #include<fstream>
@@ -137,4 +137,4 @@ private:
 }
 }
 }
-#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_CONCURRENTFSTREAMWRAPPER_H
+#endif //SECANT_SRC_IO_ASYNCOUTFILE_CONCURRENTFSTREAMWRAPPER_H

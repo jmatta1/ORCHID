@@ -15,8 +15,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
-#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
+#ifndef SECANT_SRC_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
+#define SECANT_SRC_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -197,4 +197,4 @@ public://Deleted methods go in this section because I want the enhanced error
 }
 }
 }
-#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
+#endif //SECANT_SRC_IO_ASYNCOUTFILE_WRITETHREADCONTROL_H
