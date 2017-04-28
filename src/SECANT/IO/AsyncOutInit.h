@@ -15,22 +15,20 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef SECANT_SRC_SECANT_IO_ASYNCOUTFILE_ASYNCOUTINIT_H
-#define SECANT_SRC_SECANT_IO_ASYNCOUTFILE_ASYNCOUTINIT_H
+#ifndef SECANT_SRC_IO_ASYNCOUTINIT_H
+#define SECANT_SRC_IO_ASYNCOUTINIT_H
 // includes for C system headers
 // includes for C++ system headers
 // includes from other libraries
 // includes from ORCHID
-#include"WriteThreadPool.h"
-#include"WriteMultiQueue.h"
-#include"ConcurrentOfstreamCollection.h"
-#include"WrapperClearingHouse.h"
+#include"AsyncOutFile/WriteThreadPool.h"
+#include"AsyncOutFile/WriteMultiQueue.h"
+#include"AsyncOutFile/ConcurrentOfstreamCollection.h"
+#include"AsyncOutFile/WrapperClearingHouse.h"
 
 namespace SECANT
 {
 namespace IO
-{
-namespace AsyncFile
 {
 
 /**
@@ -61,5 +59,5 @@ private:
 
 }
 }
-}
-#endif //SECANT_SRC_SECANT_IO_ASYNCOUTFILE_ASYNCOUTINIT_H
+
+#endif //SECANT_SRC_IO_ASYNCOUTINIT_H
