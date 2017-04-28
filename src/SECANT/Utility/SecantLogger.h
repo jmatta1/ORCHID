@@ -16,8 +16,8 @@
 **
 ********************************************************************************
 *******************************************************************************/
-#ifndef ORCHID_SRC_UTILITY_SECANTLOGGER_H
-#define ORCHID_SRC_UTILITY_SECANTLOGGER_H
+#ifndef SECANT_SRC_UTILITY_SECANTLOGGER_H
+#define SECANT_SRC_UTILITY_SECANTLOGGER_H
 
 // includes for C system headers
 // includes for C++ system headers
@@ -39,7 +39,9 @@ enum LogSeverity
     Critical    = 5
 };
 
-//make a global logger
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(SecantLog, boost::log::sources::severity_logger_mt<LogSeverity>)
+using LoggerType=boost::log::sources::severity_logger_mt<LogSeverity>;
 
-#endif //ORCHID_SRC_UTILITY_SECANTLOGGER_H
+//make a global logger
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(SecantLog, LoggerType)
+
+#endif //SECANT_SRC_UTILITY_SECANTLOGGER_H
