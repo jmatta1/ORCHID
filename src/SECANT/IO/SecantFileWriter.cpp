@@ -32,7 +32,7 @@
 // includes from ORCHID
 #include"SECANT/Utility/SecantConfig.h"
 #include"SECANT/Utility/SecantTime.h"
-namespace Secant
+namespace SECANT
 {
 
 namespace IO
@@ -63,46 +63,21 @@ static const unsigned long long int SecantFileHeaderTerminator = 0xF0F0F0F0F0F0F
 }
 
 SecantFileWriter::SecantFileWriter(InterThreadData::FileData *fileDat,
-                                   Utility::LoggerType& logger, int fNumber,
-                                   const std::string &baseOutputDirectory):
+                                   const std::string& fileID,
+                                   const std::string& baseOutputDirectory):
     currentBuffer(nullptr), buffInd(0), bufferNumber(0),
     eventCount(0), baseDirectory(baseOutputDirectory), writeDirectory(""),
-    fileName(""), filePath(""), runTitle(""), fileNumber(fNumber), runNumber(0), sequenceNumber(0),
-    fileData(fileDat), lg(logger)
+    fileName(""), filePath(""), runTitle(""), fileIdent(fileID), runNumber(0),
+    sequenceNumber(0), fileData(fileDat), lg(SecantLog::get())
 {
-    //make directories and prep file name
-    this->prepNewRunFolder();
-    //load the queue with buffers of the appropriate size
-    for(int i=0; i<BufferCount ; ++i)
-    {
-        char* allocBuffer = new (std::nothrow) char[BufferProperties::SizeInBytes];
-        if(allocBuffer == nullptr)
-        {
-            BOOST_LOG_SEV(lg, Critical) << "FO Thread: Error In File Write Buffer Allocation";
-            std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
-            //throw std::runtime_error("Error In File Write Buffer Allocation");
-        }
-        //technically this thread should not push, only pop, but I think that it
-        //is legal in this case since concurrent use of the queue has no hope of 
-        //start until after this loop
-        this->bufferQueue.push(allocBuffer);
-    }
-    //make the asynchronous output file uninitialized
-    this->outFile = new IO::AsyncOutFile<BufferQueue>(&(this->bufferQueue), logger);
+    //make the base output directory
+    this->prepBaseDirectory();
 }
 
 SecantFileWriter::~SecantFileWriter()
 {
-    //delete the file stream
-    delete this->outFile;
-    //delete the buffer that we have popped from the bufferqueue to write to
-    delete this->currentBuffer;
-    char* allocBuffer;
-    //pop each of the buffers in the queue and delete them
-    while(this->bufferQueue.pop(allocBuffer))
-    {
-        delete[] allocBuffer;
-    }
+    //push an empty buffer back on to the async file and everything else will destruct itself
+    outFile.pushEmptyBuffer(currentBuffer);
 }
 
 void SecantFileWriter::setNewRunParameters(const std::string& runName, int runNumber)
@@ -166,7 +141,7 @@ void SecantFileWriter::endRun()
     this->outFile->closeFile();
 }
 
-void SecantFileWriter::prepNewRunFolder()
+void SecantFileWriter::prepBaseDirectory()
 {
     //make a lock to block the mutex so only one thread hits this function at
     //any given instant
@@ -182,12 +157,24 @@ void SecantFileWriter::prepNewRunFolder()
         boost::filesystem::create_directories(writePath, errCode);
         if(!boost::filesystem::is_directory(writePath, errCode))
         {
-            BOOST_LOG_SEV(lg, Critical) << "SecantFileWriter: Could not create data directory in file thread";
+            BOOST_LOG_SEV(lg, Critical) << "SecantFileWriter: Could not create base output directory";
             std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
             //throw std::runtime_error("Could not create data directory in file thread");
         }
     }
-    //append the run title to the base output 
+    //the lock releases the mutex on deconstruction
+}
+
+void SecantFileWriter::prepNewRunFolder()
+{
+    //make a lock to block the mutex so only one thread hits this function at
+    //any given instant
+    std::lock_guard<std::mutex> lockFileSystem(this->fileSystemLock);
+    
+    //make an actual path of the directory string we were given
+    boost::filesystem::path writePath(this->baseDirectory);
+    boost::system::error_code errCode;
+    //append the run title to the base output directory
     writePath.append(this->runTitle);
     //check if the run directory already exists, if it does, don't try to create it
     if(!boost::filesystem::is_directory(writePath, errCode))
@@ -211,11 +198,10 @@ void SecantFileWriter::buildFileName()
     BOOST_LOG_SEV(lg, Information) << "SecantFileWriter: Starting new file";
     bool buildFlag = true;
     while(buildFlag)
-    {
+    {//RunTitle_FileIdent_RunNumber_FileNumber.dat.SequenceNumber
         std::ostringstream builder;
-        builder << this->runTitle << "_";
-        builder << std::setw(4) << std::setfill('0') << this->runNumber << "_";
-        builder << std::setw(2) << std::setfill('0') << this->fileNumber << ".dat.";
+        builder << runTitle << "_" << fileIdent << "_";
+        builder << std::setw(4) << std::setfill('0') << this->runNumber << ".dat.";
         builder << std::setw(4) << std::setfill('0') << this->sequenceNumber ;
         this->fileName = builder.str();
         boost::filesystem::path fileOutPath(this->writeDirectory);
