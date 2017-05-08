@@ -5,6 +5,8 @@
 ### ORCHID - ORnl Conditions at HfIr Daq
 ORCHID is a concurrent data acquisition system built to take data from the Detector Array for measurement of Neutrons and Gammas (DANG) at HFIR.
 
+Below is a simplified guide to building and using ORCHID, for further information, please see the LaTeX document in ./doc/ORCHID_User_Guide (build it with the command `pdflatex ORCHID_and_Dang_Guide.tex; pdflatex ORCHID_and_Dang_Guide.tex; pdflatex ORCHID_and_Dang_Guide.tex;`.)
+
 #### Building ORCHID
 Installation of ORCHID is relatively simple.
  - Step 1: Ensure the boost libraries (minimum version 1.54) are installed. ORCHID uses the following components of Boost
