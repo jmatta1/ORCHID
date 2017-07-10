@@ -4,7 +4,7 @@
 WarnRate = 200000   # this is the rate at will we issue warning about the digitizer running too fast currently not implemented
 UpdateFrequency = 20              #the rate in hertz that the UI updates itself
 ProcessingThreadCount = 3
-BaseOutputDirectory = "/media/ORNLData/ORCHID_Data/"
+BaseOutputDirectory = "/data1/ORCHID_Data/"
 [EndBlock]
 
 [DigitizerBlock]
