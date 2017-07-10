@@ -68,10 +68,6 @@ file(GLOB_RECURSE SRCS *.cpp)
 # Grab all the header files
 file(GLOB_RECURSE HDRS *.h)
 
-MESSAGE( STATUS "Boost_LIBRARIES:         " ${Boost_LIBRARIES} )
-MESSAGE( STATUS "Boost_LIBRARIES:         " ${Boost_INCLUDE_DIR} )
-MESSAGE( STATUS "Boost_LIBRARIES:         " ${Boost_LIBRARY_DIR} )
-
 # set things up so that files include as if they were at the root of the dir
 # tree unless they are including a file within their own folder
 include_directories(".")
