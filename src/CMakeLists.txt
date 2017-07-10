@@ -30,7 +30,7 @@ link_directories(/usr/lib)
 include(./CMakeFlagDefs.txt)
 
 # force the existence of the BOOST library package
-find_package(Boost COMPONENTS thread log log_setup filesystem date_time REQUIRED)
+find_package(Boost COMPONENTS system thread log log_setup filesystem date_time REQUIRED)
 # force the existence of the ncurses library
 find_package(Curses REQUIRED)
 #find the threading stuff
@@ -67,6 +67,10 @@ file(GLOB_RECURSE SRCS *.cpp)
 
 # Grab all the header files
 file(GLOB_RECURSE HDRS *.h)
+
+MESSAGE( STATUS "Boost_LIBRARIES:         " ${Boost_LIBRARIES} )
+MESSAGE( STATUS "Boost_LIBRARIES:         " ${Boost_INCLUDE_DIR} )
+MESSAGE( STATUS "Boost_LIBRARIES:         " ${Boost_LIBRARY_DIR} )
 
 # set things up so that files include as if they were at the root of the dir
 # tree unless they are including a file within their own folder
