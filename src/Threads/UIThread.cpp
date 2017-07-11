@@ -411,15 +411,15 @@ void UIThread::drawSlowControlsGrid()
     int currentRow = gridStartLine;
     //now draw the topmost separators
     mvwprintw(this->textWindow, currentRow, tempStartCol, "--------------");
-    mvwprintw(this->textWindow, currentRow, volStartCol, "---------------------------------------");
+    mvwprintw(this->textWindow, currentRow, volStartCol, "-----------------------------------------");
     ++currentRow;
     //now draw the column headers
     mvwprintw(this->textWindow, currentRow, tempStartCol, "|Chan|  Temp |");
-    mvwprintw(this->textWindow, currentRow, volStartCol, "| Chan | TermVol | Current | Status");
+    mvwprintw(this->textWindow, currentRow, volStartCol, "| Chan |  TermVol |  Current | Status");
     ++currentRow;
     //more separators
     mvwprintw(this->textWindow, currentRow, tempStartCol, "==============");
-    mvwprintw(this->textWindow, currentRow, volStartCol, "=======================================");
+    mvwprintw(this->textWindow, currentRow, volStartCol, "=========================================");
     ++currentRow;
     //now loop through the temp sensors
     int currDataLine = currentRow;
@@ -445,16 +445,16 @@ void UIThread::drawSlowControlsGrid()
         builder << std::setw(2) << std::setfill('0') << (this->mpodMapper->channelNum[chanInd]) << " | " << std::setfill(' ');
         //add the voltage
         float termVol =  this->slowData->terminalVoltage[chanInd];
-        if(termVol >= 999.95)//choose 999.95 to prevent rounding weirdness
+        if(termVol >= 999.95 || termVol <= -999.95) //choose 999.95 to prevent rounding weirdness
         {
-            builder << std::fixed << std::setw(5) << std::setprecision(3) << (termVol/1000.0) <<"kV | ";
+            builder << std::fixed << std::setw(6) << std::setprecision(3) << (termVol/1000.0) <<"kV | ";
         }
         else
         {
-            builder << std::fixed << std::setw(5) << std::setprecision(1) << termVol <<" V | ";
+            builder << std::fixed << std::setw(6) << std::setprecision(1) << termVol <<" V | ";
         }
         //add the current
-        builder << std::fixed << std::setw(5) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
+        builder << std::fixed << std::setw(6) << std::setprecision(1) << (this->slowData->current[chanInd]) <<"uA | ";
         //add the status
         std::string statusString;
         this->slowData->genChannelInfoString(chanInd, statusString);
