@@ -40,7 +40,7 @@ static const int errorColor = 1;
 static const int goodColor = 2;
 static const int gridStartLine = 5;
 static const int trigStartCol = 1;
-static const int tempStartCol = 76;
+static const int tempStartCol = 77;
 static const int volStartCol = 35;
 static const float expAvgSmthFactor = 0.5;
 
