@@ -52,7 +52,7 @@ Vx1730Digitizer::Vx1730Digitizer(int modNum, InputParser::DigitizerModuleData* m
     }
     //count the number of channels
     int ind = channelStartInd + 1;
-    while(chanData->moduleNumber[ind] == modNum)
+    while(chanData->moduleNumber[ind] == modNum && ind < chanData->moduleNumber.size())
     {
         ++numChannel;
         ++ind;
@@ -98,7 +98,7 @@ void Vx1730Digitizer::setupDigitizer()
     //check to make sure we have 8 or 16 channels
     if ((numChannel != 8) && (numChannel != 16))
     {
-        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Error Digitizer #" << moduleNumber << " does not have 8 or 16 channels";
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Error Digitizer #" << moduleNumber << " does not have 8 or 16 channels. Seeing instead: " << numChannel <<" number of channels";
         std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
         //throw std::runtime_error("Vx1730 Error - Wrong Channel Count");
     }

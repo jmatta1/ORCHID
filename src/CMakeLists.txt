@@ -30,7 +30,7 @@ link_directories(/usr/lib)
 include(./CMakeFlagDefs.txt)
 
 # force the existence of the BOOST library package
-find_package(Boost COMPONENTS thread log log_setup filesystem date_time REQUIRED)
+find_package(Boost COMPONENTS system thread log log_setup filesystem date_time REQUIRED)
 # force the existence of the ncurses library
 find_package(Curses REQUIRED)
 #find the threading stuff
