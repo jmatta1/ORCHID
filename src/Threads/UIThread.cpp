@@ -43,6 +43,7 @@ static const int trigStartCol = 1;
 static const int tempStartCol = 77;
 static const int volStartCol = 35;
 static const float expAvgSmthFactor = 0.5;
+static const int ErrorCountLimit = 5;
 
 UIThread::UIThread(InterThread::SlowData* slDat, InterThread::AcquisitionData* rtDat,
                    InterThread::FileData* fiDat, Utility::MpodMapper* mpodMap,
@@ -337,8 +338,9 @@ void UIThread::drawAcquisitionGlobalInformation()
             builder << "Mod " << i << ": " << std::fixed << std::setw(5) << std::setfill(' ') << std::setprecision(1) << rate;
         }
         builder << "B/s";
-        mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
     }
+    builder << "Global Acq Errors: " << acqData->procErrorCount.load();
+    mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
 }
 
 void UIThread::drawTriggersGrid()
@@ -1231,6 +1233,7 @@ void UIThread::startDataTaking()
     }
     this->acqData->clearData();
     this->acqData->clearTrigs();
+    this->acqData->clearProcErr();
     this->startTime = boost::posix_time::microsec_clock::universal_time();
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting File Writing";
     this->fileControl->setToWriting();
