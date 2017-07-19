@@ -339,7 +339,7 @@ void UIThread::drawAcquisitionGlobalInformation()
         }
         builder << "B/s";
     }
-    builder << "Global Acq Errors: " << acqData->procErrorCount.load();
+    builder << "    Acq Errors: " << acqData->procErrorCount.load();
     mvwprintw(this->textWindow, 2, 0, builder.str().c_str());
 }
 
