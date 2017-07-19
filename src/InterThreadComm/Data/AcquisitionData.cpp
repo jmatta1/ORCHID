@@ -27,7 +27,7 @@ namespace InterThread
 {
 
 AcquisitionData::AcquisitionData(int numDigiChan, int numMods):
-    numChannels(numDigiChan), numModules(numMods)
+    numChannels(numDigiChan), numModules(numMods), procErrorCount(0)
 {
     this->triggers = new std::atomic_ullong[this->numChannels];
     for(int i=0; i<this->numChannels; ++i)
@@ -46,7 +46,7 @@ void AcquisitionData::clearData()
 {
     for(int i=0; i<this->numModules; ++i)
     {
-        dataSizes[i].store(0, std::memory_order_relaxed);
+        dataSizes[i].store(0);
     }
 }
 
@@ -54,7 +54,7 @@ void AcquisitionData::clearTrigs()
 {
     for(int i=0; i<this->numChannels; ++i)
     {
-        triggers[i].store(0, std::memory_order_relaxed);
+        triggers[i].store(0);
     }
 }
 

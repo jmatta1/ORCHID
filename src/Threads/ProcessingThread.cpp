@@ -110,6 +110,7 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
             BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Found corrupted board aggregate";
             BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
             BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Brd #: " << std::dec << board << " Size: " << dataSize << " Offset: " << offset;
+            this->acqData->addProcErr(10);
             //now skip the rest of the buffer
             break;
         }
@@ -150,6 +151,7 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
     if(baseChan>14)
     {
         BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": saw an out of bounds base channel.";
+        this->acqData->addProcErr(2);
     }
     //grab a couple useful things in the buffer
     unsigned int* rawBuffer = buffer->dataBuffer;
@@ -194,6 +196,7 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
             skip = (sampleSlotsPerEvent/2);
         }
         BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Seeing a \"Non-extras\" event buffer";
+        this->acqData->incrProcErr();
         offset += processEventsWithoutExtras(rawBuffer, offset, stopOffset, baseChan, board, skip);
     }
     return (offset-startOffset);
