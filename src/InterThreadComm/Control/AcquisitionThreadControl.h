@@ -64,7 +64,7 @@ private:
     
     std::atomic_uint waitCount;
     boost::mutex waitMutex;
-    boost::condition_variable acqThreadWaitCondition;//we create the mutex for this on the fly so everyone can wake up simultaneously
+    boost::condition_variable acqThreadWaitCondition;
     
 };
 
