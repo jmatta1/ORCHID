@@ -21,12 +21,9 @@
 
 // includes for C system headers
 // includes for C++ system headers
-#include<map>
 #include<utility>
 #include<type_traits>
 // includes from other libraries
-#include<boost/assign/list_of.hpp>
-using boost::assign::map_list_of;
 // includes from ORCHID
 
 namespace Digitizer
