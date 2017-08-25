@@ -36,7 +36,7 @@ public:
         binarySize((2+1)*sizeof(unsigned short)+3*sizeof(unsigned int)+2*sizeof(unsigned char)+nSamples*sizeof(unsigned short)),
         numSamples(nSamples), numSamplePairs(nSamples/2), boardNumber(0), channelNumber(0), timeStamp(0),
         extraTimeStamp(0), eventNumber(0), dataArray(new unsigned short[nSamples]){}
-    virtual ~WavedumpEvent(){}
+    virtual ~WavedumpEvent(){delete[] dataArray;}
     
     //functions to retrieve the binary representation
     virtual int getSizeOfBinaryRepresentation();
@@ -50,7 +50,7 @@ public:
     void setTimeStamp(unsigned int tStamp){timeStamp = tStamp;}
     void setExtraTimeStamp(unsigned short exTStamp){extraTimeStamp = exTStamp;}
     void setEventNumber(unsigned int evNum){eventNumber = evNum;}
-    void setDataArray(unsigned int* dArr);
+    int setDataArray(unsigned int* dArr);
     
 private:
     unsigned short binarySize;

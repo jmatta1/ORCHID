@@ -58,13 +58,14 @@ void WavedumpEvent::getBinaryRepresentation(char* buff)
     }
 }
 
-void WavedumpEvent::setDataArray(unsigned int* dArr)
+int WavedumpEvent::setDataArray(unsigned int* dArr)
 {
     for(int i=0; i<numSamplePairs; ++i)
     {
         dataArray[2*i] = (dArr[i]&0xFFFFUL);
         dataArray[2*i+1] = ((dArr[i]&0xFFFF0000UL)>>16);
     }
+    return numSamplePairs;
 }
 
 }
