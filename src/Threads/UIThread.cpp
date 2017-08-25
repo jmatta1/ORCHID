@@ -1241,11 +1241,11 @@ void UIThread::startDataTaking()
     boost::this_thread::sleep_for(this->refreshPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Slow Controls Event Generation";
     this->sctControl->setToWriting();
-    BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Pausing to Ensure First Event Is Slow Controls";
-    wclear(this->textWindow);
-    mvwprintw(this->textWindow, 0, 0, "Pause to ensure first event is slow controls");
-    wrefresh(this->textWindow);
-    boost::this_thread::sleep_for(slowControlsPollingWaitPeriod);
+    //BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Pausing to Ensure First Event Is Slow Controls";
+    //wclear(this->textWindow);
+    //mvwprintw(this->textWindow, 0, 0, "Pause to ensure first event is slow controls");
+    //wrefresh(this->textWindow);
+    //boost::this_thread::sleep_for(slowControlsPollingWaitPeriod);
     BOOST_LOG_SEV(this->lg, Information) << "UI Thread: Starting Event Processing";
     this->procControl->setToRunning();
     //wait to be certain the processing threads are up and running before we start anything else
