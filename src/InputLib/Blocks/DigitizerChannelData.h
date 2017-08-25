@@ -35,7 +35,7 @@ public:
     std::vector<int>    moduleNumber;//1
     std::vector<int>    channelNumber;//2
     std::vector<bool>   channelEnable;//3
-    std::vector<bool>    participateInTrigger;//4
+    std::vector<int>   participateInTrigger;//4
     std::vector<bool>   largeRange;//5
     std::vector<int>    pulseWidth;//6
     std::vector<int>    trigThreshold;//7

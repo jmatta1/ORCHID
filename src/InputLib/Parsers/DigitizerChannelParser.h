@@ -78,7 +78,7 @@ struct DigitizerChannelParser : qi::grammar<Iterator>
                      int_         [phoenix::bind(&DigitizerChannelData::addTrigThreshold,          ptr, qi::_1)] > lexeme[','] >
                      int_         [phoenix::bind(&DigitizerChannelData::addCoupleTrigLogic,        ptr, qi::_1)] > lexeme[','] >
                      int_         [phoenix::bind(&DigitizerChannelData::addCouplePulseType,        ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerChannelData::addDcOffset,               ptr, qi::_1)] > lexeme[',']);
+                     int_         [phoenix::bind(&DigitizerChannelData::addDcOffset,               ptr, qi::_1)] );
 
         on_error<fail>
         (
