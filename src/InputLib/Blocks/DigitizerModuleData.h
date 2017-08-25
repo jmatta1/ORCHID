@@ -50,7 +50,7 @@ public:
     std::vector<int>            majorityCoincidenceWindow;
     std::vector<int>            majorityLevel;
     std::vector<int>            numPostTrigSamples;
-    std::vector<int>            intteruptEventCount;
+    std::vector<int>            interruptEventCount;
     std::vector<int>            maxEventsPerBLT;
 
     void addLinkType(LinkType input);
@@ -66,7 +66,7 @@ public:
     void addMajorityCoincidenceWindow(int input);
     void addMajorityLevel(int input);
     void addNumPostTrigSamples(int input);
-    void addIntteruptEventCount(int input);
+    void addInterruptEventCount(int input);
     void addMaxEventsPerBLT(int input);
     
     bool validate();

@@ -81,7 +81,7 @@ struct DigitizerModuleParser : qi::grammar<Iterator>
                      int_         [phoenix::bind(&DigitizerModuleData::addMajorityCoincidenceWindow,              ptr, qi::_1)] > lexeme[','] >
                      int_         [phoenix::bind(&DigitizerModuleData::addMajorityLevel,              ptr, qi::_1)] > lexeme[','] >
                      int_         [phoenix::bind(&DigitizerModuleData::addNumPostTrigSamples,             ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addIntteruptEventCount,      ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addInterruptEventCount,      ptr, qi::_1)] > lexeme[','] >
                      int_         [phoenix::bind(&DigitizerModuleData::addMaxEventsPerBLT,                ptr, qi::_1)] );
 
         on_error<fail>

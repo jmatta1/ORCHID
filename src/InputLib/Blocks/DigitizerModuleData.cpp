@@ -107,9 +107,9 @@ void DigitizerModuleData::addNumPostTrigSamples(int input)
     this->numPostTrigSamples.push_back(input);
 }
 
-void DigitizerModuleData::addIntteruptEventCount(int input)
+void DigitizerModuleData::addInterruptEventCount(int input)
 {
-    this->intteruptEventCount.push_back(input);
+    this->interruptEventCount.push_back(input);
 }
 
 void DigitizerModuleData::addMaxEventsPerBLT(int input)
@@ -133,7 +133,7 @@ bool DigitizerModuleData::validate()
             (majorityCoincidenceWindow.size() >= 1) &&
             (majorityLevel.size() >= 1) &&
             (numPostTrigSamples.size() >= 1) &&
-            (intteruptEventCount.size() >= 1) &&
+            (interruptEventCount.size() >= 1) &&
             (maxEventsPerBLT.size() >= 1)  ))
     {
         output = false;
@@ -151,7 +151,7 @@ bool DigitizerModuleData::validate()
             (rows == majorityCoincidenceWindow.size()) &&
             (rows == majorityLevel.size()) &&
             (rows == numPostTrigSamples.size()) &&
-            (rows == intteruptEventCount.size()) &&
+            (rows == interruptEventCount.size()) &&
             (rows == maxEventsPerBLT.size()) &&
             (rows == memFullMode.size()) ))
     {
@@ -176,7 +176,7 @@ void DigitizerModuleData::printValidationErrors()
             (majorityCoincidenceWindow.size() >= 1) &&
             (majorityLevel.size() >= 1) &&
             (numPostTrigSamples.size() >= 1) &&
-            (intteruptEventCount.size() >= 1) &&
+            (interruptEventCount.size() >= 1) &&
             (maxEventsPerBLT.size() >= 1)  ))
     {
         std::cout << "There must be 1 or more entries for each parameter" <<std::endl;
@@ -194,7 +194,7 @@ void DigitizerModuleData::printValidationErrors()
             (rows == majorityCoincidenceWindow.size()) &&
             (rows == majorityLevel.size()) &&
             (rows == numPostTrigSamples.size()) &&
-            (rows == intteruptEventCount.size()) &&
+            (rows == interruptEventCount.size()) &&
             (rows == maxEventsPerBLT.size()) ))
     {
         std::cout << "There must the same number of rows for every column" <<std::endl;
@@ -219,7 +219,7 @@ void DigitizerModuleData::sort()
     majorityCoincidenceWindow = Utility::applyPermutation(majorityCoincidenceWindow, permutation);
     majorityLevel = Utility::applyPermutation(majorityLevel, permutation);
     numPostTrigSamples = Utility::applyPermutation(numPostTrigSamples, permutation);
-    intteruptEventCount = Utility::applyPermutation(intteruptEventCount, permutation);
+    interruptEventCount = Utility::applyPermutation(interruptEventCount, permutation);
     maxEventsPerBLT = Utility::applyPermutation(maxEventsPerBLT, permutation);
 }
 
@@ -267,7 +267,7 @@ std::ostream& operator<<(std::ostream& os, DigitizerModuleData const& dmd)
         os << setw(20) << setfill(' ') << dmd.majorityCoincidenceWindow[i]             << ", ";
         os << setw(15) << setfill(' ') << dmd.majorityLevel[i]             << ", ";
         os << setw(21) << setfill(' ') << dmd.numPostTrigSamples[i]            << ",\n";
-        os << setw(21) << setfill(' ') << dmd.intteruptEventCount[i]            << ",\n";
+        os << setw(21) << setfill(' ') << dmd.interruptEventCount[i]            << ",\n";
         os << setw(19) << setfill(' ') << dmd.maxEventsPerBLT[i]            << ",\n";
     }
 
