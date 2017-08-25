@@ -30,9 +30,9 @@ namespace InterThread
 
 enum class QueueSizes : int 
 {
-    SlowControlToFile       = 50, //if we fall 50 polling periods behind we are in real trouble
+    SlowControlToFile       = 3, //since we are not polling slow controls here
     DigitizerToProcessing   = 80,
-    ProcessingToFile        = 60000
+    ProcessingToFile        = 8192
 };
 //Digitizer to processing can be *REALLY* big, for 0 trace samples
 //  (6 bytes per event) and the values governing events per channel aggregate
