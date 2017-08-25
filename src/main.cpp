@@ -34,7 +34,7 @@ HFIR background monitoring wall.
 #include"InterThreadComm/MultiQueuePair.h"
 #include"InterThreadComm/QueuePair.h"
 #include"Events/SlowControlsEvent.h"
-#include"Events/DppPsdEvent.h"
+#include"Events/WavedumpEvent.h"
 // ORCHID interprocess communication control objects
 #include"InterThreadComm/Control/SlowControlsThreadController.h"
 #include"InterThreadComm/Control/FileOutputThreadController.h"
@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::ProcessingToFile); ++i)
     {
         //we use comsumer push since consumers push to the empty object return
-        toFileQueues->consumerPush<Utility::ProcessingQueueIndex>(new Events::DppPsdEvent());
+        toFileQueues->consumerPush<Utility::ProcessingQueueIndex>(new Events::WavedumpEvent(digitizerModuleData.samplesPerEvent[i]));
     }
     //here we load the queue with empty slow controls events
     for(int i=0; i < InterThread::getEnumVal(InterThread::QueueSizes::SlowControlToFile); ++i)
