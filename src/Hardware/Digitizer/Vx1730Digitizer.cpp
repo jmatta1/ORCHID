@@ -642,7 +642,7 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     {
         addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>::value +
                                ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::InputDynamicRange>::value));
-        dataArray[regCount] = (this->channelData->largeRange[i] ? 0x00UL : 0x00UL);
+        dataArray[regCount] = (this->channelData->largeRange[i] ? 0x00UL : 0x01UL);
         ++regCount;
         addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PreTrg>::value +
                                ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::PreTrg>::value));
