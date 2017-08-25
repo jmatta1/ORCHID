@@ -72,32 +72,17 @@ struct DigitizerModuleParser : qi::grammar<Iterator>
                      int_         [phoenix::bind(&DigitizerModuleData::addLinkNumber,                 ptr, qi::_1)] > lexeme[','] >
                      int_         [phoenix::bind(&DigitizerModuleData::addDaisyChainNumber,           ptr, qi::_1)] > lexeme[','] >
 	  lexeme["0x"] > hex          [phoenix::bind(&DigitizerModuleData::addVmeBaseAddr,                ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&DigitizerModuleData::addEnableAutoFlush,            ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&DigitizerModuleData::addPropogateTrigs,             ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&DigitizerModuleData::addRecordWaveforms,            ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addAnalogProbe,                ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addDualTrace,                  ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&DigitizerModuleData::addRecExtrasWord,              ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addDigVirtProbe1,              ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addDigVirtProbe2,              ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addChanBuffPerAgg,             ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addTriggerCountingMethod,      ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addMemFullMode,                ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addPllRefClock,                ptr, qi::_1)] > lexeme[','] >
-	  lexeme["0x"] > hex          [phoenix::bind(&DigitizerModuleData::addGlobalChanPairTrigMask,     ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addGlobalCoincidenceWindow,    ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addGlobalMajorityLevel,        ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&DigitizerModuleData::addExternalTrigger,            ptr, qi::_1)] > lexeme[','] >
-	  lexeme["0x"] > hex          [phoenix::bind(&DigitizerModuleData::addChanPairTrigOutMask,        ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addTrigOutGenerationLogic,     ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addTrigOutMajorityLevel,       ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addExtTrigInTrigOut,           ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addMemBuffAlmostFullLevel,     ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addRunStartStopDelay,          ptr, qi::_1)] > lexeme[','] >
-                     boolSymbols_ [phoenix::bind(&DigitizerModuleData::addUseExtTrigger,              ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addInterruptEventCount,        ptr, qi::_1)] > lexeme[','] >
-                     int_         [phoenix::bind(&DigitizerModuleData::addAggregatesPerBlockTransfer, ptr, qi::_1)] );
-                  
+                     int_         [phoenix::bind(&DigitizerModuleData::addTrigOverlapHandling,            ptr, qi::_1)] > lexeme[','] >
+                     boolSymbols_ [phoenix::bind(&DigitizerModuleData::addEnableTestPattern,             ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addSelfTrigPolarity,            ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addSamplesPerEvent,                ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addTrigCountMode,                  ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addMemFullMode,              ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addMajorityCoincidenceWindow,              ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addMajorityLevel,              ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addNumPostTrigSamples,             ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addIntteruptEventCount,      ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerModuleData::addMaxEventsPerBLT,                ptr, qi::_1)] );
 
         on_error<fail>
         (

@@ -63,54 +63,22 @@ struct DigitizerChannelParser : qi::grammar<Iterator>
 		start    = skip(blank) [fileRule];
         fileRule = (
                      *eol_
-                     > (lineRule1 > lineRule2)
-                     > *(+eol_ >> (lineRule1 > lineRule2))
+                     > lineRule
+                     > *(+eol_ >> lineRule)
                      > *eol_
                      > eoi
                    );
 
-        lineRule1 = ( int_         [phoenix::bind(&DigitizerChannelData::addModuleNumber,       ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addChannelNumber,      ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addChannelEnable,      ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addRecordLength,       ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addLargeRange,         ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addAggregateEvents,    ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addPreTrigger,         ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addCfdDelay,           ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addCfdFraction,        ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addShortGate,          ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addLongGate,           ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addGateOffset,         ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addTrigThreshold,      ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addFixedBaseline,      ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addShapedTrigWidth,    ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addTrigHoldOff,        ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addPsdThreshold,       ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addChargeSensitivity,  ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addChargePedestalOn,   ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addDppTriggerCounting, ptr, qi::_1)] > lexeme[',']);
-    
-        lineRule2 = ( int_         [phoenix::bind(&DigitizerChannelData::addDiscMode,              ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addPulsePolarity,         ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addTrigMode,              ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addBaselineMean,          ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addDisableSelfTrigger,    ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addPsdCutBelowThresh,     ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addPsdCutAboveThresh,     ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addOverRangeRejection,    ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addTriggerHysteresis,     ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addUseLocalShapedTrig,    ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addLocalShapedTrigMode,   ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addUseLocalTrigVal,       ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addLocalTrigValMode,      ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addLocalTrigValAsVeto,    ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addExtrasWordOptions,     ptr, qi::_1)] > lexeme[','] >
-                      boolSymbols_ [phoenix::bind(&DigitizerChannelData::addSmoothIntegration,     ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addInputSmoothing,        ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addDcOffset,              ptr, qi::_1)] > lexeme[','] >
-                      int_         [phoenix::bind(&DigitizerChannelData::addVetoDurationExtension, ptr, qi::_1)] > lexeme[','] >
-	   lexeme["0x"] > hex          [phoenix::bind(&DigitizerChannelData::addTriggerValidMask,       ptr, qi::_1)] );
-                  
+        lineRule = ( int_         [phoenix::bind(&DigitizerChannelData::addModuleNumber,           ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerChannelData::addChannelNumber,          ptr, qi::_1)] > lexeme[','] >
+                     boolSymbols_ [phoenix::bind(&DigitizerChannelData::addChannelEnable,          ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerChannelData::addParticipateInTrigger,   ptr, qi::_1)] > lexeme[','] >
+                     boolSymbols_ [phoenix::bind(&DigitizerChannelData::addLargeRange,             ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerChannelData::addPulseWidth,             ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerChannelData::addTrigThreshold,          ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerChannelData::addCoupleTrigLogic,        ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerChannelData::addCouplePulseType,        ptr, qi::_1)] > lexeme[','] >
+                     int_         [phoenix::bind(&DigitizerChannelData::addDcOffset,               ptr, qi::_1)] > lexeme[',']);
 
         on_error<fail>
         (
@@ -127,8 +95,7 @@ struct DigitizerChannelParser : qi::grammar<Iterator>
 	// main rules
     qi::rule<Iterator>                  start;
     qi::rule<Iterator, qi::blank_type > fileRule;
-    qi::rule<Iterator, qi::blank_type > lineRule1;
-    qi::rule<Iterator, qi::blank_type > lineRule2;
+    qi::rule<Iterator, qi::blank_type > lineRule;
     
     //data holder
     DigitizerChannelData* ptr;

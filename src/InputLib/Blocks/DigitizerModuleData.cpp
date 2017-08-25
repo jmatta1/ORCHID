@@ -62,54 +62,29 @@ void DigitizerModuleData::addVmeBaseAddr(unsigned int input)
     this->vmeBaseAddr.push_back(input);
 }
 
-void DigitizerModuleData::addEnableAutoFlush(bool input)
+void DigitizerModuleData::addTrigOverlapHandling(int input)
 {
-    this->enableAutoFlush.push_back(input);
+    this->trigOverlapHandling.push_back(input);
 }
 
-void DigitizerModuleData::addPropogateTrigs(bool input)
+void DigitizerModuleData::addEnableTestPattern(bool input)
 {
-    this->propogateTrigs.push_back(input);
+    this->enableTestPattern.push_back(input);
 }
 
-void DigitizerModuleData::addRecordWaveforms(bool input)
+void DigitizerModuleData::addSelfTrigPolarity(int input)
 {
-    this->recordWaveforms.push_back(input);
+    this->selfTrigPolarity.push_back(input);
 }
 
-void DigitizerModuleData::addAnalogProbe(int input)
+void DigitizerModuleData::addSamplesPerEvent(int input)
 {
-    this->analogProbe.push_back(input);
+    this->samplesPerEvent.push_back(input);
 }
 
-void DigitizerModuleData::addDualTrace(int input)
+void DigitizerModuleData::addTrigCountMode(int input)
 {
-    this->dualTrace.push_back(input);
-}
-
-void DigitizerModuleData::addRecExtrasWord(bool input)
-{
-    this->recExtrasWord.push_back(input);
-}
-
-void DigitizerModuleData::addDigVirtProbe1(int input)
-{
-    this->digVirtProbe1.push_back(input);
-}
-
-void DigitizerModuleData::addDigVirtProbe2(int input)
-{
-    this->digVirtProbe2.push_back(input);
-}
-
-void DigitizerModuleData::addChanBuffPerAgg(int input)
-{
-    this->chanBuffPerAgg.push_back(input);
-}
-
-void DigitizerModuleData::addTriggerCountingMethod(int input)
-{
-    this->triggerCountingMethod.push_back(input);
+    this->trigCountMode.push_back(input);
 }
 
 void DigitizerModuleData::addMemFullMode(int input)
@@ -117,74 +92,29 @@ void DigitizerModuleData::addMemFullMode(int input)
     this->memFullMode.push_back(input);
 }
 
-void DigitizerModuleData::addPllRefClock(int input)
+void DigitizerModuleData::addMajorityCoincidenceWindow(int input)
 {
-    this->pllRefClock.push_back(input);
+    this->majorityCoincidenceWindow.push_back(input);
 }
 
-void DigitizerModuleData::addGlobalChanPairTrigMask(int input)
+void DigitizerModuleData::addMajorityLevel(int input)
 {
-    this->globalChanPairTrigMask.push_back(input);
+    this->majorityLevel.push_back(input);
 }
 
-void DigitizerModuleData::addGlobalCoincidenceWindow(int input)
+void DigitizerModuleData::addNumPostTrigSamples(int input)
 {
-    this->globalCoincidenceWindow.push_back(input);
+    this->numPostTrigSamples.push_back(input);
 }
 
-void DigitizerModuleData::addGlobalMajorityLevel(int input)
+void DigitizerModuleData::addIntteruptEventCount(int input)
 {
-    this->globalMajorityLevel.push_back(input);
+    this->intteruptEventCount.push_back(input);
 }
 
-void DigitizerModuleData::addExternalTrigger(bool input)
+void DigitizerModuleData::addMaxEventsPerBLT(int input)
 {
-    this->externalTrigger.push_back(input);
-}
-
-void DigitizerModuleData::addChanPairTrigOutMask(int input)
-{
-    this->chanPairTrigOutMask.push_back(input);
-}
-
-void DigitizerModuleData::addTrigOutGenerationLogic(int input)
-{
-    this->trigOutGenerationLogic.push_back(input);
-}
-
-void DigitizerModuleData::addTrigOutMajorityLevel(int input)
-{
-    this->trigOutMajorityLevel.push_back(input);
-}
-
-void DigitizerModuleData::addExtTrigInTrigOut(int input)
-{
-    this->extTrigInTrigOut.push_back(input);
-}
-
-void DigitizerModuleData::addMemBuffAlmostFullLevel(int input)
-{
-    this->memBuffAlmostFullLevel.push_back(input);
-}
-
-void DigitizerModuleData::addRunStartStopDelay(int input)
-{
-    this->runStartStopDelay.push_back(input);
-}
-
-void DigitizerModuleData::addUseExtTrigger(bool input)
-{
-    this->useExtTrigger.push_back(input);
-}
-
-void DigitizerModuleData::addInterruptEventCount(int input)
-{
-    this->interruptEventCount.push_back(input);
-}
-
-void DigitizerModuleData::addAggregatesPerBlockTransfer(int input)
-{
-    this->aggregatesPerBlockTransfer.push_back(input);
+    this->maxEventsPerBLT.push_back(input);
 }
 
 bool DigitizerModuleData::validate()
@@ -194,31 +124,17 @@ bool DigitizerModuleData::validate()
             (linkNumber.size() >= 1) &&
             (daisyChainNumber.size() >= 1) &&
             (vmeBaseAddr.size() >= 1) &&
-            (enableAutoFlush.size() >= 1) &&
-            (propogateTrigs.size() >= 1) &&
-            (recordWaveforms.size() >= 1) &&
-            (analogProbe.size() >= 1) &&
-            (dualTrace.size() >= 1) &&
-            (recExtrasWord.size() >= 1) &&
-            (digVirtProbe1.size() >= 1) &&
-            (digVirtProbe2.size() >= 1) &&
-            (chanBuffPerAgg.size() >= 1) &&
-            (triggerCountingMethod.size() >= 1) &&
+            (trigOverlapHandling.size() >= 1) &&
+            (enableTestPattern.size() >= 1) &&
+            (selfTrigPolarity.size() >= 1) &&
+            (samplesPerEvent.size() >= 1) &&
+            (trigCountMode.size() >= 1) &&
             (memFullMode.size() >= 1) &&
-            (pllRefClock.size() >= 1) &&
-            (globalChanPairTrigMask.size() >= 1) &&
-            (globalCoincidenceWindow.size() >= 1) &&
-            (globalMajorityLevel.size() >= 1) &&
-            (externalTrigger.size() >= 1) &&
-            (chanPairTrigOutMask.size() >= 1) &&
-            (trigOutGenerationLogic.size() >= 1) &&
-            (trigOutMajorityLevel.size() >= 1) &&
-            (extTrigInTrigOut.size() >= 1) &&
-            (memBuffAlmostFullLevel.size() >= 1) &&
-            (runStartStopDelay.size() >= 1) &&
-            (useExtTrigger.size() >= 1) &&
-            (interruptEventCount.size() >= 1) &&
-            (aggregatesPerBlockTransfer.size() >= 1)))
+            (majorityCoincidenceWindow.size() >= 1) &&
+            (majorityLevel.size() >= 1) &&
+            (numPostTrigSamples.size() >= 1) &&
+            (intteruptEventCount.size() >= 1) &&
+            (maxEventsPerBLT.size() >= 1)  ))
     {
         output = false;
     }
@@ -226,31 +142,18 @@ bool DigitizerModuleData::validate()
     if(!(   (rows == linkNumber.size()) &&
             (rows == daisyChainNumber.size()) &&
             (rows == vmeBaseAddr.size()) &&
-            (rows == enableAutoFlush.size()) &&
-            (rows == propogateTrigs.size()) &&
-            (rows == recordWaveforms.size()) &&
-            (rows == analogProbe.size()) &&
-            (rows == dualTrace.size()) &&
-            (rows == recExtrasWord.size()) &&
-            (rows == digVirtProbe1.size()) &&
-            (rows == digVirtProbe2.size()) &&
-            (rows == chanBuffPerAgg.size()) &&
-            (rows == triggerCountingMethod.size()) &&
+            (rows == trigOverlapHandling.size()) &&
+            (rows == enableTestPattern.size()) &&
+            (rows == selfTrigPolarity.size()) &&
+            (rows == samplesPerEvent.size()) &&
+            (rows == trigCountMode.size()) &&
             (rows == memFullMode.size()) &&
-            (rows == pllRefClock.size()) &&
-            (rows == globalChanPairTrigMask.size()) &&
-            (rows == globalCoincidenceWindow.size()) &&
-            (rows == globalMajorityLevel.size()) &&
-            (rows == externalTrigger.size()) &&
-            (rows == chanPairTrigOutMask.size()) &&
-            (rows == trigOutGenerationLogic.size()) &&
-            (rows == trigOutMajorityLevel.size()) &&
-            (rows == extTrigInTrigOut.size()) &&
-            (rows == memBuffAlmostFullLevel.size()) &&
-            (rows == runStartStopDelay.size()) &&
-            (rows == useExtTrigger.size()) &&
-            (rows == interruptEventCount.size()) &&
-            (rows == aggregatesPerBlockTransfer.size())))
+            (rows == majorityCoincidenceWindow.size()) &&
+            (rows == majorityLevel.size()) &&
+            (rows == numPostTrigSamples.size()) &&
+            (rows == intteruptEventCount.size()) &&
+            (rows == maxEventsPerBLT.size()) &&
+            (rows == memFullMode.size()) ))
     {
         output = false;
     }
@@ -264,31 +167,17 @@ void DigitizerModuleData::printValidationErrors()
             (linkNumber.size() >= 1) &&
             (daisyChainNumber.size() >= 1) &&
             (vmeBaseAddr.size() >= 1) &&
-            (enableAutoFlush.size() >= 1) &&
-            (propogateTrigs.size() >= 1) &&
-            (recordWaveforms.size() >= 1) &&
-            (analogProbe.size() >= 1) &&
-            (dualTrace.size() >= 1) &&
-            (recExtrasWord.size() >= 1) &&
-            (digVirtProbe1.size() >= 1) &&
-            (digVirtProbe2.size() >= 1) &&
-            (chanBuffPerAgg.size() >= 1) &&
-            (triggerCountingMethod.size() >= 1) &&
+            (trigOverlapHandling.size() >= 1) &&
+            (enableTestPattern.size() >= 1) &&
+            (selfTrigPolarity.size() >= 1) &&
+            (samplesPerEvent.size() >= 1) &&
+            (trigCountMode.size() >= 1) &&
             (memFullMode.size() >= 1) &&
-            (pllRefClock.size() >= 1) &&
-            (globalChanPairTrigMask.size() >= 1) &&
-            (globalCoincidenceWindow.size() >= 1) &&
-            (globalMajorityLevel.size() >= 1) &&
-            (externalTrigger.size() >= 1) &&
-            (chanPairTrigOutMask.size() >= 1) &&
-            (trigOutGenerationLogic.size() >= 1) &&
-            (trigOutMajorityLevel.size() >= 1) &&
-            (extTrigInTrigOut.size() >= 1) &&
-            (memBuffAlmostFullLevel.size() >= 1) &&
-            (runStartStopDelay.size() >= 1) &&
-            (useExtTrigger.size() >= 1) &&
-            (interruptEventCount.size() >= 1) &&
-            (aggregatesPerBlockTransfer.size() >= 1)))
+            (majorityCoincidenceWindow.size() >= 1) &&
+            (majorityLevel.size() >= 1) &&
+            (numPostTrigSamples.size() >= 1) &&
+            (intteruptEventCount.size() >= 1) &&
+            (maxEventsPerBLT.size() >= 1)  ))
     {
         std::cout << "There must be 1 or more entries for each parameter" <<std::endl;
     }
@@ -296,31 +185,17 @@ void DigitizerModuleData::printValidationErrors()
     if(!(   (rows == linkNumber.size()) &&
             (rows == daisyChainNumber.size()) &&
             (rows == vmeBaseAddr.size()) &&
-            (rows == enableAutoFlush.size()) &&
-            (rows == propogateTrigs.size()) &&
-            (rows == recordWaveforms.size()) &&
-            (rows == analogProbe.size()) &&
-            (rows == dualTrace.size()) &&
-            (rows == recExtrasWord.size()) &&
-            (rows == digVirtProbe1.size()) &&
-            (rows == digVirtProbe2.size()) &&
-            (rows == chanBuffPerAgg.size()) &&
-            (rows == triggerCountingMethod.size()) &&
+            (rows == trigOverlapHandling.size()) &&
+            (rows == enableTestPattern.size()) &&
+            (rows == selfTrigPolarity.size()) &&
+            (rows == samplesPerEvent.size()) &&
+            (rows == trigCountMode.size()) &&
             (rows == memFullMode.size()) &&
-            (rows == pllRefClock.size()) &&
-            (rows == globalChanPairTrigMask.size()) &&
-            (rows == globalCoincidenceWindow.size()) &&
-            (rows == globalMajorityLevel.size()) &&
-            (rows == externalTrigger.size()) &&
-            (rows == chanPairTrigOutMask.size()) &&
-            (rows == trigOutGenerationLogic.size()) &&
-            (rows == trigOutMajorityLevel.size()) &&
-            (rows == extTrigInTrigOut.size()) &&
-            (rows == memBuffAlmostFullLevel.size()) &&
-            (rows == runStartStopDelay.size()) &&
-            (rows == useExtTrigger.size()) &&
-            (rows == interruptEventCount.size()) &&
-            (rows == aggregatesPerBlockTransfer.size())))
+            (rows == majorityCoincidenceWindow.size()) &&
+            (rows == majorityLevel.size()) &&
+            (rows == numPostTrigSamples.size()) &&
+            (rows == intteruptEventCount.size()) &&
+            (rows == maxEventsPerBLT.size()) ))
     {
         std::cout << "There must the same number of rows for every column" <<std::endl;
     }
@@ -335,32 +210,27 @@ void DigitizerModuleData::sort()
     linkNumber = Utility::applyPermutation(linkNumber, permutation);
     daisyChainNumber = Utility::applyPermutation(daisyChainNumber, permutation);
     vmeBaseAddr = Utility::applyPermutation(vmeBaseAddr, permutation);
-    enableAutoFlush = Utility::applyPermutation(enableAutoFlush, permutation);
-    propogateTrigs = Utility::applyPermutation(propogateTrigs, permutation);
-    recordWaveforms = Utility::applyPermutation(recordWaveforms, permutation);
-    analogProbe = Utility::applyPermutation(analogProbe, permutation);
-    dualTrace = Utility::applyPermutation(dualTrace, permutation);
-    recExtrasWord = Utility::applyPermutation(recExtrasWord, permutation);
-    digVirtProbe1 = Utility::applyPermutation(digVirtProbe1, permutation);
-    digVirtProbe2 = Utility::applyPermutation(digVirtProbe2, permutation);
-    chanBuffPerAgg = Utility::applyPermutation(chanBuffPerAgg, permutation);
-    triggerCountingMethod = Utility::applyPermutation(triggerCountingMethod, permutation);
+    trigOverlapHandling = Utility::applyPermutation(trigOverlapHandling, permutation);
+    enableTestPattern = Utility::applyPermutation(enableTestPattern, permutation);
+    selfTrigPolarity = Utility::applyPermutation(selfTrigPolarity, permutation);
+    samplesPerEvent = Utility::applyPermutation(samplesPerEvent, permutation);
+    trigCountMode = Utility::applyPermutation(trigCountMode, permutation);
     memFullMode = Utility::applyPermutation(memFullMode, permutation);
-    pllRefClock = Utility::applyPermutation(pllRefClock, permutation);
-    globalChanPairTrigMask = Utility::applyPermutation(globalChanPairTrigMask, permutation);
-    globalCoincidenceWindow = Utility::applyPermutation(globalCoincidenceWindow, permutation);
-    globalMajorityLevel = Utility::applyPermutation(globalMajorityLevel, permutation);
-    externalTrigger = Utility::applyPermutation(externalTrigger, permutation);
-    chanPairTrigOutMask = Utility::applyPermutation(chanPairTrigOutMask, permutation);
-    trigOutGenerationLogic = Utility::applyPermutation(trigOutGenerationLogic, permutation);
-    trigOutMajorityLevel = Utility::applyPermutation(trigOutMajorityLevel, permutation);
-    extTrigInTrigOut = Utility::applyPermutation(extTrigInTrigOut, permutation);
-    memBuffAlmostFullLevel = Utility::applyPermutation(memBuffAlmostFullLevel, permutation);
-    runStartStopDelay = Utility::applyPermutation(runStartStopDelay, permutation);
-    useExtTrigger = Utility::applyPermutation(useExtTrigger, permutation);
-    interruptEventCount = Utility::applyPermutation(interruptEventCount, permutation);
-    aggregatesPerBlockTransfer = Utility::applyPermutation(aggregatesPerBlockTransfer, permutation);
+    majorityCoincidenceWindow = Utility::applyPermutation(majorityCoincidenceWindow, permutation);
+    majorityLevel = Utility::applyPermutation(majorityLevel, permutation);
+    numPostTrigSamples = Utility::applyPermutation(numPostTrigSamples, permutation);
+    intteruptEventCount = Utility::applyPermutation(intteruptEventCount, permutation);
+    maxEventsPerBLT = Utility::applyPermutation(maxEventsPerBLT, permutation);
 }
+
+std::vector<int>            samplesPerEvent;
+std::vector<int>            trigCountMode;
+std::vector<int>            memFullMode;
+std::vector<int>            majorityCoincidenceWindow;
+std::vector<int>            majorityLevel;
+std::vector<int>            numPostTrigSamples;
+std::vector<int>            intteruptEventCount;
+std::vector<int>            maxEventsPerBLT;
 
 std::ostream& operator<<(std::ostream& os, DigitizerModuleData const& dmd)
 {
@@ -372,73 +242,35 @@ std::ostream& operator<<(std::ostream& os, DigitizerModuleData const& dmd)
     using std::fixed;
     int rows = dmd.linkType.size();
     //output the first 7 columns
-    os << "__________________________________________________________________________________________________________\n";
-    os << "Link Number, DC Num, Link Type, VME Base Address, Enable Auto Flush, Propogate Triggers, Record Waveforms,\n";
+    os << "_______________________________________________________________________________________________________________________________\n";
+    os << "Link Number, DC Num, Link Type, VME Base Address, Trigger Overlap Mode, Enable Test Mode, Trigger Polarity, Samples Per Event,\n";
     for(int i=0; i<rows; ++i)
     {
         os << setw(11) << setfill(' ') << dmd.linkNumber[i]                  << ", ";
         os << setw(6)  << setfill(' ') << dmd.daisyChainNumber[i]            << ", ";
         os << setw(9)  << setfill(' ') << dmd.linkType[i]                    << ", ";
         os << "      0x" << setw(8) << setfill('0') << hex << dmd.vmeBaseAddr[i] << dec << ", ";
-        os << setw(17) << setfill(' ') << (dmd.enableAutoFlush[i] ? "T":"F") << ", ";
-        os << setw(18) << setfill(' ') << (dmd.propogateTrigs[i]  ? "T":"F") << ", ";
-        os << setw(16) << setfill(' ') << (dmd.recordWaveforms[i] ? "T":"F") << ",\n";
+        os << setw(20) << setfill(' ') << dmd.trigOverlapHandling[i]<< ", ";
+        os << setw(16) << setfill(' ') << (dmd.enableTestPattern[i]  ? "T":"F") << ", ";
+        os << setw(16) << setfill(' ') << dmd.selfTrigPolarity[i] << ",";
+        os << setw(17) << setfill(' ') << dmd.samplesPerEvent[i]  << ",\n";
     }
     //output the next 6 columns
-    os << "______________________________________________________________________________________________________________\n";
-    os << "Link Number, DC Num, Analog Probe, Dual Trace, Rec Extra Word, Virt Probe 1, Virt Probe2, Chan Buff/Aggregate,\n";
+    os << "___________________________________________________________________________________________________________________________________________________________\n";
+    os << "Link Number, DC Num, Trig Count Mode, Mem Full Mode, Majority Coin Window, Majority Level, Num Post Trig Samples, Interrupt Event Count, Max Events per BLT\n";
     for(int i=0; i<rows; ++i)
     {
         os << setw(11) << setfill(' ') << dmd.linkNumber[i]                << ", ";
         os << setw(6)  << setfill(' ') << dmd.daisyChainNumber[i]          << ", ";
-        os << setw(12) << setfill(' ') << dmd.analogProbe[i]               << ", ";
-        os << setw(10) << setfill(' ') << dmd.dualTrace[i]                 << ", ";
-        os << setw(14) << setfill(' ') << (dmd.recExtrasWord[i] ? "T":"F") << ", ";
-        os << setw(12) << setfill(' ') << dmd.digVirtProbe1[i]             << ", ";
-        os << setw(12) << setfill(' ') << dmd.digVirtProbe2[i]             << ", ";
-        os << setw(19) << setfill(' ') << dmd.chanBuffPerAgg[i]            << ",\n";
+        os << setw(15) << setfill(' ') << dmd.trigCountMode[i]                 << ", ";
+        os << setw(13) << setfill(' ') << (dmd.memFullMode[i] ? "T":"F") << ", ";
+        os << setw(20) << setfill(' ') << dmd.majorityCoincidenceWindow[i]             << ", ";
+        os << setw(15) << setfill(' ') << dmd.majorityLevel[i]             << ", ";
+        os << setw(21) << setfill(' ') << dmd.numPostTrigSamples[i]            << ",\n";
+        os << setw(21) << setfill(' ') << dmd.intteruptEventCount[i]            << ",\n";
+        os << setw(19) << setfill(' ') << dmd.maxEventsPerBLT[i]            << ",\n";
     }
-    //output the next 6 columns
-    os << "______________________________________________________________________________________________________________________\n";
-    os << "Link Number, DC Num, Trig Count Method, Mem Full Mode, PLL Ref Clock, Gbl CP Trig Mask, Gbl Coin Window, Gbl Majority,\n";
-    for(int i=0; i<rows; ++i)
-    {
-        os << setw(11) << setfill(' ') << dmd.linkNumber[i]              << ", ";
-        os << setw(6)  << setfill(' ') << dmd.daisyChainNumber[i]        << ", ";
-        os << setw(17) << setfill(' ') << dmd.triggerCountingMethod[i]   << ", ";
-        os << setw(13) << setfill(' ') << dmd.memFullMode[i]             << ", ";
-        os << setw(13) << setfill(' ') << dmd.pllRefClock[i]             << ", ";
-        os << "            0x" << setw(2) << setfill('0') << hex << dmd.globalChanPairTrigMask[i] << dec << ", ";
-        os << setw(15) << setfill(' ') << dmd.globalCoincidenceWindow[i] << ", ";
-        os << setw(12) << setfill(' ') << dmd.globalMajorityLevel[i]     << ",\n";
-    }
-    //output the next 6 columns
-    os << "__________________________________________________________________________________________________________________\n";
-    os << "Link Number, DC Num, Ext Trig, CP TOut Mask, TOut Gen Log, TOut Majority, Ext Trig For TOut, Mem Buff Almost Full,\n";
-    for(int i=0; i<rows; ++i)
-    {
-        os << setw(11) << setfill(' ') << dmd.linkNumber[i]                  << ", ";
-        os << setw(6)  << setfill(' ') << dmd.daisyChainNumber[i]            << ", ";
-        os << setw(8)  << setfill(' ') << (dmd.externalTrigger[i] ? "T":"F") << ", ";
-        os << "        0x" << setw(2) << setfill('0') << dmd.chanPairTrigOutMask[i] << dec << ", ";
-        os << setw(12) << setfill(' ') << dmd.trigOutGenerationLogic[i]      << ", ";
-        os << setw(13) << setfill(' ') << dmd.trigOutMajorityLevel[i]        << ", ";
-        os << setw(17) << setfill(' ') << dmd.extTrigInTrigOut[i]            << ", ";
-        os << setw(20) << setfill(' ') << dmd.memBuffAlmostFullLevel[i]      << ",\n";
-    }
-    //output the last 4 columns
-    os << "_______________________________________________________________________________________________\n";
-    os << "Link Number, DC Num, Start/Stop Delay, Use Ext Trig, Interrupt Evnt Count, Aggregates Per Block\n";
-    for(int i=0; i<rows; ++i)
-    {
-        os << setw(11) << setfill(' ') << dmd.linkNumber[i]                 << ", ";
-        os << setw(6)  << setfill(' ') << dmd.daisyChainNumber[i]           << ", ";
-        os << setw(16) << setfill(' ') << dmd.runStartStopDelay[i]          << ", ";
-        os << setw(12) << setfill(' ') << (dmd.useExtTrigger[i] ? "T":"F")  << ", ";
-        os << setw(20) << setfill(' ') << dmd.interruptEventCount[i]        << ", ";
-        os << setw(20) << setfill(' ') << dmd.aggregatesPerBlockTransfer[i] << "\n";
-    }
-    
+
     return os;
 }
 
