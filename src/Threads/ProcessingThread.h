@@ -48,12 +48,7 @@ private:
     void doProcessingLoop();
     void emptyProcessingBuffer();
     void processDataBuffer(Utility::ToProcessingBuffer* buffer);
-    int processBoardAggregate(Utility::ToProcessingBuffer* buffer, int startOffset);
-    int processChannelAggregate(Utility::ToProcessingBuffer* buffer, int startOffset, int baseChan);
-    int processEventsWithExtras1(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip);
-    int processEventsWithExtras2(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip);
-    int processEventsWithExtras3(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip);
-    int processEventsWithoutExtras(unsigned int* rawBuffer, int startOffset, int stopOffset, int baseChan, int boardNum, int skip);
+    int processEvent(Utility::ToProcessingBuffer* buffer, int startOffset);
     
     
     InterThread::ProcessingThreadControl* controller;
