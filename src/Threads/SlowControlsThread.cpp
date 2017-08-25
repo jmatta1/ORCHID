@@ -70,19 +70,19 @@ void SlowControlsThread::operator ()()
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Started Polling";
                 //first time we enter into a mode, read *everything*
                 //poll the mpod
-                this->mpodReader->readAll();
+                //this->mpodReader->readAll();
             }
             else if((loopCount % 300)==0)
             {
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Still Polling (# Loops: "<<loopCount<<")";
                 //after that only read the things that actually change
                 //poll the mpod
-                this->mpodReader->readActive();
+                //this->mpodReader->readActive();
             }
             else
             {//after that only read the things that actually change
                 //poll the mpod
-                this->mpodReader->readActive();
+                //this->mpodReader->readActive();
             }
             //publish the data for the UI thread but do not bother with writing it
             slowData->readVoltageData(this->mpodReader->voltageData);
@@ -94,29 +94,29 @@ void SlowControlsThread::operator ()()
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Started Writing";
                 //first time we enter into a mode, read *everything*
                 //poll the mpod
-                this->mpodReader->readAll();
+                //this->mpodReader->readAll();
             }
             else if((loopCount % 300)==0)
             {
                 BOOST_LOG_SEV(lg, Information) << "SC Thread: Still Writing (# Loops: "<<loopCount<<")";
                 //after that only read the things that actually change
-                this->mpodReader->readActive();
+                //this->mpodReader->readActive();
             }
             else
             {//after that only read the things that actually change
-                this->mpodReader->readActive();
+                //this->mpodReader->readActive();
                 
             }
             
             //publish the data for the UI Thread
             slowData->readVoltageData(this->mpodReader->voltageData);
             //first pop an empty event to hold the event
-            Events::EventInterface* scEvent;
-            this->toFileOutputQueue->producerPop<Utility::SlowControlsQueueIndex>(scEvent);
+            //Events::EventInterface* scEvent;
+            //this->toFileOutputQueue->producerPop<Utility::SlowControlsQueueIndex>(scEvent);
             //put the data into the event
-            static_cast<Events::SlowControlsEvent*>(scEvent)->ReadVoltageData(this->mpodReader->voltageData);
+            //static_cast<Events::SlowControlsEvent*>(scEvent)->ReadVoltageData(this->mpodReader->voltageData);
             //push the event into the outgoing queue
-            this->toFileOutputQueue->producerPush<Utility::SlowControlsQueueIndex>(static_cast<Events::EventInterface*>(scEvent));
+            //this->toFileOutputQueue->producerPush<Utility::SlowControlsQueueIndex>(static_cast<Events::EventInterface*>(scEvent));
             break;
         }
         lastState = currState;
