@@ -431,6 +431,9 @@ void Vx1730Digitizer::writeCommonRegisterData()
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::PostTrigger>::value;
     dataArray[regCount] = (this->moduleData->numPostTrigSamples[moduleNumber] / 8);
     ++regCount;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontPanelIoCtrl>::value;
+    dataArray[regCount] = 0x00400000; // activates the extended timestamps
+    ++regCount;
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelEnableMask>::value;
     dataArray[regCount] = calculateChanEnMaskRegVal();
     ++regCount;
@@ -440,7 +443,6 @@ void Vx1730Digitizer::writeCommonRegisterData()
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::RunStartStopDelay>::value;
     dataArray[regCount] = 0x0;
     ++regCount;
-    //start here
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ReadoutCtrl>::value;
     dataArray[regCount] = 0x00000098;
     ++regCount;
