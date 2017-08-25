@@ -129,7 +129,7 @@ void Vx1730Digitizer::startAcquisition()
     this->softwareClear();
     //now take the acquisition control register base, add bit 2 and write it
     unsigned int acqusitionRegister = (acquisitionCtrlRegBase | 0x4UL);
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acqusitionRegister);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcqControl>::value, acqusitionRegister);
     if(errVal < 0)
     {
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Starting Acqusition In Digitizer #" << moduleNumber;
@@ -149,7 +149,7 @@ void Vx1730Digitizer::stopAcquisition()
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Stopping/Disarming Acqusition On Digitizer #" << moduleNumber;
     //now take the acquisition control register base and write it, it should already have bit[2] == 0
     CAENComm_ErrorCode errVal;
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value, acquisitionCtrlRegBase);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcqControl>::value, acquisitionCtrlRegBase);
     if(errVal < 0)
     {
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Stopping Acquisition For Digitizer #" << moduleNumber;
@@ -218,8 +218,7 @@ unsigned int Vx1730Digitizer::waitForInterruptToReadData(unsigned int* buffer)
 //returns bytes read
 unsigned int Vx1730Digitizer::performFinalReadout(unsigned int* buffer)
 {
-    this->forceDataFlush();    
-    bool eventReady = true;
+    bool eventReady = isEventReady();
     unsigned int* bufferEdge = buffer;
     unsigned int dataRead = 0;
     while(eventReady)
@@ -275,7 +274,7 @@ unsigned int Vx1730Digitizer::readEvent(unsigned int* buffer)
     CAENComm_ErrorCode readResult;
     do
     {
-        int bufferSpaceRemaining = (maxSizeOfBoardAggregateBlock - totalSizeRead);
+        int bufferSpaceRemaining = (maxSizeOfEventBlock - totalSizeRead);
         int readMaxSize = ((MaxMbltReadSizeInLongWords > bufferSpaceRemaining) ? bufferSpaceRemaining : MaxMbltReadSizeInLongWords);
         sizeReadInMblt = 0;
         readResult = CAENComm_MBLTRead(this->digitizerHandle,
@@ -307,49 +306,23 @@ unsigned int Vx1730Digitizer::readEvent(unsigned int* buffer)
 //allocated for the queueing system
 void Vx1730Digitizer::calculateMaximumSizes()
 {
-    //first calculate the size of a single event, this is calculated by channel pair
+    //first calculate the size of the traces, essentially the number of active
+    //channels times the number of samples in a trace
+    int activeChannels = 0;
     int stopInd = this->channelStartInd + this->numChannel;
     for(int i=channelStartInd; i<stopInd; i+=2)
     {
-        int chanPairInd = ((i-channelStartInd)/2);
-        sizePerEvent[chanPairInd] = 0;
-        //each event has record length * 8 samples
-        //2 samples take 1 lword so 8/2 = 4
-        if((this->moduleData->recordWaveforms[moduleNumber]))
+        if(this->channelData->channelEnable[i])
         {
-            sizePerEvent[chanPairInd] = (this->channelData->recordLength[i] * 4);
-        }
-        //each event has a time trigger tag with 1 lword and the two integrals
-        //which also take 1 lword (including the pile up rejection flag in the
-        //16th bit of Qshort)
-        sizePerEvent[chanPairInd] += 2;
-        //determine if the extras word is being written, if it is, add 1lword
-        if(this->moduleData->recExtrasWord[i])
-        {
-            sizePerEvent[chanPairInd] += 1;
+            activeChannels += 1;
         }
     }
-    //now calculate the max size of a channel pair data aggregate
-    for(int i=channelStartInd; i<stopInd; i+=2)
-    {
-        int chanPairInd = ((i-channelStartInd)/2);
-        //each channel pair aggregate has a 2 lword header
-        sizePerChanPairAggregate[chanPairInd] = 2;
-        //each channel pair aggregate has up to Number of Events per Aggregate
-        sizePerChanPairAggregate[chanPairInd] += (sizePerEvent[chanPairInd] * this->channelData->aggregateEvents[i]);
-    }
-    //each board aggregate has 4 lwords in the header
-    maxSizeOfBoardAggregate = 4;
-    //each board aggregate has 0 - 1 channel pair aggregates in it
-    for(int i=channelStartInd; i<stopInd; i+=2)
-    {
-        int chanPairInd = ((i-channelStartInd)/2);
-        maxSizeOfBoardAggregate += sizePerChanPairAggregate[chanPairInd];
-    }
-    maxSizeOfBoardAggregateBlock = (maxSizeOfBoardAggregate * this->moduleData->aggregatesPerBlockTransfer[moduleNumber]);
-    maxBufferFillForAnotherRead = (maxSizeOfBoardAggregateBlock - maxSizeOfBoardAggregate);
+    int tracesSize = activeChannels*this->moduleData->samplesPerEvent[moduleNumber]/2; //two samples per lword
+    maxSizeOfEvent = tracesSize+4;
+    maxSizeOfEventBlock = maxSizeOfEvent*this->moduleData->maxEventsPerBLT[moduleNumber];
+    maxBufferFillForAnotherRead = (maxSizeOfEventBlock - maxSizeOfEvent);
     //the plus two is because of a quirk of the readout system needing a tiny bit of extra room to ensure we get CAENCOMM terminated
-    maxSizeForAllocation = (maxSizeOfBoardAggregateBlock + 2);
+    maxSizeForAllocation = (maxSizeOfEventBlock + 2);
 }
 
 //log an error and throw an exception to close things
@@ -440,55 +413,45 @@ void Vx1730Digitizer::writeCommonRegisterData()
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::BoardConfig>::value;
     dataArray[regCount] = calculateBoardConfigRegVal();
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AggregateOrg>::value;
-    dataArray[regCount] = (this->moduleData->chanBuffPerAgg[moduleNumber] & 0x0000000F);
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::BufferOrg>::value;
+    dataArray[regCount] = calculateBufferOrginization();
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcquisitionCtrl>::value;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::CustomSize>::value;
+    int temp = this->moduleData->samplesPerEvent[moduleNumber]/10;
+    if(this->moduleData->samplesPerEvent[moduleNumber]%10 != 0) ++temp;
+    dataArray[regCount] = temp;
+    ++regCount;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AcqControl>::value;
     calculateAcqCtrlRegBase();
     dataArray[regCount] = (acquisitionCtrlRegBase);
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::GlobalTrgMask>::value;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::GlobalTriggerMask>::value;
     dataArray[regCount] = calculateGlblTrigMaskRegVal();
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::TrgOutEnMask>::value;
-    dataArray[regCount] = calculateTrigOutEnableMaskRegVal();
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::PostTrigger>::value;
+    dataArray[regCount] = (this->moduleData->numPostTrigSamples[moduleNumber] / 8);
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontIoCtrl>::value;
-    dataArray[regCount] = 0x00000003;//set everything to zero except the bit that makes the lvds high impedance and the bit that
-                                       //makes the front lemo connectors TTL logic instead of NIM logic
-    ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChanEnMask>::value;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelEnableMask>::value;
     dataArray[regCount] = calculateChanEnMaskRegVal();
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SetMonitorDac>::value;
-    dataArray[regCount] = 0x00UL;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MemoryBufferAlmostFullLevel>::value;
+    dataArray[regCount] = 0x0;
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MonitorDacMode>::value;
-    dataArray[regCount] = 0x00000000UL;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::RunStartStopDelay>::value;
+    dataArray[regCount] = 0x0;
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MemBuffAlmtFullLvl>::value;
-    dataArray[regCount] = (this->moduleData->memBuffAlmostFullLevel[moduleNumber] & 0x000003FF);
-    ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::RunStrtStpDelay>::value;
-    dataArray[regCount] = (this->moduleData->runStartStopDelay[moduleNumber] & 0xFFFFFFFF);
-    ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::DisableExtTrig>::value;
-    dataArray[regCount] = ( (this->moduleData->useExtTrigger[moduleNumber]) ? 0x00000000 : 0x00000001);
-    ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::FrontLvdsIoNew>::value;
-    dataArray[regCount] = 0x00000000;
-    ++regCount;
+    //start here
     addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ReadoutCtrl>::value;
     dataArray[regCount] = 0x00000098;
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::InterruptStatID>::value;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::InterruptStatusId>::value;
     dataArray[regCount] = (0xFFFFFFFF & moduleNumber);
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::InterruptEventNum>::value;
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::InterruptEventNumber>::value;
     dataArray[regCount] = (0x000003FF & this->moduleData->interruptEventCount[moduleNumber]);
     ++regCount;
-    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::AggregateNumPerBlt>::value;
-    dataArray[regCount] = (0x000000FF & this->moduleData->aggregatesPerBlockTransfer[moduleNumber]);
+    addrArray[regCount] = Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::MaxEventsPerBlt>::value;
+    dataArray[regCount] = (0x00000FFF & this->moduleData->maxEventsPerBLT[moduleNumber]);
     ++regCount;
 
     //call the write
@@ -556,24 +519,11 @@ void Vx1730Digitizer::writeGroupRegisterData()
     int stopInd = this->channelStartInd + this->numChannel;
     for(int i=channelStartInd; i<stopInd; i+=2)
     {
-        addrArray[regCount] = (Vx1730GroupWriteRegistersAddr<Vx1730WriteRegisters::RecordLength>::value +
-                               (((i-channelStartInd)/2) * Vx1730GroupWriteRegistersOffs<Vx1730WriteRegisters::RecordLength>::value));
-        dataArray[regCount] = (0x0000FFFF & this->channelData->recordLength[i]);
-        ++regCount;
-        
-        addrArray[regCount] = (Vx1730GroupWriteRegistersAddr<Vx1730WriteRegisters::EventsPerAggregate>::value +
-                               (((i-channelStartInd)/2) * Vx1730GroupWriteRegistersOffs<Vx1730WriteRegisters::EventsPerAggregate>::value));
-        dataArray[regCount] = (0x000003FF & this->channelData->aggregateEvents[i]);
-        ++regCount;
-        
-        addrArray[regCount] = (Vx1730GroupWriteRegistersAddr<Vx1730WriteRegisters::LocalTrgManage>::value +
-                               (((i-channelStartInd)/2) * Vx1730GroupWriteRegistersOffs<Vx1730WriteRegisters::LocalTrgManage>::value));
-        dataArray[regCount] = calculateLocalTrgManagementRegVal(i);
-        ++regCount;
-        
-        addrArray[regCount] = (Vx1730GroupWriteRegistersAddr<Vx1730WriteRegisters::TriggerValMask>::value +
-                               (((i-channelStartInd)/2) * Vx1730GroupWriteRegistersOffs<Vx1730WriteRegisters::TriggerValMask>::value));
-        dataArray[regCount] = calculateTriggerValidationMask(i);
+        addrArray[regCount] = (Vx1730GroupWriteRegistersAddr<Vx1730WriteRegisters::CoupleSelfTriggerLogic>::value +
+                               (((i-channelStartInd)/2) * Vx1730GroupWriteRegistersOffs<Vx1730WriteRegisters::CoupleSelfTriggerLogic>::value));
+        int temp = this->channelData->coupleTrigLogic[i];
+        temp |= ((0x1UL & this->channelData->couplePulseType[i]) << 2);
+        dataArray[regCount] = temp;
         ++regCount;
     }
     
@@ -593,7 +543,7 @@ void Vx1730Digitizer::writeGroupRegisterData()
     //test for an overall error
     if(overallErr < 0)
     {
-        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Writing Common Addresses for Digitizer #" << moduleNumber;
+        BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Overall Error In Writing Group Addresses for Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(overallErr);
     }
     
@@ -640,61 +590,21 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     int stopInd = this->channelStartInd + this->numChannel;
     for(int i=channelStartInd; i<stopInd; ++i)
     {
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::InputDynamicRange>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::InputDynamicRange>::value));
-        dataArray[regCount] = (this->channelData->largeRange[i] ? 0x00UL : 0x00UL);
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelDynamicRange>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelDynamicRange>::value));
+        dataArray[regCount] = (this->channelData->largeRange[i] ? 0x00UL : 0x01UL);
         ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PreTrg>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::PreTrg>::value));
-        dataArray[regCount] = (this->channelData->preTrigger[i] & 0x01FFUL);
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelPulseWidth>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelPulseWidth>::value));
+        dataArray[regCount] = (this->channelData->pulseWidth[i] & 0x007FUL);
         ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::CfdSettings>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::CfdSettings>::value));
-        dataArray[regCount] = calculateCfdRegSettings(i);
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelTriggerThreshold>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelTriggerThreshold>::value));
+        dataArray[regCount] = this->channelData->trigThreshold[i] & 0x02FFF;
         ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShortGate>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ShortGate>::value));
-        dataArray[regCount] = (this->channelData->shortGate[i] & 0x0FFFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::LongGate>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::LongGate>::value));
-        dataArray[regCount] = (this->channelData->longGate[i] & 0x0FFFFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::GateOffset>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::GateOffset>::value));
-        dataArray[regCount] = (this->channelData->gateOffset[i] & 0x0FFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgThreshold>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::TrgThreshold>::value));
-        dataArray[regCount] = (this->channelData->trigThreshold[i] & 0x3FFFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::FixedBaseline>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::FixedBaseline>::value));
-        dataArray[regCount] = (this->channelData->fixedBaseline[i] & 0x3FFFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ShapedTrgWidth>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ShapedTrgWidth>::value));
-        dataArray[regCount] = (this->channelData->shapedTrigWidth[i] & 0x3FFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::TrgHoldOff>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::TrgHoldOff>::value));
-        dataArray[regCount] = (this->channelData->trigHoldOff[i] & 0xFFFFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::PsdCutThreshold>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::PsdCutThreshold>::value));
-        dataArray[regCount] = (this->channelData->psdThreshold[i] & 0x3FFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DppAlgorithmCtrl>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::DppAlgorithmCtrl>::value));
-        dataArray[regCount] = calculateDppAlgCtrlRegVal(i);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::DcOffset>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::DcOffset>::value));
+        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelDcOffset>::value +
+                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelDcOffset>::value));
         dataArray[regCount] = (this->channelData->dcOffset[i] & 0xFFFFUL);
-        ++regCount;
-        addrArray[regCount] = (Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::VetoExtension>::value +
-                               ((i-channelStartInd) * Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::VetoExtension>::value));
-        dataArray[regCount] = (this->channelData->vetoDurationExtension[i] & 0xFFFFUL);
         ++regCount;
     }
     
@@ -752,94 +662,6 @@ void Vx1730Digitizer::writeIndividualRegisterData()
     }
 }
 
-unsigned int Vx1730Digitizer::calculateDppAlgCtrlRegVal(int i)
-{
-    unsigned int output = 0x00000000;
-    output |= (channelData->chargeSensitivity[i] & 0x07UL);
-    if(channelData->chargePedestalOn[i])
-    {
-        output |= 0x00000010;
-    }
-    output |= ((channelData->dppTriggerCounting[i] & 0x01UL) << 5);
-    output |= ((channelData->discMode[i] & 0x01UL) << 6);
-    
-    output |= ((channelData->pulsePolarity[i] & 0x01UL) << 16);
-    output |= ((channelData->trigMode[i] & 0x03UL) << 18);
-    output |= ((channelData->baselineMean[i] & 0x07UL) << 20);
-    if(channelData->disableSelfTrigger[i])
-    {
-        output |= 0x01000000;
-    }
-    //pile up rejection goes here
-    if(channelData->psdCutBelowThresh[i])
-    {
-        output |= 0x08000000;
-    }
-    if(channelData->psdCutAboveThresh[i])
-    {
-        output |= 0x10000000;
-    }
-    if(channelData->overRangeRejection[i])
-    {
-        output |= 0x20000000;
-    }
-    if(channelData->triggerHysteresis[i])
-    {
-        output |= 0x40000000;
-    }
-    return output;
-}
-
-unsigned int Vx1730Digitizer::calculateCfdRegSettings(int i)
-{
-    unsigned int output = 0x00000000;
-    output |= (channelData->cfdDelay[i] & 0x000000FF);
-    output |= ((channelData->cfdFraction[i] & 0x03UL) << 8);
-    return output;
-}
-
-unsigned int Vx1730Digitizer::calculateTriggerValidationMask(int ind)
-{
-    unsigned int output = 0x00000000;
-    
-    output |= (this->channelData->triggerValidMask[ind] & 0xFFFFFFFFUL);
-    
-    return output;
-}
-
-unsigned int Vx1730Digitizer::calculateLocalTrgManagementRegVal(int ind)
-{
-    unsigned int output = 0x00000000;
-    if(this->channelData->useLocalShapedTrig[ind])
-    {
-        output |= 0x00000004;
-    }
-    
-    output |= (this->channelData->localShapedTrigMode[ind] & 0x03UL);
-    
-    if(this->channelData->useLocalShapedTrig[ind])
-    {
-        output |= 0x00000040;
-    }
-    
-    output |= ((this->channelData->localTrigValMode[ind] & 0x03UL) << 4);
-    
-    if(this->channelData->localTrigValAsVeto[ind])
-    {
-        output |= 0x80UL;
-    }
-    
-    output |= ((this->channelData->extrasWordOptions[ind] & 0x07UL) << 8);
-    
-    if(this->channelData->smoothIntegration[ind])
-    {
-        output |= 0x00000800;
-    }
-    
-    output |= ((this->channelData->inputSmoothing[ind] & 0x0FUL) << 12);
-    
-    return output;
-}
 
 unsigned int Vx1730Digitizer::calculateChanEnMaskRegVal()
 {
@@ -855,28 +677,21 @@ unsigned int Vx1730Digitizer::calculateChanEnMaskRegVal()
     return output;
 }
 
-unsigned int Vx1730Digitizer::calculateTrigOutEnableMaskRegVal()
-{
-    unsigned int output = 0x00000000;
-    output |= (0xFFUL & this->moduleData->chanPairTrigOutMask[moduleNumber]);
-    output |= ((0x03UL & this->moduleData->trigOutGenerationLogic[moduleNumber]) << 8);
-    output |= ((0x07UL & this->moduleData->trigOutMajorityLevel[moduleNumber]) << 10);
-    output |= ((0x01UL & this->moduleData->extTrigInTrigOut[moduleNumber]) << 30);
-    //enable software trigger output
-    output |= 0x80000000;
-    return output;
-}
-
 unsigned int Vx1730Digitizer::calculateGlblTrigMaskRegVal()
 {
     unsigned int output = 0x00000000;
-    output |= (0xFF & this->moduleData->globalChanPairTrigMask[moduleNumber]);
-    output |= ((0xFUL & (unsigned int)this->moduleData->globalCoincidenceWindow[moduleNumber]) << 20);
-    output |= ((0x7UL & (unsigned int)this->moduleData->globalMajorityLevel[moduleNumber]) << 24);
-    if(this->moduleData->externalTrigger[moduleNumber])
+    unsigned int trigMask = 0x00000000;
+    int stopInd = this->channelStartInd + this->numChannel;
+    for(int i=channelStartInd; i<stopInd; ++i)
     {
-        output |= 0x40000000;
+        if(this->channelData->channelEnable[i])
+        {
+            trigMask |= (0x1ULL<<(i-channelStartInd));
+        }
     }
+    output |= (0xFF & trigMask);
+    output |= ((0xFUL & (unsigned int)this->moduleData->majorityCoincidenceWindow[moduleNumber]) << 20);
+    output |= ((0x7UL & (unsigned int)this->moduleData->majorityLevel[moduleNumber]) << 24);
     //to enable software trigger
     output |= 0x80000000;
     return output;
@@ -885,64 +700,85 @@ unsigned int Vx1730Digitizer::calculateGlblTrigMaskRegVal()
 void Vx1730Digitizer::calculateAcqCtrlRegBase()
 {
     acquisitionCtrlRegBase = 0x00000000;
-    if(this->moduleData->triggerCountingMethod[moduleNumber])
+    if(this->moduleData->trigCountMode[moduleNumber] == 1)
     {
         acquisitionCtrlRegBase |= 0x00000008;
     }
-    if(this->moduleData->memFullMode[moduleNumber])
+    if(this->moduleData->memFullMode[moduleNumber] == 1)
     {
         acquisitionCtrlRegBase |= 0x00000020;
     }
-    if(this->moduleData->pllRefClock[moduleNumber])
+}
+
+unsigned int Vx1730Digitizer::calculateBufferOrginization()
+{
+    unsigned int eventSamples = this->moduleData->samplesPerEvent[moduleNumber];
+    if(eventSamples <= 630)
     {
-        acquisitionCtrlRegBase |= 0x00000040;
+        return 0xA;
+    }
+    else if(eventSamples <= 1270)
+    {
+        return 0x9;
+    }
+    else if(eventSamples <= 2550)
+    {
+        return 0x8;
+    }
+    else if(eventSamples <= 5110)
+    {
+        return 0x7;
+    }
+    else if(eventSamples <= 10230)
+    {
+        return 0x6;
+    }
+    else if(eventSamples <= 20470)
+    {
+        return 0x5;
+    }
+    else if(eventSamples <= 40950)
+    {
+        return 0x4;
+    }
+    else if(eventSamples <= 81930)
+    {
+        return 0x3;
+    }
+    else if(eventSamples <= 163830)
+    {
+        return 0x2;
+    }
+    else if(eventSamples <= 327670)
+    {
+        return 0x1;
+    }
+    else if(eventSamples <= 655350)
+    {
+        return 0x0;
+    }
+    else
+    {
+        BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Error Digitizer #" << moduleNumber << " can only support traces up to 655350 samples long";
+        std::abort(); //using abort instead of throw may prevent local variable destruction from stack unwinding, making core dumps more useful
     }
 }
 
 unsigned int Vx1730Digitizer::calculateBoardConfigRegVal()
 {
     //initial value, does not start with zero to reflect required bit sets
-    unsigned int output = 0x000C0110;
-    if(this->moduleData->enableAutoFlush[moduleNumber])
+    unsigned int output = 0x00000010;
+    if(this->moduleData->trigOverlapHandling[moduleNumber] == 1)
     {
-        output |= 0x00000001;
+        output |= 0x00000002;
     }
-    if(this->moduleData->propogateTrigs[moduleNumber])
+    if(this->moduleData->enableTestPattern[moduleNumber])
     {
-        output |= 0x00000004;
+        output |= 0x00000008;
     }
-    if(this->moduleData->dualTrace[moduleNumber] == 1)
+    if(this->moduleData->selfTrigPolarity[moduleNumber] == 1)
     {
-        output |= 0x00000800;
-    }
-    if(this->moduleData->analogProbe[moduleNumber] != 0)
-    {
-        if (this->moduleData->analogProbe[moduleNumber] == 1)
-        {
-            output |= 0x00001000;
-        }
-        else //so it is 2
-        {
-            output |= 0x00002000;
-        }
-    }
-    if(this->moduleData->recordWaveforms[moduleNumber])
-    {
-        output |= 0x00010000;
-    }
-    if(this->moduleData->recExtrasWord[moduleNumber])
-    {
-        output |= 0x00020000;
-    }
-    if(this->moduleData->digVirtProbe1[moduleNumber] != 0)
-    {
-        unsigned int temp = this->moduleData->digVirtProbe1[moduleNumber];
-        output |= (temp << 23);
-    }
-    if(this->moduleData->digVirtProbe2[moduleNumber] != 0)
-    {
-        unsigned int temp = this->moduleData->digVirtProbe1[moduleNumber];
-        output |= (temp << 26);
+        output |= 0x00000040;
     }
     return output;
 }
@@ -951,20 +787,26 @@ void Vx1730Digitizer::calibrateDigitizer()
 {
     using LowLvl::Vx1730WriteRegisters;
     using LowLvl::Vx1730CommonWriteRegistersAddr;
+    //first wait for DAC idle
+    int stopInd = this->channelStartInd + this->numChannel;
+    for(int i=channelStartInd; i<stopInd; ++i)
+    {
+        //wait for DAC idle in channel i
+        this->waitForChanDacIdle(i-channelStartInd);
+    }
     CAENComm_ErrorCode errVal;
     BOOST_LOG_SEV(lg, Information) << "ACQ Thread: Triggering digitizer self calibration in module #: " << moduleNumber;
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelCal>::value, 0x00000000);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::ChannelAdcCalibration>::value, 0x00000000);
     if(errVal < 0)
     {
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Triggering Calibration For Digitizer #" << moduleNumber;
         this->writeErrorAndThrow(errVal);
     }
-    //now wait for SPI busy clear and then for calibrated flag to be set
-    int stopInd = this->channelStartInd + this->numChannel;
+    //now wait for dac busy busy clear and then for calibrated flag to be set
     for(int i=channelStartInd; i<stopInd; ++i)
     {
-        //wait for SPI in channel i
-        this->waitForChanSpiIdle(i-channelStartInd);
+        //wait for dac idle in channel i
+        this->waitForChanDacIdle(i-channelStartInd);
         //then wait for calibrated flag in channel i
         this->waitForChanCal(i-channelStartInd);
     }
@@ -973,7 +815,7 @@ void Vx1730Digitizer::calibrateDigitizer()
     boost::this_thread::sleep_for(boost::chrono::seconds(5));
 }
 
-void Vx1730Digitizer::waitForChanSpiIdle(unsigned chNum)
+void Vx1730Digitizer::waitForChanDacIdle(unsigned chNum)
 {
     using LowLvl::Vx1730ReadRegisters;
     using LowLvl::Vx1730IndivReadRegistersOffs;
@@ -1040,7 +882,7 @@ void Vx1730Digitizer::clearResetAndSync()
     using LowLvl::Vx1730CommonWriteRegistersAddr;
     CAENComm_ErrorCode errVal;
     //hit the software reset to force the registers to default values
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwReset>::value, 0x00000000);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwareReset>::value, 0x00000000);
     if(errVal < 0)
     {
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Resetting Digitizer #" << moduleNumber;
@@ -1049,7 +891,7 @@ void Vx1730Digitizer::clearResetAndSync()
     //now hit the software clear to blank the data
     this->softwareClear();
     //hit the sync for force the phase-lock loop to realign all clock outputs
-    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwClckSync>::value, 0x00000000);
+    errVal = CAENComm_Write32(digitizerHandle, Vx1730CommonWriteRegistersAddr<Vx1730WriteRegisters::SoftwareClockSync>::value, 0x00000000);
     if(errVal < 0)
     {
         BOOST_LOG_SEV(lg, Error) << "ACQ Thread: Error Forcing Clock Sync #" << moduleNumber;

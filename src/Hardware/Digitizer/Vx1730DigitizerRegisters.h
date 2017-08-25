@@ -93,14 +93,14 @@ template<Vx1730ReadRegisters> struct Vx1730IndivReadRegistersAddr;
 //the offsets are always 0x0100
 template<Vx1730ReadRegisters> struct Vx1730IndivReadRegistersOffs { static constexpr ushort value = 0x0100;};
 //now define addresses
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::Dummy32>                        : std::integral_constant<ushort, 0x1024> {};
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::ChannelDynamicRange>            : std::integral_constant<ushort, 0x1028> {};
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::ChannelPulseWidth>              : std::integral_constant<ushort, 0x1070> {};
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::ChannelTriggerThreshold>        : std::integral_constant<ushort, 0x1080> {};
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::ChannelStatus>                  : std::integral_constant<ushort, 0x1088> {};
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::AmcFirmwareRevision>            : std::integral_constant<ushort, 0x108C> {};
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::ChannelDcOffset>                : std::integral_constant<ushort, 0x1098> {};
-template<> struct Vx1730IndivReadRegistersOffs<Vx1730ReadRegisters::ChannelAdcTemp>                 : std::integral_constant<ushort, 0x10A8> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::Dummy32>                        : std::integral_constant<ushort, 0x1024> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::ChannelDynamicRange>            : std::integral_constant<ushort, 0x1028> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::ChannelPulseWidth>              : std::integral_constant<ushort, 0x1070> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::ChannelTriggerThreshold>        : std::integral_constant<ushort, 0x1080> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::ChannelStatus>                  : std::integral_constant<ushort, 0x1088> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::AmcFirmwareRevision>            : std::integral_constant<ushort, 0x108C> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::ChannelDcOffset>                : std::integral_constant<ushort, 0x1098> {};
+template<> struct Vx1730IndivReadRegistersAddr<Vx1730ReadRegisters::ChannelAdcTemp>                 : std::integral_constant<ushort, 0x10A8> {};
 
 
 enum class Vx1730WriteRegisters : unsigned short
@@ -153,19 +153,19 @@ template<Vx1730WriteRegisters> struct Vx1730IndivWriteRegistersAddr;
 //the offsets are always 0x0100
 template<Vx1730WriteRegisters> struct Vx1730IndivWriteRegistersOffs { static constexpr ushort value = 0x0100;};
 //now define addresses
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::Dummy32>                      : std::integral_constant<ushort, 0x1024> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelDynamicRange>          : std::integral_constant<ushort, 0x1028> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelPulseWidth>            : std::integral_constant<ushort, 0x1070> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelTriggerThreshold>      : std::integral_constant<ushort, 0x1080> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelDcOffset>              : std::integral_constant<ushort, 0x1098> {};
+template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::Dummy32>                      : std::integral_constant<ushort, 0x1024> {};
+template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelDynamicRange>          : std::integral_constant<ushort, 0x1028> {};
+template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelPulseWidth>            : std::integral_constant<ushort, 0x1070> {};
+template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelTriggerThreshold>      : std::integral_constant<ushort, 0x1080> {};
+template<> struct Vx1730IndivWriteRegistersAddr<Vx1730WriteRegisters::ChannelDcOffset>              : std::integral_constant<ushort, 0x1098> {};
 
 
 template<Vx1730WriteRegisters> struct Vx1730IbcastWriteRegistersAddr;
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::Dummy32>                      : std::integral_constant<ushort, 0x8024> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelDynamicRange>          : std::integral_constant<ushort, 0x8028> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelPulseWidth>            : std::integral_constant<ushort, 0x8070> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelTriggerThreshold>      : std::integral_constant<ushort, 0x8080> {};
-template<> struct Vx1730IndivWriteRegistersOffs<Vx1730WriteRegisters::ChannelDcOffset>              : std::integral_constant<ushort, 0x8098> {};
+template<> struct Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::Dummy32>                      : std::integral_constant<ushort, 0x8024> {};
+template<> struct Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ChannelDynamicRange>          : std::integral_constant<ushort, 0x8028> {};
+template<> struct Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ChannelPulseWidth>            : std::integral_constant<ushort, 0x8070> {};
+template<> struct Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ChannelTriggerThreshold>      : std::integral_constant<ushort, 0x8080> {};
+template<> struct Vx1730IbcastWriteRegistersAddr<Vx1730WriteRegisters::ChannelDcOffset>              : std::integral_constant<ushort, 0x8098> {};
 
 
 template<Vx1730WriteRegisters> struct Vx1730GroupWriteRegistersAddr;
