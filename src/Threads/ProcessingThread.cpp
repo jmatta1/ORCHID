@@ -107,8 +107,9 @@ void ProcessingThread::processDataBuffer(Utility::ToProcessingBuffer* buffer)
         //first makes sure the board aggregate leads with the right info
         if(((rawBuffer[offset] & 0xF0000000UL)!=0xA0000000UL) && ((rawBuffer[offset] & 0x0FFFFFFFUL) <= (dataSize - offset)))
         {
-            BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Found corrupted board aggregate";
-            BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": BA Header is: 0x" << std::hex << rawBuffer[offset] << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
+            BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Found corrupted Event";
+            BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Header is: 0x" << std::hex << rawBuffer[offset]
+                                       << " 0x" << rawBuffer[offset+1] << " 0x" << rawBuffer[offset+2] << " 0x" << rawBuffer[offset+3];
             BOOST_LOG_SEV(lg, Warning) << "PR Thread " << threadNumber << ": Brd #: " << std::dec << board << " Size: " << dataSize << " Offset: " << offset;
             this->acqData->addProcErr(10);
             //now skip the rest of the buffer
@@ -157,6 +158,7 @@ int ProcessingThread::processEvent(Utility::ToProcessingBuffer* buffer, int star
             event->setExtraTimeStamp(pattern);
             event->setEventNumber(eventCount);
             offset += event->setDataArray(&(rawBuffer[offset]));
+            acqData->incrTrigs(loopCount+startChan);
             //push the event back into the queue
             this->toFileOutputQueue->producerPush<Utility::ProcessingQueueIndex>(prEvent);
         }
