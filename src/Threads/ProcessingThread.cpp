@@ -150,7 +150,11 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
 {
     if(baseChan>14)
     {
-        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": saw an out of bounds base channel.";
+        unsigned int temp = this->acqData->procErrorCount.load();
+        if((temp < 200) || (0 == temp%20))
+        {
+            BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": saw an out of bounds base channel. Error Count: " << temp;
+        }
         this->acqData->addProcErr(2);
     }
     //grab a couple useful things in the buffer
