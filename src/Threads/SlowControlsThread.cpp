@@ -47,7 +47,7 @@ void SlowControlsThread::operator ()()
     InterThread::SlowControlsThreadState currState;
     while(notTerminated)
     {
-        //TODO: add actual querying of the temperature controller
+        //TODO: add querying of the temperature controller
         boost::this_thread::sleep_for(this->refreshPeriod);
         currState = this->sctControl->getState();
         switch(currState)
