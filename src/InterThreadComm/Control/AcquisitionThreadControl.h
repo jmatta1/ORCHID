@@ -24,6 +24,7 @@
 // includes from other libraries
 #include<boost/thread.hpp>
 // includes from ORCHID
+#include"Utility/OrchidLogger.h"
 
 namespace InterThread
 {
@@ -34,7 +35,7 @@ class AcquisitionThreadControl
 {
 public:
     AcquisitionThreadControl():acqState(AcquisitionThreadState::Stopped),
-        termAckCount(0), waitCount(0) {}
+        termAckCount(0), waitCount(0), lg(OrchidLog::get()) {}
     
     //functions to be accessed by the acquisition threads
     AcquisitionThreadState getCurrentState(){return acqState.load();}
@@ -43,7 +44,7 @@ public:
 
     //functions to be accessed by the UI thread
     void setToAcquiring(){changeState(AcquisitionThreadState::Acquiring);}
-    void setToStopped(){changeState(AcquisitionThreadState::Stopped);}
+    void setToStopped(){BOOST_LOG_SEV(lg, Information) << "ATC Set to Stop"; changeState(AcquisitionThreadState::Stopped);}
     void setToTerminate(){changeState(AcquisitionThreadState::Terminate);}
     
     int getThreadsWaiting(){return waitCount.load();}
@@ -65,7 +66,7 @@ private:
     std::atomic_uint waitCount;
     boost::mutex waitMutex;
     boost::condition_variable acqThreadWaitCondition;
-    
+    boost::log::sources::severity_logger_mt<LogSeverity>& lg;
 };
 
 }
