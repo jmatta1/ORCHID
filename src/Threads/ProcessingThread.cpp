@@ -24,6 +24,12 @@
 // includes from ORCHID
 #include"Events/DppPsdEvent.h"
 
+#define DUMP_ERR_BUFFS
+
+#ifdef DUMP_ERR_BUFFS
+#include<fstream>
+#endif
+
 namespace Threads
 {
 
@@ -201,7 +207,20 @@ int ProcessingThread::processChannelAggregate(Utility::ToProcessingBuffer* buffe
         }
         BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Seeing a \"Non-extras\" event buffer";
         this->acqData->incrProcErr();
+#ifdef DUMP_ERR_BUFFS
+        BOOST_LOG_SEV(lg, Information) << "PR Thread " << threadNumber << ": Dumping buffer";
+        {//artificial block to force destruction of ofstream
+            std::ofstream errorOutput("./errorBuffs.bin", std::ios_base::app | std::ios_base::out | std::ios_base::binary);
+            errorOutput.write(reinterpret_cast<char*>(buffer->dataBuffer), sizeof(unsigned int)*buffer->sizeOfData);
+            //write a separator
+            errorOutput.write("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16);
+            errorOutput.close();
+            offset += buffer->sizeOfData; //jump past the end to force no more processing of this buffer
+        }
+#endif
+#ifndef DUMP_ERR_BUFFS
         offset += processEventsWithoutExtras(rawBuffer, offset, stopOffset, baseChan, board, skip);
+#endif
     }
     return (offset-startOffset);
 }
